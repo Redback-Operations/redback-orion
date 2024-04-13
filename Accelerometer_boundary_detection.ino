@@ -17,12 +17,18 @@ String direction;                     // Direction of movement
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial);
+  while (!Serial) {
+    delay(100);
+  }
   Serial.println("Started");
 
   if (!IMU.begin()) {
-    Serial.println("Failed to initialize IMU!");
-    while (1);
+    Serial.println("Failed to initialize IMU! Retrying...");
+    delay(1000);
+    if (!IMU.begin()) {
+      Serial.println("Failed to initialize IMU!");
+      while (1);
+    }
   }
 
   Serial.print("Accelerometer sample rate = ");
@@ -40,10 +46,19 @@ void loop() {
     // Read accelerometer data
     if (IMU.accelerationAvailable()) {
       IMU.readAcceleration(x, y, z);
+      // Validate accelerometer readings
+      if (isnan(x) || isnan(y) || isnan(z)) {
+        Serial.println("Invalid accelerometer readings!");
+        return;
+      }
+    } else {
+      // Handle IMU read failure
+      Serial.println("Failed to read accelerometer data!");
+      return;
     }
 
     // Calculate speed using magnitude of acceleration
-    speed = sqrt(x*x + y*y + z*z);
+    speed = sqrt(x * x + y * y + z * z);
 
     // Determine direction based on sign of acceleration
     if (x > 0.1) {
@@ -62,6 +77,7 @@ void loop() {
     if (x < X_BOUNDARY_MIN || x > X_BOUNDARY_MAX || y < Y_BOUNDARY_MIN || y > Y_BOUNDARY_MAX) {
       // Boundary crossed, trigger event
       Serial.println("Boundary crossed!");
+      // Add additional actions or alerts for boundary crossing here
     }
 
     // Log data
