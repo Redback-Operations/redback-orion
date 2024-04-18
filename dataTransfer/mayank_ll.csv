@@ -1,69 +1,12 @@
 time,data values
-2024-04-18T10:24:49.028Z,Step 1: Starting Service
-2024-04-18T10:24:49.033Z,Step 2: Initializing BLE
-2024-04-18T10:24:49.951Z,Step 3: BLE Successful
-2024-04-18T10:24:50.753Z,Step 4: Scanning Device
-2024-04-18T10:24:50.756Z,Peripheral Name: TICKR 0A5B
-2024-04-18T10:24:50.758Z,Step 5: Device Found
-2024-04-18T10:24:50.759Z,Step 6: Connecting ...
-2024-04-18T10:24:52.040Z,Step 7: Connected To Sensor
-2024-04-18T10:24:52.043Z,Step 8: Discovering attributes ...
-2024-04-18T10:24:53.699Z,Step 9: Attributes Discovered Successfully
-2024-04-18T10:24:53.729Z,Step 10: Connected to Data Stream of Sensor. Started Fetching Data ....
-2024-04-18T10:24:54.031Z,Heart Rate Value (BPM) = 97
-2024-04-18T10:24:55.037Z,Heart Rate Value (BPM) = 105
-2024-04-18T10:24:56.026Z,Heart Rate Value (BPM) = 106
-2024-04-18T10:24:57.032Z,Heart Rate Value (BPM) = 107
-2024-04-18T10:24:58.066Z,Heart Rate Value (BPM) = 107
-2024-04-18T10:24:59.027Z,Heart Rate Value (BPM) = 102
-2024-04-18T10:25:00.030Z,Heart Rate Value (BPM) = 96
-2024-04-18T10:25:01.037Z,Heart Rate Value (BPM) = 95
-2024-04-18T10:25:02.042Z,Heart Rate Value (BPM) = 94
-2024-04-18T10:25:03.102Z,Heart Rate Value (BPM) = 94
-2024-04-18T10:25:04.102Z,Heart Rate Value (BPM) = 94
-2024-04-18T10:25:05.102Z,Heart Rate Value (BPM) = 94
-2024-04-18T10:25:06.102Z,Heart Rate Value (BPM) = 91
-2024-04-18T10:25:07.102Z,Heart Rate Value (BPM) = 90
-2024-04-18T10:25:08.102Z,Heart Rate Value (BPM) = 90
-2024-04-18T10:25:09.102Z,Heart Rate Value (BPM) = 90
-2024-04-18T10:25:10.102Z,Heart Rate Value (BPM) = 91
-2024-04-18T10:25:11.103Z,Heart Rate Value (BPM) = 91
-2024-04-18T10:25:12.103Z,Heart Rate Value (BPM) = 91
-2024-04-18T10:25:13.102Z,Heart Rate Value (BPM) = 91
-2024-04-18T10:25:14.103Z,Heart Rate Value (BPM) = 90
-2024-04-18T10:25:15.102Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:16.102Z,Heart Rate Value (BPM) = 88
-2024-04-18T10:25:17.103Z,Heart Rate Value (BPM) = 88
-2024-04-18T10:25:18.104Z,Heart Rate Value (BPM) = 88
-2024-04-18T10:25:19.103Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:20.104Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:21.104Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:22.103Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:23.105Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:24.104Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:25.103Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:26.104Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:27.105Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:28.104Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:29.105Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:30.105Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:31.106Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:32.106Z,Heart Rate Value (BPM) = 87
-2024-04-18T10:25:33.107Z,Heart Rate Value (BPM) = 87
-2024-04-18T10:25:34.106Z,Heart Rate Value (BPM) = 88
-2024-04-18T10:25:35.106Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:36.106Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:37.106Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:38.107Z,Heart Rate Value (BPM) = 90
-2024-04-18T10:25:39.107Z,Heart Rate Value (BPM) = 90
-2024-04-18T10:25:40.107Z,Heart Rate Value (BPM) = 89
-2024-04-18T10:25:42.108Z,Heart Rate Value (BPM) = 87
-2024-04-18T10:25:43.108Z,Heart Rate Value (BPM) = 80
-2024-04-18T10:25:44.107Z,Heart Rate Value (BPM) = 80
-2024-04-18T10:25:45.108Z,Heart Rate Value (BPM) = 80
-2024-04-18T10:25:46.106Z,Heart Rate Value (BPM) = 81
-2024-04-18T10:25:47.108Z,Heart Rate Value (BPM) = 81
-2024-04-18T10:25:48.108Z,Heart Rate Value (BPM) = 82
-2024-04-18T10:25:49.107Z,Heart Rate Value (BPM) = 82
-2024-04-18T10:25:51.109Z,Heart Rate Value (BPM) = 83
-2024-04-18T10:25:52.109Z,Heart Rate Value (BPM) = 83
+2024-04-18T10:36:44.960Z,Heart Rate Value (BPM) = 83
+2024-04-18T10:36:44.970Z,Heart Rate Value (BPM) = 83
+2024-04-18T10:36:45.956Z,Heart Rate Value (BPM) = 83
+2024-04-18T10:36:46.956Z,Heart Rate Value (BPM) = 83
+2024-04-18T10:36:47.956Z,Heart Rate Value (BPM) = 82
+2024-04-18T10:36:48.956Z,Heart Rate Value (BPM) = 82
+2024-04-18T10:36:49.955Z,Heart Rate Value (BPM) = 81
+2024-04-18T10:36:50.956Z,Heart Rate Value (BPM) = 81
+2024-04-18T10:36:51.955Z,Heart Rate Value (BPM) = 81
+2024-04-18T10:36:52.955Z,Heart Rate Value (BPM) = 82
+2024-04-18T10:36:53.955Z,Heart Rate Value (BPM) = 82

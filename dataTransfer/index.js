@@ -27,6 +27,10 @@ port.on('error', function (err) {
 // Event handler for receiving data
 parser.on('data', data => {
     const currentTime = new Date().toISOString(); // Generate the current time
-    csvStream.write(`${currentTime},${data}\n`); // Write data to the CSV file
-    console.log(`${currentTime} | ${data}`);
+
+    // Check if the data is in the expected format
+    if (data) {
+        csvStream.write(`${currentTime},${data}\n`); // Write data to the CSV file
+        console.log(`${currentTime} | ${data}`);
+    }
 });
