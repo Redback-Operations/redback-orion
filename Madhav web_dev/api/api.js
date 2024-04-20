@@ -24,7 +24,7 @@ import playerRoutes from './routes/playerRoutes.js';
 import crowdRoutes from './routes/crowd.routes.js';
 
 
-// Initialize Express
+// Initialize Express yes
 const app = express();
 const port = 5004;
 
