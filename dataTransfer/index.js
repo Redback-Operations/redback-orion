@@ -1,36 +1,47 @@
 const { SerialPort } = require('serialport');
 const { ReadlineParser } = require('@serialport/parser-readline');
-const fs = require('fs');
-const path = require('path'); // Require the 'path' module
+const fs = require('fs').promises; // Using fs.promises for async file operations
+const path = require('path');
 
-// Set the correct COM port name and CSV file path
 const portName = 'COM3';
-const csvFilePath = path.join(__dirname, 'mayank_ll.csv'); // Use path.join to create the file path
+const csvFilePath = path.join(__dirname, 'mayank_ll.csv');
 
-// Create a writable stream to the CSV file
-const csvStream = fs.createWriteStream(csvFilePath);
+async function main() {
+    // Create a SerialPort instance
+    const port = new SerialPort(portName, { baudRate: 9600 });
 
-// Write the CSV header
-csvStream.write('time,data values\n');
+    // Create a Readline parser instance
+    const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
-// Create a SerialPort instance
-const port = new SerialPort({ path: portName, baudRate: 9600 });
+    // Create a writable stream to the CSV file
+    const csvStream = fs.createWriteStream(csvFilePath);
 
-// Create a Readline parser instance
-const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+    // Write the CSV header
+    await csvStream.write('time,data values\n');
 
-// Event handler for errors
-port.on('error', function (err) {
-    console.error('Error:', err.message);
-});
+    // Event handler for errors
+    port.on('error', function (err) {
+        console.error('Error:', err.message);
+    });
 
-// Event handler for receiving data
-parser.on('data', data => {
-    const currentTime = new Date().toISOString(); // Generate the current time
+    // Initialize currentTime outside the data event handler
+    const currentTime = new Date().toISOString();
 
-    // Check if the data is in the expected format
-    if (data) {
-        csvStream.write(`${currentTime},${data}\n`); // Write data to the CSV file
-        console.log(`${currentTime} | ${data}`);
-    }
+    // Event handler for receiving data
+    parser.on('data', async (data) => {
+        try {
+            // Check if the data is in the expected format
+            if (data) {
+                // Write data to the CSV file
+                await csvStream.write(`${currentTime},${data}\n`);
+                console.log(`${currentTime} | ${data}`);
+            }
+        } catch (error) {
+            console.error('Error writing to CSV:', error);
+        }
+    });
+}
+
+main().catch(error => {
+    console.error('Error:', error);
 });
