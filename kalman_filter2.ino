@@ -11,7 +11,6 @@ private:
 
 public:
     KalmanFilter(float process_noise, float sensor_noise, float estimated_error, float initial_value) {
-        /* Initialize Kalman filter variables. */
         q = process_noise;
         r = sensor_noise;
         p = estimated_error;
@@ -19,32 +18,25 @@ public:
     }
 
     float update(float measurement) {
-        /* Prediction update */
-        p = p + q;
-
-        /* Measurement update */
-        k = p / (p + r);
+        p = p + q;  // Prediction update
+        k = p / (p + r);  // Measurement update
         x = x + k * (measurement - x);
         p = (1 - k) * p;
-
         return x;
     }
 };
 
-// Constants for boundary limits
-const float X_BOUNDARY_MIN = -90.0;  // Minimum boundary limit for X-axis
-const float X_BOUNDARY_MAX = 90.0;   // Maximum boundary limit for X-axis
-const float Y_BOUNDARY_MIN = -90.0;  // Minimum boundary limit for Y-axis
-const float Y_BOUNDARY_MAX = 90.0;   // Maximum boundary limit for Y-axis
+// Constants for boundary limits and threshold definitions
+const float ACC_THRESHOLD = 9.81 * 4;  // Threshold for acceleration data validation (4g)
+const long INTERVAL = 1000;            // Interval for data logging (1 second)
 
 // Kalman Filter instances for each axis
-KalmanFilter filterX(0.01, 0.1, 1.0, 0); // process noise, measurement noise, estimated error, initial value
+KalmanFilter filterX(0.01, 0.1, 1.0, 0);
 KalmanFilter filterY(0.01, 0.1, 1.0, 0);
 KalmanFilter filterZ(0.01, 0.1, 1.0, 0);
 
 // Variables for data logging
 unsigned long previousMillis = 0;
-const long interval = 1000;  // Interval for data logging (1 second)
 
 // Variables for player tracking
 float x, y, z;  // Raw accelerometer readings
@@ -56,10 +48,9 @@ void setup() {
   Serial.println("Player Tracking Initialized");
 
   if (!IMU.begin()) {
-    Serial.println("Failed to initialize IMU!");
+    Serial.println("Failed to initialize IMU sensor!");
     while (1);  // Halt if sensor fails to initialize
   }
-
   Serial.print("Accelerometer sample rate = ");
   Serial.print(IMU.accelerationSampleRate());
   Serial.println(" Hz");
@@ -68,12 +59,18 @@ void setup() {
 void loop() {
   unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= interval) {
+  if (currentMillis - previousMillis >= INTERVAL) {
     previousMillis = currentMillis;
 
     if (IMU.accelerationAvailable()) {
       IMU.readAcceleration(x, y, z);
-      
+
+      // Validate accelerometer data before filtering
+      if (abs(x) > ACC_THRESHOLD || abs(y) > ACC_THRESHOLD || abs(z) > ACC_THRESHOLD) {
+        Serial.println("Warning: Acceleration data exceeds safety thresholds!");
+        return;  // Skip processing this set of data
+      }
+
       // Apply Kalman filter to accelerometer readings
       filteredX = filterX.update(x);
       filteredY = filterY.update(y);
@@ -81,12 +78,9 @@ void loop() {
 
       // Calculate activity intensity using magnitude of filtered acceleration
       float activityIntensity = sqrt(filteredX * filteredX + filteredY * filteredY + filteredZ * filteredZ);
-
       Serial.print("Filtered Activity Intensity: ");
       Serial.print(activityIntensity);
       Serial.println(" m/s^2");
-
-      // Output additional processing based on filtered values
     } else {
       Serial.println("Failed to read accelerometer data!");
     }
