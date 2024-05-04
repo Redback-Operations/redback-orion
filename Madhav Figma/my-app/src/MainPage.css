@@ -1,0 +1,14 @@
+/* MainPage.css */
+
+.crowd-image {
+    /* Add any general styling for the crowd image here */
+}
+
+.stuck-to-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: auto;
+    height: 100vh;
+    z-index: -1;
+}
