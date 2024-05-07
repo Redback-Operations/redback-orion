@@ -1,20 +1,29 @@
+import os
 import paho.mqtt.client as mqtt
 from pymongo import MongoClient
+import ssl
+
+# Load MongoDB credentials from environment variables
+MONGODB_USERNAME = os.getenv("MONGODB_USERNAME")
+MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
+MONGODB_HOST = os.getenv("MONGODB_HOST", "localhost")
+MONGODB_PORT = int(os.getenv("MONGODB_PORT", 27017))
+MONGODB_DATABASE = os.getenv("MONGODB_DATABASE", "mydatabase")
+
+# Construct MongoDB URI with SSL options
+MONGODB_URI = (
+    f"mongodb://{MONGODB_USERNAME}:{MONGODB_PASSWORD}@{MONGODB_HOST}:{MONGODB_PORT}/{MONGODB_DATABASE}"
+    "?ssl=true&ssl_cert_reqs=CERT_NONE"
+)
 
 # MongoDB Settings
-mongo_client = MongoClient(
-    'mongodb://localhost:27017/',
-    ssl=True,
-    ssl_ca_certs="/path/to/ca-certificates.crt",
-    ssl_certfile="/path/to/client-cert.pem",
-    ssl_keyfile="/path/to/client-key.pem"
-)
+mongo_client = MongoClient(MONGODB_URI)
 db = mongo_client.sensor_data
 collection = db.readings
 
 # MQTT Settings
-MQTT_BROKER = "broker.hivemq.com"
-MQTT_PORT = 1883
+MQTT_BROKER = os.getenv("MQTT_BROKER", "broker.hivemq.com")
+MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
@@ -29,6 +38,8 @@ client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
+# Set up SSL/TLS for MQTT connection
+client.tls_set(cert_reqs=ssl.CERT_NONE)
 client.connect(MQTT_BROKER, MQTT_PORT, 60)
 
 # Blocking call that processes network traffic, dispatches callbacks, and handles reconnecting.
