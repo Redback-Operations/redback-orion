@@ -26,7 +26,7 @@ public:
 };
 
 const float ACC_THRESHOLD = 9.81 * 4; // 4g acceleration threshold
-const float HIGH_SPEED_THRESHOLD = 2.0; // High speed threshold in m/s^2
+const float HIGH_ACCELERATION_THRESHOLD = 3.0; // High acceleration threshold in m/s^2
 const long INTERVAL = 1000; // Data logging interval (1 second)
 
 KalmanFilter filterX(0.01, 0.1, 1.0, 0);
@@ -37,7 +37,7 @@ unsigned long previousMillis = 0;
 unsigned long messageCount = 0; // Simple timestamp increment
 float x, y, z; // Raw accelerometer readings
 float filteredX, filteredY, filteredZ; // Filtered accelerometer readings
-float speed; // Calculated speed
+float acceleration; // Calculated acceleration
 String direction; // Direction of movement
 
 void setup() {
@@ -63,11 +63,11 @@ void loop() {
             filteredX = filterX.update(x);
             filteredY = filterY.update(y);
             filteredZ = filterZ.update(z);
-            speed = sqrt(filteredX * filteredX + filteredY * filteredY + filteredZ * filteredZ);
+            acceleration = sqrt(filteredX * filteredX + filteredY * filteredY + filteredZ * filteredZ);
             direction = determineDirection(filteredX, filteredY);
-            String speedAlert = (speed > HIGH_SPEED_THRESHOLD) ? "Alert: High Speed Detected!" : "No Alert";
-            String directionAlert = (direction == "Right Up") ? "Alert: Significant Right Upward Movement Detected!" : "No Alert";
-            sendToSerial(messageCount, speed, direction, speedAlert, directionAlert);
+            String accelerationAlert = (acceleration >  HIGH_ACCELERATION_THRESHOLD ) ? "Alert: High Acceleration Detected!" : "No Alert";
+            String directionAlert = (direction == "Right Up" && acceleration>4) ? "Alert: Significant Right Upward Movement Detected!" : "No Alert";
+            sendToSerial(messageCount, acceleration, direction, accelerationAlert, directionAlert);
         } else {
             Serial.println("Failed to read accelerometer data!");
         }
@@ -75,22 +75,27 @@ void loop() {
 }
 
 String determineDirection(float x, float y) {
-    String dir = "Stationary";
-    if (x > 0.1) dir = "Right";
-    else if (x < -0.1) dir = "Left";
-    if (y > 0.1) dir += " Down";
-    else if (y < -0.1) dir += " Up";
+    if (x == 0 && y == 0) return "Stationary";
+
+    String dir = "";
+    if (abs(x) > 0.1) {
+        dir = (x > 0) ? "Right" : "Left";
+    }
+    
+    if (abs(y) > 0.1) {
+        dir += (y > 0) ? " Down" : " Up";
+    }
+    
     return dir;
 }
-
-void sendToSerial(unsigned long count, float speed, String direction, String speedAlert, String directionAlert) {
+void sendToSerial(unsigned long count, float acceleration, String direction, String accelerationAlert, String directionAlert) {
     Serial.print(count);
     Serial.print("\t");
-    Serial.print(speed, 2); // Print speed with two decimal places
+    Serial.print(acceleration, 2); // Ensure acceleration is printed with two decimal places
     Serial.print("\t");
     Serial.print(direction);
     Serial.print("\t");
-    Serial.print(speedAlert);
+    Serial.print(accelerationAlert);
     Serial.print("\t");
     Serial.println(directionAlert);
 }
