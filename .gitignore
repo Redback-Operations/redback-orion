@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Ignoring node_modules in Data transfer
+/dataTransfer/node_modules
+
 # Distribution / packaging
 .Python
 build/
@@ -24,6 +27,7 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.DS_Store
 MANIFEST
 
 # PyInstaller
