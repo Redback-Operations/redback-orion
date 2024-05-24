@@ -1,7 +1,0 @@
-#use command pip install -r requirements.txt
-numpy==1.21.5
-opencv-python==4.5.3.56
-Pillow==8.4.0
-norfair==2.0.0
-torch==1.10.0+cu102
-torchvision==0.11.1+cu102
