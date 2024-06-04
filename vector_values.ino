@@ -34,7 +34,6 @@ KalmanFilter filterY(0.01, 0.1, 1.0, 0);
 KalmanFilter filterZ(0.01, 0.1, 1.0, 0);
 
 unsigned long previousMillis = 0;
-unsigned long messageCount = 0; // Simple timestamp increment
 float x, y, z; // Raw accelerometer readings
 float filteredX, filteredY, filteredZ; // Filtered accelerometer readings
 float acceleration; // Calculated acceleration
@@ -64,33 +63,21 @@ void loop() {
             filteredY = filterY.update(y);
             filteredZ = filterZ.update(z);
             acceleration = sqrt(filteredX * filteredX + filteredY * filteredY + filteredZ * filteredZ);
-            direction = determineDirection(filteredX, filteredY);
-            String accelerationAlert = (acceleration >  HIGH_ACCELERATION_THRESHOLD ) ? "Alert: High Acceleration Detected!" : "No Alert";
-            String directionAlert = (direction == "Right Up" && acceleration>4) ? "Alert: Significant Right Upward Movement Detected!" : "No Alert";
-            sendToSerial(messageCount, acceleration, direction, accelerationAlert, directionAlert);
+            direction = determineDirection(filteredX, filteredY, filteredZ);
+            String accelerationAlert = (acceleration > HIGH_ACCELERATION_THRESHOLD) ? "Alert: High Acceleration Detected!" : "No Alert";
+            String directionAlert = (direction == "0.03i 0.09j 0.96k" && acceleration > 4) ? "Alert: Significant Right Upward Movement Detected!" : "No Alert";
+            sendToSerial(acceleration, direction, accelerationAlert, directionAlert);
         } else {
             Serial.println("Failed to read accelerometer data!");
         }
     }
 }
 
-String determineDirection(float x, float y) {
-    if (x == 0 && y == 0) return "Stationary";
-
-    String dir = "";
-    if (abs(x) > 0.1) {
-        dir = (x > 0) ? "Right" : "Left";
-    }
-    
-    if (abs(y) > 0.1) {
-        dir += (y > 0) ? " Down" : " Up";
-    }
-    
-    return dir;
+String determineDirection(float x, float y, float z) {
+    return String(x, 2) + "i " + String(y, 2) + "j " + String(z, 2) + "k";
 }
-void sendToSerial(unsigned long count, float acceleration, String direction, String accelerationAlert, String directionAlert) {
-    Serial.print(count);
-    Serial.print("\t");
+
+void sendToSerial(float acceleration, String direction, String accelerationAlert, String directionAlert) {
     Serial.print(acceleration, 2); // Ensure acceleration is printed with two decimal places
     Serial.print("\t");
     Serial.print(direction);
