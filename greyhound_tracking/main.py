@@ -13,12 +13,25 @@ def fetch_bucket_contents(bucket_name):
         "prettyPrint": "false"
     }
 
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Failed to fetch bucket contents. Status code: {response.status_code}")
-        return None
+    all_contents = []
+    next_page_token = None
+
+    while True:
+        if next_page_token:
+            params["pageToken"] = next_page_token
+
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            all_contents.extend(data.get("items", []))
+            next_page_token = data.get("nextPageToken")
+            if not next_page_token:
+                break
+        else:
+            print(f"Failed to fetch bucket contents. Status code: {response.status_code}")
+            return None
+
+    return all_contents
 
 def download_blob(media_link, destination_file_name):
 
@@ -48,23 +61,25 @@ def sync():
     bucket_name = 'greyhound-vision-data'
     
     bucket_contents = fetch_bucket_contents(bucket_name)
+
     if bucket_contents:
-        for item in bucket_contents.get('items', []):
-            if item['name'].startswith('raw_videos/') and item['name'] != 'raw_videos/':
-                # Preserve the full path structure
-                relative_path = item['name']
-                full_path = os.path.join(data_directory, relative_path)
+        for item in bucket_contents:
+            relative_path = item['name']
+            full_path = os.path.join(data_directory, relative_path)
+
+            # Skip directories
+            if item['name'].endswith('/'):
+                continue
+
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
                 
-                # Create the directory structure if it doesn't exist
-                os.makedirs(os.path.dirname(full_path), exist_ok=True)
-                
-                media_link = item.get('mediaLink')
-                if media_link:
-                    success = download_blob(media_link, full_path)
-                    if not success:
-                        print(f"Failed to download {item['name']} after multiple attempts.")
-                else:
-                    print(f"No mediaLink found for {item['name']}")
+            media_link = item.get('mediaLink')
+            if media_link:
+                success = download_blob(media_link, full_path)
+                if not success:
+                    print(f"Failed to download {item['name']} after multiple attempts.")
+            else:
+                print(f"No mediaLink found for {item['name']}")
 
 @click.command()
 def train():
