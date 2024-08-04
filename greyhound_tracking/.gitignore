@@ -1,3 +1,4 @@
 /notebooks/output
+/notebooks/runs
 /notebooks/*.pt
 /data
