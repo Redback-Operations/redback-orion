@@ -9,7 +9,7 @@ This project focuses on detecting and tracking greyhounds in race. Using YOLOv8 
 ### Watch the Project in Action
 - [Watch the video demonstration of greyhound detection](https://deakin365-my.sharepoint.com/:v:/g/personal/s222182857_deakin_edu_au/Ec6OtwCsxdtInGLccCf3-BMBsgsL47J3IEAnwrbzqUd-jw?e=Avsg1g&nav=eyJwbGF5YmFja09wdGlvbnMiOnt9LCJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJUZWFtcyIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJwb3N0cm9sbC1jb3B5bGluayIsInJlZmVycmFsUGxheWJhY2tTZXNzaW9uSWQiOiIwNzFhZTJhZi0xMWFmLTQzMjEtODY5Ny0yY2E4MDAzYzZlZjkifX0%3D)
 - [View our project on Roboflow](https://universe.roboflow.com/greyhound-tracking-ioamr/australian-greyhound-racing)
-- [Relative speed Test](greyhound_tracking/notebooks/speed_test.ipynb)
+- [Relative speed of greyhounds](notebooks/speed_test.ipynb)
 
 
 ## Table of Contents
