@@ -1,5 +1,9 @@
 # Greyhound Detection and Tracking Project
 ![readme style: standard](https://img.shields.io/badge/readme%20style-standard-brightgreen)
+![Roboflow](https://img.shields.io/badge/Roboflow-Model%20Status-blue)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+
+
 
 
 
@@ -16,7 +20,6 @@ This project focuses on detecting and tracking greyhounds in race. Using YOLOv8 
 * Overview
 * Features
 * Installation
-* Usage
 * Dataset
 * Model Training
 * Challenges Faced
@@ -33,9 +36,9 @@ This project focuses on detecting and tracking greyhounds in race. Using YOLOv8 
 - **Custom Dataset:** Created and labeled a large custom dataset using Roboflow, with tasks distributed among team members for efficient data labeling.
 
 ## Installation
-- Python
-- [YOLOv8](https://www.kaggle.com/code/ultralytics/yolov8) installed
-- [Ultralytics](https://pypi.org/project/ultralytics/) installed
+- [Python](https://www.python.org/downloads/)
+- [YOLOv8](https://www.kaggle.com/code/ultralytics/yolov8)
+- [Ultralytics](https://pypi.org/project/ultralytics/)
   
 ### Prerequisites
 - NumPy
@@ -85,9 +88,9 @@ Contributions are welcome! Please follow the standard contribution guidelines:
 5. Open a pull request.
 
 ### Contributers :sparkles:
-- [**Chris Abbey**](https://github.com/rissicay) 
-- [**Mohitpreet Sing**](https://github.com/plasma141)
-- [**Harsh Bhanot**](https://github.com/HarshBhanot7)
+- [*Harsh Bhanot*](https://github.com/HarshBhanot7)
+- [*Mohitpreet Sing*](https://github.com/plasma141)
+- [*Chris Abbey*](https://github.com/rissicay) 
 
 
 
