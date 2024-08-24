@@ -8,7 +8,7 @@ class Database:
         self.collection = self.db["Crowd"]
         self.lastRecorded = 0
 
-    def insertRecord(self, count, framdId):
+    def insertRecord(self, count, frameId=None):
         currentTime = time.time()
 
         if currentTime - self.lastRecorded >= 1:
@@ -17,6 +17,8 @@ class Database:
                 "peopleCount": count,
                 "timestamp": currentTime.strftime("%d-%m-%Y %H:%M:%S")
             }
+            if frameId is not None:
+                record["frameId"] = frameId
             self.collection.insert_one(record)
             self.lastRecorded = currentTime
 
