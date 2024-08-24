@@ -52,7 +52,7 @@ class CameraProcessor:
 
             return annotatedFrame, frame
         
-        return self.floorImage, frame
+        return self.floorImage.copy(), frame
     
     def run(self):
         while True:
