@@ -11,8 +11,6 @@ The small object is an universal problems for different object detection models,
 
 From the results, focus on APs and APl column, which represent average precision scores. For instance, in EfficientDet, the AP for small objects is just 12%, compared to 51% for large objects. This shows a significant gap, nearly five fold difference!
 
-Your explanation is on the right track, but it could be made a bit clearer and more precise. Here’s a refined version:
-
 The difficulty YOLO models face in detecting small objects can be attributed to the model's architecture. According to Dario et al. (2021), YOLO includes multiple convolutional neural network (CNN) layers, after each CNN its result in a feature map and it get smaller till the final one. This small feature map tends to lose spatial context, which is crucial for detecting small objects. As a result, YOLO often misses these small objects in an image. More detail explaination is [here](https://learnopencv.com/slicing-aided-hyper-inference/).
 
 ![yolo](https://github.com/milieureka/redback-orion/blob/main/Crowd_Monitoring/Small%20object%20detection/resources/yolo.jpg)
