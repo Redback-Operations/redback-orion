@@ -1,4 +1,3 @@
-![comparison](https://github.com/milieureka/redback-orion/blob/main/Crowd_Monitoring/Small%20object%20detection/resources/comparison.gif)
 # What is small object detection?
 Object detection is a core task in computer vision, where the goal is to predict where objects are in an image and identify their types. Advanced deep learning models, such as those in the You-Only-Look-Once (YOLO) series, have achieved impressive accuracy. Yet, detecting small objects remains a particularly tough challenge in this field.
 
@@ -35,6 +34,12 @@ Illustration of framework, [source](https://supervision.roboflow.com/develop/how
 The key advantage of using SAHI is that it is model-agnostic. SAHI can leverage today’s SOTA object detection models and whatever the SOTA model happens to be tomorrow!
 
 ## Result on my implementation
+
+**YOLOv5 from T1/2024**
+![yolov5_t124](https://github.com/milieureka/redback-orion/blob/main/Crowd_Monitoring/Small%20object%20detection/resources/base-yolov5.png)
+
+**YOLOv8 + SAHI**
+![yolov8_sahi](https://github.com/milieureka/redback-orion/blob/main/Crowd_Monitoring/Small%20object%20detection/resources/yolov8%2Bsahi.png)
 
 Only YOLOv8
 
