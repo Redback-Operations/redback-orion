@@ -73,7 +73,7 @@ There are two ways of retrieving the livestream protocol:
 rtsp://<User_name>:<Password>@<ip_address>:<port>/Streaming/Channels
 ```
 
-It is remarkable that these two methods will require the useername and password from the camera.
+It is remarkable that these two methods will require the useername and password from the camera. Furthermore, the camera would always run on port 554 and 2.5 GHz band.
 
 ### Using OpenCV to load the camera frame with RTSP
 
