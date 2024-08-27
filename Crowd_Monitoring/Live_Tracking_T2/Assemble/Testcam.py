@@ -4,19 +4,18 @@ from ultralytics import YOLO
 from collections import defaultdict
 from utils import calculateHomography, transformPoints
 from pymongo import MongoClient
-from time import time
-
+import time as time_module
+from datetime import datetime
 # Load the YOLO model
 model = YOLO("yolov8n.pt")
 
 # Connect to the MongoDB database
 # and set up data recording
-# client = MongoClient("")
-# db = client["CrowdTracking"]
-# collection = db["Crowd"]
-# lastRecorded = time.time()
+client = MongoClient("mongodb+srv://amborse31:hoanhuy31@crowdtracking.ozaoo6n.mongodb.net/?retryWrites=true&w=majority&appName=CrowdTracking")
+db = client["Crowd_Monitoring"]
+collection = db["Crowd_Count"]
 
-
+lastRecorded = time_module.time()
 # Connect to the RTSP stream
 # rtspUrl = "rtsp://"
 rtspUrl = 0
@@ -53,6 +52,21 @@ while True:
     
     results = model.track(frame, persist=True, show=False, imgsz=1280, verbose=True)
     annotatedFrame = floorImage.copy()
+    
+    # Process camera results with box coordinates and confidence scores
+    for result in results:
+            boxes_camera = result.boxes.cpu().numpy()
+            for box in boxes_camera:
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                conf = box.conf[0]
+                cls = int(box.cls[0])
+            
+                if cls == 0:  # Assuming class 0 is person
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(frame, f'Person: {conf:.2f}', (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+
     # if results[0].boxes is not None and hasattr(results[0].boxes, 'id'):
     try:
         if results[0].boxes is not None:
@@ -83,6 +97,34 @@ while True:
 
                         if len(trackHistory[trackID]) > 50:
                             trackHistory[trackID].pop(0)
+                    currentTime = time_module.time()
+                    print(currentTime)
+                    # Record the number of people in the frame every second
+                    if currentTime - lastRecorded > 1:
+                        frameId = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                        totalPeople = len(np.unique(trackIDs))
+                        print("People", totalPeople)
+                        # Convert current time to human-readable format
+                        # timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                        timestamp = time_module.strftime("%d-%m-%Y %H:%M:%S", time_module.localtime(currentTime))
+                        print(timestamp)
+                        # record = {
+                        #     "frameId": frameId,
+                        #     "timestamp": timestamp,
+                        #     "totalPeople": totalPeople
+                        # }
+                        record = {
+                                "frameId": frameId,
+                                "timestamp": timestamp,
+                                "totalPeople": totalPeople
+                            }
+                        
+                        print("Before inserting record into MongoDB")
+
+                        collection.insert_one(record)
+                        print("After inserting record into MongoDB")
+                        lastRecorded = currentTime
+                    print("People 2", totalPeople)
                     video.write(annotatedFrame)
                 else:
                         print("No objects detected. No IDs available.")
