@@ -9,6 +9,13 @@ import time as time_module
 
 class CameraProcessor:
     def __init__(self):
+        # initialize the YOLO model
+        # RTSP stream URL for the video feed
+        # trackHistory is a dictionary to store the movement history of each person
+        # floorImage is a replica of the floor plan for annotation
+        # homographyMatrix is the homography matrix for transforming points
+        # db is an instance of the Database class
+        # lastRecorded is the timestamp of the last recorded data
         self.model = YOLO("yolov8n.pt")
         self.rtspUrl = ''
         self.cap = cv2.VideoCapture(self.rtspUrl)
@@ -18,12 +25,14 @@ class CameraProcessor:
         self.db = Database()
         self.lastRecorded = 0
 
+    # Function to calculate the homography matrix
     def calculateHomography(self):
         ptsSRC = np.array([[28, 1158], [2120, 1112], [1840, 488], [350, 518], [468, 1144]])
         ptsDST = np.array([[0, 990], [699, 988], [693, 658], [0, 661], [141, 988]])
         return calculateHomography(ptsSRC, ptsDST)
 
     def processFrame(self, frame):
+        # the try block is used to handle exceptions, when no detections are available
         try:
             results = self.model.track(frame, persist=True, show=False, imgsz=1280, verbose=False)
             
@@ -80,6 +89,7 @@ class CameraProcessor:
         
         return annotatedFrame, floorAnnotatedFrame
 
+    # Function to run the camera processor
     def run(self):
         while True:
             success, frame = self.cap.read()
@@ -93,6 +103,7 @@ class CameraProcessor:
                     break
         self.release()
 
+    # Function to get the raw frame from the video stream
     def getFrame(self):
         while True:
             success, frame = self.cap.read()
@@ -105,6 +116,7 @@ class CameraProcessor:
                 yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
+    # Function to get the annotated frame with floor plan
     def getAnnotatedFrame(self):
         while True:
             success, frame = self.cap.read()

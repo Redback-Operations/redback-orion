@@ -8,6 +8,7 @@ cors = CORS(app)
 cameraProcessor = CameraProcessor()
 db = Database()
 
+# routes for people count
 @app.route("/api/peopleCount", methods=["GET"])
 def getPeopleCount():
     count = db.getlastestRecord()
