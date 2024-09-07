@@ -6,10 +6,8 @@ from pymongo import MongoClient
 from datetime import datetime, date
 import threading
 from flask_cors import CORS
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -21,12 +19,12 @@ model = YOLO('yolov8n.pt')  # or use a different YOLO version
 # Retrive the RTSP stream URL from iSpy or Wireshark
 # Replace the rtsp_url with your own RTSP stream URL
 rtsp_url = ''
-
+''' 
 # MongoDB connection
 client = MongoClient('')
-db = client["CrowTracking"]
+db = client["CrowdTracking"]
 collection = db["Crowd"]
-
+''' 
 frame_id = 0
 current_date = date.today()
 

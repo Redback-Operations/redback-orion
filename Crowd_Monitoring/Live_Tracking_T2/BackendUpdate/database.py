@@ -4,6 +4,7 @@ from datetime import datetime
 
 class Database:
     def __init__(self):
+        # Initialize the MongoDB client and database
         self.client = MongoClient("")
         self.db = self.client["CrowdTracking"]
         self.collection = self.db["Crowd"]
