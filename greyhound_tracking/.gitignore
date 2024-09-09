@@ -2,3 +2,6 @@
 /notebooks/runs
 /notebooks/*.pt
 /data
+Pipfile
+Pipfile.lock
+.ipynb_checkpoints/
