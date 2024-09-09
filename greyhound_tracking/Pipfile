@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 jupyterlab = "*"
-ultralytics = "*"
+ultralytics = "8.0.196"
 numpy = "*"
 supervision = "*"
 opencv-python = "*"
@@ -13,6 +13,8 @@ google-cloud-storage = "*"
 click = "*"
 python-dotenv = "*"
 requests = "*"
+roboflow = "1.1.37"
+
 
 [dev-packages]
 
