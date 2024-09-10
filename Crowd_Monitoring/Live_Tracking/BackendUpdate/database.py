@@ -4,12 +4,8 @@ from datetime import datetime
 
 class Database:
     def __init__(self):
-<<<<<<< HEAD:Crowd_Monitoring/Live_Tracking_T2/BackendUpdate/database.py
         # Initialize the MongoDB client and database
         self.client = MongoClient("")
-=======
-        self.client = MongoClient("mongodb+srv://amborse31:hoanhuy31@crowdtracking.ozaoo6n.mongodb.net/?retryWrites=true&w=majority&appName=CrowdTracking")
->>>>>>> 6f15240 (Update folder):Crowd_Monitoring/Live_Tracking/BackendUpdate/database.py
         self.db = self.client["CrowdTracking"]
         self.collection = self.db["Crowd"]
         self.lastRecorded = time.time()  # Initialize with current timestamp
