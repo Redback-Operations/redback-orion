@@ -14,11 +14,11 @@ model = YOLO("yolov8n.pt")
 client = MongoClient("")
 db = client["CrowdTracking"]
 collection = db["Crowd"]
-lastRecorded = time.time()
+lastRecorded = 0
 
 
 # Connect to the RTSP stream
-rtspUrl = "rtsp://"
+rtspUrl = 0
 cap = cv2.VideoCapture(rtspUrl)
 
 trackHistory = defaultdict(list)

@@ -4,12 +4,13 @@ from datetime import datetime
 
 class Database:
     def __init__(self):
+        # Initialize the MongoDB client and database
         self.client = MongoClient("")
         self.db = self.client["CrowdTracking"]
         self.collection = self.db["Crowd"]
         self.lastRecorded = time.time()  # Initialize with current timestamp
 
-    def insertRecord(self, count, frameId=None):
+    def insertRecord(self, count, frameId):
         currentTime = datetime.now()  # Use datetime object for formatting
         currentTimestamp = time.time()  # Get current timestamp
 
@@ -22,7 +23,7 @@ class Database:
             }
             try:
                 self.collection.insert_one(record)
-                print(f"Recorded: Frame {frameId}, Time {currentTime}, People {count}")
+                print(f"Recorded: Frame {frameId}, Time {currentTime.strftime('%d-%m-%Y %H:%M:%S')}, People {count}")
             except Exception as e:
                 print(f"Failed to insert record into database: {e}")
             self.lastRecorded = currentTimestamp  # Update the last recorded timestamp
