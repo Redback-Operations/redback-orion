@@ -1,12 +1,12 @@
 ## Folder Structure
 
-Live_Tracking_T2
+Live_Tracking
 |--Assemble
 |--BackendUpdate
 |--Live_Tracking
 
-1. With Assemble is the program with real-time monitoring, MongoDB, and 2D visualisation features.
-2. BackendUpdate is the system to run the program for web-interface.
+1. Modules_Dev is the program with real-time monitoring, MongoDB, and 2D visualisation features.
+2. Backend_v2 is the system to run the program for web-interface.
 3. Live_tracking is for testing the live-tracking with RTSP and MongoDB data importing.
 
 ## MongoDB
@@ -73,12 +73,15 @@ With the above code, by setting up a variable for interval time, we can easily a
 
 Currently there are three different methods of real-time crowd monitoring including using the computer bulit in web-cam, the external camera, and the IP camera. This project would solely focus on the Real-Time Streaming Protocol of an IP camera and utilising OpenCV to process the recording frame.
 
-During testing the program, we had used built-in camera or external devices with cameras for convenience. Those two could be utilised by assigning "0" and "1" in the video capture statement. 0 is for the bulit-in camera whilst 1 is for connected devices.
+During testing the program, we had used built-in camera or external devices with cameras for convenience. Those two could be utilised by assigning "0" and "1" in the video capture statement. 0 is for the bulit-in camera whilst 1 is for connected devices (mobile camera - Camo App).
 
 ```
 cap = cv2.VideoCapture(0)
 cap = cv2.VideoCapture(1)
 ```
+### Camo App setup
+Download Camo app through App Store/Google Play for your computer and the mobile device. After installed, open the app and pair your mobile device with your computer.
+    ![CamoApp](Camo.png)
 
 ### Retrieving RTSP
 
