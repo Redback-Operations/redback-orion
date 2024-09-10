@@ -75,10 +75,10 @@ Currently there are three different methods of real-time crowd monitoring includ
 
 During testing the program, we had used built-in camera or external devices with cameras for convenience. Those two could be utilised by assigning "0" and "1" in the video capture statement. 0 is for the bulit-in camera whilst 1 is for connected devices.
 
-'''
+```
 cap = cv2.VideoCapture(0)
 cap = cv2.VideoCapture(1)
-'''
+```
 
 ### Retrieving RTSP
 
@@ -86,6 +86,7 @@ There are two ways of retrieving the livestream protocol:
 
 1. The simpliest one is using iSpy application. The advantage of this method is providing a full form RTSP, whiles merely be available on Window system is its cirtical drawbacks to condiser. In regard to see the RTSP, first filling out the authentication and choose the network.
    ![iSpy](iSpy.png)
+
 2. The second method is to use the network anaylsing application, WireShark. The application is widely aviable on different operating systems. By accessing to the current network that the machine is connecting to and filter the protocol, we can retrieve these networking components including IP address, port, stream, and channel.With those pieces of data, we can form a complete RTSP:
 
 ```

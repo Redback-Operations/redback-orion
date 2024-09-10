@@ -24,6 +24,7 @@ class CameraProcessor:
         self.homographyMatrix = self.calculateHomography()
         self.db = Database()
         self.lastRecorded = 0
+        self.currentFrameId = 0
 
     # Function to calculate the homography matrix
     def calculateHomography(self):
@@ -40,7 +41,7 @@ class CameraProcessor:
             annotatedFrame = frame.copy()
             floorAnnotatedFrame = self.floorImage.copy()
             totalPeople = 0
-            frameId = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES))
+
             
             if results[0].boxes is not None and hasattr(results[0].boxes, 'id'):
                 boxes = results[0].boxes.xywh.cpu().numpy()
@@ -85,7 +86,8 @@ class CameraProcessor:
             print(f"An unexpected error occurred: {e}")
     
         # Always insert data, even if no people are detected
-        self.db.insertRecord(totalPeople, frameId)
+        self.currentFrameId += 1
+        self.db.insertRecord(totalPeople, self.currentFrameId)
         
         return annotatedFrame, floorAnnotatedFrame
 
