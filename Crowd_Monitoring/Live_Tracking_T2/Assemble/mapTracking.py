@@ -11,7 +11,7 @@ model = YOLO("yolov8n.pt")
 
 # Connect to the MongoDB database
 # and set up data recording
-client = MongoClient("mongodb+srv://amborse31:hoanhuy31@crowdtracking.ozaoo6n.mongodb.net/?retryWrites=true&w=majority&appName=CrowdTracking")
+client = MongoClient("")
 db = client["CrowdTracking"]
 collection = db["Crowd"]
 lastRecorded = 0
