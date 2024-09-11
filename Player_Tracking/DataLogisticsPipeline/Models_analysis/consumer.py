@@ -36,19 +36,15 @@ my_producer = KafkaProducer(
 )
 
 
-# Data Analysis for Crowd Monitering and Player Tracking
+# # Data Analysis for Crowd Monitering and Player Tracking
 # m = load()
 # print("Starting Data Analysis")
 # for message in my_consumer:
-#     print("------------- Analytics module -------------")
-#     print("Message received!")
-#     print(f"{message} is being processed")
+#     print("------------- Model Analysis -------------")
+#     print(f"Data {message} is being processed")
 #     message = message.value
 #     df_pred = pd.DataFrame.from_records([{"ds": message['ts']}])
 #     df_pred['ds'] = pd.to_datetime(df_pred['ds'])
 #     forecast = m.predict(df_pred)
 #     forecast['sensor'] = message['sensor']
-#     my_producer.send('analytics_results',
-#                      value= forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper', 'sensor']].to_json(orient="index", date_format='iso'))
-#     print("------------- Analytics results -------------")
-#     print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper', 'sensor']].to_json(orient="index", date_format='iso'))
+#     my_producer.send('analytics_results', value= forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper', 'sensor']].to_json(orient="index", date_format='iso'))
