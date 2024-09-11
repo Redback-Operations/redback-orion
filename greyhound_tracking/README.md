@@ -17,8 +17,13 @@ This project focuses on detecting and tracking greyhounds in races for object de
 - **Speed Calculation:** Calculates the relative speed of each greyhound in the race.
 - **Custom Dataset:** Created and labeled a large custom dataset using Roboflow, with tasks distributed among team members for efficient data labeling.
 
-## Model in Action
+## Model in Action✅
 - [View our project on Roboflow](https://universe.roboflow.com/greyhound-tracking-ioamr/australian-greyhound-racing)
+- Below is a video showing our model in action, demonstrating its ability to accurately detect and track greyhounds in a training video: 
+ 
+  [Trained model deployed on 1080p video](https://drive.google.com/file/d/1vuD1QAQ0299rSBFMwKHn4vVC6XpA2SUN/view?usp=drive_link)
+  
+  This visual showcases how the model consistently identifies greyhounds, tracks them across frames, and calculates their relative speeds, providing valuable insights during races.
 
 ## Test Our Public Model
 You can test our public model by uploading your own videos to see how well it detects and tracks greyhounds in action. Use the link below to upload a video and test the model:
@@ -114,13 +119,13 @@ Contributions are welcome! Please follow the standard contribution guidelines:
 ## Getting Added to the Roboflow Project
 If you'd like to contribute or use our dataset for your own projects, you can request access to our Roboflow project. Here's how:
 
-1. **Request Access:** Reach out to any of the project contributors via GitHub, or send an email to [@gmail.com](mohitaulakh19@gmail.com) with the subject line "Roboflow Access Request".
+1. **Request Access:** Reach out to any of the project contributors via GitHub, with the subject line "Roboflow Access Request".
 2. **Join the Roboflow Team:** Once your request is approved, you'll receive an invite to join the Roboflow project. Accept the invitation to gain access to the dataset and project resources.
 3. **Access the Dataset:** After joining, you'll be able to view, download, and contribute to the dataset on Roboflow.
 
 ## Contributors :sparkles:
 - [*Harsh Bhanot*](https://github.com/HarshBhanot7)
-- [*Mohitpreet Sing*](https://github.com/plasma141)
+- [*Mohitpreet Singh*](https://github.com/plasma141)
 - [*Chris Abbey*](https://github.com/rissicay)
 
 ## License
