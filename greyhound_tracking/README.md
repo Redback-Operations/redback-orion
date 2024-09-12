@@ -18,8 +18,9 @@ This project focuses on detecting and tracking greyhounds in races for object de
 - **Custom Dataset:** Created and labeled a large custom dataset using Roboflow, with tasks distributed among team members for efficient data labeling.
 
 ## Model in Action✅
-- [View our project on Roboflow](https://universe.roboflow.com/greyhound-tracking-ioamr/australian-greyhound-racing)
-- Below is a video showing our model in action, demonstrating its ability to accurately detect and track greyhounds in a training video: 
+ [View our project on Roboflow](https://universe.roboflow.com/greyhound-tracking-ioamr/australian-greyhound-racing)
+
+ Below is a video showing our model in action, demonstrating its ability to accurately detect and track greyhounds in a training video: 
  
   [Trained model deployed on 1080p video](https://drive.google.com/file/d/1vuD1QAQ0299rSBFMwKHn4vVC6XpA2SUN/view?usp=drive_link)
   
