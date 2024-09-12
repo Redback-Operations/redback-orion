@@ -1,7 +1,6 @@
-/notebooks/output
-/notebooks/runs
-/notebooks/*.pt
-/data
 Pipfile
 Pipfile.lock
 .ipynb_checkpoints/
+output/
+*.pt
+*mp4
