@@ -94,7 +94,7 @@ The speed of greyhounds is estimated using the following steps:
 4. **Speed Estimation**: Speed is calculated by measuring the Euclidean distance between positions in consecutive frames and multiplying by the frame rate (FPS).
 
 **Get Speed Estimates:**
-- The speed calculation is done using the distance between bounding boxes across frames and converting it to km/h. You can view the implementation in the [speed_test.ipynb](speed_test.ipynb)
+- The speed calculation is done using the distance between bounding boxes across frames and converting it to km/h. You can view the implementation in the [feature_pixel_per_second.ipynb](feature_pixel_per_second.ipynb)
 
 ## Challenges and Solutions
 - **Close Proximity Detection:** Initial challenges included difficulties in detecting greyhounds when they were close together. This was mitigated by expanding the dataset and refining the model.
