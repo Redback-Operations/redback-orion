@@ -1,0 +1,5 @@
+MONGO_URI = "mongodb+srv://<username>:<password>@<uri>"
+DB = "IOT"
+COLLECTION = "occupancy"
+MODEL = "unsloth/Phi-3.5-mini-instruct"
+HF_TOKEN = "hf token"
