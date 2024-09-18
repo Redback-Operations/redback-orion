@@ -135,6 +135,11 @@ If you'd like to contribute or use our dataset for your own projects, you can re
 2. **Join the Roboflow Team:** Once your request is approved, you'll receive an invite to join the Roboflow project. Accept the invitation to gain access to the dataset and project resources.
 3. **Access the Dataset:** After joining, you'll be able to view, download, and contribute to the dataset on Roboflow.
 
+## Data Collection
+All data was collected off broadcast tv in Australia which is covered by the Australian Educational Licence which is held by Deakin University. Only data used by this collection method was used to train our model.
+- [Screenrights](https://www.screenrights.org/screen-audiences/screenrights-licences/australian-educational-licences/)
+- [Copyright](https://www.copyright.com.au/licences-permission/educational-licences/copying-under-education-licence/)
+
 ## Contributors :sparkles:
 - [*Harsh Bhanot*](https://github.com/HarshBhanot7)
 - [*Mohitpreet Singh*](https://github.com/plasma141)
