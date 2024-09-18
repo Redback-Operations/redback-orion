@@ -25,6 +25,15 @@ This project focuses on detecting and tracking greyhounds in races for object de
   [Trained model deployed on 1080p video](https://drive.google.com/file/d/1vuD1QAQ0299rSBFMwKHn4vVC6XpA2SUN/view?usp=drive_link)
   
   This visual showcases how the model consistently identifies greyhounds, tracks them across frames, and calculates their relative speeds, providing valuable insights during races.
+  
+  Some screenshots showcasing the output : 
+  
+  ![image](https://github.com/user-attachments/assets/82443ceb-1e74-4b2f-8cee-888457ba3a9c)
+  ![image](https://github.com/user-attachments/assets/400c425e-ebfa-4637-9503-39d1baad1099)
+  ![image](https://github.com/user-attachments/assets/10db37da-8dac-41b6-977b-3b98dc3bd3b4)
+
+
+
 
 ## Test Our Public Model
 You can test our public model by uploading your own videos to see how well it detects and tracks greyhounds in action. Use the link below to upload a video and test the model:
@@ -85,6 +94,8 @@ Simply upload a video, and the model will process it, highlighting greyhounds wi
 The dataset used for training the model includes a large collection of images of greyhounds, labeled and annotated using Roboflow. The dataset was created by the team, with tasks distributed among members to efficiently label each image, ensuring a high-quality dataset to improve the model's performance.
 
 - [View our Roboflow Datasets](https://universe.roboflow.com/greyhound-tracking-ioamr/australian-greyhound-racing/dataset/10)
+
+- [Input video for testing](https://drive.google.com/file/d/1m7OB1YPR9YYxoBQdoUmsBIx5SL1jvDdO/view?usp=sharing)
 
 
 ## Speed Calculation Method
