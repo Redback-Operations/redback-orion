@@ -1,7 +1,6 @@
 ---
 sidebar_position: 1
 ---
-
 # Greyhound Detection and Tracking Project
 ![readme style: standard](https://img.shields.io/badge/readme%20style-standard-brightgreen)
 ![Roboflow](https://img.shields.io/badge/Roboflow-Model%20Status-blue)
@@ -106,7 +105,10 @@ The speed of greyhounds is estimated using the following steps:
 4. **Speed Estimation**: Speed is calculated by measuring the Euclidean distance between positions in consecutive frames and multiplying by the frame rate (FPS).
 
 **Get Speed Estimates:**
-- The speed calculation is done using the distance between bounding boxes across frames and converting it to km/h. You can view the implementation in the [feature_pixel_per_second.ipynb](feature_pixel_per_second.ipynb)
+- The speed calculation is done using the distance between bounding boxes across frames and converting it to px/s and km/h. You can view the implementations given below:
+- [feature_pixel_per_second.ipynb](feature_pixel_per_second.ipynb)
+
+- [feature_kilometer_per_hour.ipynb](feature_km_per_hour.ipynb)
 
 ## Challenges and Solutions
 - **Close Proximity Detection:** Initial challenges included difficulties in detecting greyhounds when they were close together. This was mitigated by expanding the dataset and refining the model.
@@ -146,7 +148,7 @@ All data was collected off broadcast tv in Australia which is covered by the Aus
 - [*Chris Abbey*](https://github.com/rissicay)
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/HarshBhanot7/redback-documentation/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/Redback-Operations/redback-documentation/blob/main/LICENSE) file for details.
 
 ## Acknowledgements
 We would like to extend our gratitude to the following:
