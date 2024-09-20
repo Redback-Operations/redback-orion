@@ -138,7 +138,7 @@ If you'd like to contribute or use our dataset for your own projects, you can re
 ## Data Collection
 All data was collected off broadcast tv in Australia which is covered by the Australian Educational Licence which is held by Deakin University. Only data used by this collection method was used to train our model.
 - [Screenrights](https://www.screenrights.org/screen-audiences/screenrights-licences/australian-educational-licences/)
-- [Copyright](https://www.copyright.com.au/licences-permission/educational-licences/copying-under-education-licence/)
+- [Copyright](https://www.copyright.com.au/licences-permission/educational-licences/)
 
 ## Contributors :sparkles:
 - [*Harsh Bhanot*](https://github.com/HarshBhanot7)
