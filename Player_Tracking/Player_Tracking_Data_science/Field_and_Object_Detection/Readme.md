@@ -13,6 +13,8 @@ The object detection model utilizes a pre-trained model. This would not have bee
 1. **Object Detection**: https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc/model/12
 2. **Field Detection**: https://universe.roboflow.com/roboflow-jvuqo/football-field-detection-f07vi/model/15
 
+As well as some predefined classes from  <https://blog.roboflow.com/camera-calibration-sports-computer-vision/#using-keypoint-detection-models>
+
 I attempted to train myself with the same dataset, but could not achieve nearly the same amount of accuracy.
 
 ## How does it work?
@@ -22,11 +24,14 @@ I attempted to train myself with the same dataset, but could not achieve nearly 
 3. **2D Transformation**: Perform homography to transform the annotated image to a 2D plane.
 4. **XG Calculation**: Calculate the expected goal (XG) based on the positions and actions captured in the 2D transformation.
 
+## XG Model
+I took major inspiration from  a notebook found from <https://medium.com/@alf.19x/how-to-build-your-own-expected-goals-xg-model-2bd186dccdf7> that uses the mplsoccer package to train an XG model. I edited the code to change the competitions and seasons that were selected. 
+
 ## Example
 
 - ![Image](https://i.ibb.co/YyyMsrC/image.png)
 - ![Annotated Image](https://i.ibb.co/9whmLhj/annotated.png)
-- ![Transformed Image](https://i.ibb.co/Rggn96K/transformed.png)
+- ![Transformed Image][https://i.ibb.co/K2vTRdc/output.png)
 
 
 ## Prerequsites
@@ -39,10 +44,6 @@ I attempted to train myself with the same dataset, but could not achieve nearly 
 - 'matplotlib'
 - 'collections'
 
-
-## Future Work
-
-The integration of the XG Model is still in progress. 
 
 ## Contributing
 
