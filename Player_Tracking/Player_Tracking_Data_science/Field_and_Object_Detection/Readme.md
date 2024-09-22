@@ -31,7 +31,7 @@ I took major inspiration from  a notebook found from <https://medium.com/@alf.19
 
 - ![Image](https://i.ibb.co/YyyMsrC/image.png)
 - ![Annotated Image](https://i.ibb.co/9whmLhj/annotated.png)
-- ![Transformed Image][https://i.ibb.co/K2vTRdc/output.png)
+- ![Transformed Image](https://i.ibb.co/K2vTRdc/output.png)
 
 
 ## Prerequsites
