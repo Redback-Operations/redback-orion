@@ -39,6 +39,15 @@ Ensure you have the following installed:
    conda activate llms
    ```
 
+<font color="red">In case you are not using conda to setup your environment and want to use PIP please follow the unsloth documentation https://docs.unsloth.ai/get-started/installation/pip-install 
+and install the required dependencies as follows:
+</font>
+
+```Python
+!pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+!pip install --no-deps xformers trl peft accelerate bitsandbytes
+```
+
 2. **Configure environment variables**:
 
    Create a `.env` file at the root of the project and add the following variables:
@@ -71,7 +80,38 @@ Ensure you have the following installed:
 
 5. **Important**: Ensure you have CUDA installed if you wish to run the model on a GPU.
 
-Here's how you can update the README to include the minimum system requirements for running the API:
+6. If you are working on the LLAMA models please use below link to get an HF_token: 
+https://huggingface.co/settings/tokens
+
+### Steps to Get a Hugging Face Token
+
+  1. **Create a Hugging Face Account**:
+    - Go to [Hugging Face](https://huggingface.co/join) and sign up for a new account or log in if you already have one.
+
+  2. **Navigate to the Settings Page**:
+    - Once logged in, click on your profile picture in the top right corner.
+    - Select "Settings" from the dropdown menu.
+
+  3. **Access the Tokens Section**:
+    - In the settings page, find and click on the "Access Tokens" tab on the left sidebar.
+
+  4. **Generate a New Token**:
+    - Click on the "New token" button.
+    - Provide a name for your token and select the appropriate role (e.g., `read`).
+    - Click on the "Generate" button.
+
+  5. **Copy the Token**:
+    - Once the token is generated, copy it and store it securely.
+    - You will need this token to access Hugging Face models and APIs.
+
+  6. **Add the Token to Your Environment Variables**:
+    - Open your `.env` file in the root of your project.
+    - Add the following line, replacing `<Your Hugging Face Token>` with the token you just generated:
+      ```
+      HF_TOKEN=<Your Hugging Face Token>
+     ```
+
+
 
 ## Minimum System Requirements
 
