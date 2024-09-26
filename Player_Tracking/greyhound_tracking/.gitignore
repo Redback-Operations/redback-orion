@@ -1,0 +1,6 @@
+Pipfile
+Pipfile.lock
+.ipynb_checkpoints/
+output/
+*.pt
+*mp4
