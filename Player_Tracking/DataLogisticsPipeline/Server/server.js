@@ -1,3 +1,7 @@
+require('dotenv').config();
+const username = process.env.MONGODB_USER;
+const password = process.env.MONGODB_PASSWORD;
+
 const mqtt = require('mqtt')
 const mongoose = require('mongoose');
 const kafka = require("kafka-node");
@@ -50,7 +54,7 @@ main();
  */
 function main(){
     // Connect to the database
-    mongoose.connect('mongodb://admin:1234@mongo:27017/server?authSource=admin');
+    mongoose.connect('mongodb://'+username + ':' + password + '@mongo:27017/server?authSource=' + username);
 
     // Connect to the mqtt broker
     const mqttClient = mqtt.connect(
