@@ -66,6 +66,10 @@ We welcome contributions! Please follow these steps:
    ```
 5. **Open a pull request.**
 
+## Future Work
+In the files, you will find my notebooks where I attempt at training the object detection and keypoints models. Unfortunately, they are not nearly as accurate as the pre-trained models. The next step would definitely be in training the models yourself, which would allow further refinement and control over the entire process. 
+
+
 ## Contributors
 
 - [Miguel Marabut](https://github.com/MigsMarabut)
