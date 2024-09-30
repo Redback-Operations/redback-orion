@@ -27,6 +27,8 @@ I attempted to train myself with the same dataset, but could not achieve nearly 
 ## XG Model
 I took major inspiration from  a notebook found from <https://medium.com/@alf.19x/how-to-build-your-own-expected-goals-xg-model-2bd186dccdf7> that uses the mplsoccer package to train an XG model. I edited the code to change the competitions and seasons that were selected. 
 
+How we set it up is using 7 seasons, 2 Bundesliga (German League), and 5 Champion's League seasons. We then train a model using Angle and Distance as the predictor variables and if the shot was a goal or not as the outcome. Doing this allowed the model to hit an R2 of 0.15, which is an increase from the baseline in the blog which was 0.08, but not quite as high as the StatsBomb R@ score of 0.20. 
+
 ## Example
 
 - ![Image](https://i.ibb.co/YyyMsrC/image.png)
