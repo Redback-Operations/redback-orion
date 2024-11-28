@@ -1,4 +1,0 @@
-kafka-python==2.0.1
-pandas==1.5.1
-prophet==1.1.5
-numpy==1.26.4
