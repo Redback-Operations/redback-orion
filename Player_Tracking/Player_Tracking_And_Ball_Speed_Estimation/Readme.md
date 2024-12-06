@@ -145,8 +145,11 @@ cv2.destroyAllWindows()
 #### 6. Viewing the Results
 
 - Once you run the script, a window will open displaying the live video feed.
+  ![Live Video Feed](images/live_video_feed.png)
 - The code will draw bounding boxes around detected players (in green) and the ball (in red).
+  ![Bounding Boxes](images/bounding_boxes.png)
 - It will also estimate and display the speed of the ball.
+  ![Ball Speed Estimation](images/ball_speed_estimation.png)
 - Press the 'q' key to exit the video feed.
 
 ### Troubleshooting
