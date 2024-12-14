@@ -48,7 +48,7 @@ The model achieves:
   - **F1-Score**: A balance of precision and recall.
 
 
-![Screenshot of the Model Performance](model_accuracy.png "Model Performance")
+![Screenshot of the Model Performance](images/model_accuracy.png "Model Performance")
 
 ---
 
@@ -100,7 +100,7 @@ The prediction script (`Predictor.ipynb`) allows you to make predictions by manu
    - **A**: Away Win
    - **D**: Draw.
 
-![Screenshot of the Result](Result.png "Model Result")
+![Screenshot of the Result](images/Result.png "Model Result")
 
 ---
 
