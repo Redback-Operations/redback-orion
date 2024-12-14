@@ -1,6 +1,21 @@
 # coding:utf-8
 from ultralytics import YOLO
 import cv2
+import os
+
+
+def validate_file_path(file_path, base_dir="."):
+    """
+    Validate if a file path is within a specific base directory.
+    Prevents directory traversal attacks.
+    """
+    abs_path = os.path.abspath(file_path)
+    base_dir = os.path.abspath(base_dir)
+
+    if not abs_path.startswith(base_dir):
+        raise ValueError(f"Invalid file path: {file_path}")
+
+    return abs_path
 
 
 def img_cvread(img_path):
@@ -31,8 +46,18 @@ def adjust_parameters(width, height):
 
 
 if __name__ == '__main__':
-    img_path    = ""  # Input  video file path
-    output_path = ""  # Output video file path
+    base_dir = "."  # Define a base directory to validate file paths
+
+    img_path = ""       # Input image file path
+    output_path = ""    # Output image file path
+
+    # Validate file paths
+    try:
+        img_path = validate_file_path(img_path, base_dir)
+        output_path = validate_file_path(output_path, base_dir)
+    except ValueError as e:
+        print(e)
+        exit()
 
     # Path to the face detection model
     face_model_path = 'face_detector.pt'
@@ -41,6 +66,10 @@ if __name__ == '__main__':
     face_model = YOLO(face_model_path, task='detect')
 
     cv_img = img_cvread(img_path)
+    if cv_img is None:
+        print(f"Error: Could not read image from path: {img_path}")
+        exit()
+
     height, width = cv_img.shape[:2]
 
     # Adjust parameters

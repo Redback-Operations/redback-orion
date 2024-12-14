@@ -1,8 +1,22 @@
 # coding:utf-8
 from ultralytics import YOLO
 import cv2
-import numpy as np
+import os
 from moviepy.editor import VideoFileClip, AudioFileClip
+
+
+def validate_file_path(file_path, base_dir="."):
+    """
+    Validate if a file path is within a specific base directory.
+    Prevents directory traversal attacks.
+    """
+    abs_path = os.path.abspath(file_path)
+    base_dir = os.path.abspath(base_dir)
+
+    if not abs_path.startswith(base_dir):
+        raise ValueError(f"Invalid file path: {file_path}")
+
+    return abs_path
 
 
 def face_detect(cv_img, face_model):
@@ -32,8 +46,18 @@ def process_frame(frame, face_model):
 
 
 if __name__ == '__main__':
-    video_path  = ""  # Input  video file path
-    output_path = ""  # Output video file path
+    base_dir = "."  # Define a base directory to validate file paths
+
+    video_path = ""     # Input video file path
+    output_path = ""    # Output video file path
+
+    # Validate file paths
+    try:
+        video_path = validate_file_path(video_path, base_dir)
+        output_path = validate_file_path(output_path, base_dir)
+    except ValueError as e:
+        print(e)
+        exit()
 
     # Path to the face detection model
     face_model_path = 'face_detector.pt'
@@ -43,6 +67,9 @@ if __name__ == '__main__':
 
     # Open the video file
     cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Could not open video file: {video_path}")
+        exit()
 
     # Get video properties
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
