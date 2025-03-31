@@ -1,0 +1,7 @@
+Metric,Value
+hip_angle,42.96712
+knee_angle,145.7039
+hip_alignment,Hip angle is too low. Ensure proper depth without excessive bending.
+knee_alignment,Knee angle is too high. Bend your knees more to achieve proper squat depth.
+back_angle,180.0
+back_alignment,Back angle is ideal. Great form!

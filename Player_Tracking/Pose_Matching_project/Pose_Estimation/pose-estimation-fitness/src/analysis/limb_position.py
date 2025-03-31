@@ -58,27 +58,25 @@ def evaluate_limb_positions(landmarks, exercise_type):
     return results
 
 def calculate_angle(point_a, point_b, point_c):
-    """
-    Calculate the angle between three points.
-    
-    Parameters:
-    point_a (tuple): Coordinates of the first point (x, y).
-    point_b (tuple): Coordinates of the second point (x, y).
-    point_c (tuple): Coordinates of the third point (x, y).
-    
-    Returns:
-    float: The angle in degrees.
-    """
-    a = np.array(point_a)
-    b = np.array(point_b)
-    c = np.array(point_c)
-    
-    ba = a - b
-    bc = c - b
-    
+    # Calculate the angle between three points
+    ba = point_a - point_b
+    bc = point_c - point_b
     cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
-    angle = np.arccos(np.clip(cosine_angle, -1.0, 1.0))  # Clip to avoid numerical errors
+    angle = np.arccos(np.clip(cosine_angle, -1.0, 1.0))
     return np.degrees(angle)
+
+def calculate_midpoint(point_a, point_b):
+    """
+    Calculate the midpoint between two points.
+
+    Parameters:
+    point_a (np.ndarray): The first point (x, y).
+    point_b (np.ndarray): The second point (x, y).
+
+    Returns:
+    np.ndarray: The midpoint (x, y).
+    """
+    return (point_a + point_b) / 2
 
 def calculate_strain(landmarks, exercise_type):
     """
@@ -86,7 +84,7 @@ def calculate_strain(landmarks, exercise_type):
 
     Parameters:
     landmarks (np.ndarray): Array of shape (N, 2) containing the (x, y) coordinates of key points.
-    exercise_type (str): The type of exercise being performed (e.g., 'deadlift', 'bench press').
+    exercise_type (str): The type of exercise being performed (e.g., 'deadlift', 'bench press', 'squat').
 
     Returns:
     dict: A dictionary containing strain metrics and detailed explanations.
@@ -101,31 +99,32 @@ def calculate_strain(landmarks, exercise_type):
         strain_results['hip_angle'] = hip_angle
         strain_results['knee_angle'] = knee_angle
 
-        # Check if hips are straight across
-        if abs(landmarks[11][1] - landmarks[12][1]) > 10:  # Allowable y-coordinate difference
-            strain_results['hip_alignment'] = (
-                "Hips are not straight across. Ensure the left and right hips are level."
-            )
-        else:
-            strain_results['hip_alignment'] = "Hips are straight across."
+        # Debugging statements to verify calculations
+        print(f"Debug: Hip angle = {hip_angle}")
+        print(f"Debug: Knee angle = {knee_angle}")
 
-        # Check if back is straight
-        back_angle = calculate_angle(landmarks[1], landmarks[12], landmarks[11])  # Neck to spine to hips
+        # Calculate the midpoint of the back (spine)
+        back_midpoint = calculate_midpoint(landmarks[1], landmarks[12])  # Neck to spine midpoint
+        back_angle = calculate_angle(landmarks[1], back_midpoint, landmarks[12])  # Neck to midpoint to spine
+
         strain_results['back_angle'] = back_angle
-        if back_angle < 160 or back_angle > 180:
-            strain_results['back_straightness'] = (
-                "Back is not straight. Ensure the back is aligned and avoid rounding."
-            )
-        else:
-            strain_results['back_straightness'] = "Back is straight."
+        print(f"Debug: Back angle = {back_angle}")
 
-        # Check if knees are bent
-        if knee_angle > 170:
-            strain_results['knee_bend'] = (
-                "Knees are not bent enough. Bend the knees slightly to maintain proper form."
+        # Provide feedback based on the back angle
+        if back_angle < 120:
+            strain_results['back_alignment'] = (
+                "Back angle is too low (poor form). Straighten your back to improve alignment."
             )
+        elif 120 <= back_angle < 170:
+            strain_results['back_alignment'] = (
+                "Back angle is acceptable but could be improved. Aim for a straighter back."
+            )
+        elif 170 <= back_angle <= 190:
+            strain_results['back_alignment'] = "Back angle is ideal. Great form!"
         else:
-            strain_results['knee_bend'] = "Knees are bent properly."
+            strain_results['back_alignment'] = (
+                "Back angle is too high (overextension). Avoid arching your back excessively."
+            )
 
     elif exercise_type == 'bench press':
         # Example: Calculate strain on shoulders
@@ -135,20 +134,80 @@ def calculate_strain(landmarks, exercise_type):
         strain_results['elbow_angle'] = elbow_angle
         strain_results['shoulder_angle'] = shoulder_angle
 
+        # Debugging statements for bench press
+        print(f"Debug: Elbow angle = {elbow_angle}")
+        print(f"Debug: Shoulder angle = {shoulder_angle}")
+
         if elbow_angle < 90:
             strain_results['elbow_strain'] = (
-                "High strain on elbows. The elbow angle is too small, indicating excessive bending. "
-                "This can lead to joint stress and reduced stability. Adjust arm position to achieve a 90-degree angle."
+                "High strain on elbows. The elbow angle is too small, indicating excessive bending."
             )
         else:
-            strain_results['elbow_strain'] = "Elbow strain is minimal. The elbow angle is within the optimal range."
+            strain_results['elbow_strain'] = "Elbow strain is minimal."
 
         if shoulder_angle > 180:
             strain_results['shoulder_strain'] = (
-                "High strain on shoulders. The shoulder angle is too large, indicating overextension. "
-                "This can cause shoulder impingement or discomfort. Lower the shoulders to reduce strain."
+                "High strain on shoulders. The shoulder angle is too large, indicating overextension."
             )
         else:
-            strain_results['shoulder_strain'] = "Shoulder strain is minimal. The shoulder angle is within the optimal range."
+            strain_results['shoulder_strain'] = "Shoulder strain is minimal."
+
+    elif exercise_type == 'squat':
+        # Example: Calculate strain for squats
+        hip_angle = calculate_angle(landmarks[11], landmarks[12], landmarks[14])  # Hip angle
+        knee_angle = calculate_angle(landmarks[12], landmarks[14], landmarks[16])  # Knee angle
+
+        strain_results['hip_angle'] = hip_angle
+        strain_results['knee_angle'] = knee_angle
+
+        # Debugging statements to verify calculations
+        print(f"Debug: Hip angle = {hip_angle}")
+        print(f"Debug: Knee angle = {knee_angle}")
+
+        # Provide feedback for squats
+        if hip_angle < 90:
+            strain_results['hip_alignment'] = (
+                "Hip angle is too low. Ensure proper depth without excessive bending."
+            )
+        elif 90 <= hip_angle <= 120:
+            strain_results['hip_alignment'] = "Hip angle is ideal. Great form!"
+        else:
+            strain_results['hip_alignment'] = (
+                "Hip angle is too high. Lower your hips to achieve proper squat depth."
+            )
+
+        if knee_angle < 90:
+            strain_results['knee_alignment'] = (
+                "Knee angle is too low. Ensure proper alignment without excessive bending."
+            )
+        elif 90 <= knee_angle <= 120:
+            strain_results['knee_alignment'] = "Knee angle is ideal. Great form!"
+        else:
+            strain_results['knee_alignment'] = (
+                "Knee angle is too high. Bend your knees more to achieve proper squat depth."
+            )
+
+        # Calculate the midpoint of the back (spine)
+        back_midpoint = calculate_midpoint(landmarks[1], landmarks[12])  # Neck to spine midpoint
+        back_angle = calculate_angle(landmarks[1], back_midpoint, landmarks[12])  # Neck to midpoint to spine
+
+        strain_results['back_angle'] = back_angle
+        print(f"Debug: Back angle = {back_angle}")
+
+        # Provide feedback based on the back angle
+        if back_angle < 120:
+            strain_results['back_alignment'] = (
+                "Back angle is too low (poor form). Straighten your back to improve alignment."
+            )
+        elif 120 <= back_angle < 170:
+            strain_results['back_alignment'] = (
+                "Back angle is acceptable but could be improved. Aim for a straighter back."
+            )
+        elif 170 <= back_angle <= 190:
+            strain_results['back_alignment'] = "Back angle is ideal. Great form!"
+        else:
+            strain_results['back_alignment'] = (
+                "Back angle is too high (overextension). Avoid arching your back excessively."
+            )
 
     return strain_results
