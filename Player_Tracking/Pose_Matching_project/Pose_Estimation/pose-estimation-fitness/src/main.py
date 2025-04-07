@@ -6,6 +6,7 @@ from torchvision.models.detection import keypointrcnn_resnet50_fpn
 from analysis.limb_position import calculate_strain
 import os
 import csv
+import random
 
 def load_pose_model(device='cpu'):
     model = keypointrcnn_resnet50_fpn(weights="KeypointRCNN_ResNet50_FPN_Weights.DEFAULT")
@@ -106,6 +107,214 @@ def list_files_in_data_directory(data_dir):
         print(f"Error: Directory {data_dir} not found.")
         return []
 
+def evaluate_images(data_dir, model, device, exercise_type):
+    """
+    Evaluate all images in the data directory and find the one with the best form.
+
+    Parameters:
+    data_dir (str): Path to the data directory.
+    model: The pose estimation model.
+    device (str): Device to run the model on.
+    exercise_type (str): Type of exercise being evaluated.
+
+    Returns:
+    tuple: The best image path and its corresponding strain results.
+    """
+    best_image_path = None
+    best_strain_score = float('inf')  # Lower strain score is better
+    best_strain_results = None
+
+    for file in os.listdir(data_dir):
+        image_path = os.path.join(data_dir, file)
+        if not os.path.isfile(image_path):
+            continue
+
+        image = cv.imread(image_path)
+        if image is None:
+            print(f"Warning: Unable to read image {image_path}. Skipping.")
+            continue
+
+        predictions = pose_estimation(image, model, device)
+        keypoints = predictions['keypoints'].cpu().numpy()  # Shape: [num_people, num_keypoints, 3]
+
+        if len(keypoints) > 0:
+            person_keypoints = keypoints[0][:, :2]  # Extract (x, y) coordinates
+            strain_results = calculate_strain(person_keypoints, exercise_type)
+
+            # Calculate a total strain score (sum of numeric strain metrics)
+            numeric_strain_results = {
+                key: value for key, value in strain_results.items()
+                if isinstance(value, (int, float))
+            }
+            total_strain_score = sum(numeric_strain_results.values())
+
+            # Update the best image if this one has a lower strain score
+            if total_strain_score < best_strain_score:
+                best_image_path = image_path
+                best_strain_score = total_strain_score
+                best_strain_results = strain_results
+
+    return best_image_path, best_strain_results
+
+def display_images_with_strain(data_dir, model, device, exercise_type):
+    """
+    Display all images in the data directory alongside their corresponding strain graphs.
+
+    Parameters:
+    data_dir (str): Path to the data directory.
+    model: The pose estimation model.
+    device (str): Device to run the model on.
+    exercise_type (str): Type of exercise being evaluated.
+    """
+    images = []
+    strain_graphs = []
+
+    for file in os.listdir(data_dir):
+        image_path = os.path.join(data_dir, file)
+        if not os.path.isfile(image_path):
+            continue
+
+        image = cv.imread(image_path)
+        if image is None:
+            print(f"Warning: Unable to read image {image_path}. Skipping.")
+            continue
+
+        predictions = pose_estimation(image, model, device)
+        keypoints = predictions['keypoints'].cpu().numpy()  # Shape: [num_people, num_keypoints, 3]
+
+        if len(keypoints) > 0:
+            person_keypoints = keypoints[0][:, :2]  # Extract (x, y) coordinates
+            strain_results = calculate_strain(person_keypoints, exercise_type)
+
+            # Draw pose on the image
+            image_with_pose = draw_pose(image.copy(), keypoints, strain_results)
+            images.append(image_with_pose)
+
+            # Create strain graph
+            numeric_strain_results = {
+                key: value for key, value in strain_results.items()
+                if isinstance(value, (int, float))
+            }
+            if numeric_strain_results:
+                keys = list(numeric_strain_results.keys())
+                values = list(numeric_strain_results.values())
+                fig, ax = plt.subplots(figsize=(4, 3))
+                ax.barh(keys, values, color='skyblue')
+                ax.set_title("Strain Metrics")
+                ax.set_xlabel("Value")
+                ax.set_xlim(0, max(values) * 1.2)
+                fig.canvas.draw()
+                graph_image = np.frombuffer(fig.canvas.tostring_argb(), dtype=np.uint8)
+                graph_image = graph_image.reshape(fig.canvas.get_width_height()[::-1] + (4,))
+                graph_image = graph_image[:, :, 1:]  # Convert ARGB to RGB by dropping the alpha channel
+                plt.close(fig)
+                strain_graphs.append(graph_image)
+            else:
+                strain_graphs.append(None)
+
+    # Combine images and graphs into a single figure
+    num_images = len(images)
+    fig, axes = plt.subplots(num_images, 2, figsize=(10, 5 * num_images))
+
+    for i, (image, graph) in enumerate(zip(images, strain_graphs)):
+        axes[i, 0].imshow(cv.cvtColor(image, cv.COLOR_BGR2RGB))
+        axes[i, 0].axis('off')
+        axes[i, 0].set_title(f"Image {i + 1}")
+
+        if graph is not None:
+            axes[i, 1].imshow(graph)
+            axes[i, 1].axis('off')
+            axes[i, 1].set_title(f"Strain Graph {i + 1}")
+        else:
+            axes[i, 1].text(0.5, 0.5, "No Strain Data", ha='center', va='center', fontsize=12)
+            axes[i, 1].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+def display_best_and_worst_images_with_strain(data_dir, model, device, exercise_type):
+    """
+    Display the best and worst form images from the data directory with their corresponding strain graphs.
+
+    Parameters:
+    data_dir (str): Path to the data directory.
+    model: The pose estimation model.
+    device (str): Device to run the model on.
+    exercise_type (str): Type of exercise being evaluated.
+    """
+    image_data = []
+
+    for file in os.listdir(data_dir):
+        image_path = os.path.join(data_dir, file)
+        if not os.path.isfile(image_path):
+            continue
+
+        image = cv.imread(image_path)
+        if image is None:
+            print(f"Warning: Unable to read image {image_path}. Skipping.")
+            continue
+
+        predictions = pose_estimation(image, model, device)
+        keypoints = predictions['keypoints'].cpu().numpy()  # Shape: [num_people, num_keypoints, 3]
+
+        if len(keypoints) > 0:
+            person_keypoints = keypoints[0][:, :2]  # Extract (x, y) coordinates
+            strain_results = calculate_strain(person_keypoints, exercise_type)
+
+            # Calculate a total strain score (sum of numeric strain metrics)
+            numeric_strain_results = {
+                key: value for key, value in strain_results.items()
+                if isinstance(value, (int, float))
+            }
+            total_strain_score = sum(numeric_strain_results.values())
+
+            # Store image data
+            image_data.append({
+                "image_path": image_path,
+                "image": image,
+                "keypoints": keypoints,
+                "strain_results": strain_results,
+                "total_strain_score": total_strain_score
+            })
+
+    if len(image_data) < 2:
+        print("Not enough images to select best and worst. Exiting.")
+        return
+
+    # Find the best and worst images based on total strain score
+    best_image = min(image_data, key=lambda x: x["total_strain_score"])
+    worst_image = max(image_data, key=lambda x: x["total_strain_score"])
+
+    # Display the best and worst images with their strain graphs
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))  # 2 rows, 2 columns
+
+    for i, (rank, data) in enumerate([("Best", best_image), ("Worst", worst_image)]):
+        # Draw pose on the image
+        image_with_pose = draw_pose(data["image"].copy(), data["keypoints"], data["strain_results"])
+
+        # Display the image
+        axes[i, 0].imshow(cv.cvtColor(image_with_pose, cv.COLOR_BGR2RGB))
+        axes[i, 0].axis('off')
+        axes[i, 0].set_title(f"{rank} Form: {data['image_path']}")
+
+        # Create and display the strain graph
+        numeric_strain_results = {
+            key: value for key, value in data["strain_results"].items()
+            if isinstance(value, (int, float))
+        }
+        if numeric_strain_results:
+            keys = list(numeric_strain_results.keys())
+            values = list(numeric_strain_results.values())
+            axes[i, 1].barh(keys, values, color='skyblue')
+            axes[i, 1].set_title(f"Strain Metrics ({rank} Form)")
+            axes[i, 1].set_xlabel("Value")
+        else:
+            axes[i, 1].text(0.5, 0.5, "No Strain Data", ha='center', va='center', fontsize=12)
+            axes[i, 1].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
 def main():
     print("Current working directory:", os.getcwd())  # Debugging statement
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -127,72 +336,14 @@ def main():
         print("Error: Invalid input. Exiting.")
         return
 
-    # List files in the data directory and prompt user to select one
-    data_dir = r"c:\Users\Lukgv\OneDrive\Desktop\REDBACK\redback-orion\Player_Tracking\Pose_Matching_project\Pose_Estimation\data"
-    files = list_files_in_data_directory(data_dir)
-    if not files:
-        print("No files found in the data directory. Exiting.")
+    # List files in the data directory
+    data_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'data')  # Relative path to the data directory
+    if not os.path.exists(data_dir):
+        print(f"Error: Data directory {data_dir} does not exist. Exiting.")
         return
 
-    print("Available files in the data directory:")
-    for i, file in enumerate(files, start=1):
-        print(f"{i}. {file}")
-
-    try:
-        file_index = int(input("Enter the number of the file to load: ")) - 1
-        if file_index < 0 or file_index >= len(files):
-            print("Error: Invalid file selection. Exiting.")
-            return
-        image_path = os.path.join(data_dir, files[file_index])
-    except ValueError:
-        print("Error: Invalid input. Exiting.")
-        return
-
-    csv_path = os.path.join(data_dir, "strain_results.csv")
-    image = cv.imread(image_path)
-    if image is None:
-        raise FileNotFoundError(f"Image not found: {image_path}")
-
-    predictions = pose_estimation(image, model, device)
-    keypoints = predictions['keypoints'].cpu().numpy()  # Shape: [num_people, num_keypoints, 3]
-    strain_results = None
-
-    if len(keypoints) > 0:
-        person_keypoints = keypoints[0][:, :2]  # Extract (x, y) coordinates
-        strain_results = calculate_strain(person_keypoints, exercise_type)
-        print("Strain Results:", strain_results)
-
-        # Save strain results to CSV
-        save_strain_results_to_csv(strain_results, csv_path)
-
-    # Load strain results from CSV for plotting
-    strain_results = load_strain_results_from_csv(csv_path)
-
-    # Filter out non-numeric or unwanted keys
-    numeric_strain_results = {
-        key: value for key, value in strain_results.items()
-        if isinstance(value, (int, float)) and key not in ['back_straightness', 'hip_alignment']
-    }
-
-    image_with_pose = draw_pose(image, keypoints, strain_results)
-
-    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
-    axes[0].imshow(cv.cvtColor(image_with_pose, cv.COLOR_BGR2RGB))
-    axes[0].axis('off')
-    axes[0].set_title("Pose Estimation")
-
-    if numeric_strain_results:
-        keys = list(numeric_strain_results.keys())
-        values = list(numeric_strain_results.values())
-        axes[1].barh(keys, values, color='skyblue')
-        axes[1].set_title("Strain Metrics")
-        axes[1].set_xlabel("Value")
-    else:
-        axes[1].text(0.5, 0.5, "No Strain Data", ha='center', va='center', fontsize=12)
-        axes[1].axis('off')
-
-    plt.tight_layout()
-    plt.show()
+    # Display the best and worst images with their corresponding strain graphs
+    display_best_and_worst_images_with_strain(data_dir, model, device, exercise_type)
 
 if __name__ == "__main__":
     main()
