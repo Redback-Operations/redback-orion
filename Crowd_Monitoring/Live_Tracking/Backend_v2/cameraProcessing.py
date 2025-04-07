@@ -8,15 +8,20 @@ from floorReplica import FloorPlanAnnotator
 from coordinateSelector import CoordinateSelector
 import time as time_module
 import os
+import threading
+import queue
+from datetime import datetime
+import platform
 
 class CameraProcessor:
-    def __init__(self, source=0, is_video=False):
+    def __init__(self, source=0, is_video=False, queue_size=10):
         """
-        Initialize the camera processor
+        Initialize the camera processor with multi-threading support
         
         Args:
             source (str/int): Camera index, video file path, or RTSP stream
             is_video (bool): Flag to indicate if source is a video file
+            queue_size (int): Maximum size of frame and results queues
         """
         # Initialize YOLO model for object detection
         self.model = YOLO("yolov8n.pt")
@@ -31,9 +36,16 @@ class CameraProcessor:
         
         self.cap = cv2.VideoCapture(source)
         
+        # Determine floor plan image path
+        current_dir = os.path.dirname(__file__)
+        floor_plan_path = os.path.join(current_dir, "/Users/apple/Desktop/Deakin/T2_2024/SIT764_Capstone/Crowd_Monitor/Stork Fountain.jpg")
+        
         # Initialize tracking and annotation components
         self.track_history = defaultdict(list)
-        self.floor_annotator = FloorPlanAnnotator()
+        self.floor_annotator = FloorPlanAnnotator(
+            background_image=floor_plan_path,
+            show_grid=True
+        )
         
         # Coordinate selection and homography
         self.coordinator = CoordinateSelector(source, is_video)
@@ -42,6 +54,28 @@ class CameraProcessor:
         # Database for tracking
         # self.db = Database()
         self.current_frame_id = 0
+        
+        # Threading and queue setup
+        self.frame_queue = queue.Queue(maxsize=queue_size)
+        self.results_queue = queue.Queue(maxsize=queue_size)
+        
+        # Threading control
+        self.running = False
+        self.threads = []
+        
+        # FPS calculation
+        self.fps = 0
+        self.frame_count = 0
+        self.start_time = 0
+        
+        # Frames for display - used to pass frames between threads safely
+        self.display_frame = None
+        self.display_floor_plan = None
+        self.display_lock = threading.Lock()
+        
+        # Detect operating system for platform-specific handling
+        self.is_macos = platform.system() == 'Darwin'
+        print(f"Running on: {platform.system()}")
     
     def _calculate_homography(self):
         """Calculate homography matrix with fallback to default points"""
@@ -52,6 +86,79 @@ class CameraProcessor:
             pts_dst = np.array([[0, 990], [699, 988], [693, 658], [0, 661], [141, 988]])
             matrix = calculateHomography(pts_src, pts_dst)
         return matrix
+    
+    def capture_thread(self):
+        """Thread function for capturing frames"""
+        print("Capture thread started")
+        self.frame_count = 0
+        self.start_time = time_module.time()
+        
+        while self.running:
+            success, frame = self.cap.read()
+            if not success:
+                if self.is_video:
+                    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    continue
+                print("Failed to read video stream")
+                self.running = False
+                break
+            
+            if not self.frame_queue.full():
+                self.frame_queue.put(frame)
+                self.frame_count += 1
+                
+                # Calculate FPS every 30 frames
+                if self.frame_count % 30 == 0:
+                    end_time = time_module.time()
+                    self.fps = 30 / (end_time - self.start_time)
+                    self.start_time = end_time
+            else:
+                # If queue is full, skip this frame
+                time_module.sleep(0.01)
+    
+    def processing_thread(self):
+        """Thread function for processing frames"""
+        print("Processing thread started")
+        
+        while self.running:
+            if not self.frame_queue.empty():
+                frame = self.frame_queue.get()
+                try:
+                    # Process frame
+                    annotated_frame, floor_annotated_frame = self.process_frame(frame)
+                    
+                    # Add timestamp
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    cv2.putText(annotated_frame, f"FPS: {self.fps:.2f}", (10, 30), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    cv2.putText(annotated_frame, timestamp, (10, 60), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    
+                    # Update frames for display thread
+                    with self.display_lock:
+                        self.display_frame = annotated_frame
+                        self.display_floor_plan = floor_annotated_frame
+                except Exception as e:
+                    print(f"Error processing frame: {e}")
+            else:
+                # If no frames to process, wait a bit
+                time_module.sleep(0.01)
+    
+    def main_thread_display(self):
+        """Function to display frames from the main thread (macOS compatible)"""
+        if not self.running:
+            return
+        
+        with self.display_lock:
+            if self.display_frame is not None:
+                cv2.imshow("Annotated Frame", self.display_frame)
+            if self.display_floor_plan is not None:
+                cv2.imshow("Floor Annotation", self.display_floor_plan)
+                
+        # Check for exit key - must be called from main thread
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            self.running = False
     
     def process_frame(self, frame):
         """
@@ -64,11 +171,7 @@ class CameraProcessor:
             tuple: Annotated frame and floor plan annotation
         """
         try:
-            results = self.model.track(frame, persist=True, show=False, imgsz=1280, verbose=True)
-            
-            # Print detection information
-            print(f"Total detections: {len(results[0].boxes)}")
-            print(f"Human detections: {sum(results[0].boxes.cls.cpu().numpy() == 0)}")
+            results = self.model.track(frame, persist=True, show=False, imgsz=1280, verbose=False)
             
             # Prepare annotation frames
             annotated_frame = frame.copy()
@@ -141,66 +244,116 @@ class CameraProcessor:
             return frame, self.floor_annotator.get_floor_plan()
     
     def run(self):
-        """Run continuous video processing"""
-        while True:
-            success, frame = self.cap.read()
-            
-            if not success:
-                # Reset video if it's a video file
-                if self.is_video:
-                    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-                    continue
-                raise Exception("Failed to read video stream")
-            
-            # Process and display frames
-            annotated_frame, floor_annotated_frame = self.process_frame(frame)
-            cv2.imshow("Annotated Frame", annotated_frame)
-            cv2.imshow("Floor Annotation", floor_annotated_frame)
-            print("annoted frame and floor annotation done")
-            # Exit on 'q' key
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+        """Start processing with macOS-compatible threading"""
+        self.running = True
         
-        self.release()
+        # Create and start worker threads
+        capture_thread = threading.Thread(target=self.capture_thread)
+        process_thread = threading.Thread(target=self.processing_thread)
+        
+        # Set as daemon threads so they exit when main program exits
+        capture_thread.daemon = True
+        process_thread.daemon = True
+        
+        # Start threads
+        capture_thread.start()
+        process_thread.start()
+        
+        # Store threads
+        self.threads = [capture_thread, process_thread]
+        
+        # Main loop for UI operations (always runs on main thread)
+        try:
+            while self.running:
+                # Display frames from main thread only
+                self.main_thread_display()
+                
+                # Yield to other threads
+                time_module.sleep(0.01)
+        except KeyboardInterrupt:
+            print("Interrupted by user")
+        finally:
+            self.running = False
+            self.release()
     
     def get_frame(self):
         """Generator for streaming annotated frames"""
+        # Start worker threads if not already running
+        if not self.running:
+            self.running = True
+            capture_thread = threading.Thread(target=self.capture_thread)
+            process_thread = threading.Thread(target=self.processing_thread)
+            capture_thread.daemon = True
+            process_thread.daemon = True
+            capture_thread.start()
+            process_thread.start()
+            self.threads = [capture_thread, process_thread]
+        
         while True:
-            success, frame = self.cap.read()
-            if not success:
-                raise Exception("Failed to read video stream")
-            
-            annotated_frame, _ = self.process_frame(frame)
-            ret, buffer = cv2.imencode('.jpg', annotated_frame)
-            frame = buffer.tobytes()
-            
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            try:
+                # Wait for frame to be processed
+                with self.display_lock:
+                    if self.display_frame is not None:
+                        # Make a copy to avoid race conditions
+                        frame_copy = self.display_frame.copy()
+                        ret, buffer = cv2.imencode('.jpg', frame_copy)
+                        frame_bytes = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                    else:
+                        time_module.sleep(0.05)
+            except Exception as e:
+                print(f"Stream error: {e}")
+                time_module.sleep(0.1)
     
     def get_annotated_frame(self):
         """Generator for streaming floor plan annotations"""
+        # Start worker threads if not already running
+        if not self.running:
+            self.running = True
+            capture_thread = threading.Thread(target=self.capture_thread)
+            process_thread = threading.Thread(target=self.processing_thread)
+            capture_thread.daemon = True
+            process_thread.daemon = True
+            capture_thread.start()
+            process_thread.start()
+            self.threads = [capture_thread, process_thread]
+        
         while True:
-            success, frame = self.cap.read()
-            if not success:
-                raise Exception("Failed to read video stream")
-            
-            _, floor_annotated_frame = self.process_frame(frame)
-            ret, buffer = cv2.imencode('.jpg', floor_annotated_frame)
-            frame = buffer.tobytes()
-            
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            try:
+                # Wait for floor plan to be processed
+                with self.display_lock:
+                    if self.display_floor_plan is not None:
+                        # Make a copy to avoid race conditions
+                        floor_copy = self.display_floor_plan.copy()
+                        ret, buffer = cv2.imencode('.jpg', floor_copy)
+                        frame_bytes = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                    else:
+                        time_module.sleep(0.05)
+            except Exception as e:
+                print(f"Stream error: {e}")
+                time_module.sleep(0.1)
     
     def release(self):
         """Release video capture and close windows"""
-        self.cap.release()
+        self.running = False
+        
+        # Give threads time to finish
+        time_module.sleep(1)
+        
+        # Release resources
+        if self.cap is not None:
+            self.cap.release()
         cv2.destroyAllWindows()
+        print("Resources released")
 
 # Example usage
 if __name__ == "__main__":
     # Use default camera
-    # processor = CameraProcessor()
+    processor = CameraProcessor(source=1)
     
     # Use specific video file
-    processor = CameraProcessor(source="/Users/apple/Desktop/Deakin/T2_2024/SIT764_Capstone/Crowd_Monitor/market-square.mp4", is_video=True)
+    #processor = CameraProcessor(source="/Users/apple/Desktop/Deakin/T2_2024/SIT764_Capstone/Crowd_Monitor/market-square.mp4", is_video=True)
     processor.run()
