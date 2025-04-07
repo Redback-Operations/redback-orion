@@ -6,7 +6,7 @@ from database import Database
 # Configuration
 # VIDEO_SOURCE = 0  # Default camera
 # IS_VIDEO = False  # Set to True if using a video file
-VIDEO_SOURCE = "/Users/apple/Desktop/Deakin/T2_2024/SIT764_Capstone/Crowd_Monitor/people-walking.mp4"
+VIDEO_SOURCE = "/Users/apple/Desktop/Deakin/T2_2024/SIT764_Capstone/Crowd_Monitor/market-square.mp4"
 IS_VIDEO = True
 
 # Create Flask app
@@ -15,7 +15,7 @@ cors = CORS(app)
 
 # Initialize camera processor and database
 camera_processor = CameraProcessor(source=VIDEO_SOURCE, is_video=IS_VIDEO)
-db = Database()
+#db = Database()
 
 # Routes for people count
 @app.route("/api/peopleCount", methods=["GET"])
