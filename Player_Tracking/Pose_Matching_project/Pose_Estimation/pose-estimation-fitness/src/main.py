@@ -24,7 +24,7 @@ def pose_estimation(image, model, device='cpu'):
 def draw_pose(image, keypoints, strain_results=None, threshold=0.5):
     # Define drawing skeleton
     limb_pairs = {
-        "lower_back_strain": (11, 12),  #hip to spine
+        "lower_back_strain": (11, 12),  #hip to spine.
         "knee_strain": (12, 14),       #Hip to knee
         "shoulder_strain": (8, 10),    #Hip to shoulder
         "elbow_strain": (10, 12),      #Shoulder to elbow
