@@ -3,7 +3,7 @@ import numpy as np
 
 def plot_limb_positions(positions, title='Limb Positions', save_path=None):
     """
-    Plots the limb positions during exercises and optionally saves the plot.
+    Plots the limb positions during exercises and optionally saves the plot
     """
     plt.figure(figsize=(10, 6))
     for limb, coords in positions.items():
