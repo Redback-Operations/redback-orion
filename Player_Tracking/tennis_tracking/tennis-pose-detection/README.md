@@ -99,6 +99,16 @@ def calculate_angle(a, b, c):
 
 ---
 
+## 📐 Angle Calculation Output
+
+### Visualizing Pose and Angle Estimation on a Tennis Player 
+![angle demo](https://github.com/user-attachments/assets/936a9fa3-2264-4386-a6b0-7b2ca2e8ed25)
+
+
+_Angles between joints (e.g. elbow, knee) are annotated on the image to analyze posture_
+
+---
+
 ## 📁 Project Structure
 
 ```
