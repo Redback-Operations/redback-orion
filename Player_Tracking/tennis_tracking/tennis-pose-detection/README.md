@@ -18,11 +18,13 @@ This project focuses on analyzing tennis player movements using pose estimation 
 ## 📷 Demo Output
 
 ### Pose Detection and Skeleton Visualization
-![pose demo](https://github.com/user/repo/assets/pose_output_sample.jpg)  
+![pose demo](https://github.com/user-attachments/assets/f2cee88f-a5a9-497e-996c-a9400b1fee62)
+
 _Sample output showing detected pose on a tennis player_
 
 ### Skeleton on Blank Canvas
-![blank pose](https://github.com/user/repo/assets/blank_canvas_pose.jpg)  
+![blank pose](https://github.com/user-attachments/assets/5d6c8848-bf71-499d-8286-5e1ae532d385)
+
 _Clean skeletal structure on black background_
 
 ---
