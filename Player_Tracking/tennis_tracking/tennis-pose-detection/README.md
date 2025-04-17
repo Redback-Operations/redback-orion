@@ -130,11 +130,13 @@ def calculate_angle(a, b, c):
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how:
-1. Fork the repo
-2. Create a feature branch
-3. Commit and push
-4. Open a PR!
+We welcome contributions! Please follow the standard contribution guidelines:
+
+1. Fork the repository from [GitHub](https://github.com/HarshBhanot7/redback-orion).
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes and commit them (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature-branch`).
+5. Open a pull request.
 
 ---
 
