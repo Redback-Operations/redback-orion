@@ -1,9 +1,8 @@
 # 🎾 Tennis Pose Estimation: Understanding Player Movements  
-![readme style: standard](https://img.shields.io/badge/readme%20style-standard-brightgreen)  
+[![ReadMe](https://img.shields.io/badge/ReadMe-018EF5?logo=readme&logoColor=fff)](#)
 ![Python](https://img.shields.io/badge/Python-3.10-blue)  
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-green)
-![Tensorflow](https://img.shields.io/badge/Tensorflow-4.x-red)
-
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-ff8f00?logo=tensorflow&logoColor=white)](#)
 
 ## 🧠 Overview
 This project focuses on analyzing tennis player movements using pose estimation through a pretrained deep learning model. It detects key body joints, visualizes the skeletal structure, and calculates important angles between limbs, enabling a deeper understanding of player posture and movement patterns.
@@ -63,7 +62,7 @@ You can either:
 
 - Or run locally:
 ```bash
-python pose_estimation.py --input path_to_image.jpg --model pose.pb
+python pose_estimation.ipynb --input path_to_image.jpg --model pose.pb
 ```
 
 ---
@@ -145,11 +144,11 @@ We welcome contributions! Here's how:
 ---
 
 ## 📜 License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/Redback-Operations/redback-documentation/blob/main/LICENSE) file for details.
 
 ---
 
 ## 🙏 Acknowledgements
 - TensorFlow and OpenCV communities.
-- Pretrained model adapted from the [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) architecture.
+- Pretrained model adapted from the OpenPose architecture.
 
