@@ -17,15 +17,28 @@ This project focuses on analyzing tennis player movements using pose estimation 
 
 ## 📷 Demo Output
 
-### Pose Detection and Skeleton Visualization
-![pose demo](https://github.com/user-attachments/assets/f2cee88f-a5a9-497e-996c-a9400b1fee62)
+### 🧍‍♂️ Pose Detection and Skeleton Visualization
 
-_Sample output showing detected pose on a tennis player_
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/f2cee88f-a5a9-497e-996c-a9400b1fee62" width="400"/>
+  <img src="https://github.com/user-attachments/assets/56ec4397-3b77-4139-a885-a5918f7aad90" width="400"/>
+  <img src="https://github.com/user-attachments/assets/740443e8-9132-4622-9b69-0afd140edf94" width="400"/>
+</p>
 
-### Skeleton on Blank Canvas
-![blank pose](https://github.com/user-attachments/assets/5d6c8848-bf71-499d-8286-5e1ae532d385)
+<p align="center"><i>Sample outputs showing detected keypoints and full-body pose on tennis players</i></p>
 
-_Clean skeletal structure on black background_
+---
+
+### 🎯 Skeleton on Blank Canvas
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5d6c8848-bf71-499d-8286-5e1ae532d385" width="400"/>
+  <img src="https://github.com/user-attachments/assets/0ede28b1-3aa8-455d-ad6d-638a0f8c29c2" width="400"/>
+  <img src="https://github.com/user-attachments/assets/7943af2d-67d6-402c-8b40-6985ee889fd4" width="400"/>
+</p>
+
+<p align="center"><i>Clean visualization of skeleton structure without background distractions</i></p>
+
 
 ---
 
