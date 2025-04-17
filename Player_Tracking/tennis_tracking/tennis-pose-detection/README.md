@@ -121,10 +121,8 @@ def calculate_angle(a, b, c):
 
 ## 🔮 Future Work
 
-- Live video stream support.
-- Integration with sports analytics tools.
+- Live video stream pose detection.
 - Classification of shots/movements using angles and pose data.
-- Real-time feedback for coaching applications.
 
 ---
 
