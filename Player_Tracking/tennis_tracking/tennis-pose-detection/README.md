@@ -20,9 +20,9 @@ This project focuses on analyzing tennis player movements using pose estimation 
 ### 🧍‍♂️ Pose Detection and Skeleton Visualization
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f2cee88f-a5a9-497e-996c-a9400b1fee62" width="400"/>
+  <img src="https://github.com/user-attachments/assets/f2cee88f-a5a9-497e-996c-a9400b1fee62" width="470"/>
   <img src="https://github.com/user-attachments/assets/56ec4397-3b77-4139-a885-a5918f7aad90" width="400"/>
-  <img src="https://github.com/user-attachments/assets/740443e8-9132-4622-9b69-0afd140edf94" width="400"/>
+  <img src="https://github.com/user-attachments/assets/740443e8-9132-4622-9b69-0afd140edf94" width="500"/>
 </p>
 
 <p align="center"><i>Sample outputs showing detected keypoints and full-body pose on tennis players</i></p>
@@ -32,9 +32,9 @@ This project focuses on analyzing tennis player movements using pose estimation 
 ### 🎯 Skeleton on Blank Canvas
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5d6c8848-bf71-499d-8286-5e1ae532d385" width="400"/>
+  <img src="https://github.com/user-attachments/assets/5d6c8848-bf71-499d-8286-5e1ae532d385" width="450"/>
   <img src="https://github.com/user-attachments/assets/0ede28b1-3aa8-455d-ad6d-638a0f8c29c2" width="400"/>
-  <img src="https://github.com/user-attachments/assets/7943af2d-67d6-402c-8b40-6985ee889fd4" width="400"/>
+  <img src="https://github.com/user-attachments/assets/7943af2d-67d6-402c-8b40-6985ee889fd4" width="550"/>
 </p>
 
 <p align="center"><i>Clean visualization of skeleton structure without background distractions</i></p>
@@ -154,11 +154,11 @@ _Angles between joints (e.g. elbow, knee) are annotated on the image to analyze 
 
 We welcome contributions! Please follow the standard contribution guidelines:
 
-1. Fork the repository from [GitHub](https://github.com/HarshBhanot7/redback-orion).
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes and commit them (`git commit -m 'Add some feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Open a pull request.
+1. Fork the repository from [GitHub](https://github.com/HarshBhanot7/redback-orion)
+2. Create a new branch (`git checkout -b feature-branch`)
+3. Make your changes and commit them (`git commit -m 'Add some feature'`)
+4. Push to the branch (`git push origin feature-branch`)
+5. Open a pull request
 
 ---
 
