@@ -1,8 +1,9 @@
 # 🎾 Tennis Pose Estimation: Understanding Player Movements  
 [![ReadMe](https://img.shields.io/badge/ReadMe-018EF5?logo=readme&logoColor=fff)](#)
-![Python](https://img.shields.io/badge/Python-3.10-blue)  
-![OpenCV](https://img.shields.io/badge/OpenCV-4.x-green)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-ff8f00?logo=tensorflow&logoColor=white)](#)
+![Python](https://img.shields.io/badge/Python-3.10-grey)  
+
+![OpenCV](https://img.shields.io/badge/OpenCV-4.x-red)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-8f00ff?logo=tensorflow&logoColor=white)](#)
 
 ## 🧠 Overview
 This project focuses on analyzing tennis player movements using pose estimation through a pretrained deep learning model. It detects key body joints, visualizes the skeletal structure, and calculates important angles between limbs, enabling a deeper understanding of player posture and movement patterns.
