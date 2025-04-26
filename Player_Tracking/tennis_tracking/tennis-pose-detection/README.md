@@ -63,7 +63,7 @@ cd tennis-pose-estimation
 ```
 
 2. **Download the Pose Model Files:**
-Place the following pretrained OpenPose model files into your working directory:
+[From here](https://drive.google.com/drive/folders/1erlXdp3oJEjQehdIhnbcNig_0vClxxSF?usp=sharing) and place them into your working directory:
 - `pose_deploy_linevec.prototxt`
 - `pose_iter_440000.caffemodel`
 
