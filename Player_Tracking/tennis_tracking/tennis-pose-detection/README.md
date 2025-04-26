@@ -1,19 +1,17 @@
-# 🎾 Tennis Pose Estimation: Understanding Player Movements  
+# 🎾 Tennis Pose Estimation: Understanding Player Movements
 [![ReadMe](https://img.shields.io/badge/ReadMe-018EF5?logo=readme&logoColor=fff)](#)
-![Python](https://img.shields.io/badge/Python-3.10-grey)  
-
-![OpenCV](https://img.shields.io/badge/OpenCV-4.x-red)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-8f00ff?logo=tensorflow&logoColor=white)](#)
+![Python](https://img.shields.io/badge/Python-3.10-red)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.x-purple)
 
 ## 🧠 Overview
-This project focuses on analyzing tennis player movements using pose estimation through a pretrained deep learning model. It detects key body joints, visualizes the skeletal structure, and calculates important angles between limbs, enabling a deeper understanding of player posture and movement patterns.
+This project focuses on analyzing tennis player movements using pose estimation through a pretrained OpenPose model (using OpenCV's DNN module). It detects key body joints, visualizes the skeletal structure, and calculates important angles between limbs, enabling a deeper understanding of player posture and movement patterns.
 
 ## ✨ Features
-- **Pose Detection** using a pretrained TensorFlow-based model.
-- **Joint Keypoint Extraction** from images of tennis players.
-- **Skeleton Visualization** on both original and blank canvas.
+- **Pose Detection** using a pretrained OpenPose model with OpenCV.
+- **Joint Keypoint Extraction** from static images of tennis players.
+- **Skeleton Visualization** on both the original image and a blank canvas.
 - **Angle Calculation** between major body joints to analyze posture.
-- **Highly Modular** code for easy experimentation.
+- **Highly Modular** code for easy experimentation and extension.
 
 ## 📷 Demo Output
 
@@ -39,7 +37,6 @@ This project focuses on analyzing tennis player movements using pose estimation 
 
 <p align="center"><i>Clean visualization of skeleton structure without background distractions</i></p>
 
-
 ---
 
 ## 🧪 Try It Out
@@ -52,31 +49,46 @@ Make sure you have the following installed:
 - Python 3.10+
 - NumPy
 - OpenCV
-- TensorFlow (for pose model)
 
 You can install dependencies using:
 ```bash
-pip install numpy opencv-python tensorflow
+pip install numpy opencv-python
 ```
 
 ### 🚀 Steps to Run
 1. **Clone the Repository:**
 ```bash
-git clone https://github.com/yourusername/tennis-pose-estimation.git
+git clone "https://github.com/HarshBhanot7/redback-orion.git"
 cd tennis-pose-estimation
 ```
 
-2. **Download the Pose Model:**
-Place the pretrained pose model file `pose.pb` inside your working directory or set its path in the script.
+2. **Download the Pose Model Files:**
+Place the following pretrained OpenPose model files into your working directory:
+- `pose_deploy_linevec.prototxt`
+- `pose_iter_440000.caffemodel`
+
+(You can download them from OpenPose or OpenCV model zoo.)
 
 3. **Run the Script:**
-You can either:
-- Use the Colab Notebook (Recommended):  
-  [Open in Google Colab](https://colab.research.google.com/drive/your-colab-link)
+If using Google Colab:
+- Open the notebook and upload your images and models.
 
-- Or run locally:
+If running locally:
 ```bash
-python pose_estimation.ipynb --input path_to_image.jpg --model pose.pb
+python pose_estimation.ipynb
+```
+or run it cell-by-cell in Jupyter Notebook.
+
+---
+
+## 📁 Project Structure
+
+```
+├── pose_estimation.py / .ipynb
+├── pose_deploy_linevec.prototxt
+├── pose_iter_440000.caffemodel
+├── input_images/
+├── README.md
 ```
 
 ---
@@ -84,7 +96,7 @@ python pose_estimation.ipynb --input path_to_image.jpg --model pose.pb
 ## 📊 Keypoint & Skeleton Mapping
 
 - **Keypoints Tracked:**
-  - Head, Spine, Shoulders, Elbows, Hands, Hips, Knees, Feet, Eyes, Ears
+  - Nose, Neck, Shoulders, Elbows, Wrists, Hips, Knees, Ankles, Eyes, Ears
 
 - **Skeleton Connections:**  
   Connects key joints to visualize the player's pose as a skeletal structure.
@@ -93,9 +105,11 @@ python pose_estimation.ipynb --input path_to_image.jpg --model pose.pb
 
 ## 📐 Angle Calculation
 The following joint angles are calculated using 3-point geometry:
-- Shoulder, Elbow, Wrist
-- Hip, Knee, Foot
-- Torso and Limb Angles (Spine-Shoulder, Spine-Hip)
+- Shoulder-Elbow-Wrist
+- Hip-Knee-Ankle
+- Neck-Shoulder-Elbow
+- Neck-Hip-Knee
+- Torso Width (Shoulder to Shoulder) and Hip Width (Hip to Hip)
 
 This helps assess movement quality and form. Angles are annotated on the image automatically.
 
@@ -115,31 +129,19 @@ def calculate_angle(a, b, c):
 
 ## 📐 Angle Calculation Output
 
-### Visualizing Pose and Angle Estimation on a Tennis Player 
+### Visualizing Pose and Angle Estimation on a Tennis Player
 ![angle demo](https://github.com/user-attachments/assets/936a9fa3-2264-4386-a6b0-7b2ca2e8ed25)
 
-
-_Angles between joints (e.g. elbow, knee) are annotated on the image to analyze posture_
-
----
-
-## 📁 Project Structure
-
-```
-├── pose_estimation.ipynb
-├── pose.pb
-├── input images
-├── README.md
-```
+<p align="center"><i>Angles between joints (e.g., elbow, knee) are annotated to analyze player posture.</i></p>
 
 ---
 
 ## 🧩 Challenges & Solutions
 
 - **Model Accuracy:** Some joint detections are imprecise when limbs overlap.
-    - ➤ Solution: Filter low-confidence keypoints and post-process output.
+  - ➤ Solution: Filter low-confidence keypoints and apply post-processing.
 - **Overlapping Angle Text:** Annotated angles may overlap.
-    - ➤ Solution: Dynamic offset system to reposition text intelligently.
+  - ➤ Solution: Dynamic text repositioning system to avoid overlap.
 
 ---
 
@@ -147,6 +149,7 @@ _Angles between joints (e.g. elbow, knee) are annotated on the image to analyze 
 
 - Live video stream pose detection.
 - Classification of shots/movements using angles and pose data.
+- 3D pose estimation extension.
 
 ---
 
@@ -173,6 +176,5 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 ---
 
 ## 🙏 Acknowledgements
-- TensorFlow and OpenCV communities.
-- Pretrained model adapted from the OpenPose architecture.
-
+- OpenCV and OpenPose community for providing the pretrained models.
+- Pretrained model adapted from the OpenCV architecture.
