@@ -67,8 +67,6 @@ Place the following pretrained OpenPose model files into your working directory:
 - `pose_deploy_linevec.prototxt`
 - `pose_iter_440000.caffemodel`
 
-(You can download them from OpenPose or OpenCV model zoo.)
-
 3. **Run the Script:**
 If using Google Colab:
 - Open the notebook and upload your images and models.
@@ -84,7 +82,7 @@ or run it cell-by-cell in Jupyter Notebook.
 ## 📁 Project Structure
 
 ```
-├── pose_estimation.py / .ipynb
+├── pose_estimation.ipynb
 ├── pose_deploy_linevec.prototxt
 ├── pose_iter_440000.caffemodel
 ├── input_images/
