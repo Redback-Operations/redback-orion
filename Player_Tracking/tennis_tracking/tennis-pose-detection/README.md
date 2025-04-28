@@ -18,9 +18,11 @@ This project focuses on analyzing tennis player movements using pose estimation 
 ### 🧍‍♂️ Pose Detection and Skeleton Visualization
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f2cee88f-a5a9-497e-996c-a9400b1fee62" width="470"/>
-  <img src="https://github.com/user-attachments/assets/56ec4397-3b77-4139-a885-a5918f7aad90" width="400"/>
-  <img src="https://github.com/user-attachments/assets/740443e8-9132-4622-9b69-0afd140edf94" width="500"/>
+  <img src="https://github.com/user-attachments/assets/dc6f0ca1-272c-4574-b805-6f35e35f4887" width="500"/>
+  <img src="https://github.com/user-attachments/assets/b168ee1d-48e7-49e9-954f-d979ffc661d1" width="500"/>
+  <img src="https://github.com/user-attachments/assets/ebc8ab6f-aeb2-4e4b-aa98-9b30f75ff24f" width="500"/>
+  <img src="https://github.com/user-attachments/assets/ea74b9ba-01fd-4bb8-857d-f18f3723c79d" width="500"/>
+  <img src="https://github.com/user-attachments/assets/b8afc82e-081b-4b05-8e70-4d6971e02f66" width="500"/>
 </p>
 
 <p align="center"><i>Sample outputs showing detected keypoints and full-body pose on tennis players</i></p>
@@ -30,9 +32,11 @@ This project focuses on analyzing tennis player movements using pose estimation 
 ### 🎯 Skeleton on Blank Canvas
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5d6c8848-bf71-499d-8286-5e1ae532d385" width="450"/>
-  <img src="https://github.com/user-attachments/assets/0ede28b1-3aa8-455d-ad6d-638a0f8c29c2" width="400"/>
-  <img src="https://github.com/user-attachments/assets/7943af2d-67d6-402c-8b40-6985ee889fd4" width="550"/>
+  <img src="https://github.com/user-attachments/assets/5917f9b2-baa1-4a3d-bd38-78dee8a7efaa" width="500"/>
+  <img src="https://github.com/user-attachments/assets/14ed2280-2a63-4543-9378-aadcad28bc66" width="500"/>
+  <img src="https://github.com/user-attachments/assets/44bcb12c-ea82-4b27-a723-c85b4366338b" width="500"/>
+  <img src="https://github.com/user-attachments/assets/8b9d0604-81b4-4f2b-bce2-dd8a69dcf42d" width="500"/>
+  <img src="https://github.com/user-attachments/assets/a9d671d3-c9f9-4706-90d2-a2c631f4383d" width="500"/>
 </p>
 
 <p align="center"><i>Clean visualization of skeleton structure without background distractions</i></p>
@@ -82,10 +86,11 @@ or run it cell-by-cell in Jupyter Notebook.
 ## 📁 Project Structure
 
 ```
-├── pose_estimation.ipynb
+├── Pose Detection.ipynb
 ├── pose_deploy_linevec.prototxt
 ├── pose_iter_440000.caffemodel
-├── input_images/
+├── Input Images/
+├── Output Images/
 ├── README.md
 ```
 
@@ -128,7 +133,11 @@ def calculate_angle(a, b, c):
 ## 📐 Angle Calculation Output
 
 ### Visualizing Pose and Angle Estimation on a Tennis Player
-![angle demo](https://github.com/user-attachments/assets/936a9fa3-2264-4386-a6b0-7b2ca2e8ed25)
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/72f0fd83-9a3c-4b78-aba6-1b459840a997" width="500"/>
+  <img src="https://github.com/user-attachments/assets/c4fcbf9e-25db-4ad1-b693-06634d8c1115" width="500"/>
+</p>
 
 <p align="center"><i>Angles between joints (e.g., elbow, knee) are annotated to analyze player posture.</i></p>
 
