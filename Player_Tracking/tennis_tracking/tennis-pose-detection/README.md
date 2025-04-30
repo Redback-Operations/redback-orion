@@ -2,6 +2,7 @@
 [![ReadMe](https://img.shields.io/badge/ReadMe-018EF5?logo=readme&logoColor=fff)](#)
 ![Python](https://img.shields.io/badge/Python-3.10-red)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-purple)
+![COCO](https://img.shields.io/badge/COCO-green)
 
 ## 🧠 Overview
 This project focuses on analyzing tennis player movements using pose estimation through a pretrained OpenPose model (using OpenCV's DNN module). It detects key body joints, visualizes the skeletal structure, and calculates important angles between limbs, enabling a deeper understanding of player posture and movement patterns.
@@ -20,7 +21,7 @@ This project focuses on analyzing tennis player movements using pose estimation 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/dc6f0ca1-272c-4574-b805-6f35e35f4887" width="500"/>
   <img src="https://github.com/user-attachments/assets/b168ee1d-48e7-49e9-954f-d979ffc661d1" width="500"/>
-  <img src="https://github.com/user-attachments/assets/ebc8ab6f-aeb2-4e4b-aa98-9b30f75ff24f" width="500"/>
+  <img src="https://github.com/user-attachments/assets/7bfda739-6942-4755-a2d3-3a02cb84c06d" width="500"/>
   <img src="https://github.com/user-attachments/assets/ea74b9ba-01fd-4bb8-857d-f18f3723c79d" width="500"/>
   <img src="https://github.com/user-attachments/assets/b8afc82e-081b-4b05-8e70-4d6971e02f66" width="500"/>
 </p>
@@ -34,7 +35,7 @@ This project focuses on analyzing tennis player movements using pose estimation 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/5917f9b2-baa1-4a3d-bd38-78dee8a7efaa" width="500"/>
   <img src="https://github.com/user-attachments/assets/14ed2280-2a63-4543-9378-aadcad28bc66" width="500"/>
-  <img src="https://github.com/user-attachments/assets/44bcb12c-ea82-4b27-a723-c85b4366338b" width="500"/>
+  <img src="https://github.com/user-attachments/assets/02833a6c-9e96-4166-8fd0-68ad5dcc8430" width="500"/>
   <img src="https://github.com/user-attachments/assets/8b9d0604-81b4-4f2b-bce2-dd8a69dcf42d" width="500"/>
   <img src="https://github.com/user-attachments/assets/a9d671d3-c9f9-4706-90d2-a2c631f4383d" width="500"/>
 </p>
@@ -132,11 +133,14 @@ def calculate_angle(a, b, c):
 
 ## 📐 Angle Calculation Output
 
-### Visualizing Pose and Angle Estimation on a Tennis Player
+### Angle Estimation with High Accuracy
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/72f0fd83-9a3c-4b78-aba6-1b459840a997" width="500"/>
+  <img src="https://github.com/user-attachments/assets/1ef94ecc-fa18-4f71-b818-b7bea35742ab" width="500"/>
   <img src="https://github.com/user-attachments/assets/c4fcbf9e-25db-4ad1-b693-06634d8c1115" width="500"/>
+  <img src="https://github.com/user-attachments/assets/72f0fd83-9a3c-4b78-aba6-1b459840a997" width="500"/>
+  <img src="https://github.com/user-attachments/assets/d9484c1b-0be7-431b-a30e-80030f28f762" width="500"/>
+  <img src="https://github.com/user-attachments/assets/eaabb285-a6c7-4940-9f6e-5805efde8f82" width="500"/>
 </p>
 
 <p align="center"><i>Angles between joints (e.g., elbow, knee) are annotated to analyze player posture.</i></p>
