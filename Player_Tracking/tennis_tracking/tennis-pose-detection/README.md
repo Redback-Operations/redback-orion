@@ -1,4 +1,4 @@
-# 🎾 Tennis Pose Estimation: Understanding Player Movements
+# Tennis Pose Estimation: Understanding Player Movements🎾 
 [![ReadMe](https://img.shields.io/badge/ReadMe-018EF5?logo=readme&logoColor=fff)](#)
 ![Python](https://img.shields.io/badge/Python-3.10-red)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-purple)
@@ -123,6 +123,16 @@ Angles are annotated on the image and also printed in the console output for log
 
 ```python
 def calculate_angle(a, b, c):
+    """
+    Calculate the angle between three points (in degrees).
+    
+    Parameters:
+        a, b, c: Points in the form of (x, y) coordinates
+                 b is the vertex point
+    
+    Returns:
+        angle: The angle in degrees
+    """
     ba = a - b
     bc = c - b
     cosine = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc) + 1e-6)
@@ -168,10 +178,11 @@ These printed values help with:
 
 ## 🧩 Challenges & Solutions
 
-- **Model Accuracy:** Some joint detections are imprecise when limbs overlap.
-  - ➤ Solution: Filter low-confidence keypoints and apply post-processing.
-- **Overlapping Angle Text:** Annotated angles may overlap.
-  - ➤ Solution: Dynamic text repositioning system to avoid overlap.
+| **Challenge**         | **Solution**                                                             |
+|-----------------------|--------------------------------------------------------------------------|
+| **Model Accuracy**     | Filtered low-confidence detections & applied post-processing             |
+| **Text Overlap**       | Implemented dynamic text positioning algorithm                           |
+| **Occlusion Handling** | Developed interpolation for temporarily hidden joints                    |
 
 ---
 
@@ -196,7 +207,7 @@ We welcome contributions! Please follow the standard contribution guidelines:
 ---
 
 ## 👨‍💻 Contributors
-- [*Harsh Bhanot*](https://github.com/HarshBhanot7)
+- [Harsh Bhanot](https://github.com/HarshBhanot7) - *Project Lead & Developer*
 
 ---
 
