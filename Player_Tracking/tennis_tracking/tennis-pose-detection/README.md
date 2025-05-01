@@ -115,7 +115,7 @@ The following joint angles are calculated using 3-point geometry:
 - Neck-Hip-Knee
 - Torso Width (Shoulder to Shoulder) and Hip Width (Hip to Hip)
 
-This helps assess movement quality and form. Angles are annotated on the image automatically.
+Angles are annotated on the image and also printed in the console output for logging or debugging purposes.
 
 ---
 
@@ -144,6 +144,25 @@ def calculate_angle(a, b, c):
 </p>
 
 <p align="center"><i>Angles between joints (e.g., elbow, knee) are annotated to analyze player posture.</i></p>
+
+---
+
+## 💻 Console Output Example
+
+```
+RShoulder-RElbow-RWrist: 153°
+LShoulder-LElbow-LWrist: 147°
+RHip-RKnee-RAnkle: 168°
+LHip-LKnee-LAnkle: 164°
+Neck-RShoulder-RElbow: 132°
+Neck-LShoulder-LElbow: 135°
+RShoulder-Neck-LShoulder: 95°
+RHip-Neck-LHip: 101°
+```
+These printed values help with:
+- Debugging pose estimation
+- Logging joint angles for further analysis
+- Verifying correctness without needing to inspect images
 
 ---
 
