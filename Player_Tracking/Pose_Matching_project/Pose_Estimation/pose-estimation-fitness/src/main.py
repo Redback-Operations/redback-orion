@@ -337,7 +337,7 @@ def main():
         return
 
     # List files in the data directory
-    data_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'data')  # Relative path to the data directory
+    data_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'dataDeadlift')  # Relative path to the data directory
     if not os.path.exists(data_dir):
         print(f"Error: Data directory {data_dir} does not exist. Exiting.")
         return
