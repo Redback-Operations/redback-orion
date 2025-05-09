@@ -36,3 +36,11 @@ python src/main.py
 
 ## Contributions
 Contributions to this project are welcome. Please submit a pull request or open an issue for discussion.
+
+## To-Do
+- Add support for additional exercises (e.g., lunges, pull-ups, push-ups).
+- Implement dynamic limb pair definitions for new exercises.
+- Enhance strain calculation logic to accommodate different exercise types.
+- Create a configuration file for exercise-specific parameters (e.g., thresholds, keypoint mappings).
+- Add unit tests for new exercise types to ensure accuracy.
+- Improve visualization for multi-person exercises.
