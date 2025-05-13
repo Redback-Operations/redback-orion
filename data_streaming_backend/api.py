@@ -1,14 +1,13 @@
 import io
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from kafka import KafkaProducer
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form
+from kafka import KafkaProducer, KafkaConsumer
 from PIL import Image
 import requests
 from bs4 import BeautifulSoup
 import os
 from datetime import datetime, timezone
-from kafka import KafkaConsumer
 from uuid import uuid4
-from fastapi import Form
+from urllib.parse import urlparse
 
 app = FastAPI()
 
@@ -25,8 +24,21 @@ AIRFLOW_LOGIN = {
 }
 DAG_ID = "object_detection_single_task"
 
+# -------------------------------
+# URL Validation Function
+# -------------------------------
+def validate_url(url: str):
+    parsed = urlparse(url)
+    if not (parsed.scheme in ['http', 'https'] and parsed.netloc):
+        raise ValueError(f"Invalid URL provided: {url}")
+
+# Validate AIRFLOW_BASE_URL on startup
+validate_url(AIRFLOW_BASE_URL)
+
+# -------------------------------
+# Image Compression
+# -------------------------------
 def compress_image_bytes(file: UploadFile, quality=50) -> bytes:
-    """Compress uploaded image and return bytes."""
     img = Image.open(file.file)
     if img.mode != 'RGB':
         img = img.convert('RGB')
@@ -34,21 +46,26 @@ def compress_image_bytes(file: UploadFile, quality=50) -> bytes:
     img.save(img_bytes, format='JPEG', quality=quality, optimize=True)
     return img_bytes.getvalue()
 
-def send_to_kafka(image_bytes: bytes,topic:str=KAFKA_TOPIC):
-    """Send compressed image to Kafka."""
+# -------------------------------
+# Send to Kafka
+# -------------------------------
+def send_to_kafka(image_bytes: bytes, topic: str = KAFKA_TOPIC):
     producer = KafkaProducer(
         bootstrap_servers=KAFKA_SERVER,
         value_serializer=lambda v: v
     )
     future = producer.send(topic, image_bytes)
     producer.flush(timeout=10)
-    return future.get(timeout=10)  # Wait for confirmation
+    return future.get(timeout=10)
 
+# -------------------------------
+# Trigger Airflow DAG
+# -------------------------------
 def trigger_airflow_dag(dag_id):
-    """Trigger Airflow DAG using session authentication."""
     session = requests.Session()
     login_url = f"{AIRFLOW_BASE_URL}/login/"
-    
+    validate_url(login_url)
+
     # Step 1: Get CSRF token
     resp = session.get(login_url)
     if "csrf_token" in resp.text:
@@ -62,10 +79,10 @@ def trigger_airflow_dag(dag_id):
 
     # Step 2: Trigger DAG
     trigger_url = f"{AIRFLOW_BASE_URL}/api/v1/dags/{dag_id}/dagRuns"
-    dt = datetime.now(timezone.utc).replace(tzinfo=timezone.utc)
+    dt = datetime.now(timezone.utc)
     payload = {
         "conf": {},
-        "dag_run_id": f"run_{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.')}",
+        "dag_run_id": f"run_{dt.strftime('%Y-%m-%dT%H:%M:%S.')}",
         "logical_date": dt.strftime('%Y-%m-%dT%H:%M:%S.') + f'{int(dt.microsecond / 1000):03d}Z',
         "note": "triggered via API"
     }
@@ -76,20 +93,20 @@ def trigger_airflow_dag(dag_id):
         raise Exception(f"DAG trigger failed: {response.text}")
     return response.json()
 
+# -------------------------------
+# Upload Image Endpoint
+# -------------------------------
 @app.post("/upload/")
 async def upload_image(file: UploadFile = File(...), dag_id: str = DAG_ID):
     try:
         KAFKA_TOPIC = "image_blob_topic" if dag_id == 'object_detection_single_task' else 'heatmap'
         RESULT_TOPIC = "results_topic" if dag_id == 'object_detection_single_task' else 'heatmap_results'
 
-        # Compress image and send to Kafka
         compressed_bytes = compress_image_bytes(file)
         kafka_result = send_to_kafka(compressed_bytes, KAFKA_TOPIC)
 
-        # Trigger Airflow DAG
         airflow_result = trigger_airflow_dag(dag_id)
 
-        # Wait for DAG run to complete and read JSON from Kafka result topic
         consumer = KafkaConsumer(
             RESULT_TOPIC,
             bootstrap_servers=KAFKA_SERVER,
@@ -115,15 +132,17 @@ async def upload_image(file: UploadFile = File(...), dag_id: str = DAG_ID):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+# -------------------------------
+# Trigger DAG for Test
+# -------------------------------
 @app.post("/trigger-test-kafka-dag/")
 def trigger_test_kafka_dag():
-    """Trigger the test_kafka_in_virtualenv_dag DAG via Airflow API and wait for Kafka output."""
     try:
         session = requests.Session()
         login_url = f"{AIRFLOW_BASE_URL}/login/"
-        
-        # Get CSRF token
+        validate_url(login_url)
+
         resp = session.get(login_url)
         if "csrf_token" in resp.text:
             soup = BeautifulSoup(resp.text, "html.parser")
@@ -134,12 +153,12 @@ def trigger_test_kafka_dag():
         if "DAGs" not in resp.text:
             raise HTTPException(status_code=500, detail="Airflow login failed!")
 
-        # Trigger DAG
         dag_id = "test_kafka_in_virtualenv_dag"
         trigger_url = f"{AIRFLOW_BASE_URL}/api/v1/dags/{dag_id}/dagRuns"
+        dt = datetime.now(timezone.utc)
         payload = {
-            "dag_run_id": f"run_{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.')}",
-            "logical_date": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.') + f'{int(datetime.now(timezone.utc).microsecond / 1000):03d}Z',
+            "dag_run_id": f"run_{dt.strftime('%Y-%m-%dT%H:%M:%S.')}",
+            "logical_date": dt.strftime('%Y-%m-%dT%H:%M:%S.') + f'{int(dt.microsecond / 1000):03d}Z',
             "note": "Test trigger for Kafka virtualenv DAG"
         }
 
@@ -149,7 +168,6 @@ def trigger_test_kafka_dag():
         if response.status_code != 200:
             raise HTTPException(status_code=500, detail=f"DAG trigger failed: {response.text}")
 
-        # Wait for Kafka output
         consumer = KafkaConsumer(
             'kafka_test',
             bootstrap_servers=KAFKA_SERVER,
@@ -169,31 +187,33 @@ def trigger_test_kafka_dag():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+# -------------------------------
+# Health Check Endpoints
+# -------------------------------
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Image Upload API. Use /upload/ to upload an image."}
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint."""
     return {"status": "ok", "message": "API is running."}
 
 @app.get("/health-kafka")
 def health_check_kafka():
-    """Health check for Kafka connection."""
     try:
         producer = KafkaProducer(bootstrap_servers=KAFKA_SERVER)
         producer.close()
         return {"status": "ok", "message": "Kafka connection is healthy."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Kafka connection failed: {str(e)}")
-    
+
 @app.get("/health-airflow")
 def health_check_airflow():
-    """Health check for Airflow connection."""
     try:
-        response = requests.get(f"{AIRFLOW_BASE_URL}/health")
+        health_url = f"{AIRFLOW_BASE_URL}/health"
+        validate_url(health_url)
+        response = requests.get(health_url)
         if response.status_code == 200:
             return {"status": "ok", "message": "Airflow connection is healthy."}
         else:
@@ -201,6 +221,9 @@ def health_check_airflow():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Airflow connection failed: {str(e)}")
 
+# -------------------------------
+# DAG Upload Endpoint
+# -------------------------------
 @app.post("/upload-dag/")
 async def upload_dag(file: UploadFile = File(...), dag_name: str = Form(...)):
     try:

@@ -1,4 +1,5 @@
 import os
+import tempfile
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonVirtualenvOperator
@@ -10,17 +11,20 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
+# Use safe, system temporary directory
+tmp_dir = tempfile.gettempdir()
+
 # Environment Variables
 ENV_VARS = {
     'KAFKA_BOOTSTRAP_SERVER': os.getenv('KAFKA_BOOTSTRAP_SERVER', 'redback.it.deakin.edu.au:9092'),
     'IMAGE_TOPIC': 'heatmap',
     'RESULTS_TOPIC': 'heatmap_results',
-    'YOLO_WEIGHTS': '/tmp/yolov4.weights',
-    'YOLO_CONFIG': '/tmp/yolov4.cfg',
-    'COCO_NAMES': '/tmp/coco.names'
+    'YOLO_WEIGHTS': os.path.join(tmp_dir, 'yolov4.weights'),
+    'YOLO_CONFIG': os.path.join(tmp_dir, 'yolov4.cfg'),
+    'COCO_NAMES': os.path.join(tmp_dir, 'coco.names'),
+    'TMP_OUTPUT_DIR': tmp_dir  # Optional for saving plots
 }
 
-# Define DAG
 def process_image_blob_and_generate_heatmap():
     import os
     import io
@@ -37,8 +41,8 @@ def process_image_blob_and_generate_heatmap():
     yolo_weights = os.getenv('YOLO_WEIGHTS')
     yolo_config = os.getenv('YOLO_CONFIG')
     coco_names = os.getenv('COCO_NAMES')
+    tmp_output_dir = os.getenv('TMP_OUTPUT_DIR', '/tmp')
 
-    # Download YOLO files if not already present (use reliable mirrors)
     try:
         if not os.path.exists(yolo_config):
             urllib.request.urlretrieve("https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4.cfg", yolo_config)
@@ -56,7 +60,6 @@ def process_image_blob_and_generate_heatmap():
     with open(coco_names, 'r') as f:
         classes = [line.strip() for line in f.readlines()]
 
-    # Kafka setup
     kafka_server = os.getenv('KAFKA_BOOTSTRAP_SERVER')
     image_topic = os.getenv('IMAGE_TOPIC')
     results_topic = os.getenv('RESULTS_TOPIC')
@@ -121,7 +124,7 @@ def process_image_blob_and_generate_heatmap():
     plt.xlabel('Grid X')
     plt.ylabel('Grid Y')
     plt.colorbar(label='Detection Count')
-    # plt.savefig('/tmp/2d_heatmap.png')
+    plt.savefig(os.path.join(tmp_output_dir, '2d_heatmap.png'))
     plt.close()
 
     # Save 3D heatmap
@@ -135,9 +138,10 @@ def process_image_blob_and_generate_heatmap():
     ax.set_xlabel('Grid X')
     ax.set_ylabel('Grid Y')
     ax.set_zlabel('Detection Count')
-    # plt.savefig('/tmp/3d_heatmap.png')
+    plt.savefig(os.path.join(tmp_output_dir, '3d_heatmap.png'))
     plt.close()
 
+# Define DAG
 with DAG(
     dag_id='crowd_heatmap_generation',
     default_args=default_args,

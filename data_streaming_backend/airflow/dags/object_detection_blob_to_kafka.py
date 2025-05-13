@@ -1,6 +1,6 @@
 import os
+import tempfile
 from datetime import datetime, timedelta
-
 from airflow import DAG
 from airflow.operators.python import PythonVirtualenvOperator
 
@@ -11,14 +11,16 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-# Environment variables passed into venvs
-# YOLO_WEIGHTS_PATH is passed via env_vars to each operator
+# Use OS-agnostic temp directory
+tmp_dir = tempfile.gettempdir()
+weights_file = os.path.join(tmp_dir, 'yolov8n.pt')
+
 ENV_VARS = {
     'KAFKA_BOOTSTRAP_SERVER': os.getenv('KAFKA_BOOTSTRAP_SERVER', 'redback.it.deakin.edu.au:9092'),
     'IMAGE_TOPIC': 'image_blob_topic',
     'JSON_TOPIC': 'results_topic',
     'IMG_OUT_TOPIC': 'result_image_topic',
-    'YOLO_WEIGHTS_PATH': '/tmp/yolov8n.pt'
+    'YOLO_WEIGHTS_PATH': weights_file
 }
 
 with DAG(
@@ -29,7 +31,6 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    # Task: Download YOLOv8 weights if missing
     def download_weights():
         import os
         from sahi.utils.ultralytics import download_model_weights
@@ -45,21 +46,19 @@ with DAG(
         env_vars=ENV_VARS
     )
 
-    # Task: Consume image blob, detect, and publish results
     def consume_and_detect():
-        import os, io, json,numpy
+        import os, io, json
         from kafka import KafkaConsumer, KafkaProducer
         from sahi import AutoDetectionModel
         from sahi.predict import get_sliced_prediction
-        from sahi.utils.cv import visualize_object_predictions
         from PIL import Image
+
         kafka_server = os.getenv('KAFKA_BOOTSTRAP_SERVER')
         image_topic = os.getenv('IMAGE_TOPIC')
         json_topic = os.getenv('JSON_TOPIC')
         img_topic = os.getenv('IMG_OUT_TOPIC')
         weights_path = os.getenv('YOLO_WEIGHTS_PATH')
 
-        # 1) Consume image bytes from Kafka
         consumer = KafkaConsumer(
             image_topic,
             bootstrap_servers=[kafka_server],
@@ -72,10 +71,8 @@ with DAG(
         else:
             raise RuntimeError('No image blob received from Kafka topic')
 
-        # 2) Load image to PIL
         img = Image.open(io.BytesIO(img_bytes))
 
-        # 3) Load YOLOv8 model
         model = AutoDetectionModel.from_pretrained(
             model_type='yolov8',
             model_path=weights_path,
@@ -83,7 +80,6 @@ with DAG(
             device='cpu'
         )
 
-        # 4) Run sliced prediction
         result = get_sliced_prediction(
             image=img,
             detection_model=model,
@@ -93,7 +89,6 @@ with DAG(
             overlap_width_ratio=0.2,
         )
 
-        # 5) Build JSON results
         preds = [
             {
                 'category_id': int(o.category.id),
@@ -110,7 +105,6 @@ with DAG(
         ]
         json_payload = json.dumps(preds).encode('utf-8')
 
-        # 7) Publish JSON and annotated image back to Kafka
         producer = KafkaProducer(
             bootstrap_servers=kafka_server,
             value_serializer=lambda v: v
