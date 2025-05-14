@@ -1,16 +1,11 @@
 import numpy as np
 
+# This file is used to analyze limb positions and strain during exercises
+# This file will need to be modified or rewritten to implement the new model
+# Currently its accuracy is not sufficient
+
+
 def evaluate_limb_positions(landmarks, exercise_type):
-    """
-    Evaluate limb positions based on pose landmarks during a specified exercise.
-    
-    Parameters:
-    landmarks (np.ndarray): Array of shape (N, 2) containing the (x, y) coordinates of key points.
-    exercise_type (str): The type of exercise being performed (e.g., 'deadlift', 'bench press').
-    
-    Returns:
-    dict: A dictionary containing evaluation results and suggested corrections.
-    """
     results = {}
     
     # Ensure required keypoints exist
@@ -66,29 +61,9 @@ def calculate_angle(point_a, point_b, point_c):
     return np.degrees(angle)
 
 def calculate_midpoint(point_a, point_b):
-    """
-    Calculate the midpoint between two points.
-
-    Parameters:
-    point_a (np.ndarray): The first point (x, y).
-    point_b (np.ndarray): The second point (x, y).
-
-    Returns:
-    np.ndarray: The midpoint (x, y).
-    """
     return (point_a + point_b) / 2
 
 def calculate_strain(landmarks, exercise_type):
-    """
-    Calculate strain based on joint angles and deviations from optimal form.
-
-    Parameters:
-    landmarks (np.ndarray): Array of shape (N, 2) containing the (x, y) coordinates of key points.
-    exercise_type (str): The type of exercise being performed (e.g., 'deadlift', 'bench press', 'squat').
-
-    Returns:
-    dict: A dictionary containing strain metrics and detailed explanations.
-    """
     strain_results = {}
 
     if exercise_type == 'deadlift':

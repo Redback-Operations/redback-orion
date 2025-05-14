@@ -1,3 +1,7 @@
+# This script performs pose estimation on images using a pre-trained Keypoint R-CNN model.
+# It calculates strain metrics for various exercises, visualizes the results, and identifies the best and worst forms.
+# Inputs include image files, a specified exercise type, and a pre-trained pose estimation model.
+
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,12 +12,18 @@ import os
 import csv
 import random
 
+# Loads the pre-trained Keypoint R-CNN model for pose estimation.
+# Input: device ('cpu' or 'cuda').
+# Output: A PyTorch model ready for inference.
 def load_pose_model(device='cpu'):
     model = keypointrcnn_resnet50_fpn(weights="KeypointRCNN_ResNet50_FPN_Weights.DEFAULT")
     model.to(device)
     model.eval()
     return model
 
+# Performs pose estimation on a given image using the loaded model.
+# Inputs: image (numpy array), model (PyTorch model), device ('cpu' or 'cuda').
+# Output: Predictions containing keypoints and other details.
 def pose_estimation(image, model, device='cpu'):
     image_tensor = torch.tensor(image.transpose(2, 0, 1)).float() / 255.0  
     image_tensor = image_tensor.to(device)
@@ -21,6 +31,9 @@ def pose_estimation(image, model, device='cpu'):
         predictions = model([image_tensor])[0]  
     return predictions
 
+# Draws the detected pose and strain results on the image.
+# Inputs: image (numpy array), keypoints (list of keypoints), strain_results (dict), threshold (float).
+# Output: Image with drawn poses and strain information.
 def draw_pose(image, keypoints, strain_results=None, threshold=0.5):
     # Define drawing skeleton
     limb_pairs = {
@@ -55,30 +68,19 @@ def draw_pose(image, keypoints, strain_results=None, threshold=0.5):
             y_offset += 20  # Increment y-coordinate for the next line of text
     return image
 
+# Saves strain results to a CSV file.
+# Inputs: strain_results (dict), csv_path (str).
 def save_strain_results_to_csv(strain_results, csv_path):
-    """
-    Save strain results to a CSV file.
-
-    Parameters:
-    strain_results (dict): The dictionary containing strain metrics.
-    csv_path (str): The path to the CSV file.
-    """
     with open(csv_path, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['Metric', 'Value'])  # Write header
         for key, value in strain_results.items():
             writer.writerow([key, value])
 
+# Loads strain results from a CSV file.
+# Input: csv_path (str).
+# Output: strain_results (dict).
 def load_strain_results_from_csv(csv_path):
-    """
-    Load strain results from a CSV file.
-
-    Parameters:
-    csv_path (str): The path to the CSV file.
-
-    Returns:
-    dict: A dictionary containing strain metrics.
-    """
     strain_results = {}
     with open(csv_path, mode='r') as file:
         reader = csv.reader(file)
@@ -91,35 +93,20 @@ def load_strain_results_from_csv(csv_path):
                 strain_results[key] = value  # Keep non-numeric values as strings
     return strain_results
 
+# Lists files in the specified data directory.
+# Input: data_dir (str).
+# Output: List of file names.
 def list_files_in_data_directory(data_dir):
-    """
-    List all files in the specified data directory.
-
-    Parameters:
-    data_dir (str): Path to the data directory.
-
-    Returns:
-    list: A list of filenames in the directory.
-    """
     try:
         return [f for f in os.listdir(data_dir) if os.path.isfile(os.path.join(data_dir, f))]
     except FileNotFoundError:
         print(f"Error: Directory {data_dir} not found.")
         return []
 
+# Evaluates images in the data directory to find the one with the best form based on strain metrics.
+# Inputs: data_dir (str), model (PyTorch model), device ('cpu' or 'cuda'), exercise_type (str).
+# Output: Path to the best image and its strain results.
 def evaluate_images(data_dir, model, device, exercise_type):
-    """
-    Evaluate all images in the data directory and find the one with the best form.
-
-    Parameters:
-    data_dir (str): Path to the data directory.
-    model: The pose estimation model.
-    device (str): Device to run the model on.
-    exercise_type (str): Type of exercise being evaluated.
-
-    Returns:
-    tuple: The best image path and its corresponding strain results.
-    """
     best_image_path = None
     best_strain_score = float('inf')  # Lower strain score is better
     best_strain_results = None
@@ -156,16 +143,9 @@ def evaluate_images(data_dir, model, device, exercise_type):
 
     return best_image_path, best_strain_results
 
+# Displays images with their corresponding strain graphs.
+# Inputs: data_dir (str), model (PyTorch model), device ('cpu' or 'cuda'), exercise_type (str).
 def display_images_with_strain(data_dir, model, device, exercise_type):
-    """
-    Display all images in the data directory alongside their corresponding strain graphs.
-
-    Parameters:
-    data_dir (str): Path to the data directory.
-    model: The pose estimation model.
-    device (str): Device to run the model on.
-    exercise_type (str): Type of exercise being evaluated.
-    """
     images = []
     strain_graphs = []
 
@@ -232,16 +212,9 @@ def display_images_with_strain(data_dir, model, device, exercise_type):
     plt.tight_layout()
     plt.show()
 
+# Displays the best and worst images based on strain metrics along with their corresponding strain graphs.
+# Inputs: data_dir (str), model (PyTorch model), device ('cpu' or 'cuda'), exercise_type (str).
 def display_best_and_worst_images_with_strain(data_dir, model, device, exercise_type):
-    """
-    Display the best and worst form images from the data directory with their corresponding strain graphs.
-
-    Parameters:
-    data_dir (str): Path to the data directory.
-    model: The pose estimation model.
-    device (str): Device to run the model on.
-    exercise_type (str): Type of exercise being evaluated.
-    """
     image_data = []
 
     for file in os.listdir(data_dir):
@@ -315,6 +288,7 @@ def display_best_and_worst_images_with_strain(data_dir, model, device, exercise_
     plt.tight_layout()
     plt.show()
 
+# Main function to load the model, prompt user for workout type, and display best and worst images with strain graphs.
 def main():
     print("Current working directory:", os.getcwd())  # Debugging statement
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -337,7 +311,7 @@ def main():
         return
 
     # List files in the data directory
-    data_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'dataDeadlift')  # Relative path to the data directory
+    data_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'data')  # Relative path to the data directory
     if not os.path.exists(data_dir):
         print(f"Error: Data directory {data_dir} does not exist. Exiting.")
         return
