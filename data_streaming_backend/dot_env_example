@@ -37,3 +37,9 @@ AIRFLOW__WEBSERVER__DEFAULT_USER_PASSWORD=admin
 
 DB_PATH=postgres_connection_string
 KEY=fernet_Key
+
+# -----------------
+# API 
+# -----------------
+USERNAME=AIRFLOW_LOGIN_USERNAME
+PASSWORD=AIRFLOW_LOGIN_PASSWORD

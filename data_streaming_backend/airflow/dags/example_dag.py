@@ -23,7 +23,7 @@ dag = DAG(
     'example_dag',
     default_args=default_args,
     description='A simple test DAG to print and wait',
-    catchup=True,
+    catchup=False,
     tags=['example']
 )
 
