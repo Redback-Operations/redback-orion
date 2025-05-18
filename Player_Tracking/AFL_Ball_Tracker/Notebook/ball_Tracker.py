@@ -1,48 +1,43 @@
 # Import necessary libraries
 from ultralytics import YOLO  # YOLOv8 for object detection
 import cv2                    # OpenCV for image/video processing
-import pickle                 # Used to save/load intermediate detection results
+import json                   # JSON used to safely store detection results
 import os
 
 # Define a class for tracking the ball using YOLO
 class BallTracker:
     def __init__(self, model_path):
-        # Load a trained YOLOv8 model
         self.model = YOLO(model_path)
 
     def detect_frames(self, frames, read_from_stub=False, stub_path=None):
-        # This method detects balls in a list of frames
-        # It supports reading from a cached result (stub) to avoid reprocessing
         ball_detections = []
 
-        # If using cached detection results
-        if read_from_stub and stub_path:
-            with open(stub_path, 'rb') as f:
-                return pickle.load(f)
+        # Load detection data from JSON stub if available
+        if read_from_stub and stub_path and os.path.exists(stub_path):
+            with open(stub_path, 'r') as f:
+                return json.load(f)
 
         # Perform detection on each frame
         for frame in frames:
             ball_dict = self.detect_frame(frame)
             ball_detections.append(ball_dict)
 
-        # Optionally save detections to stub
+        # Save detection data to JSON stub
         if stub_path:
-            with open(stub_path, 'wb') as f:
-                pickle.dump(ball_detections, f)
+            with open(stub_path, 'w') as f:
+                json.dump(ball_detections, f, indent=2)
 
         return ball_detections
 
     def detect_frame(self, frame):
-        # Run inference on a single frame and return bounding box as a dictionary
-        results = self.model.predict(frame, conf=0.15)[0]  # Confidence threshold can be adjusted
+        results = self.model.predict(frame, conf=0.15)[0]
         ball_dict = {}
         for box in results.boxes:
-            result = box.xyxy.tolist()[0]  # Get bounding box coordinates
-            ball_dict[1] = result  # Using 1 as a dummy ID (can be improved for real tracking)
+            result = box.xyxy.tolist()[0]  # Get bounding box
+            ball_dict[1] = result          # Dummy ID (can be expanded)
         return ball_dict
 
     def draw_bboxes(self, frames, ball_detections):
-        # Draw bounding boxes and labels on the frames
         output_frames = []
         for frame, ball_dict in zip(frames, ball_detections):
             for track_id, bbox in ball_dict.items():
@@ -75,23 +70,15 @@ def save_video(frames, output_path, fps=30):
 
 # === Run Inference ===
 if __name__ == "__main__":
-    # === STEP 1: Provide path to the input video file ===
-    video_path = "Test1.mp4"  # <-- Replace with your video file path
+    video_path = "Test1.mp4"  # Update as needed
+    trained_model_path = "runs/detect/train/weights/best.pt"  # Update path
+    stub_path = "ball_detections.json"  # Optional: cache file
 
-    # === STEP 2: Provide path to your trained YOLOv8 model ===
-    trained_model_path = "runs/detect/train/weights/best.pt"  # <-- Update this with the correct model file path
-
-    # Create an instance of BallTracker using the trained model
     tracker = BallTracker(trained_model_path)
-
-    # Load frames from the input video
     frames = load_video_frames(video_path)
 
-    # Detect the ball in each frame
-    detections = tracker.detect_frames(frames)
+    # Use stub if file exists, otherwise do fresh detection
+    detections = tracker.detect_frames(frames, read_from_stub=True, stub_path=stub_path)
 
-    # Draw bounding boxes on the frames
     output_frames = tracker.draw_bboxes(frames, detections)
-
-    # Save the resulting video with detections
-    save_video(output_frames, "nfl_ball_output.mp4")  # Output file name can be changed
+    save_video(output_frames, "nfl_ball_output.mp4")
