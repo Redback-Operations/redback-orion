@@ -72,77 +72,22 @@ runs/detect/train/weights/best.pt
 
 ### Use the following Python class to detect and annotate AFL balls in a video.
 
-```python
-from ultralytics import YOLO
-import cv2
-import pickle
-
-class BallTracker:
-    def __init__(self, model_path):
-        self.model = YOLO(model_path)
-
-    def detect_frames(self, frames, read_from_stub=False, stub_path=None):
-        if read_from_stub and stub_path:
-            with open(stub_path, 'rb') as f:
-                return pickle.load(f)
-        ball_detections = []
-        for frame in frames:
-            ball_dict = {}
-            results = self.model.predict(frame, conf=0.15)[0]
-            for box in results.boxes:
-                result = box.xyxy.tolist()[0]
-                ball_dict[1] = result
-            ball_detections.append(ball_dict)
-        if stub_path:
-            with open(stub_path, 'wb') as f:
-                pickle.dump(ball_detections, f)
-        return ball_detections
-
-    def draw_bboxes(self, frames, ball_detections):
-        output_frames = []
-        for frame, ball_dict in zip(frames, ball_detections):
-            for bbox in ball_dict.values():
-                x1, y1, x2, y2 = map(int, bbox)
-                cv2.putText(frame, "Ball", (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
-            output_frames.append(frame)
-        return output_frames
-```
-
-### Video Handling Helpers
-
-```python
-def load_video_frames(video_path):
-    cap = cv2.VideoCapture(video_path)
-    frames = []
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        frames.append(frame)
-    cap.release()
-    return frames
-
-def save_video(frames, output_path, fps=30):
-    height, width, _ = frames[0].shape
-    out = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
-    for frame in frames:
-        out.write(frame)
-    out.release()
-```
+Use the python ball_Tracker.py that is provided in this file to run the code. 
 
 ### Example Usage
 
 ```python
+# Example Usage
 video_path = "Test1.mp4"
-trained_model_path = "runs/detect/train/weights/best.pt"  # Update with your actual model path
+trained_model_path = "runs/detect/train/weights/best.pt"
+stub_path = "ball_detections.json"
 
 tracker = BallTracker(trained_model_path)
 frames = load_video_frames(video_path)
-detections = tracker.detect_frames(frames)
+detections = tracker.detect_frames(frames, read_from_stub=True, stub_path=stub_path)
 output_frames = tracker.draw_bboxes(frames, detections)
 save_video(output_frames, "nfl_ball_output.mp4")
+
 ```
 
 ---
