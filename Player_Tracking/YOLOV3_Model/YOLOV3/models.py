@@ -5,6 +5,8 @@ import torch.nn.functional as F
 from utils.parse_config import *
 from utils.utils import *
 
+import subprocess
+
 ONNX_EXPORT = False
 
 
@@ -264,8 +266,14 @@ def load_darknet_weights(self, weights, cutoff=-1):
     # Try to download weights if not available locally
     if not os.path.isfile(weights):
         try:
-            os.system('wget https://pjreddie.com/media/files/' + weights_file + ' -O ' + weights)
-        except IOError:
+            #os.system('wget https://pjreddie.com/media/files/' + weights_file + ' -O ' + weights)
+            # Safer
+            subprocess.run(
+                ["wget", f"https://pjreddie.com/media/files/{weights_file}", "-O", weights],
+                check=True
+            )
+        # Changed from IOError
+        except subprocess.CalledProcessError:
             print(weights + ' not found.\nTry https://drive.google.com/drive/folders/1uxgUBemJVw9wZsdpboYbzUN4bcRhsuAI')
 
     # Establish cutoffs
