@@ -1,6 +1,7 @@
 import argparse
 import time
 from sys import platform
+import subprocess
 
 from models import *
 from utils.datasets import *
@@ -116,7 +117,11 @@ def detect(
     if save_images:
         print('Results saved to %s' % os.getcwd() + os.sep + output)
         if platform == 'darwin':  # macos
-            os.system('open ' + output + ' ' + save_path)
+            #os.system('open ' + output + ' ' + save_path)
+            # Safer line
+            subprocess.run(['open', output, save_path])
+            
+
 
 
 if __name__ == '__main__':
