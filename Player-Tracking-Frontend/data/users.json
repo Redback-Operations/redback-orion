@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "id": "1746166955287",
+      "name": "Rahul Rayudu",
+      "email": "rayudu@gmail.com",
+      "password": "$2b$10$Wh2cphJ./7cmc6KUknQdKOCA717DIMce1Wfm7Hq8dhtwFyqB/k00O"
+    },
+    {
+      "id": "1746167038707",
+      "name": "Ahmad",
+      "email": "ahmad@gmail.com",
+      "password": "$2b$10$KgpmjFBBrJJH0/ECsgdKNu3164oHkVrhkLTscBKHuGM8Axf2y2J0y"
+    }
+  ]
+}
