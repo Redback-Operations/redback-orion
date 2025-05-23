@@ -1,3 +1,6 @@
+---
+sidebar_position: 1
+---
 # Tennis Pose Estimation: Understanding Player Movements🎾 
 [![ReadMe](https://img.shields.io/badge/ReadMe-018EF5?logo=readme&logoColor=fff)](#)
 ![Python](https://img.shields.io/badge/Python-3.10-red)
@@ -188,9 +191,9 @@ These printed values help with:
 
 ## 🔮 Future Work
 
-- Live video stream pose detection.
-- Classification of shots/movements using angles and pose data.
-- 3D pose estimation extension.
+- Pose Comparison Feature: Implement functionality to compare a player’s pose side-by-side with that of a professional. Highlight key differences in joint angles to help players visually identify areas for improvement.
+- Technique Scoring System: Develop an automated scoring system that evaluates the player's form by comparing joint angles to an ideal reference. This can help players track their technique accuracy and progress over time.
+- Injury Risk Alerts: Integrate a system that analyzes joint angle data to detect potentially harmful or incorrect movements. Provide real-time alerts or warnings to help prevent injuries and promote safe training practices.
 
 ---
 
