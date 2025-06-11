@@ -69,13 +69,15 @@ This project uses a custom basketball player dataset annotated using Roboflow.
 To download the YOLOv8-compatible dataset:
 
 ```python
-!pip install roboflow
-
 from roboflow import Roboflow
-rf = Roboflow(api_key="LqKpTXknZOXpFqSOBqjF")
+import os
+
+rf = Roboflow(api_key=os.getenv("ROBOFLOW_API_KEY"))
 project = rf.workspace().project("player-tracking-dv9lo")
 dataset = project.version(1).download("yolov8")
+
 ```
+
 
 ## 9. Challenges Faced
 - Maintaining tracking accuracy under occlusions  
