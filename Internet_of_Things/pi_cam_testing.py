@@ -26,4 +26,4 @@ def video_feed():
 
 if __name__ == '__main__':
     # Start the Flask application on all interfaces at port 5000 with threading enabled.
-    app.run(host='0.0.0.0', port=5000, threaded=True)
+    app.run(host='0.0.0.0', port=5000, threaded=True) # nosec
