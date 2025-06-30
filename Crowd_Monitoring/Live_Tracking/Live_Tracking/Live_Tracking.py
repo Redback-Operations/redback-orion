@@ -104,3 +104,4 @@ def video_feed():
 if __name__ == '__main__':
     threading.Thread(target=generate_frames, daemon=True).start()
     app.run(port=8000) #nosec
+
