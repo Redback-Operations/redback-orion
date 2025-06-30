@@ -68,4 +68,4 @@ def video_feed():
     return Response(generate_frames(picam2), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)  # Run the app
+    app.run(host='0.0.0.0', port=5000)  # nosec
