@@ -110,6 +110,33 @@ The speed of greyhounds is estimated using the following steps:
 
 - [feature_kilometer_per_hour.ipynb](feature_km_per_hour.ipynb)
 
+ ## Speed Calculation Method (UPDATED) ([speed_estimation_final.ipynb](speed_estimation_final.ipynb))
+ This method calculates the speed of each detected greyhound in pixels per second (pixels/s).
+
+1.  **Detection**: The YOLOv8 model (`best (3).pt` or your specified model) is used to detect greyhounds in each frame of the input video.
+2.  **Tracking**: The ByteTrack algorithm (`tracker="bytetrack.yaml"`) is employed to track each detected greyhound across consecutive frames. Each tracked greyhound is assigned a unique `track_id`. For display purposes, these `track_id`s are mapped to simpler labels like "dog_1", "dog_2", etc.
+3.  **Position Logging**: For each tracked greyhound, the center coordinates `(center_x, center_y)` of its bounding box are recorded in every frame it appears. A history of these positions (frame number, x, y) is maintained for each `track_id` (up to the last 30 positions).
+4.  **Speed Calculation**:
+    * **Time Interval**: The time elapsed between consecutive frames is calculated as $ \frac{1}{FPS} $, where FPS is the frames per second of the video. This is calculated once at the beginning.
+    * **Pixel Distance**: If a greyhound is tracked for at least two frames, the Euclidean distance between its current center position (`current_pos_pixel`) and its previous center position (`prev_pos_pixel`) is calculated:
+
+    * **Pixel Distance**: If a greyhound is tracked for at least two frames, the Euclidean distance between its current center position (`current_pos_pixel`) and its previous center position (`prev_pos_pixel`) is calculated:
+      
+       ![image](https://github.com/user-attachments/assets/d257cacd-972d-47b8-911d-008c432df127)
+
+    * **Pixel Speed**: The speed in pixels per second is then estimated as:
+       ![image](https://github.com/user-attachments/assets/49a40b6a-751c-4a06-952b-2366a8e09260)
+
+      
+5.  **Annotation & Output**:
+    * The original video frames are annotated with bounding boxes around detected greyhounds.
+    * A text label is displayed near each bounding box, showing the assigned dog label and its calculated speed (e.g., "dog_1: 150.5 pixels/s").
+    * The processed frames are compiled into an output video file named `pixel_speed_estimation.avi`.
+    * [Link to output video] (https://drive.google.com/file/d/1TLh9Cm2t7bD5YQzE0xjnMGPdO5FYcuXP/view?usp=sharing) 
+      ![image](https://github.com/user-attachments/assets/730c32b9-8b56-4d57-9b08-bc0f0df6b061)
+
+ 
+
 ## Challenges and Solutions
 - **Close Proximity Detection:** Initial challenges included difficulties in detecting greyhounds when they were close together. This was mitigated by expanding the dataset and refining the model.
 - **Obstruction Issues:** Detecting greyhounds behind railings or other obstacles required additional training data and fine-tuning of the model.
@@ -154,4 +181,5 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 We would like to extend our gratitude to the following:
 
 - **YOLOv8 and Ultralytics Communities:** Thank you for your contributions to the field of object detection and tracking. Your work has been instrumental in the development of our project.
+- **ByteTrack Authors:** For the robust tracking algorithm used in this project.
 - **Roboflow:** Special thanks for providing platform and annotation tools that have significantly contributed to the accuracy and efficiency of our model.

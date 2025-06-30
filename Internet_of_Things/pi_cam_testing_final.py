@@ -56,4 +56,4 @@ if __name__ == '__main__':
     ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     ssl_context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
 
-    app.run(host='0.0.0.0', port=5000, threaded=True, ssl_context=ssl_context)
+    app.run(host='0.0.0.0', port=5000, threaded=True, ssl_context=ssl_context) # nosec

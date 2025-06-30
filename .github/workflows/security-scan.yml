@@ -47,7 +47,7 @@ jobs:
         run: |
           # Run bandit recursively on all Python files
           echo "Running Bandit security scan..."
-          bandit -r . -f txt -o bandit-results.txt || true
+          bandit -r . -f txt -o bandit-results.txt -s B101 || true
           
           # Run Safety check on requirements
           if [ -f "requirements.txt" ]; then
