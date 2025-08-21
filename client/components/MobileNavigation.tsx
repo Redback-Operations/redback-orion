@@ -2,21 +2,22 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { 
-  Activity, 
-  BarChart3, 
-  Users, 
-  Download, 
-  Video, 
-  Menu, 
+import {
+  Activity,
+  BarChart3,
+  Users,
+  Download,
+  Video,
+  Menu,
   Home,
-  Zap
+  Zap,
+  Terminal
 } from 'lucide-react';
 
 const navigationItems = [
   {
     name: 'Home',
-    href: '/',
+    href: '/afl-dashboard',
     icon: Home,
     description: 'Main dashboard'
   },
@@ -28,7 +29,7 @@ const navigationItems = [
   },
   {
     name: 'Live Match',
-    href: '/live-match',
+    href: '/afl-dashboard',
     icon: Activity,
     description: 'Real-time match data'
   },
@@ -39,16 +40,16 @@ const navigationItems = [
     description: 'Stadium crowd analytics'
   },
   {
-    name: 'Reports',
-    href: '/reports',
-    icon: Download,
-    description: 'Analytics & exports'
+    name: 'Analytics',
+    href: '/analytics',
+    icon: Video,
+    description: 'Video analysis & reports'
   },
   {
-    name: 'Video Analysis',
-    href: '/video-analysis',
-    icon: Video,
-    description: 'AI video insights'
+    name: 'API Diagnostics',
+    href: '/api-diagnostics',
+    icon: Terminal,
+    description: 'System monitoring'
   }
 ];
 
