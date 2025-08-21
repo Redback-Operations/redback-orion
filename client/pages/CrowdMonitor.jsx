@@ -5,8 +5,8 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import MobileNavigation from '@/components/MobileNavigation';
-import LiveClock from '@/components/LiveClock';
+import MobileNavigation from '@/components/MobileNavigation.jsx';
+import LiveClock from '@/components/LiveClock.jsx';
 import { 
   Users, 
   TrendingUp, 
