@@ -9,8 +9,8 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import MobileNavigation from '@/components/MobileNavigation';
-import LiveClock from '@/components/LiveClock';
+import MobileNavigation from '@/components/MobileNavigation.jsx';
+import LiveClock from '@/components/LiveClock.jsx';
 import { 
   Upload, 
   Video, 
