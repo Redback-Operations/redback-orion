@@ -1,22 +1,34 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import MobileNavigation from '@/components/MobileNavigation.jsx';
-import LiveClock from '@/components/LiveClock.jsx';
-import { 
-  Activity, 
-  AlertCircle, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import MobileNavigation from "@/components/MobileNavigation.jsx";
+import LiveClock from "@/components/LiveClock.jsx";
+import {
+  Activity,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Clock,
   Zap,
   Server,
   Database,
@@ -37,8 +49,8 @@ import {
   Settings,
   Eye,
   AlertTriangle,
-  RefreshCw
-} from 'lucide-react';
+  RefreshCw,
+} from "lucide-react";
 
 // Mock API endpoints and their status
 const generateApiStatus = () => [
@@ -51,7 +63,7 @@ const generateApiStatus = () => [
     uptime: 99.8,
     lastCheck: "2 min ago",
     version: "v1.2.3",
-    description: "Real-time player statistics and metrics"
+    description: "Real-time player statistics and metrics",
   },
   {
     id: 2,
@@ -62,7 +74,7 @@ const generateApiStatus = () => [
     uptime: 99.9,
     lastCheck: "1 min ago",
     version: "v1.1.8",
-    description: "Stadium crowd density and safety data"
+    description: "Stadium crowd density and safety data",
   },
   {
     id: 3,
@@ -73,7 +85,7 @@ const generateApiStatus = () => [
     uptime: 98.2,
     lastCheck: "5 min ago",
     version: "v2.0.1",
-    description: "AI-powered video processing and analysis"
+    description: "AI-powered video processing and analysis",
   },
   {
     id: 4,
@@ -84,7 +96,7 @@ const generateApiStatus = () => [
     uptime: 99.7,
     lastCheck: "30 sec ago",
     version: "v1.4.2",
-    description: "Live match data and statistics"
+    description: "Live match data and statistics",
   },
   {
     id: 5,
@@ -95,7 +107,7 @@ const generateApiStatus = () => [
     uptime: 87.3,
     lastCheck: "12 min ago",
     version: "v1.0.9",
-    description: "Analytics report generation service"
+    description: "Analytics report generation service",
   },
   {
     id: 6,
@@ -106,8 +118,8 @@ const generateApiStatus = () => [
     uptime: 99.95,
     lastCheck: "1 min ago",
     version: "v2.1.0",
-    description: "User authentication and authorization"
-  }
+    description: "User authentication and authorization",
+  },
 ];
 
 const generateSystemMetrics = () => ({
@@ -118,7 +130,7 @@ const generateSystemMetrics = () => ({
   activeConnections: Math.floor(Math.random() * 500) + 100,
   requestsPerMinute: Math.floor(Math.random() * 1000) + 200,
   errorRate: Math.random() * 5,
-  avgResponseTime: Math.random() * 200 + 50
+  avgResponseTime: Math.random() * 200 + 50,
 });
 
 const generateApiLogs = () => [
@@ -130,7 +142,7 @@ const generateApiLogs = () => [
     status: 200,
     responseTime: 145,
     ip: "192.168.1.100",
-    userAgent: "AFL-Analytics-Mobile/1.2.0"
+    userAgent: "AFL-Analytics-Mobile/1.2.0",
   },
   {
     id: 2,
@@ -141,7 +153,7 @@ const generateApiLogs = () => [
     responseTime: 5000,
     ip: "192.168.1.105",
     userAgent: "AFL-Analytics-Web/2.1.0",
-    error: "Internal server error: Video processing timeout"
+    error: "Internal server error: Video processing timeout",
   },
   {
     id: 3,
@@ -151,7 +163,7 @@ const generateApiLogs = () => [
     status: 200,
     responseTime: 89,
     ip: "192.168.1.102",
-    userAgent: "AFL-Analytics-Mobile/1.2.0"
+    userAgent: "AFL-Analytics-Mobile/1.2.0",
   },
   {
     id: 4,
@@ -162,7 +174,7 @@ const generateApiLogs = () => [
     responseTime: 12,
     ip: "192.168.1.108",
     userAgent: "AFL-Analytics-Web/2.1.0",
-    error: "Report not found"
+    error: "Report not found",
   },
   {
     id: 5,
@@ -172,8 +184,8 @@ const generateApiLogs = () => [
     status: 200,
     responseTime: 234,
     ip: "192.168.1.103",
-    userAgent: "AFL-Analytics-Admin/1.0.0"
-  }
+    userAgent: "AFL-Analytics-Admin/1.0.0",
+  },
 ];
 
 export default function ApiDiagnostics() {
@@ -181,13 +193,13 @@ export default function ApiDiagnostics() {
   const [apiStatus, setApiStatus] = useState(generateApiStatus());
   const [systemMetrics, setSystemMetrics] = useState(generateSystemMetrics());
   const [apiLogs, setApiLogs] = useState(generateApiLogs());
-  const [testEndpoint, setTestEndpoint] = useState('');
-  const [testMethod, setTestMethod] = useState('GET');
-  const [testBody, setTestBody] = useState('');
-  const [testHeaders, setTestHeaders] = useState('');
+  const [testEndpoint, setTestEndpoint] = useState("");
+  const [testMethod, setTestMethod] = useState("GET");
+  const [testBody, setTestBody] = useState("");
+  const [testHeaders, setTestHeaders] = useState("");
   const [testResult, setTestResult] = useState(null);
   const [isTesting, setIsTesting] = useState(false);
-  const [selectedTimeRange, setSelectedTimeRange] = useState('1h');
+  const [selectedTimeRange, setSelectedTimeRange] = useState("1h");
 
   // Simulate real-time updates
   useEffect(() => {
@@ -195,12 +207,15 @@ export default function ApiDiagnostics() {
 
     const interval = setInterval(() => {
       setSystemMetrics(generateSystemMetrics());
-      setApiStatus(prevStatus => 
-        prevStatus.map(api => ({
+      setApiStatus((prevStatus) =>
+        prevStatus.map((api) => ({
           ...api,
-          responseTime: Math.max(10, api.responseTime + (Math.random() - 0.5) * 50),
-          lastCheck: "Just now"
-        }))
+          responseTime: Math.max(
+            10,
+            api.responseTime + (Math.random() - 0.5) * 50,
+          ),
+          lastCheck: "Just now",
+        })),
       );
     }, 5000);
 
@@ -212,23 +227,26 @@ export default function ApiDiagnostics() {
     setTestResult(null);
 
     // Simulate API test
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const mockResult = {
       status: Math.random() > 0.8 ? 500 : 200,
       responseTime: Math.random() * 300 + 50,
       headers: {
-        'content-type': 'application/json',
-        'x-response-time': '156ms',
-        'x-request-id': 'req_' + Math.random().toString(36).substr(2, 9)
+        "content-type": "application/json",
+        "x-response-time": "156ms",
+        "x-request-id": "req_" + Math.random().toString(36).substr(2, 9),
       },
-      body: testMethod === 'GET' ? {
-        data: [
-          { id: 1, name: "Test Player", performance: 85 },
-          { id: 2, name: "Another Player", performance: 92 }
-        ],
-        meta: { total: 2, page: 1 }
-      } : { message: "Success", id: Math.floor(Math.random() * 1000) }
+      body:
+        testMethod === "GET"
+          ? {
+              data: [
+                { id: 1, name: "Test Player", performance: 85 },
+                { id: 2, name: "Another Player", performance: 92 },
+              ],
+              meta: { total: 2, page: 1 },
+            }
+          : { message: "Success", id: Math.floor(Math.random() * 1000) },
     };
 
     setTestResult(mockResult);
@@ -237,41 +255,51 @@ export default function ApiDiagnostics() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'healthy': return 'text-green-600 bg-green-100';
-      case 'warning': return 'text-yellow-600 bg-yellow-100';
-      case 'error': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "healthy":
+        return "text-green-600 bg-green-100";
+      case "warning":
+        return "text-yellow-600 bg-yellow-100";
+      case "error":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'healthy': return <CheckCircle className="w-4 h-4" />;
-      case 'warning': return <AlertTriangle className="w-4 h-4" />;
-      case 'error': return <XCircle className="w-4 h-4" />;
-      default: return <AlertCircle className="w-4 h-4" />;
+      case "healthy":
+        return <CheckCircle className="w-4 h-4" />;
+      case "warning":
+        return <AlertTriangle className="w-4 h-4" />;
+      case "error":
+        return <XCircle className="w-4 h-4" />;
+      default:
+        return <AlertCircle className="w-4 h-4" />;
     }
   };
 
   const getHttpStatusColor = (status) => {
-    if (status >= 200 && status < 300) return 'text-green-600';
-    if (status >= 300 && status < 400) return 'text-blue-600';
-    if (status >= 400 && status < 500) return 'text-yellow-600';
-    return 'text-red-600';
+    if (status >= 200 && status < 300) return "text-green-600";
+    if (status >= 300 && status < 400) return "text-blue-600";
+    if (status >= 400 && status < 500) return "text-yellow-600";
+    return "text-red-600";
   };
 
-  const healthyApis = apiStatus.filter(api => api.status === 'healthy').length;
+  const healthyApis = apiStatus.filter(
+    (api) => api.status === "healthy",
+  ).length;
   const totalApis = apiStatus.length;
   const overallHealth = (healthyApis / totalApis) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       <MobileNavigation />
-      
+
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-4">
-          <LiveClock 
-            isLive={isLive} 
+          <LiveClock
+            isLive={isLive}
             onToggleLive={setIsLive}
             matchTime={{ quarter: 2, timeRemaining: "15:23" }}
           />
@@ -283,14 +311,21 @@ export default function ApiDiagnostics() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">API Health</p>
-                    <p className="text-2xl font-bold">{healthyApis}/{totalApis}</p>
-                    <p className="text-xs text-gray-500">{overallHealth.toFixed(1)}% healthy</p>
+                    <p className="text-2xl font-bold">
+                      {healthyApis}/{totalApis}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {overallHealth.toFixed(1)}% healthy
+                    </p>
                   </div>
-                  <div className={`p-2 rounded-full ${overallHealth > 80 ? 'bg-green-100' : 'bg-red-100'}`}>
-                    {overallHealth > 80 ? 
-                      <CheckCircle className="w-6 h-6 text-green-500" /> :
+                  <div
+                    className={`p-2 rounded-full ${overallHealth > 80 ? "bg-green-100" : "bg-red-100"}`}
+                  >
+                    {overallHealth > 80 ? (
+                      <CheckCircle className="w-6 h-6 text-green-500" />
+                    ) : (
                       <XCircle className="w-6 h-6 text-red-500" />
-                    }
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -301,7 +336,9 @@ export default function ApiDiagnostics() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Avg Response</p>
-                    <p className="text-2xl font-bold">{systemMetrics.avgResponseTime.toFixed(0)}ms</p>
+                    <p className="text-2xl font-bold">
+                      {systemMetrics.avgResponseTime.toFixed(0)}ms
+                    </p>
                     <p className="text-xs text-gray-500">Last minute</p>
                   </div>
                   <Zap className="w-6 h-6 text-blue-500" />
@@ -314,7 +351,9 @@ export default function ApiDiagnostics() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Requests/min</p>
-                    <p className="text-2xl font-bold">{systemMetrics.requestsPerMinute}</p>
+                    <p className="text-2xl font-bold">
+                      {systemMetrics.requestsPerMinute}
+                    </p>
                     <p className="text-xs text-gray-500">Current load</p>
                   </div>
                   <Activity className="w-6 h-6 text-purple-500" />
@@ -327,7 +366,9 @@ export default function ApiDiagnostics() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Error Rate</p>
-                    <p className="text-2xl font-bold">{systemMetrics.errorRate.toFixed(1)}%</p>
+                    <p className="text-2xl font-bold">
+                      {systemMetrics.errorRate.toFixed(1)}%
+                    </p>
                     <p className="text-xs text-gray-500">Last hour</p>
                   </div>
                   <AlertTriangle className="w-6 h-6 text-orange-500" />
@@ -372,29 +413,42 @@ export default function ApiDiagnostics() {
 
               <div className="grid gap-4">
                 {apiStatus.map((api) => (
-                  <Card key={api.id} className="hover:shadow-md transition-shadow">
+                  <Card
+                    key={api.id}
+                    className="hover:shadow-md transition-shadow"
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className={`p-1 rounded-full ${getStatusColor(api.status)}`}>
+                          <div
+                            className={`p-1 rounded-full ${getStatusColor(api.status)}`}
+                          >
                             {getStatusIcon(api.status)}
                           </div>
                           <div>
                             <h4 className="font-medium">{api.name}</h4>
-                            <p className="text-sm text-gray-600">{api.endpoint}</p>
+                            <p className="text-sm text-gray-600">
+                              {api.endpoint}
+                            </p>
                           </div>
                         </div>
                         <div className="text-right">
                           <Badge variant="outline">{api.version}</Badge>
-                          <p className="text-xs text-gray-500 mt-1">{api.lastCheck}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {api.lastCheck}
+                          </p>
                         </div>
                       </div>
 
-                      <p className="text-sm text-gray-600 mb-3">{api.description}</p>
+                      <p className="text-sm text-gray-600 mb-3">
+                        {api.description}
+                      </p>
 
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div className="text-center p-2 bg-gray-50 rounded">
-                          <div className="font-medium">{api.responseTime}ms</div>
+                          <div className="font-medium">
+                            {api.responseTime}ms
+                          </div>
                           <div className="text-gray-600">Response Time</div>
                         </div>
                         <div className="text-center p-2 bg-gray-50 rounded">
@@ -402,7 +456,9 @@ export default function ApiDiagnostics() {
                           <div className="text-gray-600">Uptime</div>
                         </div>
                         <div className="text-center p-2 bg-gray-50 rounded">
-                          <div className={`font-medium ${api.status === 'healthy' ? 'text-green-600' : api.status === 'warning' ? 'text-yellow-600' : 'text-red-600'}`}>
+                          <div
+                            className={`font-medium ${api.status === "healthy" ? "text-green-600" : api.status === "warning" ? "text-yellow-600" : "text-red-600"}`}
+                          >
                             {api.status.toUpperCase()}
                           </div>
                           <div className="text-gray-600">Status</div>
@@ -450,7 +506,10 @@ export default function ApiDiagnostics() {
                           <span>Memory Usage</span>
                           <span>{systemMetrics.memory.toFixed(1)}%</span>
                         </div>
-                        <Progress value={systemMetrics.memory} className="h-2" />
+                        <Progress
+                          value={systemMetrics.memory}
+                          className="h-2"
+                        />
                       </div>
 
                       <div>
@@ -466,7 +525,10 @@ export default function ApiDiagnostics() {
                           <span>Network Utilization</span>
                           <span>{systemMetrics.network.toFixed(1)}%</span>
                         </div>
-                        <Progress value={systemMetrics.network} className="h-2" />
+                        <Progress
+                          value={systemMetrics.network}
+                          className="h-2"
+                        />
                       </div>
                     </div>
                   </CardContent>
@@ -482,19 +544,33 @@ export default function ApiDiagnostics() {
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">{systemMetrics.activeConnections}</div>
-                        <div className="text-sm text-gray-600">Active Connections</div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {systemMetrics.activeConnections}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Active Connections
+                        </div>
                       </div>
                       <div className="text-center p-3 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">{systemMetrics.requestsPerMinute}</div>
-                        <div className="text-sm text-gray-600">Requests/min</div>
+                        <div className="text-2xl font-bold text-green-600">
+                          {systemMetrics.requestsPerMinute}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Requests/min
+                        </div>
                       </div>
                       <div className="text-center p-3 bg-purple-50 rounded-lg">
-                        <div className="text-2xl font-bold text-purple-600">{systemMetrics.avgResponseTime.toFixed(0)}ms</div>
-                        <div className="text-sm text-gray-600">Avg Response</div>
+                        <div className="text-2xl font-bold text-purple-600">
+                          {systemMetrics.avgResponseTime.toFixed(0)}ms
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Avg Response
+                        </div>
                       </div>
                       <div className="text-center p-3 bg-red-50 rounded-lg">
-                        <div className="text-2xl font-bold text-red-600">{systemMetrics.errorRate.toFixed(1)}%</div>
+                        <div className="text-2xl font-bold text-red-600">
+                          {systemMetrics.errorRate.toFixed(1)}%
+                        </div>
                         <div className="text-sm text-gray-600">Error Rate</div>
                       </div>
                     </div>
@@ -554,7 +630,10 @@ export default function ApiDiagnostics() {
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">API Request Logs</h3>
                 <div className="flex gap-2">
-                  <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+                  <Select
+                    value={selectedTimeRange}
+                    onValueChange={setSelectedTimeRange}
+                  >
                     <SelectTrigger className="w-32">
                       <SelectValue />
                     </SelectTrigger>
@@ -578,31 +657,53 @@ export default function ApiDiagnostics() {
                     <table className="w-full">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Timestamp</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Method</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Endpoint</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Response Time</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">IP Address</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                            Timestamp
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                            Method
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                            Endpoint
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                            Status
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                            Response Time
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                            IP Address
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
                         {apiLogs.map((log) => (
                           <tr key={log.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 text-sm text-gray-900">{log.timestamp}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">
+                              {log.timestamp}
+                            </td>
                             <td className="px-4 py-3">
                               <Badge variant="outline" className="text-xs">
                                 {log.method}
                               </Badge>
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-900 font-mono">{log.endpoint}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900 font-mono">
+                              {log.endpoint}
+                            </td>
                             <td className="px-4 py-3">
-                              <span className={`text-sm font-medium ${getHttpStatusColor(log.status)}`}>
+                              <span
+                                className={`text-sm font-medium ${getHttpStatusColor(log.status)}`}
+                              >
                                 {log.status}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{log.responseTime}ms</td>
-                            <td className="px-4 py-3 text-sm text-gray-900 font-mono">{log.ip}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">
+                              {log.responseTime}ms
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-900 font-mono">
+                              {log.ip}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -629,7 +730,10 @@ export default function ApiDiagnostics() {
                     <div className="space-y-3">
                       <div>
                         <Label htmlFor="method">HTTP Method</Label>
-                        <Select value={testMethod} onValueChange={setTestMethod}>
+                        <Select
+                          value={testMethod}
+                          onValueChange={setTestMethod}
+                        >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -664,9 +768,13 @@ export default function ApiDiagnostics() {
                         />
                       </div>
 
-                      {(testMethod === 'POST' || testMethod === 'PUT' || testMethod === 'PATCH') && (
+                      {(testMethod === "POST" ||
+                        testMethod === "PUT" ||
+                        testMethod === "PATCH") && (
                         <div>
-                          <Label htmlFor="body">Request Body (JSON format)</Label>
+                          <Label htmlFor="body">
+                            Request Body (JSON format)
+                          </Label>
                           <Textarea
                             id="body"
                             placeholder='{"key": "value"}'
@@ -677,8 +785,8 @@ export default function ApiDiagnostics() {
                         </div>
                       )}
 
-                      <Button 
-                        onClick={runApiTest} 
+                      <Button
+                        onClick={runApiTest}
                         disabled={!testEndpoint || isTesting}
                         className="w-full"
                       >
@@ -709,8 +817,13 @@ export default function ApiDiagnostics() {
                     {testResult ? (
                       <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                          <Badge 
-                            variant={testResult.status >= 200 && testResult.status < 300 ? "default" : "destructive"}
+                          <Badge
+                            variant={
+                              testResult.status >= 200 &&
+                              testResult.status < 300
+                                ? "default"
+                                : "destructive"
+                            }
                           >
                             {testResult.status}
                           </Badge>
@@ -784,9 +897,21 @@ export default function ApiDiagnostics() {
                       <div className="space-y-2">
                         <h4 className="font-medium">Email Notifications</h4>
                         <div className="space-y-2">
-                          {['API Downtime', 'High Error Rate', 'Slow Response Times', 'System Resource Alerts'].map((alert) => (
-                            <label key={alert} className="flex items-center space-x-2">
-                              <input type="checkbox" defaultChecked className="rounded" />
+                          {[
+                            "API Downtime",
+                            "High Error Rate",
+                            "Slow Response Times",
+                            "System Resource Alerts",
+                          ].map((alert) => (
+                            <label
+                              key={alert}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="checkbox"
+                                defaultChecked
+                                className="rounded"
+                              />
                               <span className="text-sm">{alert}</span>
                             </label>
                           ))}
@@ -812,9 +937,15 @@ export default function ApiDiagnostics() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="100">100 requests/min</SelectItem>
-                            <SelectItem value="500">500 requests/min</SelectItem>
-                            <SelectItem value="1000">1000 requests/min</SelectItem>
+                            <SelectItem value="100">
+                              100 requests/min
+                            </SelectItem>
+                            <SelectItem value="500">
+                              500 requests/min
+                            </SelectItem>
+                            <SelectItem value="1000">
+                              1000 requests/min
+                            </SelectItem>
                             <SelectItem value="unlimited">Unlimited</SelectItem>
                           </SelectContent>
                         </Select>
@@ -823,18 +954,28 @@ export default function ApiDiagnostics() {
                       <div className="space-y-2">
                         <h4 className="font-medium">Security Features</h4>
                         <div className="space-y-2">
-                          {['IP Whitelisting', 'Request Logging', 'SSL/TLS Enforcement', 'DDoS Protection'].map((feature) => (
-                            <label key={feature} className="flex items-center space-x-2">
-                              <input type="checkbox" defaultChecked className="rounded" />
+                          {[
+                            "IP Whitelisting",
+                            "Request Logging",
+                            "SSL/TLS Enforcement",
+                            "DDoS Protection",
+                          ].map((feature) => (
+                            <label
+                              key={feature}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="checkbox"
+                                defaultChecked
+                                className="rounded"
+                              />
                               <span className="text-sm">{feature}</span>
                             </label>
                           ))}
                         </div>
                       </div>
 
-                      <Button className="w-full">
-                        Save Settings
-                      </Button>
+                      <Button className="w-full">Save Settings</Button>
                     </div>
                   </CardContent>
                 </Card>

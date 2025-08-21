@@ -1,56 +1,56 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { 
-  Activity, 
-  BarChart3, 
-  Users, 
-  Download, 
-  Video, 
-  Menu, 
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Activity,
+  BarChart3,
+  Users,
+  Download,
+  Video,
+  Menu,
   Home,
   Zap,
-  Terminal
-} from 'lucide-react';
+  Terminal,
+} from "lucide-react";
 
 const navigationItems = [
   {
-    name: 'Home',
-    href: '/afl-dashboard',
+    name: "Home",
+    href: "/afl-dashboard",
     icon: Home,
-    description: 'Main dashboard'
+    description: "Main dashboard",
   },
   {
-    name: 'Player Performance',
-    href: '/player-performance',
+    name: "Player Performance",
+    href: "/player-performance",
     icon: BarChart3,
-    description: 'Player stats & analysis'
+    description: "Player stats & analysis",
   },
   {
-    name: 'Live Match',
-    href: '/afl-dashboard',
+    name: "Live Match",
+    href: "/afl-dashboard",
     icon: Activity,
-    description: 'Real-time match data'
+    description: "Real-time match data",
   },
   {
-    name: 'Crowd Monitor',
-    href: '/crowd-monitor',
+    name: "Crowd Monitor",
+    href: "/crowd-monitor",
     icon: Users,
-    description: 'Stadium crowd analytics'
+    description: "Stadium crowd analytics",
   },
   {
-    name: 'Analytics',
-    href: '/analytics',
+    name: "Analytics",
+    href: "/analytics",
     icon: Video,
-    description: 'Video analysis & reports'
+    description: "Video analysis & reports",
   },
   {
-    name: 'API Diagnostics',
-    href: '/api-diagnostics',
+    name: "API Diagnostics",
+    href: "/api-diagnostics",
     icon: Terminal,
-    description: 'System monitoring'
-  }
+    description: "System monitoring",
+  },
 ];
 
 export default function MobileNavigation() {
@@ -58,8 +58,8 @@ export default function MobileNavigation() {
   const location = useLocation();
 
   const isActive = (href) => {
-    if (href === '/') {
-      return location.pathname === '/';
+    if (href === "/") {
+      return location.pathname === "/";
     }
     return location.pathname.startsWith(href);
   };
@@ -77,7 +77,7 @@ export default function MobileNavigation() {
               AFL Analytics
             </span>
           </Link>
-          
+
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="sm">
@@ -92,13 +92,13 @@ export default function MobileNavigation() {
                   </div>
                   <span className="text-lg font-bold">AFL Analytics</span>
                 </div>
-                
+
                 <nav className="flex-1 py-4">
                   <div className="space-y-2">
                     {navigationItems.map((item) => {
                       const Icon = item.icon;
                       const active = isActive(item.href);
-                      
+
                       return (
                         <Link
                           key={item.name}
@@ -106,16 +106,22 @@ export default function MobileNavigation() {
                           onClick={() => setIsOpen(false)}
                           className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors ${
                             active
-                              ? 'bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 text-green-700'
-                              : 'hover:bg-gray-50'
+                              ? "bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 text-green-700"
+                              : "hover:bg-gray-50"
                           }`}
                         >
-                          <Icon className={`w-5 h-5 ${active ? 'text-green-600' : 'text-gray-500'}`} />
+                          <Icon
+                            className={`w-5 h-5 ${active ? "text-green-600" : "text-gray-500"}`}
+                          />
                           <div className="flex-1">
-                            <div className={`font-medium ${active ? 'text-green-700' : 'text-gray-700'}`}>
+                            <div
+                              className={`font-medium ${active ? "text-green-700" : "text-gray-700"}`}
+                            >
                               {item.name}
                             </div>
-                            <div className="text-xs text-gray-500">{item.description}</div>
+                            <div className="text-xs text-gray-500">
+                              {item.description}
+                            </div>
                           </div>
                           {active && (
                             <div className="w-2 h-2 bg-green-500 rounded-full" />
@@ -142,29 +148,35 @@ export default function MobileNavigation() {
               AFL Analytics
             </span>
           </div>
-          
+
           <div className="flex-1 p-4">
             <div className="space-y-2">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.href);
-                
+
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors ${
                       active
-                        ? 'bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 text-green-700'
-                        : 'hover:bg-gray-50'
+                        ? "bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 text-green-700"
+                        : "hover:bg-gray-50"
                     }`}
                   >
-                    <Icon className={`w-5 h-5 ${active ? 'text-green-600' : 'text-gray-500'}`} />
+                    <Icon
+                      className={`w-5 h-5 ${active ? "text-green-600" : "text-gray-500"}`}
+                    />
                     <div className="flex-1">
-                      <div className={`font-medium ${active ? 'text-green-700' : 'text-gray-700'}`}>
+                      <div
+                        className={`font-medium ${active ? "text-green-700" : "text-gray-700"}`}
+                      >
                         {item.name}
                       </div>
-                      <div className="text-xs text-gray-500">{item.description}</div>
+                      <div className="text-xs text-gray-500">
+                        {item.description}
+                      </div>
                     </div>
                     {active && (
                       <div className="w-2 h-2 bg-green-500 rounded-full" />
@@ -183,17 +195,19 @@ export default function MobileNavigation() {
           {navigationItems.slice(1, 5).map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
-            
+
             return (
               <Link
                 key={item.name}
                 to={item.href}
                 className={`flex flex-col items-center py-2 px-1 transition-colors ${
-                  active ? 'text-green-600' : 'text-gray-500'
+                  active ? "text-green-600" : "text-gray-500"
                 }`}
               >
                 <Icon className="w-5 h-5 mb-1" />
-                <span className="text-xs font-medium truncate">{item.name.split(' ')[0]}</span>
+                <span className="text-xs font-medium truncate">
+                  {item.name.split(" ")[0]}
+                </span>
               </Link>
             );
           })}

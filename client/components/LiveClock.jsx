@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Clock } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Play, Pause, Clock } from "lucide-react";
 
 export default function LiveClock({ isLive, onToggleLive, matchTime }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [gameTime, setGameTime] = useState({
     quarter: matchTime?.quarter || 2,
     minutes: 15,
-    seconds: 23
+    seconds: 23,
   });
 
   // Update current time every second
@@ -25,7 +25,7 @@ export default function LiveClock({ isLive, onToggleLive, matchTime }) {
     if (!isLive) return;
 
     const gameTimer = setInterval(() => {
-      setGameTime(prev => {
+      setGameTime((prev) => {
         let newSeconds = prev.seconds - 1;
         let newMinutes = prev.minutes;
         let newQuarter = prev.quarter;
@@ -49,7 +49,7 @@ export default function LiveClock({ isLive, onToggleLive, matchTime }) {
         return {
           quarter: newQuarter,
           minutes: newMinutes,
-          seconds: newSeconds
+          seconds: newSeconds,
         };
       });
     }, 1000);
@@ -58,17 +58,17 @@ export default function LiveClock({ isLive, onToggleLive, matchTime }) {
   }, [isLive]);
 
   const formatTime = (time) => {
-    return time.toLocaleTimeString('en-US', {
+    return time.toLocaleTimeString("en-US", {
       hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
   };
 
   const formatGameTime = () => {
-    const mins = gameTime.minutes.toString().padStart(2, '0');
-    const secs = gameTime.seconds.toString().padStart(2, '0');
+    const mins = gameTime.minutes.toString().padStart(2, "0");
+    const secs = gameTime.seconds.toString().padStart(2, "0");
     return `${mins}:${secs}`;
   };
 
@@ -76,22 +76,28 @@ export default function LiveClock({ isLive, onToggleLive, matchTime }) {
     <div className="flex flex-col sm:flex-row items-center gap-3 p-3 bg-white rounded-lg border shadow-sm">
       {/* Live Status */}
       <div className="flex items-center gap-2">
-        <Badge 
-          variant={isLive ? "destructive" : "secondary"} 
-          className={`${isLive ? 'animate-pulse' : ''} font-medium`}
+        <Badge
+          variant={isLive ? "destructive" : "secondary"}
+          className={`${isLive ? "animate-pulse" : ""} font-medium`}
         >
-          <div className={`w-2 h-2 rounded-full mr-2 ${isLive ? 'bg-red-500' : 'bg-gray-400'}`} />
+          <div
+            className={`w-2 h-2 rounded-full mr-2 ${isLive ? "bg-red-500" : "bg-gray-400"}`}
+          />
           {isLive ? "LIVE" : "OFFLINE"}
         </Badge>
-        
+
         <Button
           variant="outline"
           size="sm"
           onClick={() => onToggleLive(!isLive)}
           className="flex items-center gap-1"
         >
-          {isLive ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-          {isLive ? 'Pause' : 'Go Live'}
+          {isLive ? (
+            <Pause className="w-3 h-3" />
+          ) : (
+            <Play className="w-3 h-3" />
+          )}
+          {isLive ? "Pause" : "Go Live"}
         </Button>
       </div>
 
@@ -101,7 +107,7 @@ export default function LiveClock({ isLive, onToggleLive, matchTime }) {
           <Clock className="w-4 h-4 text-gray-500" />
           <span className="font-mono">{formatTime(currentTime)}</span>
         </div>
-        
+
         {isLive && (
           <>
             <div className="h-4 w-px bg-gray-300" />
