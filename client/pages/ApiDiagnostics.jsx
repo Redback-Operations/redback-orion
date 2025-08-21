@@ -9,8 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import MobileNavigation from '@/components/MobileNavigation';
-import LiveClock from '@/components/LiveClock';
+import MobileNavigation from '@/components/MobileNavigation.jsx';
+import LiveClock from '@/components/LiveClock.jsx';
 import { 
   Activity, 
   AlertCircle, 
