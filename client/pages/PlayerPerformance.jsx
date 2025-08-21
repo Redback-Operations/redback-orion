@@ -6,8 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import MobileNavigation from '@/components/MobileNavigation';
-import LiveClock from '@/components/LiveClock';
+import MobileNavigation from '@/components/MobileNavigation.jsx';
+import LiveClock from '@/components/LiveClock.jsx';
 import { 
   Search, 
   Filter,
