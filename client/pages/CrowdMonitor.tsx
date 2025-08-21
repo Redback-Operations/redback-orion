@@ -1,26 +1,38 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import MobileNavigation from '@/components/MobileNavigation';
-import LiveClock from '@/components/LiveClock';
-import { 
-  Users, 
-  TrendingUp, 
-  TrendingDown, 
-  MapPin, 
-  AlertTriangle, 
-  CheckCircle, 
-  Eye, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import MobileNavigation from "@/components/MobileNavigation";
+import LiveClock from "@/components/LiveClock";
+import {
+  Users,
+  TrendingUp,
+  TrendingDown,
+  MapPin,
+  AlertTriangle,
+  CheckCircle,
+  Eye,
   Activity,
   BarChart3,
   Clock,
   Shield,
-  Navigation
-} from 'lucide-react';
+  Navigation,
+} from "lucide-react";
 
 // Crowd zone data with real-time simulation
 const generateCrowdData = () => {
@@ -35,7 +47,7 @@ const generateCrowdData = () => {
       entryPoints: ["Gate A", "Gate B"],
       facilities: ["Toilets", "Food Court", "Merchandise"],
       temperature: 24,
-      safety: "normal"
+      safety: "normal",
     },
     {
       id: 2,
@@ -47,7 +59,7 @@ const generateCrowdData = () => {
       entryPoints: ["Gate A-Upper"],
       facilities: ["Toilets", "Bar"],
       temperature: 26,
-      safety: "normal"
+      safety: "normal",
     },
     {
       id: 3,
@@ -59,7 +71,7 @@ const generateCrowdData = () => {
       entryPoints: ["Gate C", "Gate D"],
       facilities: ["Toilets", "Food Court", "First Aid"],
       temperature: 23,
-      safety: "crowded"
+      safety: "crowded",
     },
     {
       id: 4,
@@ -71,7 +83,7 @@ const generateCrowdData = () => {
       entryPoints: ["Gate C-Upper"],
       facilities: ["Premium Bar"],
       temperature: 25,
-      safety: "crowded"
+      safety: "crowded",
     },
     {
       id: 5,
@@ -83,7 +95,7 @@ const generateCrowdData = () => {
       entryPoints: ["Gate E"],
       facilities: ["Toilets", "Snack Bar"],
       temperature: 22,
-      safety: "normal"
+      safety: "normal",
     },
     {
       id: 6,
@@ -95,7 +107,7 @@ const generateCrowdData = () => {
       entryPoints: ["Gate F"],
       facilities: ["Toilets", "Restaurant"],
       temperature: 24,
-      safety: "crowded"
+      safety: "crowded",
     },
     {
       id: 7,
@@ -107,7 +119,7 @@ const generateCrowdData = () => {
       entryPoints: ["Premium Entrance"],
       facilities: ["VIP Lounge", "Premium Dining"],
       temperature: 21,
-      safety: "normal"
+      safety: "normal",
     },
     {
       id: 8,
@@ -119,16 +131,16 @@ const generateCrowdData = () => {
       entryPoints: ["Premium Entrance"],
       facilities: ["VIP Lounge", "Premium Bar"],
       temperature: 21,
-      safety: "normal"
-    }
+      safety: "normal",
+    },
   ];
 
-  return zones.map(zone => ({
+  return zones.map((zone) => ({
     ...zone,
     density: Math.round((zone.current / zone.capacity) * 100),
-    trend: Math.random() > 0.5 ? 'up' : Math.random() > 0.5 ? 'down' : 'stable',
+    trend: Math.random() > 0.5 ? "up" : Math.random() > 0.5 ? "down" : "stable",
     waitTime: Math.floor(Math.random() * 15) + 1,
-    flow: Math.floor(Math.random() * 50) + 10
+    flow: Math.floor(Math.random() * 50) + 10,
   }));
 };
 
@@ -152,49 +164,59 @@ export default function CrowdMonitor() {
   const [isLive, setIsLive] = useState(true);
   const [crowdZones, setCrowdZones] = useState(generateCrowdData());
   const [selectedZone, setSelectedZone] = useState(crowdZones[0]);
-  const [viewMode, setViewMode] = useState('heatmap');
-  const [timeRange, setTimeRange] = useState('live');
+  const [viewMode, setViewMode] = useState("heatmap");
+  const [timeRange, setTimeRange] = useState("live");
 
   // Simulate real-time crowd updates
   useEffect(() => {
     if (!isLive) return;
 
     const interval = setInterval(() => {
-      setCrowdZones(prevZones => 
-        prevZones.map(zone => {
+      setCrowdZones((prevZones) =>
+        prevZones.map((zone) => {
           const change = (Math.random() - 0.5) * 100;
-          const newCurrent = Math.max(0, Math.min(zone.capacity, zone.current + change));
+          const newCurrent = Math.max(
+            0,
+            Math.min(zone.capacity, zone.current + change),
+          );
           return {
             ...zone,
             current: Math.round(newCurrent),
             density: Math.round((newCurrent / zone.capacity) * 100),
-            color: getDensityColor(Math.round((newCurrent / zone.capacity) * 100)),
+            color: getDensityColor(
+              Math.round((newCurrent / zone.capacity) * 100),
+            ),
             flow: Math.floor(Math.random() * 50) + 10,
-            waitTime: Math.floor(Math.random() * 15) + 1
+            waitTime: Math.floor(Math.random() * 15) + 1,
           };
-        })
+        }),
       );
     }, 3000);
 
     return () => clearInterval(interval);
   }, [isLive]);
 
-  const totalCapacity = crowdZones.reduce((sum, zone) => sum + zone.capacity, 0);
+  const totalCapacity = crowdZones.reduce(
+    (sum, zone) => sum + zone.capacity,
+    0,
+  );
   const totalCurrent = crowdZones.reduce((sum, zone) => sum + zone.current, 0);
   const averageDensity = Math.round((totalCurrent / totalCapacity) * 100);
 
-  const criticalZones = crowdZones.filter(zone => zone.density >= 95);
-  const highDensityZones = crowdZones.filter(zone => zone.density >= 85 && zone.density < 95);
+  const criticalZones = crowdZones.filter((zone) => zone.density >= 95);
+  const highDensityZones = crowdZones.filter(
+    (zone) => zone.density >= 85 && zone.density < 95,
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       <MobileNavigation />
-      
+
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-4">
           {/* Live Clock */}
-          <LiveClock 
-            isLive={isLive} 
+          <LiveClock
+            isLive={isLive}
             onToggleLive={setIsLive}
             matchTime={{ quarter: 2, timeRemaining: "15:23" }}
           />
@@ -206,8 +228,12 @@ export default function CrowdMonitor() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Total Attendance</p>
-                    <p className="text-2xl font-bold">{totalCurrent.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">of {totalCapacity.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">
+                      {totalCurrent.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      of {totalCapacity.toLocaleString()}
+                    </p>
                   </div>
                   <Users className="w-8 h-8 text-blue-500" />
                 </div>
@@ -220,7 +246,9 @@ export default function CrowdMonitor() {
                   <div>
                     <p className="text-sm text-gray-600">Average Density</p>
                     <p className="text-2xl font-bold">{averageDensity}%</p>
-                    <p className="text-xs text-gray-500">{getDensityLabel(averageDensity)}</p>
+                    <p className="text-xs text-gray-500">
+                      {getDensityLabel(averageDensity)}
+                    </p>
                   </div>
                   <Activity className="w-8 h-8 text-green-500" />
                 </div>
@@ -232,7 +260,9 @@ export default function CrowdMonitor() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Critical Zones</p>
-                    <p className="text-2xl font-bold text-red-600">{criticalZones.length}</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {criticalZones.length}
+                    </p>
                     <p className="text-xs text-gray-500">95%+ capacity</p>
                   </div>
                   <AlertTriangle className="w-8 h-8 text-red-500" />
@@ -245,7 +275,9 @@ export default function CrowdMonitor() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">High Density</p>
-                    <p className="text-2xl font-bold text-orange-600">{highDensityZones.length}</p>
+                    <p className="text-2xl font-bold text-orange-600">
+                      {highDensityZones.length}
+                    </p>
                     <p className="text-xs text-gray-500">85-94% capacity</p>
                   </div>
                   <BarChart3 className="w-8 h-8 text-orange-500" />
@@ -318,7 +350,9 @@ export default function CrowdMonitor() {
                         key={zone.id}
                         onClick={() => setSelectedZone(zone)}
                         className={`absolute transition-all duration-300 hover:opacity-80 border-2 ${
-                          selectedZone.id === zone.id ? 'border-white border-4' : 'border-transparent'
+                          selectedZone.id === zone.id
+                            ? "border-white border-4"
+                            : "border-transparent"
                         }`}
                         style={{
                           left: `${zone.coordinates.x}%`,
@@ -326,11 +360,13 @@ export default function CrowdMonitor() {
                           width: `${zone.coordinates.width}%`,
                           height: `${zone.coordinates.height}%`,
                           backgroundColor: zone.color,
-                          opacity: zone.density / 100 * 0.8 + 0.2
+                          opacity: (zone.density / 100) * 0.8 + 0.2,
                         }}
                       >
                         <div className="text-white text-xs font-medium p-1 text-center">
-                          <div className="truncate">{zone.name.split(' - ')[0]}</div>
+                          <div className="truncate">
+                            {zone.name.split(" - ")[0]}
+                          </div>
                           <div>{zone.density}%</div>
                         </div>
                       </button>
@@ -368,10 +404,21 @@ export default function CrowdMonitor() {
                 <CardHeader>
                   <CardTitle>{selectedZone.name}</CardTitle>
                   <CardDescription className="flex items-center gap-4">
-                    <Badge variant={selectedZone.density >= 95 ? "destructive" : selectedZone.density >= 85 ? "secondary" : "default"}>
+                    <Badge
+                      variant={
+                        selectedZone.density >= 95
+                          ? "destructive"
+                          : selectedZone.density >= 85
+                            ? "secondary"
+                            : "default"
+                      }
+                    >
                       {getDensityLabel(selectedZone.density)}
                     </Badge>
-                    <span>{selectedZone.current.toLocaleString()} / {selectedZone.capacity.toLocaleString()}</span>
+                    <span>
+                      {selectedZone.current.toLocaleString()} /{" "}
+                      {selectedZone.capacity.toLocaleString()}
+                    </span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -382,16 +429,23 @@ export default function CrowdMonitor() {
                           <span>Capacity</span>
                           <span>{selectedZone.density}%</span>
                         </div>
-                        <Progress value={selectedZone.density} className="h-3" />
+                        <Progress
+                          value={selectedZone.density}
+                          className="h-3"
+                        />
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div className="p-2 bg-gray-50 rounded">
-                          <div className="font-medium">{selectedZone.waitTime}min</div>
+                          <div className="font-medium">
+                            {selectedZone.waitTime}min
+                          </div>
                           <div className="text-gray-600">Wait Time</div>
                         </div>
                         <div className="p-2 bg-gray-50 rounded">
-                          <div className="font-medium">{selectedZone.flow}/min</div>
+                          <div className="font-medium">
+                            {selectedZone.flow}/min
+                          </div>
                           <div className="text-gray-600">Flow Rate</div>
                         </div>
                       </div>
@@ -400,14 +454,18 @@ export default function CrowdMonitor() {
                     <div className="space-y-2">
                       <h5 className="font-medium text-sm">Entry Points</h5>
                       {selectedZone.entryPoints.map((entry, index) => (
-                        <div key={index} className="text-sm text-gray-600">{entry}</div>
+                        <div key={index} className="text-sm text-gray-600">
+                          {entry}
+                        </div>
                       ))}
                     </div>
 
                     <div className="space-y-2">
                       <h5 className="font-medium text-sm">Facilities</h5>
                       {selectedZone.facilities.map((facility, index) => (
-                        <div key={index} className="text-sm text-gray-600">{facility}</div>
+                        <div key={index} className="text-sm text-gray-600">
+                          {facility}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -418,27 +476,46 @@ export default function CrowdMonitor() {
             <TabsContent value="list" className="space-y-4">
               <div className="space-y-3">
                 {crowdZones.map((zone) => (
-                  <Card key={zone.id} className={`cursor-pointer transition-colors ${
-                    selectedZone.id === zone.id ? 'ring-2 ring-blue-500' : ''
-                  }`} onClick={() => setSelectedZone(zone)}>
+                  <Card
+                    key={zone.id}
+                    className={`cursor-pointer transition-colors ${
+                      selectedZone.id === zone.id ? "ring-2 ring-blue-500" : ""
+                    }`}
+                    onClick={() => setSelectedZone(zone)}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h4 className="font-medium">{zone.name}</h4>
                           <p className="text-sm text-gray-600">
-                            {zone.current.toLocaleString()} / {zone.capacity.toLocaleString()} people
+                            {zone.current.toLocaleString()} /{" "}
+                            {zone.capacity.toLocaleString()} people
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={zone.density >= 95 ? "destructive" : zone.density >= 85 ? "secondary" : "default"}>
+                          <Badge
+                            variant={
+                              zone.density >= 95
+                                ? "destructive"
+                                : zone.density >= 85
+                                  ? "secondary"
+                                  : "default"
+                            }
+                          >
                             {getDensityLabel(zone.density)}
                           </Badge>
-                          {zone.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-500" />}
-                          {zone.trend === 'down' && <TrendingDown className="w-4 h-4 text-red-500" />}
-                          {zone.trend === 'stable' && <div className="w-4 h-4 rounded-full bg-gray-400" />}
+                          {zone.trend === "up" && (
+                            <TrendingUp className="w-4 h-4 text-green-500" />
+                          )}
+                          {zone.trend === "down" && (
+                            <TrendingDown className="w-4 h-4 text-red-500" />
+                          )}
+                          {zone.trend === "stable" && (
+                            <div className="w-4 h-4 rounded-full bg-gray-400" />
+                          )}
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm mb-1">
                           <span>Density</span>
@@ -457,15 +534,19 @@ export default function CrowdMonitor() {
                           <div className="text-gray-600">Flow</div>
                         </div>
                         <div className="text-center p-2 bg-gray-50 rounded">
-                          <div className="font-medium">{zone.temperature}°C</div>
+                          <div className="font-medium">
+                            {zone.temperature}°C
+                          </div>
                           <div className="text-gray-600">Temp</div>
                         </div>
                       </div>
 
-                      {zone.safety === 'crowded' && (
+                      {zone.safety === "crowded" && (
                         <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded flex items-center gap-2">
                           <AlertTriangle className="w-4 h-4 text-orange-500" />
-                          <span className="text-sm text-orange-700">High density - monitor closely</span>
+                          <span className="text-sm text-orange-700">
+                            High density - monitor closely
+                          </span>
                         </div>
                       )}
                     </CardContent>
@@ -485,35 +566,42 @@ export default function CrowdMonitor() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {['Low', 'Low-Medium', 'Medium', 'High', 'Critical'].map((level, index) => {
-                        const ranges = [
-                          { min: 0, max: 49, color: 'bg-green-500' },
-                          { min: 50, max: 69, color: 'bg-yellow-500' },
-                          { min: 70, max: 84, color: 'bg-amber-500' },
-                          { min: 85, max: 94, color: 'bg-orange-500' },
-                          { min: 95, max: 100, color: 'bg-red-600' }
-                        ];
-                        const range = ranges[index];
-                        const zonesInRange = crowdZones.filter(zone => 
-                          zone.density >= range.min && zone.density <= range.max
-                        ).length;
-                        const percentage = (zonesInRange / crowdZones.length) * 100;
-                        
-                        return (
-                          <div key={level} className="space-y-1">
-                            <div className="flex justify-between text-sm">
-                              <span>{level} ({range.min}-{range.max}%)</span>
-                              <span>{zonesInRange} zones</span>
+                      {["Low", "Low-Medium", "Medium", "High", "Critical"].map(
+                        (level, index) => {
+                          const ranges = [
+                            { min: 0, max: 49, color: "bg-green-500" },
+                            { min: 50, max: 69, color: "bg-yellow-500" },
+                            { min: 70, max: 84, color: "bg-amber-500" },
+                            { min: 85, max: 94, color: "bg-orange-500" },
+                            { min: 95, max: 100, color: "bg-red-600" },
+                          ];
+                          const range = ranges[index];
+                          const zonesInRange = crowdZones.filter(
+                            (zone) =>
+                              zone.density >= range.min &&
+                              zone.density <= range.max,
+                          ).length;
+                          const percentage =
+                            (zonesInRange / crowdZones.length) * 100;
+
+                          return (
+                            <div key={level} className="space-y-1">
+                              <div className="flex justify-between text-sm">
+                                <span>
+                                  {level} ({range.min}-{range.max}%)
+                                </span>
+                                <span>{zonesInRange} zones</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full ${range.color}`}
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className={`h-2 rounded-full ${range.color}`}
-                                style={{ width: `${percentage}%` }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        },
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -528,31 +616,55 @@ export default function CrowdMonitor() {
                   <CardContent>
                     <div className="space-y-4">
                       <div>
-                        <h5 className="text-sm font-medium mb-2">Average Wait Times</h5>
+                        <h5 className="text-sm font-medium mb-2">
+                          Average Wait Times
+                        </h5>
                         <div className="text-2xl font-bold">
-                          {Math.round(crowdZones.reduce((sum, zone) => sum + zone.waitTime, 0) / crowdZones.length)} min
+                          {Math.round(
+                            crowdZones.reduce(
+                              (sum, zone) => sum + zone.waitTime,
+                              0,
+                            ) / crowdZones.length,
+                          )}{" "}
+                          min
                         </div>
-                        <p className="text-sm text-gray-600">Across all zones</p>
-                      </div>
-                      
-                      <div>
-                        <h5 className="text-sm font-medium mb-2">Total Flow Rate</h5>
-                        <div className="text-2xl font-bold">
-                          {crowdZones.reduce((sum, zone) => sum + zone.flow, 0)} people/min
-                        </div>
-                        <p className="text-sm text-gray-600">Combined entry/exit rate</p>
+                        <p className="text-sm text-gray-600">
+                          Across all zones
+                        </p>
                       </div>
 
                       <div>
-                        <h5 className="text-sm font-medium mb-2">Zones by Wait Time</h5>
+                        <h5 className="text-sm font-medium mb-2">
+                          Total Flow Rate
+                        </h5>
+                        <div className="text-2xl font-bold">
+                          {crowdZones.reduce((sum, zone) => sum + zone.flow, 0)}{" "}
+                          people/min
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Combined entry/exit rate
+                        </p>
+                      </div>
+
+                      <div>
+                        <h5 className="text-sm font-medium mb-2">
+                          Zones by Wait Time
+                        </h5>
                         <div className="space-y-2">
                           {crowdZones
                             .sort((a, b) => b.waitTime - a.waitTime)
                             .slice(0, 3)
                             .map((zone, index) => (
-                              <div key={zone.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                <span className="text-sm truncate">{zone.name}</span>
-                                <Badge variant="outline">{zone.waitTime}min</Badge>
+                              <div
+                                key={zone.id}
+                                className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                              >
+                                <span className="text-sm truncate">
+                                  {zone.name}
+                                </span>
+                                <Badge variant="outline">
+                                  {zone.waitTime}min
+                                </Badge>
                               </div>
                             ))}
                         </div>
@@ -576,13 +688,15 @@ export default function CrowdMonitor() {
                       <div className="p-3 bg-red-50 border border-red-200 rounded">
                         <div className="flex items-center gap-2 mb-2">
                           <AlertTriangle className="w-5 h-5 text-red-500" />
-                          <span className="font-medium text-red-700">Critical Density Alert</span>
+                          <span className="font-medium text-red-700">
+                            Critical Density Alert
+                          </span>
                         </div>
                         <p className="text-sm text-red-600 mb-2">
                           {criticalZones.length} zone(s) at 95%+ capacity:
                         </p>
                         <div className="space-y-1">
-                          {criticalZones.map(zone => (
+                          {criticalZones.map((zone) => (
                             <div key={zone.id} className="text-sm">
                               • {zone.name} ({zone.density}%)
                             </div>
@@ -595,23 +709,31 @@ export default function CrowdMonitor() {
                       <div className="p-3 bg-orange-50 border border-orange-200 rounded">
                         <div className="flex items-center gap-2 mb-2">
                           <Eye className="w-5 h-5 text-orange-500" />
-                          <span className="font-medium text-orange-700">High Density Warning</span>
+                          <span className="font-medium text-orange-700">
+                            High Density Warning
+                          </span>
                         </div>
                         <p className="text-sm text-orange-600">
-                          {highDensityZones.length} zone(s) require monitoring (85-94% capacity)
+                          {highDensityZones.length} zone(s) require monitoring
+                          (85-94% capacity)
                         </p>
                       </div>
                     )}
 
-                    {criticalZones.length === 0 && highDensityZones.length === 0 && (
-                      <div className="p-3 bg-green-50 border border-green-200 rounded">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-500" />
-                          <span className="font-medium text-green-700">All zones operating normally</span>
+                    {criticalZones.length === 0 &&
+                      highDensityZones.length === 0 && (
+                        <div className="p-3 bg-green-50 border border-green-200 rounded">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                            <span className="font-medium text-green-700">
+                              All zones operating normally
+                            </span>
+                          </div>
+                          <p className="text-sm text-green-600">
+                            No immediate safety concerns detected
+                          </p>
                         </div>
-                        <p className="text-sm text-green-600">No immediate safety concerns detected</p>
-                      </div>
-                    )}
+                      )}
                   </div>
                 </CardContent>
               </Card>

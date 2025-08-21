@@ -1,7 +1,13 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wand2, Home, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Wand2, Home, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function NotFound() {
   return (
@@ -29,22 +35,30 @@ export default function NotFound() {
             </div>
             <CardTitle className="text-2xl">Page Not Found</CardTitle>
             <CardDescription className="text-lg">
-              This page is still waiting to be designed. Want to create it with Stitch?
+              This page is still waiting to be designed. Want to create it with
+              Stitch?
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600">
-              This looks like a perfect opportunity to use our AI-powered design tool 
-              to bring this page to life.
+              This looks like a perfect opportunity to use our AI-powered design
+              tool to bring this page to life.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 flex-1">
+              <Button
+                asChild
+                className="bg-gradient-to-r from-blue-600 to-purple-600 flex-1"
+              >
                 <Link to="/">
                   <Home className="w-4 h-4 mr-2" />
                   Go Home
                 </Link>
               </Button>
-              <Button variant="outline" onClick={() => window.history.back()} className="flex-1">
+              <Button
+                variant="outline"
+                onClick={() => window.history.back()}
+                className="flex-1"
+              >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Go Back
               </Button>
