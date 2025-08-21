@@ -85,6 +85,7 @@ export default function Index() {
           <nav className="hidden md:flex items-center space-x-6">
             <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
             <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Examples</a>
+            <a href="/afl-dashboard" className="text-gray-600 hover:text-gray-900 transition-colors">AFL Dashboard</a>
             <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Docs</a>
             <Button variant="outline" size="sm">Sign In</Button>
             <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600">
