@@ -26,6 +26,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/home" element={<AFLDashboard />} />
           <Route path="/afl-dashboard" element={<AFLDashboard />} />
           <Route path="/player-performance" element={<PlayerPerformance />} />
           <Route path="/crowd-monitor" element={<CrowdMonitor />} />
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/reports" element={<Analytics />} />
           <Route path="/api-diagnostics" element={<ApiDiagnostics />} />
           <Route path="/live-match" element={<AFLDashboard />} />
+          <Route path="/stitch" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
