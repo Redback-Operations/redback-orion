@@ -1,0 +1,48 @@
+{
+  "players": [
+    {
+      "player": {
+        "jerseyNumber": 35,
+        "name": "Nick Daicos",
+        "age": 22,
+        "position": "MID",
+        "team": "Collingwood Football Club",
+        "heightCm": 184,
+        "weightKg": 79,
+        "photoUrl": "https://s.afl.com.au/staticfile/AFL%20Tenant/AFL/Players/ChampIDImages/AFL/2025014/1023261.png?im=Scale,width=0.6,height=0.6"
+      },
+      "stream": [
+        { "ts": "2025-08-11T10:00:00.100Z", "quarter": 1, "fatigue": 0.15, "distance": 115.0, "goals": 0 },
+        { "ts": "2025-08-11T10:05:00.200Z", "quarter": 1, "fatigue": 0.22, "distance": 180.4, "goals": 0 },
+        { "ts": "2025-08-11T10:12:00.300Z", "quarter": 2, "fatigue": 0.36, "distance": 250.9, "goals": 1 },
+        { "ts": "2025-08-11T10:20:00.400Z", "quarter": 2, "fatigue": 0.41, "distance": 320.2, "goals": 1 },
+        { "ts": "2025-08-11T10:28:00.500Z", "quarter": 3, "fatigue": 0.58, "distance": 410.0, "goals": 1 },
+        { "ts": "2025-08-11T10:33:00.600Z", "quarter": 3, "fatigue": 0.63, "distance": 460.3, "goals": 1 },
+        { "ts": "2025-08-11T10:40:00.700Z", "quarter": 4, "fatigue": 0.77, "distance": 540.1, "goals": 2 },
+        { "ts": "2025-08-11T10:45:00.800Z", "quarter": 4, "fatigue": 0.82, "distance": 580.4, "goals": 2 }
+      ]
+    },
+    {
+      "player": {
+        "jerseyNumber": 19,
+        "name": "Rowan Marshall",
+        "age": 29,
+        "position": "Ruck",
+        "team": "St Kilda Football Club",
+        "heightCm": 201,
+        "weightKg": 105,
+        "photoUrl": "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcQXy1i3FjLG7dyot0yzr3u5lDI-8b6BioGI2FL0Uvlo8qdYix-IdVX0-BdBkHxff70FEQoZ_l_-onGmvQg"
+      },
+      "stream": [
+        { "ts": "2025-08-11T10:00:00.150Z", "quarter": 1, "fatigue": 0.12, "distance": 100.2, "goals": 0 },
+        { "ts": "2025-08-11T10:06:00.250Z", "quarter": 1, "fatigue": 0.20, "distance": 160.1, "goals": 0 },
+        { "ts": "2025-08-11T10:14:00.350Z", "quarter": 2, "fatigue": 0.33, "distance": 230.7, "goals": 1 },
+        { "ts": "2025-08-11T10:22:00.450Z", "quarter": 2, "fatigue": 0.37, "distance": 300.4, "goals": 1 },
+        { "ts": "2025-08-11T10:30:00.550Z", "quarter": 3, "fatigue": 0.49, "distance": 380.2, "goals": 1 },
+        { "ts": "2025-08-11T10:36:00.650Z", "quarter": 3, "fatigue": 0.57, "distance": 450.0, "goals": 2 },
+        { "ts": "2025-08-11T10:44:00.750Z", "quarter": 4, "fatigue": 0.70, "distance": 520.5, "goals": 2 },
+        { "ts": "2025-08-11T10:50:00.850Z", "quarter": 4, "fatigue": 0.76, "distance": 560.9, "goals": 3 }
+      ]
+    }
+  ]
+}
