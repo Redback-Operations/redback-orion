@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target, BarChart3, TrendingUp, Users as TeamIcon, Calendar, Plus, Volume2, Circle, Users as StaffIcon, Users as CrowdIcon, Download, Eye as ViewIcon, Activity, Clock, Target as GoalIcon, Star, MapPin as PinIcon } from 'lucide-react'
+import { Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target, BarChart3, TrendingUp, Users as TeamIcon, Calendar, Plus, Volume2, Circle, Users as StaffIcon, Users as CrowdIcon, Download, Eye as ViewIcon, Activity, Clock, Target as GoalIcon, Star, MapPin as PinIcon, Search, BarChart, LineChart } from 'lucide-react'
 import './App.css'
 
 // AFL Teams data with colors and emojis
@@ -52,6 +52,7 @@ function App() {
   // Dashboard State
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [currentView, setCurrentView] = useState('login')
+  const [showPlayerStats, setShowPlayerStats] = useState(false)
 
   const [isLogin, setIsLogin] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
@@ -178,6 +179,7 @@ function App() {
               <span>Show Crowd</span>
             </button>
           </div>
+
         </div>
       </div>
 
@@ -218,7 +220,7 @@ function App() {
           <div className="section-header">
             <h3>Player Performance Metrics</h3>
             <p>Real-time tracking of key player stats.</p>
-            <button className="action-btn">
+            <button className="action-btn" onClick={() => setShowPlayerStats(true)}>
               <ViewIcon size={16} />
               View Detailed Stats
             </button>
@@ -362,6 +364,182 @@ function App() {
           <a href="#">Privacy Policy</a>
           <a href="#">Terms of Service</a>
         </div>
+      </div>
+    </div>
+  )
+
+  // Player Stats View Component
+  const PlayerStatsView = () => (
+    <div className="player-stats-container">
+      {/* Header */}
+      <div className="player-stats-header">
+        <div className="header-left">
+          <button 
+            className="back-btn"
+            onClick={() => setShowPlayerStats(false)}
+          >
+            <ArrowLeft size={20} />
+            Back to Dashboard
+          </button>
+          <div className="header-icon">📊</div>
+          <h1>Player Stats View</h1>
+        </div>
+        <div className="header-right">
+          <nav className="header-nav">
+            <a href="#" className="nav-link">Home</a>
+            <a href="#" className="nav-link">Matches</a>
+            <a href="#" className="nav-link">Players</a>
+            <a href="#" className="nav-link">Stats</a>
+          </nav>
+          <div className="search-bar">
+            <Search size={16} />
+            <input type="text" placeholder="Search in site" />
+          </div>
+        </div>
+      </div>
+
+      {/* Current Match Section */}
+      <div className="current-match-section">
+        <h2>Current Match: Team A vs Team B</h2>
+        <p>Player Statistics Overview</p>
+        <div className="match-tabs">
+          <button className="tab-btn active">Overview</button>
+          <button className="tab-btn">Heatmaps</button>
+          <button className="tab-btn">Performance</button>
+        </div>
+      </div>
+
+      {/* Player Statistics Section */}
+      <div className="player-statistics-section">
+        <h3>Player Statistics</h3>
+        <p>Detailed stats for each player in the match.</p>
+        <div className="player-cards">
+          <div className="player-card">
+            <div className="player-position">Midfielder</div>
+            <div className="player-image-placeholder">
+              <span>Player A Image</span>
+            </div>
+            <div className="player-info">
+              <h4>Player A</h4>
+              <p>Jersey No: 10</p>
+            </div>
+          </div>
+          <div className="player-card">
+            <div className="player-position">Forward</div>
+            <div className="player-image-placeholder">
+              <span>Player B Image</span>
+            </div>
+            <div className="player-info">
+              <h4>Player B</h4>
+              <p>Jersey No: 7</p>
+            </div>
+          </div>
+          <div className="player-card">
+            <div className="player-position">Forward</div>
+            <div className="player-image-placeholder">
+              <span>Player C Image</span>
+            </div>
+            <div className="player-info">
+              <h4>Player C</h4>
+              <p>Jersey No: 4</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Team Performance Metrics Section */}
+      <div className="team-performance-section">
+        <h3>Team Performance Metrics</h3>
+        <p>Analyze team's overall performance statistics.</p>
+        <button className="action-btn">View Detailed Analysis</button>
+        <div className="charts-container">
+          <div className="chart-card">
+            <h4>Average Speed by Player</h4>
+            <div className="chart">
+              <div className="chart-y-axis">Speed (km/h)</div>
+              <div className="bar-chart">
+                <div className="bar" style={{ height: '60%' }}></div>
+                <div className="bar" style={{ height: '80%' }}></div>
+                <div className="bar" style={{ height: '40%' }}></div>
+                <div className="bar" style={{ height: '90%' }}></div>
+                <div className="bar" style={{ height: '70%' }}></div>
+                <div className="bar" style={{ height: '50%' }}></div>
+              </div>
+              <div className="chart-x-axis">Player</div>
+            </div>
+          </div>
+          <div className="chart-card">
+            <h4>Distance Covered Over Time</h4>
+            <div className="chart">
+              <div className="chart-y-axis">Distance (km)</div>
+              <div className="line-chart">
+                <div className="line-path"></div>
+                <div className="line-fill"></div>
+              </div>
+              <div className="chart-x-axis">Time</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Player Heatmap Zones Section */}
+      <div className="heatmap-zones-section">
+        <h3>Player Heatmap Zones</h3>
+        <p>Visual representation of player movements during the match.</p>
+        <button className="action-btn">Show Heatmap</button>
+        <div className="heatmap-cards">
+          <div className="heatmap-card">
+            <div className="heatmap-placeholder"></div>
+            <div className="heatmap-info">
+              <h4>Player A</h4>
+              <p>Heatmap Zone: Defensive Midfield</p>
+            </div>
+          </div>
+          <div className="heatmap-card">
+            <div className="heatmap-placeholder"></div>
+            <div className="heatmap-info">
+              <h4>Player B</h4>
+              <p>Heatmap Zone: Attacking Half</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Player Tracking Stability Section */}
+      <div className="tracking-stability-section">
+        <h3>Player Tracking Stability</h3>
+        <p>View tracking stability for all players.</p>
+        <div className="stability-list">
+          <div className="stability-item">
+            <BarChart size={20} />
+            <div className="stability-info">
+              <h4>Player A</h4>
+              <p>Stability: High</p>
+            </div>
+          </div>
+          <div className="stability-item">
+            <LineChart size={20} />
+            <div className="stability-info">
+              <h4>Player B</h4>
+              <p>Stability: Medium</p>
+            </div>
+          </div>
+          <div className="stability-item">
+            <BarChart size={20} />
+            <div className="stability-info">
+              <h4>Player C</h4>
+              <p>Stability: Low</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="player-stats-footer">
+        <a href="#">Follow Us on Social Media</a>
+        <a href="#">Contact Support</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
       </div>
     </div>
   )
@@ -679,7 +857,11 @@ function App() {
 
   return (
     <div className="app">
-      {currentView === 'dashboard' ? <Dashboard /> : <Authentication />}
+      {currentView === 'dashboard' ? (
+        showPlayerStats ? <PlayerStatsView /> : <Dashboard />
+      ) : (
+        <Authentication />
+      )}
     </div>
   )
 }
