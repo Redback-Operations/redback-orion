@@ -1,5 +1,4 @@
 import React, { useState, useCallback, memo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import {
   Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target,
   BarChart3, TrendingUp, Calendar, Plus, Volume2, Circle, Download, Activity, Clock, Star, Search,
@@ -58,7 +57,7 @@ const Dashboard = memo(function Dashboard({
   showReferee, showBall, showStaff, showCrowd,
   setShowReferee, setShowBall, setShowStaff, setShowCrowd,
   activeTab, setActiveTab,
-  setShowPlayerStats,
+  setShowPlayerStats, setShowCrowdHeatmap,
   downloadReport
 }) {
   return (
@@ -134,7 +133,7 @@ const Dashboard = memo(function Dashboard({
             </button>
             <button
               className={`tab-btn ${activeTab === 'crowd-heatmap' ? 'active' : ''}`}
-              onClick={() => setActiveTab('crowd-heatmap')}
+              onClick={() => setShowCrowdHeatmap(true)}
             >
               Crowd Heatmap
             </button>
@@ -478,6 +477,240 @@ const PlayerStatsView = memo(function PlayerStatsView({ setShowPlayerStats }) {
   )
 })
 
+const CrowdHeatmapView = memo(function CrowdHeatmapView({ setShowCrowdHeatmap }) {
+  const [activeFilter, setActiveFilter] = useState('current-density')
+  const [crowdData] = useState({
+    totalDensity: 1200,
+    densityChange: 200,
+    trend: 'Increased',
+    trendDirection: 'Upward',
+    zoneData: [
+      { zone: 'Zone A', density: 65, color: '#e5e7eb' },
+      { zone: 'Zone B', density: 25, color: '#9ca3af' },
+      { zone: 'Zone C', density: 10, color: '#374151' }
+    ],
+    timeSeriesData: [
+      { time: '10:00', density: 800 },
+      { time: '10:15', density: 950 },
+      { time: '10:30', density: 1100 },
+      { time: '10:45', density: 1050 },
+      { time: '11:00', density: 1200 }
+    ]
+  })
+
+  return (
+    <div className="crowd-heatmap-container">
+      {/* Header */}
+      <div className="crowd-heatmap-header">
+        <div className="header-left">
+          <button
+            className="back-btn"
+            onClick={() => setShowCrowdHeatmap(false)}
+          >
+            <ArrowLeft size={20} />
+            Back to Dashboard
+          </button>
+          <div className="header-icon">🔥</div>
+          <h1>Crowd Heatmap Screen</h1>
+        </div>
+        <div className="header-right">
+          <nav className="header-nav">
+            <a href="#" className="nav-link">Home</a>
+            <a href="#" className="nav-link">Match Details</a>
+            <a href="#" className="nav-link">Player Tracking</a>
+            <a href="#" className="nav-link">Analytics</a>
+          </nav>
+          <div className="search-bar">
+            <Search size={16} />
+            <input type="text" placeholder="Search in site" />
+          </div>
+        </div>
+      </div>
+
+      {/* Crowd Density Overview Section */}
+      <div className="crowd-overview-section">
+        <div className="section-header">
+          <div className="header-content">
+            <h2>Crowd Density Overview</h2>
+            <p>Real-time visualization of crowd density in each zone.</p>
+          </div>
+          <div className="filter-buttons">
+            <button
+              className={`filter-btn ${activeFilter === 'current-density' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('current-density')}
+            >
+              Current Density
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'historical-data' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('historical-data')}
+            >
+              Historical Data
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'analysis' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('analysis')}
+            >
+              Analysis
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="crowd-content-grid">
+        {/* Left Column */}
+        <div className="left-column">
+          {/* Total Crowd Density Section */}
+          <div className="total-density-section">
+            <div className="section-header">
+              <div className="header-content">
+                <h3>Total Crowd Density</h3>
+                <p>Current density metrics for the crowd in designated zones.</p>
+              </div>
+              <button className="action-btn">
+                <Eye size={16} />
+                View Detailed Metrics
+              </button>
+            </div>
+            <div className="density-metrics">
+              <div className="metric-card">
+                <div className="metric-icon">👥</div>
+                <div className="metric-content">
+                  <h4>Total Density</h4>
+                  <div className="metric-value">{crowdData.totalDensity.toLocaleString()} people</div>
+                  <div className="metric-change positive">+{crowdData.densityChange}</div>
+                </div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-icon">📈</div>
+                <div className="metric-content">
+                  <h4>Density Trend</h4>
+                  <div className="metric-value">{crowdData.trend}</div>
+                  <div className="metric-change">{crowdData.trendDirection}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Density Trend Over Time Section */}
+          <div className="trend-section">
+            <div className="section-header">
+              <div className="header-content">
+                <h3>Density Trend Over Time</h3>
+              </div>
+            </div>
+            <div className="trend-chart">
+              <div className="chart-y-axis">Density</div>
+                             <div className="line-chart-container">
+                 <svg className="line-chart" viewBox="0 0 400 200" preserveAspectRatio="none">
+                   <defs>
+                     <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                       <stop offset="0%" stopColor="#4285f4" stopOpacity="0.8"/>
+                       <stop offset="100%" stopColor="#4285f4" stopOpacity="0.1"/>
+                     </linearGradient>
+                   </defs>
+                   {/* Grid lines for better readability */}
+                   <line x1="0" y1="50" x2="400" y2="50" stroke="#e0e0e0" strokeWidth="1" opacity="0.5"/>
+                   <line x1="0" y1="100" x2="400" y2="100" stroke="#e0e0e0" strokeWidth="1" opacity="0.5"/>
+                   <line x1="0" y1="150" x2="400" y2="150" stroke="#e0e0e0" strokeWidth="1" opacity="0.5"/>
+                   
+                   {/* Main trend line */}
+                   <path
+                     d="M 20,160 L 100,130 L 180,110 L 260,120 L 340,90"
+                     stroke="#4285f4"
+                     strokeWidth="3"
+                     fill="none"
+                     className="trend-line"
+                     strokeLinecap="round"
+                     strokeLinejoin="round"
+                   />
+                   
+                   {/* Gradient fill area */}
+                   <path
+                     d="M 20,160 L 100,130 L 180,110 L 260,120 L 340,90 L 340,180 L 20,180 Z"
+                     fill="url(#lineGradient)"
+                     className="trend-fill"
+                   />
+                   
+                   {/* Data points */}
+                   <circle cx="20" cy="160" r="4" fill="#4285f4"/>
+                   <circle cx="100" cy="130" r="4" fill="#4285f4"/>
+                   <circle cx="180" cy="110" r="4" fill="#4285f4"/>
+                   <circle cx="260" cy="120" r="4" fill="#4285f4"/>
+                   <circle cx="340" cy="90" r="4" fill="#4285f4"/>
+                 </svg>
+               </div>
+              <div className="chart-x-axis">Time</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className="right-column">
+          {/* Crowd Zone Density Section */}
+          <div className="zone-density-section">
+            <div className="section-header">
+              <div className="header-content">
+                <h3>Crowd Zone Density</h3>
+                <p>Visualization of crowd density in marked zones.</p>
+              </div>
+              <button className="action-btn">
+                <Download size={16} />
+                Download Heatmap
+              </button>
+            </div>
+            <div className="heatmap-container">
+              <h4>Density Heatmap</h4>
+              <div className="pie-chart-container">
+                <div className="pie-chart">
+                  <div className="pie-segment" style={{
+                    background: `conic-gradient(${crowdData.zoneData[0].color} 0deg ${crowdData.zoneData[0].density * 3.6}deg, 
+                                               ${crowdData.zoneData[1].color} ${crowdData.zoneData[0].density * 3.6}deg ${(crowdData.zoneData[0].density + crowdData.zoneData[1].density) * 3.6}deg,
+                                               ${crowdData.zoneData[2].color} ${(crowdData.zoneData[0].density + crowdData.zoneData[1].density) * 3.6}deg 360deg)`
+                  }}></div>
+                </div>
+                <div className="pie-legend">
+                  {crowdData.zoneData.map((zone, index) => (
+                    <div key={index} className="legend-item">
+                      <div className="legend-color" style={{ backgroundColor: zone.color }}></div>
+                      <span>{zone.zone}: {zone.density}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="chart-x-axis">Zones</div>
+            </div>
+          </div>
+
+          {/* Static Camera Zone View Section */}
+          <div className="camera-zone-section">
+            <div className="section-header">
+              <div className="header-content">
+                <h3>Static Camera Zone View</h3>
+              </div>
+            </div>
+            <div className="camera-view-container">
+              <div className="camera-placeholder">
+                <MapPin size={24} />
+                <p>Static camera zone view with real-time crowd density heatmap.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="crowd-heatmap-footer">
+        <a href="#">Follow Us on Social Media</a>
+        <a href="#">Contact Support</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  )
+})
+
 const Authentication = memo(function Authentication({
   AFL_TEAMS,
   isLogin, isLoading, formData,
@@ -805,6 +1038,7 @@ function App() {
   // Views
   const [currentView, setCurrentView] = useState('login')
   const [showPlayerStats, setShowPlayerStats] = useState(false)
+  const [showCrowdHeatmap, setShowCrowdHeatmap] = useState(false)
 
   // Auth states
   const [isLogin, setIsLogin] = useState(true)
@@ -907,6 +1141,8 @@ function App() {
       {currentView === 'dashboard' ? (
         showPlayerStats ? (
           <PlayerStatsView setShowPlayerStats={setShowPlayerStats} />
+        ) : showCrowdHeatmap ? (
+          <CrowdHeatmapView setShowCrowdHeatmap={setShowCrowdHeatmap} />
         ) : (
           <Dashboard
             showReferee={showReferee}
@@ -920,6 +1156,7 @@ function App() {
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             setShowPlayerStats={setShowPlayerStats}
+            setShowCrowdHeatmap={setShowCrowdHeatmap}
             downloadReport={downloadReport}
           />
         )
