@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target, BarChart3, TrendingUp, Users as TeamIcon, Calendar, Plus, Volume2, Circle, Users as StaffIcon, Users as CrowdIcon, Download, Eye as ViewIcon, Activity, Clock, Target as GoalIcon, Star, MapPin as PinIcon, Search, BarChart, LineChart } from 'lucide-react'
+import { Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target, BarChart3, TrendingUp, Calendar, Plus, Volume2, Circle, Download, Activity, Clock, Star, Search, BarChart, LineChart } from 'lucide-react'
 import './App.css'
 
 // AFL Teams data with colors and emojis
@@ -127,6 +127,59 @@ function App() {
     setShowPositionSelector(false)
   }
 
+  // Download Report Function
+  const downloadReport = () => {
+    // Create the report data
+    const reportData = {
+      matchInfo: {
+        teams: "Team A vs Team B",
+        score: "2-1",
+        time: "12:34",
+        quarter: "3"
+      },
+      analytics: {
+        possessionOverTime: [
+          { time: "0-5min", teamA: 65, teamB: 35 },
+          { time: "5-10min", teamA: 58, teamB: 42 },
+          { time: "10-15min", teamA: 72, teamB: 28 },
+          { time: "15-20min", teamA: 45, teamB: 55 },
+          { time: "20-25min", teamA: 68, teamB: 32 }
+        ],
+        playerActivity: [
+          { player: "Player A", actions: 85, position: "Midfield" },
+          { player: "Player B", actions: 92, position: "Forward" },
+          { player: "Player C", actions: 78, position: "Defender" },
+          { player: "Player D", actions: 88, position: "Midfield" },
+          { player: "Player E", actions: 76, position: "Forward" }
+        ]
+      },
+      performanceMetrics: {
+        goals: 2,
+        assists: 1,
+        shotsOnTarget: 5,
+        possession: 62,
+        passes: 245,
+        tackles: 18
+      },
+      timestamp: new Date().toISOString(),
+      generatedBy: "AFL Tracker Analytics"
+    }
+
+    // Convert to JSON string
+    const jsonString = JSON.stringify(reportData, null, 2)
+    
+    // Create blob and download
+    const blob = new Blob([jsonString], { type: 'application/json' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `match-progression-analytics-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }
+
   // Dashboard Component
   const Dashboard = () => (
     <div className="dashboard-container">
@@ -166,7 +219,7 @@ function App() {
               className={`control-btn ${showStaff ? 'active' : ''}`}
               onClick={() => setShowStaff(!showStaff)}
             >
-              <StaffIcon size={20} />
+              <Users size={20} />
               <span>Show Staff</span>
             </button>
           </div>
@@ -175,7 +228,7 @@ function App() {
               className={`control-btn ${showCrowd ? 'active' : ''}`}
               onClick={() => setShowCrowd(!showCrowd)}
             >
-              <CrowdIcon size={20} />
+              <Users size={20} />
               <span>Show Crowd</span>
             </button>
           </div>
@@ -221,7 +274,7 @@ function App() {
             <h3>Player Performance Metrics</h3>
             <p>Real-time tracking of key player stats.</p>
             <button className="action-btn" onClick={() => setShowPlayerStats(true)}>
-              <ViewIcon size={16} />
+              <Eye size={16} />
               View Detailed Stats
             </button>
           </div>
@@ -258,7 +311,7 @@ function App() {
           <div className="section-header">
             <h3>Match Progression Analytics</h3>
             <p>Analysis of match changes over time.</p>
-            <button className="action-btn">
+            <button className="action-btn" onClick={downloadReport}>
               <Download size={16} />
               Download Report
             </button>
@@ -303,7 +356,7 @@ function App() {
             <h3>Live Player Tracking</h3>
             <p>Visual representation of player movements.</p>
             <button className="action-btn">
-              <ViewIcon size={16} />
+              <Eye size={16} />
               Show Heatmap
             </button>
           </div>
@@ -351,7 +404,7 @@ function App() {
         <div className="map-section">
           <div className="interactive-map">
             <div className="map-placeholder">
-              <PinIcon size={24} />
+              <MapPin size={24} />
               <p>Interactive map showing player positions and movements.</p>
             </div>
           </div>
