@@ -1,6 +1,10 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useCallback, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target, BarChart3, TrendingUp, Calendar, Plus, Volume2, Circle, Download, Activity, Clock, Star, Search, BarChart, LineChart } from 'lucide-react'
+import {
+  Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target,
+  BarChart3, TrendingUp, Calendar, Plus, Volume2, Circle, Download, Activity, Clock, Star, Search,
+  BarChart, LineChart
+} from 'lucide-react'
 import './App.css'
 
 // AFL Teams data with colors and emojis
@@ -25,10 +29,8 @@ const AFL_TEAMS = [
   { name: 'Western Bulldogs', primary: '#FF6B35', secondary: '#FFFFFF', emoji: '🐕', mascot: 'Bulldog' }
 ]
 
-// Player Positions
-const PLAYER_POSITIONS = [
-  'Forward', 'Midfielder', 'Defender', 'Ruck', 'Interchange'
-]
+// Player Positions (not used in current UI, keeping for future)
+const PLAYER_POSITIONS = ['Forward', 'Midfielder', 'Defender', 'Ruck', 'Interchange']
 
 // Mock Dashboard Data
 const DASHBOARD_DATA = {
@@ -48,140 +50,18 @@ const DASHBOARD_DATA = {
   ]
 }
 
-function App() {
-  // Dashboard State
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [currentView, setCurrentView] = useState('login')
-  const [showPlayerStats, setShowPlayerStats] = useState(false)
+/* =========================
+   HOISTED CHILD COMPONENTS
+   ========================= */
 
-  const [isLogin, setIsLogin] = useState(true)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [selectedTeam, setSelectedTeam] = useState(null)
-  const [selectedPosition, setSelectedPosition] = useState('')
-  const [showTeamSelector, setShowTeamSelector] = useState(false)
-  const [showPositionSelector, setShowPositionSelector] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    name: '',
-    team: '',
-    position: '',
-    favoriteGround: ''
-  })
-
-  // Dashboard States
-  const [showReferee, setShowReferee] = useState(true)
-  const [showBall, setShowBall] = useState(true)
-  const [showStaff, setShowStaff] = useState(false)
-  const [showCrowd, setShowCrowd] = useState(true)
-  const [activeTab, setActiveTab] = useState('player-tracking')
-
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
-    
-    // Simulate authentication process
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    console.log('Form submitted:', formData)
-    setIsLoading(false)
-    
-    // Switch to dashboard view
-    setCurrentView('dashboard')
-  }
-
-  const toggleForm = () => {
-    setIsLogin(!isLogin)
-    setFormData({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      name: '',
-      team: '',
-      position: '',
-      favoriteGround: ''
-    })
-    setSelectedTeam(null)
-    setSelectedPosition('')
-  }
-
-  const selectTeam = (team) => {
-    setSelectedTeam(team)
-    setFormData({ ...formData, team: team.name })
-    setShowTeamSelector(false)
-  }
-
-  const selectPosition = (position) => {
-    setSelectedPosition(position)
-    setFormData({ ...formData, position })
-    setShowPositionSelector(false)
-  }
-
-  // Download Report Function
-  const downloadReport = () => {
-    // Create the report data
-    const reportData = {
-      matchInfo: {
-        teams: "Team A vs Team B",
-        score: "2-1",
-        time: "12:34",
-        quarter: "3"
-      },
-      analytics: {
-        possessionOverTime: [
-          { time: "0-5min", teamA: 65, teamB: 35 },
-          { time: "5-10min", teamA: 58, teamB: 42 },
-          { time: "10-15min", teamA: 72, teamB: 28 },
-          { time: "15-20min", teamA: 45, teamB: 55 },
-          { time: "20-25min", teamA: 68, teamB: 32 }
-        ],
-        playerActivity: [
-          { player: "Player A", actions: 85, position: "Midfield" },
-          { player: "Player B", actions: 92, position: "Forward" },
-          { player: "Player C", actions: 78, position: "Defender" },
-          { player: "Player D", actions: 88, position: "Midfield" },
-          { player: "Player E", actions: 76, position: "Forward" }
-        ]
-      },
-      performanceMetrics: {
-        goals: 2,
-        assists: 1,
-        shotsOnTarget: 5,
-        possession: 62,
-        passes: 245,
-        tackles: 18
-      },
-      timestamp: new Date().toISOString(),
-      generatedBy: "AFL Tracker Analytics"
-    }
-
-    // Convert to JSON string
-    const jsonString = JSON.stringify(reportData, null, 2)
-    
-    // Create blob and download
-    const blob = new Blob([jsonString], { type: 'application/json' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `match-progression-analytics-${new Date().toISOString().split('T')[0]}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-  }
-
-  // Dashboard Component
-  const Dashboard = () => (
+const Dashboard = memo(function Dashboard({
+  showReferee, showBall, showStaff, showCrowd,
+  setShowReferee, setShowBall, setShowStaff, setShowCrowd,
+  activeTab, setActiveTab,
+  setShowPlayerStats,
+  downloadReport
+}) {
+  return (
     <div className="dashboard-container">
       {/* Left Sidebar */}
       <div className="dashboard-sidebar">
@@ -197,7 +77,7 @@ function App() {
         <div className="sidebar-controls">
           <h3>Display Controls</h3>
           <div className="control-item">
-            <button 
+            <button
               className={`control-btn ${showReferee ? 'active' : ''}`}
               onClick={() => setShowReferee(!showReferee)}
             >
@@ -206,7 +86,7 @@ function App() {
             </button>
           </div>
           <div className="control-item">
-            <button 
+            <button
               className={`control-btn ${showBall ? 'active' : ''}`}
               onClick={() => setShowBall(!showBall)}
             >
@@ -215,7 +95,7 @@ function App() {
             </button>
           </div>
           <div className="control-item">
-            <button 
+            <button
               className={`control-btn ${showStaff ? 'active' : ''}`}
               onClick={() => setShowStaff(!showStaff)}
             >
@@ -224,7 +104,7 @@ function App() {
             </button>
           </div>
           <div className="control-item">
-            <button 
+            <button
               className={`control-btn ${showCrowd ? 'active' : ''}`}
               onClick={() => setShowCrowd(!showCrowd)}
             >
@@ -232,7 +112,6 @@ function App() {
               <span>Show Crowd</span>
             </button>
           </div>
-
         </div>
       </div>
 
@@ -247,19 +126,19 @@ function App() {
             <span>Quarter: 3</span>
           </div>
           <div className="match-tabs">
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'player-tracking' ? 'active' : ''}`}
               onClick={() => setActiveTab('player-tracking')}
             >
               Player Tracking
             </button>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'crowd-heatmap' ? 'active' : ''}`}
               onClick={() => setActiveTab('crowd-heatmap')}
             >
               Crowd Heatmap
             </button>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
               onClick={() => setActiveTab('analytics')}
             >
@@ -288,19 +167,19 @@ function App() {
               </div>
             </div>
             <div className="metric-card">
-              <div className="metric-icon">🤝</div>
-              <div className="metric-content">
-                <h4>Assists</h4>
-                <div className="metric-value">1</div>
-                <div className="metric-change">0</div>
-              </div>
-            </div>
-            <div className="metric-card">
               <div className="metric-icon">🎯</div>
               <div className="metric-content">
                 <h4>Shots on Target</h4>
                 <div className="metric-value">5</div>
                 <div className="metric-change positive">+2</div>
+              </div>
+            </div>
+            <div className="metric-card">
+              <div className="metric-icon">🤝</div>
+              <div className="metric-content">
+                <h4>Assists</h4>
+                <div className="metric-value">1</div>
+                <div className="metric-change">0</div>
               </div>
             </div>
           </div>
@@ -420,14 +299,15 @@ function App() {
       </div>
     </div>
   )
+})
 
-  // Player Stats View Component
-  const PlayerStatsView = () => (
+const PlayerStatsView = memo(function PlayerStatsView({ setShowPlayerStats }) {
+  return (
     <div className="player-stats-container">
       {/* Header */}
       <div className="player-stats-header">
         <div className="header-left">
-          <button 
+          <button
             className="back-btn"
             onClick={() => setShowPlayerStats(false)}
           >
@@ -596,16 +476,24 @@ function App() {
       </div>
     </div>
   )
+})
 
-  // Authentication Component
-  const Authentication = () => (
+const Authentication = memo(function Authentication({
+  AFL_TEAMS,
+  isLogin, isLoading, formData,
+  selectedTeam, showTeamSelector,
+  handleInputChange, handleSubmit, toggleForm,
+  setShowTeamSelector, selectTeam,
+  showPassword, setShowPassword,
+  showConfirmPassword, setShowConfirmPassword
+}) {
+  return (
     <div className="app-container">
       {/* Left Panel - Authentication Form with Image */}
       <div className="left-panel">
         {/* Image Section */}
         <div className="image-section">
           <div className="image-container">
-            {/* Replace this with your actual image */}
             <div className="placeholder-image">
               <div className="image-overlay">
                 <div className="image-content">
@@ -691,7 +579,7 @@ function App() {
                     >
                       {selectedTeam ? `${selectedTeam.emoji} ${selectedTeam.name}` : 'Select your team'}
                     </button>
-                    
+
                     {showTeamSelector && (
                       <div className="dropdown">
                         {AFL_TEAMS.map((team) => (
@@ -852,8 +740,8 @@ function App() {
             <div className="team-utilization">
               <h4>Team's Performance</h4>
               <div className="utilization-table">
-                {DASHBOARD_DATA.teams.map((team, index) => (
-                  <div key={index} className="utilization-row">
+                {DASHBOARD_DATA.teams.map((team) => (
+                  <div key={`team-${team.name}`} className="utilization-row">
                     <div className="team-name">{team.name}</div>
                     <div className="utilization-bars">
                       <div className="bar overall" style={{ width: `${team.utilization}%` }}></div>
@@ -881,8 +769,8 @@ function App() {
                 <button className="add-btn">Add</button>
               </div>
               <div className="existing-players">
-                {DASHBOARD_DATA.players.map((player, index) => (
-                  <div key={index} className="player-item">
+                {DASHBOARD_DATA.players.map((player) => (
+                  <div key={`player-${player.name}`} className="player-item">
                     <div className="player-avatar">{player.image}</div>
                     <div className="player-info">
                       <div className="player-name">{player.name}</div>
@@ -907,13 +795,152 @@ function App() {
       </div>
     </div>
   )
+})
+
+/* ===========
+   APP (OWNER)
+   =========== */
+
+function App() {
+  // Views
+  const [currentView, setCurrentView] = useState('login')
+  const [showPlayerStats, setShowPlayerStats] = useState(false)
+
+  // Auth states
+  const [isLogin, setIsLogin] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState(null)
+  const [showTeamSelector, setShowTeamSelector] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    name: '',
+    team: '',
+    position: '',
+    favoriteGround: ''
+  })
+
+  // Dashboard display states
+  const [showReferee, setShowReferee] = useState(true)
+  const [showBall, setShowBall] = useState(true)
+  const [showStaff, setShowStaff] = useState(false)
+  const [showCrowd, setShowCrowd] = useState(true)
+  const [activeTab, setActiveTab] = useState('player-tracking')
+
+  // Handlers (memoized)
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }, [])
+
+  const handleSubmit = useCallback(async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+    await new Promise(resolve => setTimeout(resolve, 2000)) // simulate auth
+    console.log('Form submitted:', formData)
+    setIsLoading(false)
+    setCurrentView('dashboard')
+  }, [formData])
+
+  const toggleForm = useCallback(() => {
+    setIsLogin(prev => !prev)
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      name: '',
+      team: '',
+      position: '',
+      favoriteGround: ''
+    })
+    setSelectedTeam(null)
+  }, [])
+
+  const selectTeam = useCallback((team) => {
+    setSelectedTeam(team)
+    setFormData(prev => ({ ...prev, team: team.name }))
+    setShowTeamSelector(false)
+  }, [])
+
+  // Download Report Function
+  const downloadReport = useCallback(() => {
+    const reportData = {
+      matchInfo: { teams: "Team A vs Team B", score: "2-1", time: "12:34", quarter: "3" },
+      analytics: {
+        possessionOverTime: [
+          { time: "0-5min", teamA: 65, teamB: 35 },
+          { time: "5-10min", teamA: 58, teamB: 42 },
+          { time: "10-15min", teamA: 72, teamB: 28 },
+          { time: "15-20min", teamA: 45, teamB: 55 },
+          { time: "20-25min", teamA: 68, teamB: 32 }
+        ],
+        playerActivity: [
+          { player: "Player A", actions: 85, position: "Midfield" },
+          { player: "Player B", actions: 92, position: "Forward" },
+          { player: "Player C", actions: 78, position: "Defender" },
+          { player: "Player D", actions: 88, position: "Midfield" },
+          { player: "Player E", actions: 76, position: "Forward" }
+        ]
+      },
+      performanceMetrics: { goals: 2, assists: 1, shotsOnTarget: 5, possession: 62, passes: 245, tackles: 18 },
+      timestamp: new Date().toISOString(),
+      generatedBy: "AFL Tracker Analytics"
+    }
+
+    const jsonString = JSON.stringify(reportData, null, 2)
+    const blob = new Blob([jsonString], { type: 'application/json' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `match-progression-analytics-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }, [])
 
   return (
     <div className="app">
       {currentView === 'dashboard' ? (
-        showPlayerStats ? <PlayerStatsView /> : <Dashboard />
+        showPlayerStats ? (
+          <PlayerStatsView setShowPlayerStats={setShowPlayerStats} />
+        ) : (
+          <Dashboard
+            showReferee={showReferee}
+            showBall={showBall}
+            showStaff={showStaff}
+            showCrowd={showCrowd}
+            setShowReferee={setShowReferee}
+            setShowBall={setShowBall}
+            setShowStaff={setShowStaff}
+            setShowCrowd={setShowCrowd}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            setShowPlayerStats={setShowPlayerStats}
+            downloadReport={downloadReport}
+          />
+        )
       ) : (
-        <Authentication />
+        <Authentication
+          AFL_TEAMS={AFL_TEAMS}
+          isLogin={isLogin}
+          isLoading={isLoading}
+          formData={formData}
+          selectedTeam={selectedTeam}
+          showTeamSelector={showTeamSelector}
+          handleInputChange={handleInputChange}
+          handleSubmit={handleSubmit}
+          toggleForm={toggleForm}
+          setShowTeamSelector={setShowTeamSelector}
+          selectTeam={selectTeam}
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
+          showConfirmPassword={showConfirmPassword}
+          setShowConfirmPassword={setShowConfirmPassword}
+        />
       )}
     </div>
   )
