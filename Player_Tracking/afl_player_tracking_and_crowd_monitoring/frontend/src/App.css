@@ -1957,3 +1957,612 @@ body {
 .player-stats-footer a:hover {
   color: #4285f4;
 }
+
+/* =========================
+   CROWD HEATMAP STYLES
+   ========================= */
+
+/* Crowd Heatmap Container */
+.crowd-heatmap-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Crowd Heatmap Header */
+.crowd-heatmap-header {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  color: #666;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #e9ecef;
+  border-color: #4285f4;
+  color: #4285f4;
+}
+
+.header-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+}
+
+.crowd-heatmap-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #4285f4;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  color: #333;
+  width: 200px;
+}
+
+.search-bar input::placeholder {
+  color: #999;
+}
+
+/* Crowd Overview Section */
+.crowd-overview-section {
+  background: white;
+  margin: 30px;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.crowd-overview-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-content h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.header-content p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-btn {
+  padding: 12px 20px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  color: #666;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  background: #e9ecef;
+}
+
+.filter-btn.active {
+  background: #4285f4;
+  color: white;
+  border-color: #4285f4;
+}
+
+/* Crowd Content Grid */
+.crowd-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 0 30px 30px;
+  flex: 1;
+}
+
+/* Left Column */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Total Density Section */
+.total-density-section {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.total-density-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-content h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.header-content p {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.density-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.density-metrics .metric-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+}
+
+.density-metrics .metric-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.density-metrics .metric-content h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.density-metrics .metric-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 2px;
+}
+
+.density-metrics .metric-change {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.density-metrics .metric-change.positive {
+  color: #10b981;
+}
+
+/* Trend Section */
+.trend-section {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.trend-section .section-header {
+  margin-bottom: 25px;
+}
+
+.trend-chart {
+  height: 300px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.chart-y-axis {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+.line-chart-container {
+  flex: 1;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.line-chart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.trend-line {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 4px rgba(66, 133, 244, 0.3));
+}
+
+.trend-fill {
+  opacity: 0.2;
+}
+
+.line-chart circle {
+  filter: drop-shadow(0 2px 4px rgba(66, 133, 244, 0.4));
+}
+
+.chart-x-axis {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  margin-top: 10px;
+}
+
+/* Right Column */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Zone Density Section */
+.zone-density-section {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.zone-density-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.heatmap-container {
+  text-align: center;
+}
+
+.heatmap-container h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 20px;
+}
+
+.pie-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.pie-chart {
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
+
+.pie-segment {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Camera Zone Section */
+.camera-zone-section {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.camera-zone-section .section-header {
+  margin-bottom: 25px;
+}
+
+.camera-view-container {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f8f9fa;
+  border: 2px dashed #e0e0e0;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: #666;
+}
+
+.camera-placeholder svg {
+  color: #999;
+}
+
+.camera-placeholder p {
+  font-size: 0.9rem;
+  text-align: center;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* Crowd Heatmap Footer */
+.crowd-heatmap-footer {
+  padding: 20px 30px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  background: #ffffff;
+  margin-top: auto;
+}
+
+.crowd-heatmap-footer a {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.crowd-heatmap-footer a:hover {
+  color: #4285f4;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .crowd-content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .density-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .pie-chart-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .trend-chart {
+    height: 250px;
+    padding: 15px;
+  }
+  
+  .line-chart-container {
+    margin: 15px 0;
+  }
+  
+  .crowd-heatmap-header {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .search-bar input {
+    width: 150px;
+  }
+  
+  .crowd-overview-section,
+  .total-density-section,
+  .trend-section,
+  .zone-density-section,
+  .camera-zone-section {
+    margin: 15px;
+    padding: 20px;
+  }
+  
+  .crowd-content-grid {
+    margin: 0 15px 15px;
+    gap: 20px;
+  }
+  
+  .filter-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .pie-chart {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .pie-legend {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .crowd-heatmap-header {
+    padding: 15px;
+  }
+  
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .header-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+  
+  .crowd-heatmap-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .header-nav {
+    gap: 15px;
+  }
+  
+  .nav-link {
+    font-size: 0.8rem;
+  }
+  
+  .search-bar {
+    padding: 6px 12px;
+  }
+  
+  .search-bar input {
+    width: 120px;
+    font-size: 0.8rem;
+  }
+  
+  .header-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .header-content h3 {
+    font-size: 1.2rem;
+  }
+  
+  .density-metrics .metric-value {
+    font-size: 1.5rem;
+  }
+  
+  .pie-chart {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .camera-view-container {
+    height: 200px;
+  }
+}
