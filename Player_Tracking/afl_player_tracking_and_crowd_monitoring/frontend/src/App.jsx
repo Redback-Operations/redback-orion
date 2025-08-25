@@ -2,7 +2,7 @@ import React, { useState, useCallback, memo } from 'react'
 import {
   Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target,
   BarChart3, TrendingUp, Calendar, Plus, Volume2, Circle, Download, Activity, Clock, Star, Search,
-  BarChart, LineChart
+  BarChart, LineChart, Upload, Video, Play, Pause, FileVideo, AlertCircle, CheckCircle
 } from 'lucide-react'
 import './App.css'
 
@@ -60,6 +60,77 @@ const Dashboard = memo(function Dashboard({
   setShowPlayerStats, setShowCrowdHeatmap,
   downloadReport
 }) {
+  const [uploadedVideo, setUploadedVideo] = useState(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisComplete, setAnalysisComplete] = useState(false)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+  const [analysisResults, setAnalysisResults] = useState(null)
+
+  const handleVideoUpload = (event) => {
+    const file = event.target.files[0]
+    if (file && file.type.startsWith('video/')) {
+      setUploadedVideo(file)
+      setAnalysisComplete(false)
+      setAnalysisResults(null)
+    }
+  }
+
+  const startAnalysis = async () => {
+    if (!uploadedVideo) return
+    
+    setIsAnalyzing(true)
+    setAnalysisProgress(0)
+    
+    // Simulate analysis progress
+    const interval = setInterval(() => {
+      setAnalysisProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval)
+          setIsAnalyzing(false)
+          setAnalysisComplete(true)
+          // Generate mock analysis results
+          setAnalysisResults({
+            matchDuration: '2:15:30',
+            totalPlayers: 36,
+            goals: 12,
+            assists: 8,
+            possession: { teamA: 58, teamB: 42 },
+            playerStats: [
+              { name: 'Player A', goals: 3, assists: 2, distance: '8.5km', speed: '12.3km/h' },
+              { name: 'Player B', goals: 2, assists: 1, distance: '7.8km', speed: '11.9km/h' },
+              { name: 'Player C', goals: 1, assists: 3, distance: '9.2km', speed: '13.1km/h' }
+            ],
+            crowdDensity: {
+              peak: 1500,
+              average: 1200,
+              zones: [
+                { zone: 'North Stand', density: 85, capacity: 500 },
+                { zone: 'South Stand', density: 72, capacity: 500 },
+                { zone: 'East Stand', density: 68, capacity: 400 },
+                { zone: 'West Stand', density: 75, capacity: 400 }
+              ]
+            },
+            keyEvents: [
+              { time: '00:15:30', event: 'Goal by Team A', player: 'Player A' },
+              { time: '00:28:45', event: 'Yellow Card', player: 'Player B' },
+              { time: '00:45:12', event: 'Goal by Team B', player: 'Player C' },
+              { time: '01:12:33', event: 'Goal by Team A', player: 'Player A' },
+              { time: '01:45:20', event: 'Red Card', player: 'Player D' }
+            ]
+          })
+          return 100
+        }
+        return prev + Math.random() * 15
+      })
+    }, 500)
+  }
+
+  const resetAnalysis = () => {
+    setUploadedVideo(null)
+    setAnalysisComplete(false)
+    setAnalysisResults(null)
+    setAnalysisProgress(0)
+  }
   return (
     <div className="dashboard-container">
       {/* Left Sidebar */}
@@ -116,6 +187,224 @@ const Dashboard = memo(function Dashboard({
 
       {/* Main Content */}
       <div className="dashboard-main">
+        {/* Video Upload Section */}
+        <div className="video-upload-section">
+          <div className="section-header">
+            <div className="header-content">
+              <h2>Match Video Analysis</h2>
+              <p>Upload your match video to get comprehensive analysis and insights</p>
+            </div>
+          </div>
+          
+          {!uploadedVideo ? (
+            <div className="upload-area">
+              <div className="upload-zone">
+                <Upload size={48} />
+                <h3>Upload Match Video</h3>
+                <p>Drag and drop your video file here or click to browse</p>
+                <p className="file-types">Supported formats: MP4, AVI, MOV, MKV (Max 500MB)</p>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  className="file-input"
+                  id="video-upload"
+                />
+                <label htmlFor="video-upload" className="upload-btn">
+                  Choose Video File
+                </label>
+              </div>
+            </div>
+          ) : (
+            <div className="video-preview-section">
+              <div className="video-info">
+                <div className="video-details">
+                  <FileVideo size={24} />
+                  <div className="video-text">
+                    <h4>{uploadedVideo.name}</h4>
+                    <p>{(uploadedVideo.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  </div>
+                </div>
+                <div className="video-actions">
+                  {!isAnalyzing && !analysisComplete && (
+                    <button className="action-btn primary" onClick={startAnalysis}>
+                      <Play size={16} />
+                      Start Analysis
+                    </button>
+                  )}
+                  {!isAnalyzing && analysisComplete && (
+                    <button className="action-btn secondary" onClick={resetAnalysis}>
+                      <Upload size={16} />
+                      Upload New Video
+                    </button>
+                  )}
+                  <button className="action-btn" onClick={resetAnalysis}>
+                    <AlertCircle size={16} />
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+              {isAnalyzing && (
+                <div className="analysis-progress">
+                  <div className="progress-header">
+                    <h4>Analyzing Video...</h4>
+                    <span>{Math.round(analysisProgress)}%</span>
+                  </div>
+                  <div className="progress-bar">
+                    <div 
+                      className="progress-fill" 
+                      style={{ width: `${analysisProgress}%` }}
+                    ></div>
+                  </div>
+                  <div className="progress-steps">
+                    <div className={`step ${analysisProgress > 0 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Processing video frames</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 25 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Detecting players and objects</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 50 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Tracking movements and events</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 75 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Generating analysis report</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {analysisComplete && analysisResults && (
+                <div className="analysis-results">
+                  <div className="results-header">
+                    <h3>Analysis Complete!</h3>
+                    <p>Comprehensive match analysis results</p>
+                  </div>
+                  
+                  <div className="results-grid">
+                    <div className="result-card">
+                      <h4>Match Overview</h4>
+                      <div className="result-stats">
+                        <div className="stat">
+                          <span className="label">Duration:</span>
+                          <span className="value">{analysisResults.matchDuration}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="label">Total Players:</span>
+                          <span className="value">{analysisResults.totalPlayers}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="label">Goals:</span>
+                          <span className="value">{analysisResults.goals}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="label">Assists:</span>
+                          <span className="value">{analysisResults.assists}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Possession</h4>
+                      <div className="possession-chart">
+                        <div className="possession-bar">
+                          <div 
+                            className="team-a" 
+                            style={{ width: `${analysisResults.possession.teamA}%` }}
+                          >
+                            <span>Team A: {analysisResults.possession.teamA}%</span>
+                          </div>
+                          <div 
+                            className="team-b" 
+                            style={{ width: `${analysisResults.possession.teamB}%` }}
+                          >
+                            <span>Team B: {analysisResults.possession.teamB}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Top Performers</h4>
+                      <div className="player-list">
+                        {analysisResults.playerStats.map((player, index) => (
+                          <div key={index} className="player-stat">
+                            <div className="player-name">{player.name}</div>
+                            <div className="player-metrics">
+                              <span>⚽ {player.goals} goals</span>
+                              <span>🎯 {player.assists} assists</span>
+                              <span>🏃 {player.distance}</span>
+                              <span>⚡ {player.speed}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Crowd Analysis</h4>
+                      <div className="crowd-stats">
+                        <div className="crowd-metric">
+                          <span className="label">Peak Attendance:</span>
+                          <span className="value">{analysisResults.crowdDensity.peak.toLocaleString()}</span>
+                        </div>
+                        <div className="crowd-metric">
+                          <span className="label">Average Attendance:</span>
+                          <span className="value">{analysisResults.crowdDensity.average.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <div className="zone-list">
+                        {analysisResults.crowdDensity.zones.map((zone, index) => (
+                          <div key={index} className="zone-item">
+                            <span className="zone-name">{zone.zone}</span>
+                            <div className="zone-bar">
+                              <div 
+                                className="zone-fill" 
+                                style={{ width: `${zone.density}%` }}
+                              ></div>
+                            </div>
+                            <span className="zone-density">{zone.density}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="key-events">
+                    <h4>Key Match Events</h4>
+                    <div className="events-timeline">
+                      {analysisResults.keyEvents.map((event, index) => (
+                        <div key={index} className="event-item">
+                          <div className="event-time">{event.time}</div>
+                          <div className="event-content">
+                            <div className="event-title">{event.event}</div>
+                            <div className="event-player">{event.player}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="results-actions">
+                    <button className="action-btn primary">
+                      <Download size={16} />
+                      Download Full Report
+                    </button>
+                    <button className="action-btn">
+                      <BarChart3 size={16} />
+                      View Detailed Analytics
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Current Match Overview */}
         <div className="match-overview">
           <h2>Current Match: Team A vs Team B</h2>
