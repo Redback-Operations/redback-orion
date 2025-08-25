@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target, BarChart3, TrendingUp, Calendar, Plus, Volume2, Circle, Download, Activity, Clock, Star, Search, BarChart, LineChart } from 'lucide-react'
+import React, { useState, useCallback, memo } from 'react'
+import {
+  Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target,
+  BarChart3, TrendingUp, Calendar, Plus, Volume2, Circle, Download, Activity, Clock, Star, Search,
+  BarChart, LineChart, Upload, Video, Play, Pause, FileVideo, AlertCircle, CheckCircle
+} from 'lucide-react'
 import './App.css'
 
 // AFL Teams data with colors and emojis
@@ -25,10 +28,8 @@ const AFL_TEAMS = [
   { name: 'Western Bulldogs', primary: '#FF6B35', secondary: '#FFFFFF', emoji: '🐕', mascot: 'Bulldog' }
 ]
 
-// Player Positions
-const PLAYER_POSITIONS = [
-  'Forward', 'Midfielder', 'Defender', 'Ruck', 'Interchange'
-]
+// Player Positions (not used in current UI, keeping for future)
+const PLAYER_POSITIONS = ['Forward', 'Midfielder', 'Defender', 'Ruck', 'Interchange']
 
 // Mock Dashboard Data
 const DASHBOARD_DATA = {
@@ -48,140 +49,89 @@ const DASHBOARD_DATA = {
   ]
 }
 
-function App() {
-  // Dashboard State
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [currentView, setCurrentView] = useState('login')
-  const [showPlayerStats, setShowPlayerStats] = useState(false)
+/* =========================
+   HOISTED CHILD COMPONENTS
+   ========================= */
 
-  const [isLogin, setIsLogin] = useState(true)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [selectedTeam, setSelectedTeam] = useState(null)
-  const [selectedPosition, setSelectedPosition] = useState('')
-  const [showTeamSelector, setShowTeamSelector] = useState(false)
-  const [showPositionSelector, setShowPositionSelector] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    name: '',
-    team: '',
-    position: '',
-    favoriteGround: ''
-  })
+const Dashboard = memo(function Dashboard({
+  showReferee, showBall, showStaff, showCrowd,
+  setShowReferee, setShowBall, setShowStaff, setShowCrowd,
+  activeTab, setActiveTab,
+  setShowPlayerStats, setShowCrowdHeatmap,
+  downloadReport
+}) {
+  const [uploadedVideo, setUploadedVideo] = useState(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisComplete, setAnalysisComplete] = useState(false)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+  const [analysisResults, setAnalysisResults] = useState(null)
 
-  // Dashboard States
-  const [showReferee, setShowReferee] = useState(true)
-  const [showBall, setShowBall] = useState(true)
-  const [showStaff, setShowStaff] = useState(false)
-  const [showCrowd, setShowCrowd] = useState(true)
-  const [activeTab, setActiveTab] = useState('player-tracking')
-
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
-    
-    // Simulate authentication process
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    console.log('Form submitted:', formData)
-    setIsLoading(false)
-    
-    // Switch to dashboard view
-    setCurrentView('dashboard')
-  }
-
-  const toggleForm = () => {
-    setIsLogin(!isLogin)
-    setFormData({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      name: '',
-      team: '',
-      position: '',
-      favoriteGround: ''
-    })
-    setSelectedTeam(null)
-    setSelectedPosition('')
-  }
-
-  const selectTeam = (team) => {
-    setSelectedTeam(team)
-    setFormData({ ...formData, team: team.name })
-    setShowTeamSelector(false)
-  }
-
-  const selectPosition = (position) => {
-    setSelectedPosition(position)
-    setFormData({ ...formData, position })
-    setShowPositionSelector(false)
-  }
-
-  // Download Report Function
-  const downloadReport = () => {
-    // Create the report data
-    const reportData = {
-      matchInfo: {
-        teams: "Team A vs Team B",
-        score: "2-1",
-        time: "12:34",
-        quarter: "3"
-      },
-      analytics: {
-        possessionOverTime: [
-          { time: "0-5min", teamA: 65, teamB: 35 },
-          { time: "5-10min", teamA: 58, teamB: 42 },
-          { time: "10-15min", teamA: 72, teamB: 28 },
-          { time: "15-20min", teamA: 45, teamB: 55 },
-          { time: "20-25min", teamA: 68, teamB: 32 }
-        ],
-        playerActivity: [
-          { player: "Player A", actions: 85, position: "Midfield" },
-          { player: "Player B", actions: 92, position: "Forward" },
-          { player: "Player C", actions: 78, position: "Defender" },
-          { player: "Player D", actions: 88, position: "Midfield" },
-          { player: "Player E", actions: 76, position: "Forward" }
-        ]
-      },
-      performanceMetrics: {
-        goals: 2,
-        assists: 1,
-        shotsOnTarget: 5,
-        possession: 62,
-        passes: 245,
-        tackles: 18
-      },
-      timestamp: new Date().toISOString(),
-      generatedBy: "AFL Tracker Analytics"
+  const handleVideoUpload = (event) => {
+    const file = event.target.files[0]
+    if (file && file.type.startsWith('video/')) {
+      setUploadedVideo(file)
+      setAnalysisComplete(false)
+      setAnalysisResults(null)
     }
-
-    // Convert to JSON string
-    const jsonString = JSON.stringify(reportData, null, 2)
-    
-    // Create blob and download
-    const blob = new Blob([jsonString], { type: 'application/json' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `match-progression-analytics-${new Date().toISOString().split('T')[0]}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
   }
 
-  // Dashboard Component
-  const Dashboard = () => (
+  const startAnalysis = async () => {
+    if (!uploadedVideo) return
+    
+    setIsAnalyzing(true)
+    setAnalysisProgress(0)
+    
+    // Simulate analysis progress
+    const interval = setInterval(() => {
+      setAnalysisProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval)
+          setIsAnalyzing(false)
+          setAnalysisComplete(true)
+          // Generate mock analysis results
+          setAnalysisResults({
+            matchDuration: '2:15:30',
+            totalPlayers: 36,
+            goals: 12,
+            assists: 8,
+            possession: { teamA: 58, teamB: 42 },
+            playerStats: [
+              { name: 'Player A', goals: 3, assists: 2, distance: '8.5km', speed: '12.3km/h' },
+              { name: 'Player B', goals: 2, assists: 1, distance: '7.8km', speed: '11.9km/h' },
+              { name: 'Player C', goals: 1, assists: 3, distance: '9.2km', speed: '13.1km/h' }
+            ],
+            crowdDensity: {
+              peak: 1500,
+              average: 1200,
+              zones: [
+                { zone: 'North Stand', density: 85, capacity: 500 },
+                { zone: 'South Stand', density: 72, capacity: 500 },
+                { zone: 'East Stand', density: 68, capacity: 400 },
+                { zone: 'West Stand', density: 75, capacity: 400 }
+              ]
+            },
+            keyEvents: [
+              { time: '00:15:30', event: 'Goal by Team A', player: 'Player A' },
+              { time: '00:28:45', event: 'Yellow Card', player: 'Player B' },
+              { time: '00:45:12', event: 'Goal by Team B', player: 'Player C' },
+              { time: '01:12:33', event: 'Goal by Team A', player: 'Player A' },
+              { time: '01:45:20', event: 'Red Card', player: 'Player D' }
+            ]
+          })
+          return 100
+        }
+        return prev + Math.random() * 15
+      })
+    }, 500)
+  }
+
+  const resetAnalysis = () => {
+    setUploadedVideo(null)
+    setAnalysisComplete(false)
+    setAnalysisResults(null)
+    setAnalysisProgress(0)
+  }
+  return (
     <div className="dashboard-container">
       {/* Left Sidebar */}
       <div className="dashboard-sidebar">
@@ -197,7 +147,7 @@ function App() {
         <div className="sidebar-controls">
           <h3>Display Controls</h3>
           <div className="control-item">
-            <button 
+            <button
               className={`control-btn ${showReferee ? 'active' : ''}`}
               onClick={() => setShowReferee(!showReferee)}
             >
@@ -206,7 +156,7 @@ function App() {
             </button>
           </div>
           <div className="control-item">
-            <button 
+            <button
               className={`control-btn ${showBall ? 'active' : ''}`}
               onClick={() => setShowBall(!showBall)}
             >
@@ -215,7 +165,7 @@ function App() {
             </button>
           </div>
           <div className="control-item">
-            <button 
+            <button
               className={`control-btn ${showStaff ? 'active' : ''}`}
               onClick={() => setShowStaff(!showStaff)}
             >
@@ -224,7 +174,7 @@ function App() {
             </button>
           </div>
           <div className="control-item">
-            <button 
+            <button
               className={`control-btn ${showCrowd ? 'active' : ''}`}
               onClick={() => setShowCrowd(!showCrowd)}
             >
@@ -232,12 +182,229 @@ function App() {
               <span>Show Crowd</span>
             </button>
           </div>
-
         </div>
       </div>
 
       {/* Main Content */}
       <div className="dashboard-main">
+        {/* Video Upload Section */}
+        <div className="video-upload-section">
+          <div className="section-header">
+            <div className="header-content">
+              <h2>Match Video Analysis</h2>
+              <p>Upload your match video to get comprehensive analysis and insights</p>
+            </div>
+          </div>
+          
+          {!uploadedVideo ? (
+            <div className="upload-area">
+              <div className="upload-zone">
+                <Upload size={48} />
+                <h3>Upload Match Video</h3>
+                <p>Drag and drop your video file here or click to browse</p>
+                <p className="file-types">Supported formats: MP4, AVI, MOV, MKV (Max 500MB)</p>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  className="file-input"
+                  id="video-upload"
+                />
+                <label htmlFor="video-upload" className="upload-btn">
+                  Choose Video File
+                </label>
+              </div>
+            </div>
+          ) : (
+            <div className="video-preview-section">
+              <div className="video-info">
+                <div className="video-details">
+                  <FileVideo size={24} />
+                  <div className="video-text">
+                    <h4>{uploadedVideo.name}</h4>
+                    <p>{(uploadedVideo.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  </div>
+                </div>
+                <div className="video-actions">
+                  {!isAnalyzing && !analysisComplete && (
+                    <button className="action-btn primary" onClick={startAnalysis}>
+                      <Play size={16} />
+                      Start Analysis
+                    </button>
+                  )}
+                  {!isAnalyzing && analysisComplete && (
+                    <button className="action-btn secondary" onClick={resetAnalysis}>
+                      <Upload size={16} />
+                      Upload New Video
+                    </button>
+                  )}
+                  <button className="action-btn" onClick={resetAnalysis}>
+                    <AlertCircle size={16} />
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+              {isAnalyzing && (
+                <div className="analysis-progress">
+                  <div className="progress-header">
+                    <h4>Analyzing Video...</h4>
+                    <span>{Math.round(analysisProgress)}%</span>
+                  </div>
+                  <div className="progress-bar">
+                    <div 
+                      className="progress-fill" 
+                      style={{ width: `${analysisProgress}%` }}
+                    ></div>
+                  </div>
+                  <div className="progress-steps">
+                    <div className={`step ${analysisProgress > 0 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Processing video frames</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 25 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Detecting players and objects</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 50 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Tracking movements and events</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 75 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Generating analysis report</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {analysisComplete && analysisResults && (
+                <div className="analysis-results">
+                  <div className="results-header">
+                    <h3>Analysis Complete!</h3>
+                    <p>Comprehensive match analysis results</p>
+                  </div>
+                  
+                  <div className="results-grid">
+                    <div className="result-card">
+                      <h4>Match Overview</h4>
+                      <div className="result-stats">
+                        <div className="stat">
+                          <span className="label">Duration:</span>
+                          <span className="value">{analysisResults.matchDuration}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="label">Total Players:</span>
+                          <span className="value">{analysisResults.totalPlayers}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="label">Goals:</span>
+                          <span className="value">{analysisResults.goals}</span>
+                        </div>
+                        <div className="stat">
+                          <span className="label">Assists:</span>
+                          <span className="value">{analysisResults.assists}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Possession</h4>
+                      <div className="possession-chart">
+                        <div className="possession-bar">
+                          <div 
+                            className="team-a" 
+                            style={{ width: `${analysisResults.possession.teamA}%` }}
+                          >
+                            <span>Team A: {analysisResults.possession.teamA}%</span>
+                          </div>
+                          <div 
+                            className="team-b" 
+                            style={{ width: `${analysisResults.possession.teamB}%` }}
+                          >
+                            <span>Team B: {analysisResults.possession.teamB}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Top Performers</h4>
+                      <div className="player-list">
+                        {analysisResults.playerStats.map((player, index) => (
+                          <div key={index} className="player-stat">
+                            <div className="player-name">{player.name}</div>
+                            <div className="player-metrics">
+                              <span>⚽ {player.goals} goals</span>
+                              <span>🎯 {player.assists} assists</span>
+                              <span>🏃 {player.distance}</span>
+                              <span>⚡ {player.speed}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Crowd Analysis</h4>
+                      <div className="crowd-stats">
+                        <div className="crowd-metric">
+                          <span className="label">Peak Attendance:</span>
+                          <span className="value">{analysisResults.crowdDensity.peak.toLocaleString()}</span>
+                        </div>
+                        <div className="crowd-metric">
+                          <span className="label">Average Attendance:</span>
+                          <span className="value">{analysisResults.crowdDensity.average.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <div className="zone-list">
+                        {analysisResults.crowdDensity.zones.map((zone, index) => (
+                          <div key={index} className="zone-item">
+                            <span className="zone-name">{zone.zone}</span>
+                            <div className="zone-bar">
+                              <div 
+                                className="zone-fill" 
+                                style={{ width: `${zone.density}%` }}
+                              ></div>
+                            </div>
+                            <span className="zone-density">{zone.density}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="key-events">
+                    <h4>Key Match Events</h4>
+                    <div className="events-timeline">
+                      {analysisResults.keyEvents.map((event, index) => (
+                        <div key={index} className="event-item">
+                          <div className="event-time">{event.time}</div>
+                          <div className="event-content">
+                            <div className="event-title">{event.event}</div>
+                            <div className="event-player">{event.player}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="results-actions">
+                    <button className="action-btn primary">
+                      <Download size={16} />
+                      Download Full Report
+                    </button>
+                    <button className="action-btn">
+                      <BarChart3 size={16} />
+                      View Detailed Analytics
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Current Match Overview */}
         <div className="match-overview">
           <h2>Current Match: Team A vs Team B</h2>
@@ -247,19 +414,19 @@ function App() {
             <span>Quarter: 3</span>
           </div>
           <div className="match-tabs">
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'player-tracking' ? 'active' : ''}`}
               onClick={() => setActiveTab('player-tracking')}
             >
               Player Tracking
             </button>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'crowd-heatmap' ? 'active' : ''}`}
-              onClick={() => setActiveTab('crowd-heatmap')}
+              onClick={() => setShowCrowdHeatmap(true)}
             >
               Crowd Heatmap
             </button>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
               onClick={() => setActiveTab('analytics')}
             >
@@ -288,19 +455,19 @@ function App() {
               </div>
             </div>
             <div className="metric-card">
-              <div className="metric-icon">🤝</div>
-              <div className="metric-content">
-                <h4>Assists</h4>
-                <div className="metric-value">1</div>
-                <div className="metric-change">0</div>
-              </div>
-            </div>
-            <div className="metric-card">
               <div className="metric-icon">🎯</div>
               <div className="metric-content">
                 <h4>Shots on Target</h4>
                 <div className="metric-value">5</div>
                 <div className="metric-change positive">+2</div>
+              </div>
+            </div>
+            <div className="metric-card">
+              <div className="metric-icon">🤝</div>
+              <div className="metric-content">
+                <h4>Assists</h4>
+                <div className="metric-value">1</div>
+                <div className="metric-change">0</div>
               </div>
             </div>
           </div>
@@ -420,14 +587,15 @@ function App() {
       </div>
     </div>
   )
+})
 
-  // Player Stats View Component
-  const PlayerStatsView = () => (
+const PlayerStatsView = memo(function PlayerStatsView({ setShowPlayerStats }) {
+  return (
     <div className="player-stats-container">
       {/* Header */}
       <div className="player-stats-header">
         <div className="header-left">
-          <button 
+          <button
             className="back-btn"
             onClick={() => setShowPlayerStats(false)}
           >
@@ -596,16 +764,258 @@ function App() {
       </div>
     </div>
   )
+})
 
-  // Authentication Component
-  const Authentication = () => (
+const CrowdHeatmapView = memo(function CrowdHeatmapView({ setShowCrowdHeatmap }) {
+  const [activeFilter, setActiveFilter] = useState('current-density')
+  const [crowdData] = useState({
+    totalDensity: 1200,
+    densityChange: 200,
+    trend: 'Increased',
+    trendDirection: 'Upward',
+    zoneData: [
+      { zone: 'Zone A', density: 65, color: '#e5e7eb' },
+      { zone: 'Zone B', density: 25, color: '#9ca3af' },
+      { zone: 'Zone C', density: 10, color: '#374151' }
+    ],
+    timeSeriesData: [
+      { time: '10:00', density: 800 },
+      { time: '10:15', density: 950 },
+      { time: '10:30', density: 1100 },
+      { time: '10:45', density: 1050 },
+      { time: '11:00', density: 1200 }
+    ]
+  })
+
+  return (
+    <div className="crowd-heatmap-container">
+      {/* Header */}
+      <div className="crowd-heatmap-header">
+        <div className="header-left">
+          <button
+            className="back-btn"
+            onClick={() => setShowCrowdHeatmap(false)}
+          >
+            <ArrowLeft size={20} />
+            Back to Dashboard
+          </button>
+          <div className="header-icon">🔥</div>
+          <h1>Crowd Heatmap Screen</h1>
+        </div>
+        <div className="header-right">
+          <nav className="header-nav">
+            <a href="#" className="nav-link">Home</a>
+            <a href="#" className="nav-link">Match Details</a>
+            <a href="#" className="nav-link">Player Tracking</a>
+            <a href="#" className="nav-link">Analytics</a>
+          </nav>
+          <div className="search-bar">
+            <Search size={16} />
+            <input type="text" placeholder="Search in site" />
+          </div>
+        </div>
+      </div>
+
+      {/* Crowd Density Overview Section */}
+      <div className="crowd-overview-section">
+        <div className="section-header">
+          <div className="header-content">
+            <h2>Crowd Density Overview</h2>
+            <p>Real-time visualization of crowd density in each zone.</p>
+          </div>
+          <div className="filter-buttons">
+            <button
+              className={`filter-btn ${activeFilter === 'current-density' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('current-density')}
+            >
+              Current Density
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'historical-data' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('historical-data')}
+            >
+              Historical Data
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'analysis' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('analysis')}
+            >
+              Analysis
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="crowd-content-grid">
+        {/* Left Column */}
+        <div className="left-column">
+          {/* Total Crowd Density Section */}
+          <div className="total-density-section">
+            <div className="section-header">
+              <div className="header-content">
+                <h3>Total Crowd Density</h3>
+                <p>Current density metrics for the crowd in designated zones.</p>
+              </div>
+              <button className="action-btn">
+                <Eye size={16} />
+                View Detailed Metrics
+              </button>
+            </div>
+            <div className="density-metrics">
+              <div className="metric-card">
+                <div className="metric-icon">👥</div>
+                <div className="metric-content">
+                  <h4>Total Density</h4>
+                  <div className="metric-value">{crowdData.totalDensity.toLocaleString()} people</div>
+                  <div className="metric-change positive">+{crowdData.densityChange}</div>
+                </div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-icon">📈</div>
+                <div className="metric-content">
+                  <h4>Density Trend</h4>
+                  <div className="metric-value">{crowdData.trend}</div>
+                  <div className="metric-change">{crowdData.trendDirection}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Density Trend Over Time Section */}
+          <div className="trend-section">
+            <div className="section-header">
+              <div className="header-content">
+                <h3>Density Trend Over Time</h3>
+              </div>
+            </div>
+            <div className="trend-chart">
+              <div className="chart-y-axis">Density</div>
+                             <div className="line-chart-container">
+                 <svg className="line-chart" viewBox="0 0 400 200" preserveAspectRatio="none">
+                   <defs>
+                     <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                       <stop offset="0%" stopColor="#4285f4" stopOpacity="0.8"/>
+                       <stop offset="100%" stopColor="#4285f4" stopOpacity="0.1"/>
+                     </linearGradient>
+                   </defs>
+                   {/* Grid lines for better readability */}
+                   <line x1="0" y1="50" x2="400" y2="50" stroke="#e0e0e0" strokeWidth="1" opacity="0.5"/>
+                   <line x1="0" y1="100" x2="400" y2="100" stroke="#e0e0e0" strokeWidth="1" opacity="0.5"/>
+                   <line x1="0" y1="150" x2="400" y2="150" stroke="#e0e0e0" strokeWidth="1" opacity="0.5"/>
+                   
+                   {/* Main trend line */}
+                   <path
+                     d="M 20,160 L 100,130 L 180,110 L 260,120 L 340,90"
+                     stroke="#4285f4"
+                     strokeWidth="3"
+                     fill="none"
+                     className="trend-line"
+                     strokeLinecap="round"
+                     strokeLinejoin="round"
+                   />
+                   
+                   {/* Gradient fill area */}
+                   <path
+                     d="M 20,160 L 100,130 L 180,110 L 260,120 L 340,90 L 340,180 L 20,180 Z"
+                     fill="url(#lineGradient)"
+                     className="trend-fill"
+                   />
+                   
+                   {/* Data points */}
+                   <circle cx="20" cy="160" r="4" fill="#4285f4"/>
+                   <circle cx="100" cy="130" r="4" fill="#4285f4"/>
+                   <circle cx="180" cy="110" r="4" fill="#4285f4"/>
+                   <circle cx="260" cy="120" r="4" fill="#4285f4"/>
+                   <circle cx="340" cy="90" r="4" fill="#4285f4"/>
+                 </svg>
+               </div>
+              <div className="chart-x-axis">Time</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className="right-column">
+          {/* Crowd Zone Density Section */}
+          <div className="zone-density-section">
+            <div className="section-header">
+              <div className="header-content">
+                <h3>Crowd Zone Density</h3>
+                <p>Visualization of crowd density in marked zones.</p>
+              </div>
+              <button className="action-btn">
+                <Download size={16} />
+                Download Heatmap
+              </button>
+            </div>
+            <div className="heatmap-container">
+              <h4>Density Heatmap</h4>
+              <div className="pie-chart-container">
+                <div className="pie-chart">
+                  <div className="pie-segment" style={{
+                    background: `conic-gradient(${crowdData.zoneData[0].color} 0deg ${crowdData.zoneData[0].density * 3.6}deg, 
+                                               ${crowdData.zoneData[1].color} ${crowdData.zoneData[0].density * 3.6}deg ${(crowdData.zoneData[0].density + crowdData.zoneData[1].density) * 3.6}deg,
+                                               ${crowdData.zoneData[2].color} ${(crowdData.zoneData[0].density + crowdData.zoneData[1].density) * 3.6}deg 360deg)`
+                  }}></div>
+                </div>
+                <div className="pie-legend">
+                  {crowdData.zoneData.map((zone, index) => (
+                    <div key={index} className="legend-item">
+                      <div className="legend-color" style={{ backgroundColor: zone.color }}></div>
+                      <span>{zone.zone}: {zone.density}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="chart-x-axis">Zones</div>
+            </div>
+          </div>
+
+          {/* Static Camera Zone View Section */}
+          <div className="camera-zone-section">
+            <div className="section-header">
+              <div className="header-content">
+                <h3>Static Camera Zone View</h3>
+              </div>
+            </div>
+            <div className="camera-view-container">
+              <div className="camera-placeholder">
+                <MapPin size={24} />
+                <p>Static camera zone view with real-time crowd density heatmap.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="crowd-heatmap-footer">
+        <a href="#">Follow Us on Social Media</a>
+        <a href="#">Contact Support</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  )
+})
+
+const Authentication = memo(function Authentication({
+  AFL_TEAMS,
+  isLogin, isLoading, formData,
+  selectedTeam, showTeamSelector,
+  handleInputChange, handleSubmit, toggleForm,
+  setShowTeamSelector, selectTeam,
+  showPassword, setShowPassword,
+  showConfirmPassword, setShowConfirmPassword
+}) {
+  return (
     <div className="app-container">
       {/* Left Panel - Authentication Form with Image */}
       <div className="left-panel">
         {/* Image Section */}
         <div className="image-section">
           <div className="image-container">
-            {/* Replace this with your actual image */}
             <div className="placeholder-image">
               <div className="image-overlay">
                 <div className="image-content">
@@ -691,7 +1101,7 @@ function App() {
                     >
                       {selectedTeam ? `${selectedTeam.emoji} ${selectedTeam.name}` : 'Select your team'}
                     </button>
-                    
+
                     {showTeamSelector && (
                       <div className="dropdown">
                         {AFL_TEAMS.map((team) => (
@@ -852,8 +1262,8 @@ function App() {
             <div className="team-utilization">
               <h4>Team's Performance</h4>
               <div className="utilization-table">
-                {DASHBOARD_DATA.teams.map((team, index) => (
-                  <div key={index} className="utilization-row">
+                {DASHBOARD_DATA.teams.map((team) => (
+                  <div key={`team-${team.name}`} className="utilization-row">
                     <div className="team-name">{team.name}</div>
                     <div className="utilization-bars">
                       <div className="bar overall" style={{ width: `${team.utilization}%` }}></div>
@@ -881,8 +1291,8 @@ function App() {
                 <button className="add-btn">Add</button>
               </div>
               <div className="existing-players">
-                {DASHBOARD_DATA.players.map((player, index) => (
-                  <div key={index} className="player-item">
+                {DASHBOARD_DATA.players.map((player) => (
+                  <div key={`player-${player.name}`} className="player-item">
                     <div className="player-avatar">{player.image}</div>
                     <div className="player-info">
                       <div className="player-name">{player.name}</div>
@@ -907,13 +1317,156 @@ function App() {
       </div>
     </div>
   )
+})
+
+/* ===========
+   APP (OWNER)
+   =========== */
+
+function App() {
+  // Views
+  const [currentView, setCurrentView] = useState('login')
+  const [showPlayerStats, setShowPlayerStats] = useState(false)
+  const [showCrowdHeatmap, setShowCrowdHeatmap] = useState(false)
+
+  // Auth states
+  const [isLogin, setIsLogin] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState(null)
+  const [showTeamSelector, setShowTeamSelector] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    name: '',
+    team: '',
+    position: '',
+    favoriteGround: ''
+  })
+
+  // Dashboard display states
+  const [showReferee, setShowReferee] = useState(true)
+  const [showBall, setShowBall] = useState(true)
+  const [showStaff, setShowStaff] = useState(false)
+  const [showCrowd, setShowCrowd] = useState(true)
+  const [activeTab, setActiveTab] = useState('player-tracking')
+
+  // Handlers (memoized)
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }, [])
+
+  const handleSubmit = useCallback(async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+    await new Promise(resolve => setTimeout(resolve, 2000)) // simulate auth
+    console.log('Form submitted:', formData)
+    setIsLoading(false)
+    setCurrentView('dashboard')
+  }, [formData])
+
+  const toggleForm = useCallback(() => {
+    setIsLogin(prev => !prev)
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      name: '',
+      team: '',
+      position: '',
+      favoriteGround: ''
+    })
+    setSelectedTeam(null)
+  }, [])
+
+  const selectTeam = useCallback((team) => {
+    setSelectedTeam(team)
+    setFormData(prev => ({ ...prev, team: team.name }))
+    setShowTeamSelector(false)
+  }, [])
+
+  // Download Report Function
+  const downloadReport = useCallback(() => {
+    const reportData = {
+      matchInfo: { teams: "Team A vs Team B", score: "2-1", time: "12:34", quarter: "3" },
+      analytics: {
+        possessionOverTime: [
+          { time: "0-5min", teamA: 65, teamB: 35 },
+          { time: "5-10min", teamA: 58, teamB: 42 },
+          { time: "10-15min", teamA: 72, teamB: 28 },
+          { time: "15-20min", teamA: 45, teamB: 55 },
+          { time: "20-25min", teamA: 68, teamB: 32 }
+        ],
+        playerActivity: [
+          { player: "Player A", actions: 85, position: "Midfield" },
+          { player: "Player B", actions: 92, position: "Forward" },
+          { player: "Player C", actions: 78, position: "Defender" },
+          { player: "Player D", actions: 88, position: "Midfield" },
+          { player: "Player E", actions: 76, position: "Forward" }
+        ]
+      },
+      performanceMetrics: { goals: 2, assists: 1, shotsOnTarget: 5, possession: 62, passes: 245, tackles: 18 },
+      timestamp: new Date().toISOString(),
+      generatedBy: "AFL Tracker Analytics"
+    }
+
+    const jsonString = JSON.stringify(reportData, null, 2)
+    const blob = new Blob([jsonString], { type: 'application/json' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `match-progression-analytics-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }, [])
 
   return (
     <div className="app">
       {currentView === 'dashboard' ? (
-        showPlayerStats ? <PlayerStatsView /> : <Dashboard />
+        showPlayerStats ? (
+          <PlayerStatsView setShowPlayerStats={setShowPlayerStats} />
+        ) : showCrowdHeatmap ? (
+          <CrowdHeatmapView setShowCrowdHeatmap={setShowCrowdHeatmap} />
+        ) : (
+          <Dashboard
+            showReferee={showReferee}
+            showBall={showBall}
+            showStaff={showStaff}
+            showCrowd={showCrowd}
+            setShowReferee={setShowReferee}
+            setShowBall={setShowBall}
+            setShowStaff={setShowStaff}
+            setShowCrowd={setShowCrowd}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            setShowPlayerStats={setShowPlayerStats}
+            setShowCrowdHeatmap={setShowCrowdHeatmap}
+            downloadReport={downloadReport}
+          />
+        )
       ) : (
-        <Authentication />
+        <Authentication
+          AFL_TEAMS={AFL_TEAMS}
+          isLogin={isLogin}
+          isLoading={isLoading}
+          formData={formData}
+          selectedTeam={selectedTeam}
+          showTeamSelector={showTeamSelector}
+          handleInputChange={handleInputChange}
+          handleSubmit={handleSubmit}
+          toggleForm={toggleForm}
+          setShowTeamSelector={setShowTeamSelector}
+          selectTeam={selectTeam}
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
+          showConfirmPassword={showConfirmPassword}
+          setShowConfirmPassword={setShowConfirmPassword}
+        />
       )}
     </div>
   )
