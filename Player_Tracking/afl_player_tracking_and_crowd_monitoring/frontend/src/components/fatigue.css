@@ -1,0 +1,240 @@
+/* Fatigue Panel — Unified Styles*/
+
+/* Controls row */
+.fatigue-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Base button  */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 34px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #e6e7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #111827;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+}
+
+.btn:hover {
+  background: #f8f9fb;
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.action-btn {
+  font-weight: 500;
+}
+
+.icon-btn {
+  padding: 0.45rem;
+  width: 34px;
+  justify-content: center;
+}
+
+.hidden-input {
+  display: none;
+}
+
+/* Speed slider + label */
+.speed {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 0.3rem;
+  color: #374151;
+}
+
+.speed input[type="range"] {
+  width: 160px;
+  accent-color: #2563eb;
+}
+
+.speed input[type="range"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-radius: 8px;
+}
+
+.progress-info {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Player Cards & Fatigue Variants*/
+
+.player-card.fatigue {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.player-card.hint {
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Header row */
+.player-head {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.player-head .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.player-head .id {
+  flex: 1;
+  min-width: 0;
+}
+
+.player-head .name {
+  font-weight: 600;
+}
+
+.player-head .jersey {
+  color: #999;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+.player-head .meta {
+  color: #6b7280;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fatigue badge */
+.badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+}
+
+.badge.ok {
+  background: #e8f7ee;
+  color: #136b3a;
+  border-color: #d0eedb;
+}
+.badge.warn {
+  background: #fff5e6;
+  color: #9a6000;
+  border-color: #ffe1b8;
+}
+.badge.bad {
+  background: #ffe9e9;
+  color: #8b0000;
+  border-color: #ffd0d0;
+}
+
+/* Progress bar */
+.fatigue-bar {
+  position: relative;
+  height: 12px;
+  background: #f1f2f5;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fatigue-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-radius: 999px;
+}
+
+.fatigue-fill.ok {
+  background: linear-gradient(90deg, #43c07a, #94e08d);
+}
+.fatigue-fill.warn {
+  background: linear-gradient(90deg, #f6a72a, #ffd36a);
+}
+.fatigue-fill.bad {
+  background: linear-gradient(90deg, #f06a6a, #f29a9a);
+}
+
+.fatigue-label {
+  position: absolute;
+  right: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: #374151;
+}
+
+/* Metric chips */
+.metrics {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  background: #f7f8fb;
+  border: 1px solid #ececf1;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.chip-label {
+  color: #6b7280;
+}
+.chip-value {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Trend sparkline */
+.trend {
+  margin-top: 0.2rem;
+}
+
+.spark {
+  width: 100%;
+  height: 30px;
+}
+
+.spark-line {
+  fill: none;
+  stroke: #111827;
+  stroke-width: 1.5;
+  opacity: 0.8;
+}
+
+.spark-fill {
+  fill: #b3c3ff33;
+  stroke: none;
+}

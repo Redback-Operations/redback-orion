@@ -1,370 +1,659 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, User, Mail, Lock, Shield, ArrowRight, ArrowLeft, Users, MapPin, Trophy, Target, BarChart3, TrendingUp, Users as TeamIcon, Calendar, Plus, Volume2, Circle, Users as StaffIcon, Users as CrowdIcon, Download, Eye as ViewIcon, Activity, Clock, Target as GoalIcon, Star, MapPin as PinIcon } from 'lucide-react'
-import './App.css'
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Eye,
+  EyeOff,
+  User,
+  Mail,
+  Lock,
+  Shield,
+  ArrowRight,
+  ArrowLeft,
+  Users,
+  MapPin,
+  Trophy,
+  Target,
+  BarChart3,
+  TrendingUp,
+  Users as TeamIcon,
+  Calendar,
+  Plus,
+  Volume2,
+  Circle,
+  Users as StaffIcon,
+  Users as CrowdIcon,
+  Download,
+  Eye as ViewIcon,
+  Activity,
+  Clock,
+  Target as GoalIcon,
+  Star,
+  MapPin as PinIcon,
+} from "lucide-react";
+import "./App.css";
+
+import FatigueLivePanel from "./components/FatigueLivePanel.jsx";
+import ScreenLoader from "./components/ScreenLoader.jsx";
+import ScreenError from "./components/ScreenError.jsx";
 
 // AFL Teams data with colors and emojis
 const AFL_TEAMS = [
-  { name: 'Adelaide Crows', primary: '#002E5D', secondary: '#FFD100', emoji: '🦅', mascot: 'Crow' },
-  { name: 'Brisbane Lions', primary: '#A30046', secondary: '#FFD100', emoji: '🦁', mascot: 'Lion' },
-  { name: 'Carlton Blues', primary: '#041E42', secondary: '#FFFFFF', emoji: '🔵', mascot: 'Blue' },
-  { name: 'Collingwood Magpies', primary: '#000000', secondary: '#FFFFFF', emoji: '🖤', mascot: 'Magpie' },
-  { name: 'Essendon Bombers', primary: '#CC0000', secondary: '#000000', emoji: '✈️', mascot: 'Bomber' },
-  { name: 'Fremantle Dockers', primary: '#4A90E2', secondary: '#FFFFFF', emoji: '⚓', mascot: 'Docker' },
-  { name: 'Geelong Cats', primary: '#1E3A8A', secondary: '#FFFFFF', emoji: '🐱', mascot: 'Cat' },
-  { name: 'Gold Coast Suns', primary: '#FF6B35', secondary: '#FFD100', emoji: '☀️', mascot: 'Sun' },
-  { name: 'GWS Giants', primary: '#FF6B35', secondary: '#000000', emoji: '👹', mascot: 'Giant' },
-  { name: 'Hawthorn Hawks', primary: '#8B4513', secondary: '#FFD100', emoji: '🦅', mascot: 'Hawk' },
-  { name: 'Melbourne Demons', primary: '#000080', secondary: '#FF0000', emoji: '😈', mascot: 'Demon' },
-  { name: 'North Melbourne Kangaroos', primary: '#000080', secondary: '#FFFFFF', emoji: '🦘', mascot: 'Kangaroo' },
-  { name: 'Port Adelaide Power', primary: '#000000', secondary: '#00A0DC', emoji: '⚡', mascot: 'Power' },
-  { name: 'Richmond Tigers', primary: '#FFD100', secondary: '#000000', emoji: '🐯', mascot: 'Tiger' },
-  { name: 'St Kilda Saints', primary: '#000000', secondary: '#FF0000', emoji: '⛪', mascot: 'Saint' },
-  { name: 'Sydney Swans', primary: '#FF0000', secondary: '#FFFFFF', emoji: '🦢', mascot: 'Swan' },
-  { name: 'West Coast Eagles', primary: '#002E5D', secondary: '#FFD100', emoji: '🦅', mascot: 'Eagle' },
-  { name: 'Western Bulldogs', primary: '#FF6B35', secondary: '#FFFFFF', emoji: '🐕', mascot: 'Bulldog' }
-]
+  {
+    name: "Adelaide Crows",
+    primary: "#002E5D",
+    secondary: "#FFD100",
+    emoji: "🦅",
+    mascot: "Crow",
+  },
+  {
+    name: "Brisbane Lions",
+    primary: "#A30046",
+    secondary: "#FFD100",
+    emoji: "🦁",
+    mascot: "Lion",
+  },
+  {
+    name: "Carlton Blues",
+    primary: "#041E42",
+    secondary: "#FFFFFF",
+    emoji: "🔵",
+    mascot: "Blue",
+  },
+  {
+    name: "Collingwood Magpies",
+    primary: "#000000",
+    secondary: "#FFFFFF",
+    emoji: "🖤",
+    mascot: "Magpie",
+  },
+  {
+    name: "Essendon Bombers",
+    primary: "#CC0000",
+    secondary: "#000000",
+    emoji: "✈️",
+    mascot: "Bomber",
+  },
+  {
+    name: "Fremantle Dockers",
+    primary: "#4A90E2",
+    secondary: "#FFFFFF",
+    emoji: "⚓",
+    mascot: "Docker",
+  },
+  {
+    name: "Geelong Cats",
+    primary: "#1E3A8A",
+    secondary: "#FFFFFF",
+    emoji: "🐱",
+    mascot: "Cat",
+  },
+  {
+    name: "Gold Coast Suns",
+    primary: "#FF6B35",
+    secondary: "#FFD100",
+    emoji: "☀️",
+    mascot: "Sun",
+  },
+  {
+    name: "GWS Giants",
+    primary: "#FF6B35",
+    secondary: "#000000",
+    emoji: "👹",
+    mascot: "Giant",
+  },
+  {
+    name: "Hawthorn Hawks",
+    primary: "#8B4513",
+    secondary: "#FFD100",
+    emoji: "🦅",
+    mascot: "Hawk",
+  },
+  {
+    name: "Melbourne Demons",
+    primary: "#000080",
+    secondary: "#FF0000",
+    emoji: "😈",
+    mascot: "Demon",
+  },
+  {
+    name: "North Melbourne Kangaroos",
+    primary: "#000080",
+    secondary: "#FFFFFF",
+    emoji: "🦘",
+    mascot: "Kangaroo",
+  },
+  {
+    name: "Port Adelaide Power",
+    primary: "#000000",
+    secondary: "#00A0DC",
+    emoji: "⚡",
+    mascot: "Power",
+  },
+  {
+    name: "Richmond Tigers",
+    primary: "#FFD100",
+    secondary: "#000000",
+    emoji: "🐯",
+    mascot: "Tiger",
+  },
+  {
+    name: "St Kilda Saints",
+    primary: "#000000",
+    secondary: "#FF0000",
+    emoji: "⛪",
+    mascot: "Saint",
+  },
+  {
+    name: "Sydney Swans",
+    primary: "#FF0000",
+    secondary: "#FFFFFF",
+    emoji: "🦢",
+    mascot: "Swan",
+  },
+  {
+    name: "West Coast Eagles",
+    primary: "#002E5D",
+    secondary: "#FFD100",
+    emoji: "🦅",
+    mascot: "Eagle",
+  },
+  {
+    name: "Western Bulldogs",
+    primary: "#FF6B35",
+    secondary: "#FFFFFF",
+    emoji: "🐕",
+    mascot: "Bulldog",
+  },
+];
 
 // Player Positions
 const PLAYER_POSITIONS = [
-  'Forward', 'Midfielder', 'Defender', 'Ruck', 'Interchange'
-]
+  "Forward",
+  "Midfielder",
+  "Defender",
+  "Ruck",
+  "Interchange",
+];
 
 // Mock Dashboard Data
 const DASHBOARD_DATA = {
   productiveTime: 12.4,
   focusedTime: 8.5,
   teams: [
-    { name: 'Forward Line', utilization: 85, overUtilized: 15, underUtilized: 0 },
-    { name: 'Midfield', utilization: 92, overUtilized: 8, underUtilized: 0 },
-    { name: 'Defense', utilization: 78, overUtilized: 0, underUtilized: 22 },
-    { name: 'Ruck Division', utilization: 88, overUtilized: 12, underUtilized: 0 },
-    { name: 'Interchange', utilization: 65, overUtilized: 0, underUtilized: 35 }
+    {
+      name: "Forward Line",
+      utilization: 85,
+      overUtilized: 15,
+      underUtilized: 0,
+    },
+    { name: "Midfield", utilization: 92, overUtilized: 8, underUtilized: 0 },
+    { name: "Defense", utilization: 78, overUtilized: 0, underUtilized: 22 },
+    {
+      name: "Ruck Division",
+      utilization: 88,
+      overUtilized: 12,
+      underUtilized: 0,
+    },
+    {
+      name: "Interchange",
+      utilization: 65,
+      overUtilized: 0,
+      underUtilized: 35,
+    },
   ],
   players: [
-    { name: 'Marcus Bontempelli', team: 'Western Bulldogs', position: 'Midfielder', image: '🏉' },
-    { name: 'Dustin Martin', team: 'Richmond Tigers', position: 'Midfielder', image: '🏉' },
-    { name: 'Patrick Dangerfield', team: 'Geelong Cats', position: 'Midfielder', image: '🏉' }
-  ]
-}
+    {
+      name: "Marcus Bontempelli",
+      team: "Western Bulldogs",
+      position: "Midfielder",
+      image: "🏉",
+    },
+    {
+      name: "Dustin Martin",
+      team: "Richmond Tigers",
+      position: "Midfielder",
+      image: "🏉",
+    },
+    {
+      name: "Patrick Dangerfield",
+      team: "Geelong Cats",
+      position: "Midfielder",
+      image: "🏉",
+    },
+  ],
+};
 
 function App() {
   // Dashboard State
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [currentView, setCurrentView] = useState('login')
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentView, setCurrentView] = useState("login");
 
-  const [isLogin, setIsLogin] = useState(true)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [selectedTeam, setSelectedTeam] = useState(null)
-  const [selectedPosition, setSelectedPosition] = useState('')
-  const [showTeamSelector, setShowTeamSelector] = useState(false)
-  const [showPositionSelector, setShowPositionSelector] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [selectedPosition, setSelectedPosition] = useState("");
+  const [showTeamSelector, setShowTeamSelector] = useState(false);
+  const [showPositionSelector, setShowPositionSelector] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [devError, setDevError] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    name: '',
-    team: '',
-    position: '',
-    favoriteGround: ''
-  })
+    email: "",
+    password: "",
+    confirmPassword: "",
+    name: "",
+    team: "",
+    position: "",
+    favoriteGround: "",
+  });
+
+  // DEV: To skip login from the URL while testing
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+
+    // skip login
+    if (sp.get("view") === "dashboard" || sp.get("dev") === "1") {
+      setCurrentView("dashboard");
+    }
+
+    // gates
+    const gate = sp.get("gate");
+    if (gate === "loading") setIsLoading(true);
+    if (gate === "error") setDevError(true);
+  }, []);
 
   // Dashboard States
-  const [showReferee, setShowReferee] = useState(true)
-  const [showBall, setShowBall] = useState(true)
-  const [showStaff, setShowStaff] = useState(false)
-  const [showCrowd, setShowCrowd] = useState(true)
-  const [activeTab, setActiveTab] = useState('player-tracking')
+  const [showReferee, setShowReferee] = useState(true);
+  const [showBall, setShowBall] = useState(true);
+  const [showStaff, setShowStaff] = useState(false);
+  const [showCrowd, setShowCrowd] = useState(true);
+  const [activeTab, setActiveTab] = useState("player-tracking");
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
-    
+    e.preventDefault();
+    setIsLoading(true);
+
     // Simulate authentication process
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    console.log('Form submitted:', formData)
-    setIsLoading(false)
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    console.log("Form submitted:", formData);
+    setIsLoading(false);
+
     // Switch to dashboard view
-    setCurrentView('dashboard')
-  }
+    setCurrentView("dashboard");
+  };
 
   const toggleForm = () => {
-    setIsLogin(!isLogin)
+    setIsLogin(!isLogin);
     setFormData({
-      email: '',
-      password: '',
-      confirmPassword: '',
-      name: '',
-      team: '',
-      position: '',
-      favoriteGround: ''
-    })
-    setSelectedTeam(null)
-    setSelectedPosition('')
-  }
+      email: "",
+      password: "",
+      confirmPassword: "",
+      name: "",
+      team: "",
+      position: "",
+      favoriteGround: "",
+    });
+    setSelectedTeam(null);
+    setSelectedPosition("");
+  };
 
   const selectTeam = (team) => {
-    setSelectedTeam(team)
-    setFormData({ ...formData, team: team.name })
-    setShowTeamSelector(false)
-  }
+    setSelectedTeam(team);
+    setFormData({ ...formData, team: team.name });
+    setShowTeamSelector(false);
+  };
 
   const selectPosition = (position) => {
-    setSelectedPosition(position)
-    setFormData({ ...formData, position })
-    setShowPositionSelector(false)
-  }
+    setSelectedPosition(position);
+    setFormData({ ...formData, position });
+    setShowPositionSelector(false);
+  };
+
+  /* ------------------- Generic section loader/error wiring ------------------- */
+  const SectionGate = ({ loading, error, onRetry, label, children }) => {
+    if (loading) return <ScreenLoader label={label} />;
+    if (error)
+      return (
+        <ScreenError title="Failed to load" message={error} onRetry={onRetry} />
+      );
+    return <>{children}</>;
+  };
+
+  // per-section loading/error state ( later hook these to real APIs)
+  const [metricsLoading, setMetricsLoading] = useState(false);
+  const [metricsError, setMetricsError] = useState("");
+
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState("");
+
+  const [trackingLoading, setTrackingLoading] = useState(false);
+  const [trackingError, setTrackingError] = useState("");
+
+  const [actionsLoading, setActionsLoading] = useState(false);
+  const [actionsError, setActionsError] = useState("");
+
+  const [mapLoading, setMapLoading] = useState(false);
+  const [mapError, setMapError] = useState("");
+
+  // demo "fetch" functions (replace later with real calls)
+  const refetchMetrics = () => {
+    setMetricsError("");
+    setMetricsLoading(true);
+    setTimeout(() => {
+      setMetricsLoading(false);
+      // setMetricsError("Timeout from API"); // uncomment to test error
+    }, 600);
+  };
+
+  const refetchAnalytics = () => {
+    setAnalyticsError("");
+    setAnalyticsLoading(true);
+    setTimeout(() => {
+      setAnalyticsLoading(false);
+    }, 700);
+  };
+
+  const refetchTracking = () => {
+    setTrackingError("");
+    setTrackingLoading(true);
+    setTimeout(() => {
+      setTrackingLoading(false);
+    }, 500);
+  };
+
+  const refetchActions = () => {
+    setActionsError("");
+    setActionsLoading(true);
+    setTimeout(() => {
+      setActionsLoading(false);
+    }, 550);
+  };
+
+  const refetchMap = () => {
+    setMapError("");
+    setMapLoading(true);
+    setTimeout(() => {
+      setMapLoading(false);
+    }, 500);
+  };
+
+  // fire once when dashboard mounts
+  useEffect(() => {
+    if (currentView === "dashboard") {
+      refetchMetrics();
+      refetchAnalytics();
+      refetchTracking();
+      refetchActions();
+      refetchMap();
+    }
+  }, [currentView]);
+  /* ------------------------------------------------------------------------------- */
 
   // Dashboard Component
-  const Dashboard = () => (
-    <div className="dashboard-container">
-      {/* Left Sidebar */}
-      <div className="dashboard-sidebar">
-        <div className="sidebar-header">
-          <div className="logo-section">
-            <div className="afl-logo">
-              <div className="logo-icon">🏉</div>
-              <h1>AFL Tracker</h1>
+  const Dashboard = () =>
+    isLoading ? (
+      <ScreenLoader label="Loading dashboard…" />
+    ) : devError ? (
+      <ScreenError
+        title="Analytics failed"
+        message="Timeout from API"
+        onRetry={() => window.location.reload()}
+      />
+    ) : (
+      <div className="dashboard-container">
+        {/* Left Sidebar */}
+        <div className="dashboard-sidebar">
+          <div className="sidebar-header">
+            <div className="logo-section">
+              <div className="afl-logo">
+                <div className="logo-icon">🏉</div>
+                <h1>AFL Tracker</h1>
+              </div>
+            </div>
+          </div>
+
+          <div className="sidebar-controls">
+            <h3>Display Controls</h3>
+            <div className="control-item">
+              <button
+                className={`control-btn ${showReferee ? "active" : ""}`}
+                onClick={() => setShowReferee(!showReferee)}
+              >
+                <Volume2 size={20} />
+                <span>Show Referee</span>
+              </button>
+            </div>
+            <div className="control-item">
+              <button
+                className={`control-btn ${showBall ? "active" : ""}`}
+                onClick={() => setShowBall(!showBall)}
+              >
+                <Circle size={20} />
+                <span>Show Ball</span>
+              </button>
+            </div>
+            <div className="control-item">
+              <button
+                className={`control-btn ${showStaff ? "active" : ""}`}
+                onClick={() => setShowStaff(!showStaff)}
+              >
+                <StaffIcon size={20} />
+                <span>Show Staff</span>
+              </button>
+            </div>
+            <div className="control-item">
+              <button
+                className={`control-btn ${showCrowd ? "active" : ""}`}
+                onClick={() => setShowCrowd(!showCrowd)}
+              >
+                <CrowdIcon size={20} />
+                <span>Show Crowd</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="sidebar-controls">
-          <h3>Display Controls</h3>
-          <div className="control-item">
-            <button 
-              className={`control-btn ${showReferee ? 'active' : ''}`}
-              onClick={() => setShowReferee(!showReferee)}
-            >
-              <Volume2 size={20} />
-              <span>Show Referee</span>
-            </button>
+        {/* Main Content */}
+        <div className="dashboard-main">
+          {/* Current Match Overview */}
+          <div className="match-overview">
+            <h2>Current Match: Team A vs Team B</h2>
+            <div className="match-stats">
+              <span>Score: 2-1</span>
+              <span>Time: 12:34</span>
+              <span>Quarter: 3</span>
+            </div>
+            <div className="match-tabs">
+              <button
+                className={`tab-btn ${
+                  activeTab === "player-tracking" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("player-tracking")}
+              >
+                Player Tracking
+              </button>
+              <button
+                className={`tab-btn ${
+                  activeTab === "crowd-heatmap" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("crowd-heatmap")}
+              >
+                Crowd Heatmap
+              </button>
+              <button
+                className={`tab-btn ${
+                  activeTab === "analytics" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("analytics")}
+              >
+                Analytics
+              </button>
+            </div>
           </div>
-          <div className="control-item">
-            <button 
-              className={`control-btn ${showBall ? 'active' : ''}`}
-              onClick={() => setShowBall(!showBall)}
-            >
-              <Circle size={20} />
-              <span>Show Ball</span>
-            </button>
+
+          {/* Player Performance Metrics */}
+          <div className="metrics-section">
+            <div className="section-header">
+              <h3>Player Performance Metrics</h3>
+              <p>Real-time tracking of key player stats.</p>
+              <button className="action-btn">
+                <ViewIcon size={16} />
+                View Detailed Stats
+              </button>
+            </div>
+            <div className="metrics-grid">
+              <div className="metric-card">
+                <div className="metric-icon">⚽</div>
+                <div className="metric-content">
+                  <h4>Goals</h4>
+                  <div className="metric-value">2</div>
+                  <div className="metric-change positive">+1</div>
+                </div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-icon">🤝</div>
+                <div className="metric-content">
+                  <h4>Assists</h4>
+                  <div className="metric-value">1</div>
+                  <div className="metric-change">0</div>
+                </div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-icon">🎯</div>
+                <div className="metric-content">
+                  <h4>Shots on Target</h4>
+                  <div className="metric-value">5</div>
+                  <div className="metric-change positive">+2</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="control-item">
-            <button 
-              className={`control-btn ${showStaff ? 'active' : ''}`}
-              onClick={() => setShowStaff(!showStaff)}
-            >
-              <StaffIcon size={20} />
-              <span>Show Staff</span>
-            </button>
+
+          {/* Player Fatigue (Live) panel */}
+          <FatigueLivePanel />
+
+          {/* Match Progression Analytics */}
+          <div className="analytics-section">
+            <div className="section-header">
+              <h3>Match Progression Analytics</h3>
+              <p>Analysis of match changes over time.</p>
+              <button className="action-btn">
+                <Download size={16} />
+                Download Report
+              </button>
+            </div>
+            <div className="charts-grid">
+              <div className="chart-card">
+                <h4>Possession Over Time</h4>
+                <div className="chart-container">
+                  <div className="chart-placeholder">
+                    <div className="chart-line"></div>
+                    <div className="chart-line"></div>
+                    <div className="chart-line"></div>
+                  </div>
+                  <div className="chart-labels">
+                    <span>Possession %</span>
+                    <span>Time</span>
+                  </div>
+                </div>
+              </div>
+              <div className="chart-card">
+                <h4>Player Activity</h4>
+                <div className="chart-container">
+                  <div className="bar-chart">
+                    <div className="bar" style={{ height: "60%" }}></div>
+                    <div className="bar" style={{ height: "80%" }}></div>
+                    <div className="bar" style={{ height: "40%" }}></div>
+                    <div className="bar" style={{ height: "90%" }}></div>
+                    <div className="bar" style={{ height: "70%" }}></div>
+                  </div>
+                  <div className="chart-labels">
+                    <span>Actions</span>
+                    <span>Player</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="control-item">
-            <button 
-              className={`control-btn ${showCrowd ? 'active' : ''}`}
-              onClick={() => setShowCrowd(!showCrowd)}
-            >
-              <CrowdIcon size={20} />
-              <span>Show Crowd</span>
-            </button>
+
+          {/* Live Player Tracking */}
+          <div className="tracking-section">
+            <div className="section-header">
+              <h3>Live Player Tracking</h3>
+              <p>Visual representation of player movements.</p>
+              <button className="action-btn">
+                <ViewIcon size={16} />
+                Show Heatmap
+              </button>
+            </div>
+            <div className="tracking-content">
+              <div className="player-info-cards">
+                <div className="player-card">
+                  <h4>Player A</h4>
+                  <p>Position: Midfield</p>
+                  <p>Confidence: 95%</p>
+                </div>
+                <div className="player-card">
+                  <h4>Player B</h4>
+                  <p>Position: Forward</p>
+                  <p>Confidence: 90%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Current Actions */}
+          <div className="actions-section">
+            <div className="section-header">
+              <h3>Current Actions</h3>
+              <p>List of actions occurring in the match.</p>
+            </div>
+            <div className="actions-list">
+              <div className="action-item">
+                <div className="action-icon goal">⚽</div>
+                <div className="action-content">
+                  <h4>Goal by Team A</h4>
+                  <p>Player A, 12:03</p>
+                </div>
+              </div>
+              <div className="action-item">
+                <div className="action-icon card">🟨</div>
+                <div className="action-content">
+                  <h4>Yellow Card</h4>
+                  <p>Player B, 11:45</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Map */}
+          <div className="map-section">
+            <div className="interactive-map">
+              <div className="map-placeholder">
+                <PinIcon size={24} />
+                <p>Interactive map showing player positions and movements.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="dashboard-footer">
+            <a href="#">Follow Us on Social Media</a>
+            <a href="#">Contact Support</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
           </div>
         </div>
       </div>
-
-      {/* Main Content */}
-      <div className="dashboard-main">
-        {/* Current Match Overview */}
-        <div className="match-overview">
-          <h2>Current Match: Team A vs Team B</h2>
-          <div className="match-stats">
-            <span>Score: 2-1</span>
-            <span>Time: 12:34</span>
-            <span>Quarter: 3</span>
-          </div>
-          <div className="match-tabs">
-            <button 
-              className={`tab-btn ${activeTab === 'player-tracking' ? 'active' : ''}`}
-              onClick={() => setActiveTab('player-tracking')}
-            >
-              Player Tracking
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'crowd-heatmap' ? 'active' : ''}`}
-              onClick={() => setActiveTab('crowd-heatmap')}
-            >
-              Crowd Heatmap
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
-              onClick={() => setActiveTab('analytics')}
-            >
-              Analytics
-            </button>
-          </div>
-        </div>
-
-        {/* Player Performance Metrics */}
-        <div className="metrics-section">
-          <div className="section-header">
-            <h3>Player Performance Metrics</h3>
-            <p>Real-time tracking of key player stats.</p>
-            <button className="action-btn">
-              <ViewIcon size={16} />
-              View Detailed Stats
-            </button>
-          </div>
-          <div className="metrics-grid">
-            <div className="metric-card">
-              <div className="metric-icon">⚽</div>
-              <div className="metric-content">
-                <h4>Goals</h4>
-                <div className="metric-value">2</div>
-                <div className="metric-change positive">+1</div>
-              </div>
-            </div>
-            <div className="metric-card">
-              <div className="metric-icon">🤝</div>
-              <div className="metric-content">
-                <h4>Assists</h4>
-                <div className="metric-value">1</div>
-                <div className="metric-change">0</div>
-              </div>
-            </div>
-            <div className="metric-card">
-              <div className="metric-icon">🎯</div>
-              <div className="metric-content">
-                <h4>Shots on Target</h4>
-                <div className="metric-value">5</div>
-                <div className="metric-change positive">+2</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Match Progression Analytics */}
-        <div className="analytics-section">
-          <div className="section-header">
-            <h3>Match Progression Analytics</h3>
-            <p>Analysis of match changes over time.</p>
-            <button className="action-btn">
-              <Download size={16} />
-              Download Report
-            </button>
-          </div>
-          <div className="charts-grid">
-            <div className="chart-card">
-              <h4>Possession Over Time</h4>
-              <div className="chart-container">
-                <div className="chart-placeholder">
-                  <div className="chart-line"></div>
-                  <div className="chart-line"></div>
-                  <div className="chart-line"></div>
-                </div>
-                <div className="chart-labels">
-                  <span>Possession %</span>
-                  <span>Time</span>
-                </div>
-              </div>
-            </div>
-            <div className="chart-card">
-              <h4>Player Activity</h4>
-              <div className="chart-container">
-                <div className="bar-chart">
-                  <div className="bar" style={{ height: '60%' }}></div>
-                  <div className="bar" style={{ height: '80%' }}></div>
-                  <div className="bar" style={{ height: '40%' }}></div>
-                  <div className="bar" style={{ height: '90%' }}></div>
-                  <div className="bar" style={{ height: '70%' }}></div>
-                </div>
-                <div className="chart-labels">
-                  <span>Actions</span>
-                  <span>Player</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Live Player Tracking */}
-        <div className="tracking-section">
-          <div className="section-header">
-            <h3>Live Player Tracking</h3>
-            <p>Visual representation of player movements.</p>
-            <button className="action-btn">
-              <ViewIcon size={16} />
-              Show Heatmap
-            </button>
-          </div>
-          <div className="tracking-content">
-            <div className="player-info-cards">
-              <div className="player-card">
-                <h4>Player A</h4>
-                <p>Position: Midfield</p>
-                <p>Confidence: 95%</p>
-              </div>
-              <div className="player-card">
-                <h4>Player B</h4>
-                <p>Position: Forward</p>
-                <p>Confidence: 90%</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Current Actions */}
-        <div className="actions-section">
-          <div className="section-header">
-            <h3>Current Actions</h3>
-            <p>List of actions occurring in the match.</p>
-          </div>
-          <div className="actions-list">
-            <div className="action-item">
-              <div className="action-icon goal">⚽</div>
-              <div className="action-content">
-                <h4>Goal by Team A</h4>
-                <p>Player A, 12:03</p>
-              </div>
-            </div>
-            <div className="action-item">
-              <div className="action-icon card">🟨</div>
-              <div className="action-content">
-                <h4>Yellow Card</h4>
-                <p>Player B, 11:45</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Interactive Map */}
-        <div className="map-section">
-          <div className="interactive-map">
-            <div className="map-placeholder">
-              <PinIcon size={24} />
-              <p>Interactive map showing player positions and movements.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="dashboard-footer">
-          <a href="#">Follow Us on Social Media</a>
-          <a href="#">Contact Support</a>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-        </div>
-      </div>
-    </div>
-  )
+    );
 
   // Authentication Component
   const Authentication = () => (
@@ -458,9 +747,11 @@ function App() {
                       className="select-btn"
                       onClick={() => setShowTeamSelector(!showTeamSelector)}
                     >
-                      {selectedTeam ? `${selectedTeam.emoji} ${selectedTeam.name}` : 'Select your team'}
+                      {selectedTeam
+                        ? `${selectedTeam.emoji} ${selectedTeam.name}`
+                        : "Select your team"}
                     </button>
-                    
+
                     {showTeamSelector && (
                       <div className="dropdown">
                         {AFL_TEAMS.map((team) => (
@@ -516,7 +807,9 @@ function App() {
                     <button
                       type="button"
                       className="password-toggle"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
                       {showConfirmPassword ? <EyeOff /> : <Eye />}
                     </button>
@@ -534,8 +827,8 @@ function App() {
                 <div className="checkbox-group">
                   <label className="checkbox">
                     <input type="checkbox" required />
-                    <span className="checkmark"></span>
-                    I agree to the <a href="#">Terms & Privacy</a>
+                    <span className="checkmark"></span>I agree to the{" "}
+                    <a href="#">Terms & Privacy</a>
                   </label>
                 </div>
               )}
@@ -543,8 +836,10 @@ function App() {
               <button type="submit" className="submit-btn" disabled={isLoading}>
                 {isLoading ? (
                   <div className="loading-spinner"></div>
+                ) : isLogin ? (
+                  "Login"
                 ) : (
-                  isLogin ? 'Login' : 'Sign Up'
+                  "Sign Up"
                 )}
               </button>
             </form>
@@ -552,9 +847,11 @@ function App() {
             {/* Form Toggle */}
             <div className="form-toggle">
               <p>
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                {isLogin
+                  ? "Don't have an account?"
+                  : "Already have an account?"}
                 <button onClick={toggleForm} className="toggle-link">
-                  {isLogin ? 'Sign up' : 'Sign in'}
+                  {isLogin ? "Sign up" : "Sign in"}
                 </button>
               </p>
             </div>
@@ -572,7 +869,9 @@ function App() {
         <div className="dashboard-preview">
           <div className="preview-header">
             <h2>The simplest way to track your AFL players</h2>
-            <p>Advanced analytics and real-time monitoring for professional teams</p>
+            <p>
+              Advanced analytics and real-time monitoring for professional teams
+            </p>
           </div>
 
           <div className="dashboard-card">
@@ -581,7 +880,7 @@ function App() {
               <div className="dashboard-controls">
                 <select className="team-select">
                   <option>All Teams</option>
-                  {AFL_TEAMS.map(team => (
+                  {AFL_TEAMS.map((team) => (
                     <option key={team.name}>{team.name}</option>
                   ))}
                 </select>
@@ -598,7 +897,9 @@ function App() {
                   <h4>Player Performance</h4>
                   <TrendingUp size={20} />
                 </div>
-                <div className="metric-value">{DASHBOARD_DATA.productiveTime} hr</div>
+                <div className="metric-value">
+                  {DASHBOARD_DATA.productiveTime} hr
+                </div>
                 <div className="metric-change positive">+12.5%</div>
                 <div className="metric-chart">
                   <div className="chart-line"></div>
@@ -610,7 +911,9 @@ function App() {
                   <h4>Match Time</h4>
                   <BarChart3 size={20} />
                 </div>
-                <div className="metric-value">{DASHBOARD_DATA.focusedTime} hr</div>
+                <div className="metric-value">
+                  {DASHBOARD_DATA.focusedTime} hr
+                </div>
                 <div className="metric-change positive">+8.2%</div>
                 <div className="metric-chart">
                   <div className="chart-line"></div>
@@ -625,9 +928,18 @@ function App() {
                   <div key={index} className="utilization-row">
                     <div className="team-name">{team.name}</div>
                     <div className="utilization-bars">
-                      <div className="bar overall" style={{ width: `${team.utilization}%` }}></div>
-                      <div className="bar over" style={{ width: `${team.overUtilized}%` }}></div>
-                      <div className="bar under" style={{ width: `${team.underUtilized}%` }}></div>
+                      <div
+                        className="bar overall"
+                        style={{ width: `${team.utilization}%` }}
+                      ></div>
+                      <div
+                        className="bar over"
+                        style={{ width: `${team.overUtilized}%` }}
+                      ></div>
+                      <div
+                        className="bar under"
+                        style={{ width: `${team.underUtilized}%` }}
+                      ></div>
                     </div>
                     <div className="utilization-stats">
                       <span className="overall">{team.utilization}%</span>
@@ -655,7 +967,9 @@ function App() {
                     <div className="player-avatar">{player.image}</div>
                     <div className="player-info">
                       <div className="player-name">{player.name}</div>
-                      <div className="player-details">{player.team} • {player.position}</div>
+                      <div className="player-details">
+                        {player.team} • {player.position}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -675,13 +989,13 @@ function App() {
         </div>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="app">
-      {currentView === 'dashboard' ? <Dashboard /> : <Authentication />}
+      {currentView === "dashboard" ? <Dashboard /> : <Authentication />}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
