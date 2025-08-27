@@ -230,9 +230,17 @@ export default function AFLDashboard() {
                 <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
                 {isLive ? "LIVE" : "OFFLINE"}
               </Badge>
+              {userEmail && (
+                <span className="text-sm text-gray-600 hidden sm:block">
+                  Welcome, {userEmail}
+                </span>
+              )}
               <Button variant="outline" size="sm">
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                Logout
               </Button>
             </div>
           </div>
