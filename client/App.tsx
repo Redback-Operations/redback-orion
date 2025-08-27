@@ -37,30 +37,35 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/home" element={<AFLDashboard />} />
-          <Route path="/afl-dashboard" element={<AFLDashboard />} />
-          <Route path="/player-performance" element={<PlayerPerformance />} />
-          <Route path="/crowd-monitor" element={<CrowdMonitor />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/video-analysis" element={<Analytics />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/api-diagnostics" element={<ApiDiagnostics />} />
-          <Route path="/live-match" element={<AFLDashboard />} />
-          <Route path="/stitch" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary onError={(error, errorInfo) => {
+    // In a real app, send this to your logging service
+    console.error("Global error caught:", error, errorInfo);
+  }}>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/home" element={<AFLDashboard />} />
+            <Route path="/afl-dashboard" element={<AFLDashboard />} />
+            <Route path="/player-performance" element={<PlayerPerformance />} />
+            <Route path="/crowd-monitor" element={<CrowdMonitor />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/video-analysis" element={<Analytics />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/api-diagnostics" element={<ApiDiagnostics />} />
+            <Route path="/live-match" element={<AFLDashboard />} />
+            <Route path="/stitch" element={<Index />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 createRoot(document.getElementById("root")!).render(<App />);
