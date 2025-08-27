@@ -85,11 +85,49 @@ class ErrorBoundary extends Component<Props, State> {
   };
 
   private copyErrorDetails = () => {
-    const errorDetails = this.getErrorDetails();
-    navigator.clipboard.writeText(errorDetails).then(() => {
-      // Could show a toast notification here
-      console.log("Error details copied to clipboard");
-    });
+    try {
+      const errorDetails = this.getErrorDetails();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(errorDetails).then(() => {
+          console.log("Error details copied to clipboard");
+        }).catch((error) => {
+          console.error("Failed to copy to clipboard:", error);
+          // Fallback: try to select text or show alert
+          this.fallbackCopy(errorDetails);
+        });
+      } else {
+        this.fallbackCopy(errorDetails);
+      }
+    } catch (error) {
+      console.error("Copy operation failed:", error);
+    }
+  };
+
+  private fallbackCopy = (text: string) => {
+    try {
+      // Try to use the old execCommand method as fallback
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        console.log("Error details copied using fallback method");
+      } finally {
+        if (textArea.parentNode) {
+          textArea.parentNode.removeChild(textArea);
+        }
+      }
+    } catch (fallbackError) {
+      console.error("Fallback copy failed:", fallbackError);
+      // Last resort: show alert with the text
+      alert("Copy failed. Here are the error details:\n\n" + text);
+    }
   };
 
   private getErrorDetails = () => {
