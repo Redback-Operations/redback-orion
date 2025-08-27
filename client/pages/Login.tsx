@@ -189,6 +189,18 @@ export default function Login() {
       `${signupForm.firstName} ${signupForm.lastName}`,
     );
 
+    // Clear the signup form
+    setSignupForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      organization: "",
+      role: "",
+      agreeTerms: false,
+    });
+
     // Successful signup - redirect to dashboard
     navigate("/afl-dashboard");
   };
