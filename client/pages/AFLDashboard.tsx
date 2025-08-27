@@ -1537,7 +1537,7 @@ ${clip.event} (${clip.time}):
 EXPORT DETAILS
 ==============
 • Export Format: Metadata Analysis (TXT)
-• Processing Time: ${Math.floor(Math.random() * 3 + 1)} minutes
+��� Processing Time: ${Math.floor(Math.random() * 3 + 1)} minutes
 • Clips Ready for Download: ${clipEvents.length}
 • Analysis Confidence: 94.8%
 
@@ -1603,7 +1603,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="performance" className="space-y-6">
+        <Tabs defaultValue="video" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger
               value="performance"
