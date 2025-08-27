@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { downloadText, downloadFile } from "@/lib/download";
 import { Button } from "@/components/ui/button";
 import {
   Card,
