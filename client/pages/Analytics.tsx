@@ -310,6 +310,37 @@ export default function Analytics() {
     }
   };
 
+  // Generate dynamic summaries based on analysis data
+  const generateDynamicSummary = (insights: any, analysisType: string) => {
+    const totalEvents = insights.matchEvents.length;
+    const topPlayer = insights.playerStats.reduce((best: any, current: any) =>
+      parseFloat(current.efficiency) > parseFloat(best.efficiency) ? current : best
+    );
+    const avgCrowdDensity = (insights.crowdDensity.reduce((sum: number, section: any) =>
+      sum + parseFloat(section.density), 0) / insights.crowdDensity.length).toFixed(1);
+    const totalAttendance = insights.crowdDensity.reduce((sum: number, section: any) =>
+      sum + section.attendance, 0);
+    const mostActiveZone = insights.heatMapZones.reduce((max: any, zone: any) =>
+      zone.activity > max.activity ? zone : max
+    );
+
+    return {
+      overview: `Analysis of ${totalEvents} key match events with ${totalAttendance.toLocaleString()} attendees across ${insights.crowdDensity.length} stadium sections.`,
+      performance: `Top performer: ${topPlayer.name} with ${topPlayer.efficiency}% efficiency, ${topPlayer.goals} goals, and ${topPlayer.tackles} tackles.`,
+      crowd: `Average crowd density: ${avgCrowdDensity}%. Most engaged section: ${insights.crowdDensity.reduce((max: any, section: any) =>
+        parseFloat(section.density) > parseFloat(max.density) ? section : max
+      ).section}`,
+      tactical: `Primary activity in ${mostActiveZone.zone} (${mostActiveZone.activity}% activity level) with ${mostActiveZone.events} tracked events.`,
+      insights: analysisType === 'highlights' ?
+        `${totalEvents} key highlights identified with crowd correlation analysis.` :
+        analysisType === 'player' ?
+        `${insights.playerStats.length} players tracked with comprehensive performance metrics.` :
+        analysisType === 'tactics' ?
+        `Tactical patterns analyzed across ${insights.heatMapZones.length} field zones.` :
+        `Performance data collected for ${insights.playerStats.length} players with ${Math.floor(Math.random() * 500 + 200)} data points per player.`
+    };
+  };
+
   // Generate realistic AFL video analysis data
   const generateVideoInsights = () => {
     const players = [
