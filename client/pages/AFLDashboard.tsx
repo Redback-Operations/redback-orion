@@ -1299,9 +1299,13 @@ export default function AFLDashboard() {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600">
+                  <Button
+                    className="w-full bg-gradient-to-r from-green-600 to-blue-600"
+                    onClick={uploadAndAnalyzeVideo}
+                    disabled={!selectedVideoFile || isVideoUploading || isVideoAnalyzing}
+                  >
                     <Zap className="w-4 h-4 mr-2" />
-                    Start Analysis
+                    {isVideoUploading ? 'Uploading...' : isVideoAnalyzing ? 'Analyzing...' : 'Start Analysis'}
                   </Button>
                 </CardContent>
               </Card>
