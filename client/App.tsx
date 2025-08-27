@@ -81,7 +81,6 @@ export default function App() {
               />
               <Route path="/crowd-monitor" element={<CrowdMonitor />} />
               <Route path="/analytics" element={<Analytics />} />
-              <Route path="/video-analysis" element={<Analytics />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/api-diagnostics" element={<ApiDiagnostics />} />
               <Route path="/error-demo" element={<ErrorDemo />} />
