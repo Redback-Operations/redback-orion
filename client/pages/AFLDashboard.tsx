@@ -295,6 +295,147 @@ export default function AFLDashboard() {
     },
   ]);
 
+  // Processing queue management functions
+  const StatusIcon = ({ status }: { status: string }) => {
+    switch (status) {
+      case "completed":
+        return <div className="w-3 h-3 rounded-full bg-green-500" />;
+      case "analyzing":
+      case "processing":
+        return <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />;
+      case "uploading":
+        return <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />;
+      case "queued":
+        return <div className="w-3 h-3 rounded-full bg-gray-400" />;
+      case "failed":
+        return <div className="w-3 h-3 rounded-full bg-red-500" />;
+      default:
+        return <div className="w-3 h-3 rounded-full bg-gray-300" />;
+    }
+  };
+
+  const retryProcessing = (itemId: string) => {
+    setProcessingQueue(prev => prev.map(item =>
+      item.id === itemId
+        ? {
+            ...item,
+            status: "queued",
+            progress: 0,
+            processingStage: "queue_waiting",
+            retryCount: item.retryCount + 1,
+            estimatedCompletion: new Date(Date.now() + Math.random() * 3600000 + 1800000).toISOString()
+          }
+        : item
+    ));
+  };
+
+  const removeFromQueue = (itemId: string) => {
+    setProcessingQueue(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const formatTimeAgo = (timestamp: string) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffMs = now.getTime() - time.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    return time.toLocaleDateString();
+  };
+
+  const formatETA = (timestamp: string | null) => {
+    if (!timestamp) return "Unknown";
+    const now = new Date();
+    const eta = new Date(timestamp);
+    const diffMs = eta.getTime() - now.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+
+    if (diffMins < 0) return "Overdue";
+    if (diffMins < 60) return `${diffMins} min remaining`;
+    const diffHours = Math.floor(diffMins / 60);
+    return `${diffHours}h ${diffMins % 60}m remaining`;
+  };
+
+  // Simulate realistic processing queue progress
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProcessingQueue(prev => prev.map(item => {
+        // Only update items that are actively processing
+        if (item.status === "analyzing" || item.status === "processing" || item.status === "uploading") {
+          const progressIncrement = Math.random() * 3 + 0.5; // Random increment between 0.5-3.5%
+          const newProgress = Math.min(100, item.progress + progressIncrement);
+
+          // Simulate stage transitions
+          let newStage = item.processingStage;
+          let newStatus = item.status;
+
+          if (item.status === "uploading" && newProgress >= 100) {
+            newStatus = "queued";
+            newStage = "queue_waiting";
+            return {
+              ...item,
+              status: newStatus,
+              progress: 0,
+              processingStage: newStage,
+            };
+          }
+
+          if (item.status === "queued" && Math.random() > 0.7) {
+            newStatus = "processing";
+            newStage = "preprocessing";
+            return {
+              ...item,
+              status: newStatus,
+              progress: 5,
+              processingStage: newStage,
+            };
+          }
+
+          if (item.status === "processing" && item.progress > 30 && Math.random() > 0.8) {
+            newStatus = "analyzing";
+            newStage = "video_analysis";
+          }
+
+          if (newProgress >= 100) {
+            newStatus = "completed";
+            newStage = "analysis_complete";
+            return {
+              ...item,
+              status: newStatus,
+              progress: 100,
+              processingStage: newStage,
+              completedTime: new Date().toISOString(),
+              estimatedCompletion: null,
+            };
+          }
+
+          // Small chance of failure for realism
+          if (Math.random() < 0.001 && item.errorCount < 2) {
+            return {
+              ...item,
+              status: "failed",
+              processingStage: "error_state",
+              errorCount: item.errorCount + 1,
+            };
+          }
+
+          return {
+            ...item,
+            progress: newProgress,
+            status: newStatus,
+            processingStage: newStage,
+          };
+        }
+        return item;
+      }));
+    }, 2000); // Update every 2 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Check authentication on component mount
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
