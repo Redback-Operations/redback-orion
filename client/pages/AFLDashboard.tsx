@@ -804,6 +804,23 @@ export default function AFLDashboard() {
     // Always add demo items for testing
     setTimeout(() => {
       addDemoProcessingItems();
+
+      // Auto-test view modal after demo items are loaded
+      setTimeout(() => {
+        const completedItem = {
+          id: "demo_completed_123",
+          name: "Demo_Completed_Analysis.mp4",
+          analysisType: "Highlight Generation",
+          status: "completed",
+          duration: "00:28:45",
+          size: "650 MB",
+          uploadTime: new Date(Date.now() - 1800000).toISOString(),
+          completedTime: new Date(Date.now() - 600000).toISOString(),
+          priority: "low",
+          processingStage: "analysis_complete",
+        };
+        handleViewAnalysis(completedItem);
+      }, 1000);
     }, 500);
   }, [navigate]);
 
