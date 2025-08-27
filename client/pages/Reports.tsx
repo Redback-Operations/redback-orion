@@ -37,6 +37,7 @@ import {
   Trash2,
   Share2,
 } from "lucide-react";
+import { downloadText } from "@/lib/download";
 
 // Mock data for reports
 const availableReports = [
