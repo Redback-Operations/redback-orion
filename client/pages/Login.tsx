@@ -119,23 +119,36 @@ export default function Login() {
     setIsLoading(true);
     setError("");
 
+    // Validate all required fields
+    if (!signupForm.firstName || !signupForm.lastName || !signupForm.email ||
+        !signupForm.password || !signupForm.organization) {
+      setError("Please fill all required fields");
+      setIsLoading(false);
+      return;
+    }
+
     if (signupForm.password !== signupForm.confirmPassword) {
       setError("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
-    // Simulate signup process
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    if (signupForm.email && signupForm.password && signupForm.agreeTerms) {
-      // Successful signup - redirect to dashboard
-      navigate("/afl-dashboard");
-    } else {
-      setError("Please fill all required fields and agree to terms");
+    if (!signupForm.agreeTerms) {
+      setError("Please agree to the terms of service");
+      setIsLoading(false);
+      return;
     }
 
-    setIsLoading(false);
+    // Simulate signup API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Store authentication state for new user
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('userEmail', signupForm.email);
+    localStorage.setItem('userName', `${signupForm.firstName} ${signupForm.lastName}`);
+
+    // Successful signup - redirect to dashboard
+    navigate("/afl-dashboard");
   };
 
   const demoLogin = () => {
