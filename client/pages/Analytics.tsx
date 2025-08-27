@@ -313,14 +313,29 @@ export default function Analytics() {
   // Generate realistic AFL video analysis data
   const generateVideoInsights = () => {
     const players = [
-      "Marcus Bontempelli", "Patrick Cripps", "Clayton Oliver", "Lachie Neale",
-      "Dustin Martin", "Jeremy Cameron", "Tom Hawkins", "Charlie Curnow",
-      "Jack Steele", "Andrew Brayshaw", "Christian Petracca", "Max Gawn"
+      "Marcus Bontempelli",
+      "Patrick Cripps",
+      "Clayton Oliver",
+      "Lachie Neale",
+      "Dustin Martin",
+      "Jeremy Cameron",
+      "Tom Hawkins",
+      "Charlie Curnow",
+      "Jack Steele",
+      "Andrew Brayshaw",
+      "Christian Petracca",
+      "Max Gawn",
     ];
 
     const stadiumSections = [
-      "MCC Members", "AFL Members", "Southern Stand", "Olympic Stand",
-      "Ponsford Stand", "Great Southern Stand", "Premium Seating", "General Admission"
+      "MCC Members",
+      "AFL Members",
+      "Southern Stand",
+      "Olympic Stand",
+      "Ponsford Stand",
+      "Great Southern Stand",
+      "Premium Seating",
+      "General Admission",
     ];
 
     const playerStats = players.slice(0, 8).map((player, index) => ({
@@ -338,27 +353,62 @@ export default function Analytics() {
       contestedPossessions: Math.floor(Math.random() * 15 + 5),
       uncontestedPossessions: Math.floor(Math.random() * 20 + 10),
       inside50s: Math.floor(Math.random() * 8),
-      clangers: Math.floor(Math.random() * 5)
+      clangers: Math.floor(Math.random() * 5),
     }));
 
-    const crowdDensity = stadiumSections.map(section => ({
+    const crowdDensity = stadiumSections.map((section) => ({
       section,
       capacity: Math.floor(Math.random() * 8000 + 2000),
       attendance: Math.floor(Math.random() * 7000 + 1500),
       density: (70 + Math.random() * 25).toFixed(1), // percentage
       avgMovement: (5 + Math.random() * 15).toFixed(1), // movement index
       noiseLevel: (60 + Math.random() * 30).toFixed(1), // decibels
-      peakMoments: Math.floor(Math.random() * 8 + 2)
+      peakMoments: Math.floor(Math.random() * 8 + 2),
     }));
 
     const matchEvents = [
-      { time: "00:03:45", event: "First Goal", player: playerStats[0].name, quarter: 1 },
-      { time: "00:12:23", event: "Mark of the Day", player: playerStats[1].name, quarter: 1 },
-      { time: "00:28:56", event: "Spectacular Tackle", player: playerStats[2].name, quarter: 2 },
-      { time: "00:31:12", event: "Long Range Goal", player: playerStats[3].name, quarter: 2 },
-      { time: "00:45:34", event: "50m Penalty", player: playerStats[4].name, quarter: 3 },
-      { time: "00:67:21", event: "Crucial Save", player: playerStats[5].name, quarter: 4 },
-      { time: "00:78:45", event: "Match Winning Goal", player: playerStats[6].name, quarter: 4 }
+      {
+        time: "00:03:45",
+        event: "First Goal",
+        player: playerStats[0].name,
+        quarter: 1,
+      },
+      {
+        time: "00:12:23",
+        event: "Mark of the Day",
+        player: playerStats[1].name,
+        quarter: 1,
+      },
+      {
+        time: "00:28:56",
+        event: "Spectacular Tackle",
+        player: playerStats[2].name,
+        quarter: 2,
+      },
+      {
+        time: "00:31:12",
+        event: "Long Range Goal",
+        player: playerStats[3].name,
+        quarter: 2,
+      },
+      {
+        time: "00:45:34",
+        event: "50m Penalty",
+        player: playerStats[4].name,
+        quarter: 3,
+      },
+      {
+        time: "00:67:21",
+        event: "Crucial Save",
+        player: playerStats[5].name,
+        quarter: 4,
+      },
+      {
+        time: "00:78:45",
+        event: "Match Winning Goal",
+        player: playerStats[6].name,
+        quarter: 4,
+      },
     ];
 
     const heatMapZones = [
@@ -367,7 +417,7 @@ export default function Analytics() {
       { zone: "Defensive 50", activity: 65, events: 38 },
       { zone: "Centre Square", activity: 88, events: 52 },
       { zone: "Wing Left", activity: 71, events: 29 },
-      { zone: "Wing Right", activity: 74, events: 32 }
+      { zone: "Wing Right", activity: 74, events: 32 },
     ];
 
     return { playerStats, crowdDensity, matchEvents, heatMapZones };
@@ -390,21 +440,40 @@ export default function Analytics() {
           const jsonData = {
             reportType,
             generatedOn: new Date().toISOString(),
-            videoFile: selectedFile?.name || 'Sample_Match_Video.mp4',
+            videoFile: selectedFile?.name || "Sample_Match_Video.mp4",
             analysisType: selectedAnalysis,
             matchOverview: {
               quarterScores: ["3.2 (20)", "5.4 (34)", "7.8 (50)", "12.11 (83)"],
               finalScore: "Team A: 83 - Team B: 76",
               duration: Math.floor(Math.random() * 120 + 90),
-              attendance: insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0),
-              weather: "Clear, 18°C, Light breeze"
+              attendance: insights.crowdDensity.reduce(
+                (sum, section) => sum + section.attendance,
+                0,
+              ),
+              weather: "Clear, 18°C, Light breeze",
             },
             playerPerformance: insights.playerStats,
             crowdAnalysis: {
-              totalCapacity: insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0),
-              totalAttendance: insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0),
-              overallDensity: ((insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1),
-              sectionBreakdown: insights.crowdDensity
+              totalCapacity: insights.crowdDensity.reduce(
+                (sum, section) => sum + section.capacity,
+                0,
+              ),
+              totalAttendance: insights.crowdDensity.reduce(
+                (sum, section) => sum + section.attendance,
+                0,
+              ),
+              overallDensity: (
+                (insights.crowdDensity.reduce(
+                  (sum, section) => sum + section.attendance,
+                  0,
+                ) /
+                  insights.crowdDensity.reduce(
+                    (sum, section) => sum + section.capacity,
+                    0,
+                  )) *
+                100
+              ).toFixed(1),
+              sectionBreakdown: insights.crowdDensity,
             },
             keyEvents: insights.matchEvents,
             fieldAnalysis: {
@@ -413,8 +482,8 @@ export default function Analytics() {
                 forwardPressure: "87%",
                 defensiveStructure: "Zone-based with man-on-man contests",
                 setPieceEfficiency: "73%",
-                turnoverRate: "15.2%"
-              }
+                turnoverRate: "15.2%",
+              },
             },
             videoMetrics: {
               trackingPoints: Math.floor(Math.random() * 50000 + 25000),
@@ -422,35 +491,40 @@ export default function Analytics() {
               ballTrackingPrecision: "94.2%",
               sectionsMonitored: insights.crowdDensity.length,
               keyMomentsIdentified: insights.matchEvents.length,
-              metricsCalculated: insights.playerStats.length * 14
+              metricsCalculated: insights.playerStats.length * 14,
             },
             summary: {
               analysisComplete: analysisComplete,
               videoMetadata,
-              generatedBy: "AFL Analytics Platform"
-            }
+              generatedBy: "AFL Analytics Platform",
+            },
           };
           downloadJSON(jsonData, fileName);
           break;
 
         case "csv":
           const insights = generateVideoInsights();
-          const csvHeader = "Player,Speed (km/h),Goals,Tackles,Assists,Disposals,Marks,Handballs,Kicks,Efficiency (%),Time on Ground (%),Contested Possessions,Uncontested Possessions,Inside 50s,Clangers\n";
+          const csvHeader =
+            "Player,Speed (km/h),Goals,Tackles,Assists,Disposals,Marks,Handballs,Kicks,Efficiency (%),Time on Ground (%),Contested Possessions,Uncontested Possessions,Inside 50s,Clangers\n";
           const csvData = insights.playerStats
-            .map(player =>
-              `"${player.name}",${player.speed},${player.goals},${player.tackles},${player.assists},${player.disposals},${player.marks},${player.handballs},${player.kicks},${player.efficiency},${player.timeOnGround},${player.contestedPossessions},${player.uncontestedPossessions},${player.inside50s},${player.clangers}`,
+            .map(
+              (player) =>
+                `"${player.name}",${player.speed},${player.goals},${player.tackles},${player.assists},${player.disposals},${player.marks},${player.handballs},${player.kicks},${player.efficiency},${player.timeOnGround},${player.contestedPossessions},${player.uncontestedPossessions},${player.inside50s},${player.clangers}`,
             )
             .join("\n");
 
           // Add crowd density data
-          const crowdCsvHeader = "\n\nCrowd Density Analysis\nSection,Capacity,Attendance,Density (%),Movement Index,Noise Level (dB),Peak Moments\n";
+          const crowdCsvHeader =
+            "\n\nCrowd Density Analysis\nSection,Capacity,Attendance,Density (%),Movement Index,Noise Level (dB),Peak Moments\n";
           const crowdCsvData = insights.crowdDensity
-            .map(section =>
-              `"${section.section}",${section.capacity},${section.attendance},${section.density},${section.avgMovement},${section.noiseLevel},${section.peakMoments}`,
+            .map(
+              (section) =>
+                `"${section.section}",${section.capacity},${section.attendance},${section.density},${section.avgMovement},${section.noiseLevel},${section.peakMoments}`,
             )
             .join("\n");
 
-          const csvContent = csvHeader + csvData + crowdCsvHeader + crowdCsvData;
+          const csvContent =
+            csvHeader + csvData + crowdCsvHeader + crowdCsvData;
           downloadCSV(csvContent, fileName);
           break;
 
@@ -460,7 +534,7 @@ export default function Analytics() {
           const textContent = `AFL ANALYTICS VIDEO ANALYSIS REPORT - ${reportType.toUpperCase()}
 
 Generated: ${new Date().toLocaleString()}
-Video File: ${selectedFile?.name || 'Sample_Match_Video.mp4'}
+Video File: ${selectedFile?.name || "Sample_Match_Video.mp4"}
 Analysis Type: ${selectedAnalysis}
 Duration: ${Math.floor(Math.random() * 120 + 90)} minutes
 
@@ -475,13 +549,18 @@ Attendance: ${insights.crowdDensity.reduce((sum, section) => sum + section.atten
 
 KEY MATCH EVENTS
 ================
-${insights.matchEvents.map(event =>
-  `${event.time} (Q${event.quarter}): ${event.event} - ${event.player}`
-).join('\n')}
+${insights.matchEvents
+  .map(
+    (event) =>
+      `${event.time} (Q${event.quarter}): ${event.event} - ${event.player}`,
+  )
+  .join("\n")}
 
 DETAILED PLAYER PERFORMANCE ANALYSIS
 ====================================
-${insights.playerStats.map(player => `
+${insights.playerStats
+  .map(
+    (player) => `
 ${player.name}:
   Performance Metrics:
   • Speed (Max): ${player.speed} km/h
@@ -498,7 +577,9 @@ ${player.name}:
   • Uncontested: ${player.uncontestedPossessions}
   • Inside 50s: ${player.inside50s}
   • Clangers: ${player.clangers}
-`).join('\n')}
+`,
+  )
+  .join("\n")}
 
 CROWD DENSITY ANALYSIS
 ======================
@@ -507,7 +588,9 @@ Total Attendance: ${insights.crowdDensity.reduce((sum, section) => sum + section
 Overall Density: ${((insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
 
 Stand-by-Stand Analysis:
-${insights.crowdDensity.map(section => `
+${insights.crowdDensity
+  .map(
+    (section) => `
 ${section.section}:
   • Capacity: ${section.capacity.toLocaleString()}
   • Attendance: ${section.attendance.toLocaleString()}
@@ -515,13 +598,18 @@ ${section.section}:
   • Movement Index: ${section.avgMovement}/20
   • Noise Level: ${section.noiseLevel} dB
   • Peak Reaction Moments: ${section.peakMoments}
-`).join('')}
+`,
+  )
+  .join("")}
 
 FIELD HEAT MAP ANALYSIS
 =======================
-${insights.heatMapZones.map(zone =>
-  `${zone.zone}: ${zone.activity}% activity (${zone.events} events tracked)`
-).join('\n')}
+${insights.heatMapZones
+  .map(
+    (zone) =>
+      `${zone.zone}: ${zone.activity}% activity (${zone.events} events tracked)`,
+  )
+  .join("\n")}
 
 TACTICAL INSIGHTS
 =================

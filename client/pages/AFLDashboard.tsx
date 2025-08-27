@@ -312,14 +312,29 @@ export default function AFLDashboard() {
   // Generate detailed AFL video analysis insights
   const generateDashboardInsights = () => {
     const players = [
-      "Marcus Bontempelli", "Patrick Cripps", "Clayton Oliver", "Lachie Neale",
-      "Dustin Martin", "Jeremy Cameron", "Tom Hawkins", "Charlie Curnow",
-      "Jack Steele", "Andrew Brayshaw", "Christian Petracca", "Max Gawn"
+      "Marcus Bontempelli",
+      "Patrick Cripps",
+      "Clayton Oliver",
+      "Lachie Neale",
+      "Dustin Martin",
+      "Jeremy Cameron",
+      "Tom Hawkins",
+      "Charlie Curnow",
+      "Jack Steele",
+      "Andrew Brayshaw",
+      "Christian Petracca",
+      "Max Gawn",
     ];
 
     const stadiumSections = [
-      "MCC Members", "AFL Members", "Southern Stand", "Olympic Stand",
-      "Ponsford Stand", "Great Southern Stand", "Premium Seating", "General Admission"
+      "MCC Members",
+      "AFL Members",
+      "Southern Stand",
+      "Olympic Stand",
+      "Ponsford Stand",
+      "Great Southern Stand",
+      "Premium Seating",
+      "General Admission",
     ];
 
     const playerStats = players.slice(0, 6).map((player, index) => ({
@@ -331,17 +346,17 @@ export default function AFLDashboard() {
       disposals: Math.floor(Math.random() * 25 + 12),
       marks: Math.floor(Math.random() * 10 + 2),
       efficiency: (65 + Math.random() * 30).toFixed(1),
-      timeOnGround: Math.floor(Math.random() * 25 + 70)
+      timeOnGround: Math.floor(Math.random() * 25 + 70),
     }));
 
-    const crowdDensity = stadiumSections.slice(0, 6).map(section => ({
+    const crowdDensity = stadiumSections.slice(0, 6).map((section) => ({
       section,
       capacity: Math.floor(Math.random() * 6000 + 2000),
       attendance: Math.floor(Math.random() * 5500 + 1800),
       density: (75 + Math.random() * 20).toFixed(1),
       avgMovement: (6 + Math.random() * 12).toFixed(1),
       noiseLevel: (65 + Math.random() * 25).toFixed(1),
-      peakMoments: Math.floor(Math.random() * 6 + 2)
+      peakMoments: Math.floor(Math.random() * 6 + 2),
     }));
 
     return { playerStats, crowdDensity };
@@ -359,17 +374,26 @@ export default function AFLDashboard() {
 
 Generated: ${new Date().toLocaleString()}
 Video File: ${selectedVideoFile.name}
-Analysis Type: ${selectedAnalysisType === "highlights" ? "Match Highlights" :
-              selectedAnalysisType === "player" ? "Player Tracking" :
-              selectedAnalysisType === "tactics" ? "Tactical Analysis" :
-              selectedAnalysisType === "performance" ? "Performance Metrics" : "Crowd Reactions"}
+Analysis Type: ${
+      selectedAnalysisType === "highlights"
+        ? "Match Highlights"
+        : selectedAnalysisType === "player"
+          ? "Player Tracking"
+          : selectedAnalysisType === "tactics"
+            ? "Tactical Analysis"
+            : selectedAnalysisType === "performance"
+              ? "Performance Metrics"
+              : "Crowd Reactions"
+    }
 Focus Areas: ${selectedFocusAreas.join(", ") || "General Analysis"}
 
 ═══════════════════════════════════════════════════════════
 
 DETAILED PLAYER PERFORMANCE METRICS
 ===================================
-${insights.playerStats.map(player => `
+${insights.playerStats
+  .map(
+    (player) => `
 ${player.name}:
   • Maximum Speed: ${player.speed} km/h
   • Goals Scored: ${player.goals}
@@ -379,7 +403,9 @@ ${player.name}:
   • Marks Taken: ${player.marks}
   • Disposal Efficiency: ${player.efficiency}%
   • Time on Ground: ${player.timeOnGround}%
-`).join('')}
+`,
+  )
+  .join("")}
 
 CROWD DENSITY ANALYSIS BY STAND
 ===============================
@@ -387,7 +413,9 @@ Total Attendance: ${insights.crowdDensity.reduce((sum, section) => sum + section
 Overall Stadium Density: ${((insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
 
 Stand-by-Stand Breakdown:
-${insights.crowdDensity.map(section => `
+${insights.crowdDensity
+  .map(
+    (section) => `
 ${section.section}:
   • Capacity: ${section.capacity.toLocaleString()}
   • Attendance: ${section.attendance.toLocaleString()}
@@ -395,7 +423,9 @@ ${section.section}:
   • Movement Index: ${section.avgMovement}/20
   • Noise Level: ${section.noiseLevel} dB
   • Peak Reaction Moments: ${section.peakMoments}
-`).join('')}
+`,
+  )
+  .join("")}
 
 ANALYSIS SUMMARY
 ================
@@ -432,28 +462,73 @@ Generated at: ${new Date().toISOString()}
 
     const insights = generateDashboardInsights();
     const clipEvents = [
-      { time: "00:03:45", event: "Opening Goal", player: insights.playerStats[0].name, speed: insights.playerStats[0].speed, crowd: "Explosive reaction" },
-      { time: "00:18:23", event: "Spectacular Mark", player: insights.playerStats[1].name, speed: insights.playerStats[1].speed, crowd: "Standing ovation" },
-      { time: "00:34:56", event: "Crucial Tackle", player: insights.playerStats[2].name, speed: insights.playerStats[2].speed, crowd: "Defensive roar" },
-      { time: "00:52:12", event: "Assist Play", player: insights.playerStats[3].name, speed: insights.playerStats[3].speed, crowd: "Building excitement" },
-      { time: "01:08:34", event: "Match Winner", player: insights.playerStats[4].name, speed: insights.playerStats[4].speed, crowd: "Stadium eruption" },
-      { time: "01:15:45", event: "Final Siren", player: "Multiple Players", speed: "N/A", crowd: "Celebration frenzy" }
+      {
+        time: "00:03:45",
+        event: "Opening Goal",
+        player: insights.playerStats[0].name,
+        speed: insights.playerStats[0].speed,
+        crowd: "Explosive reaction",
+      },
+      {
+        time: "00:18:23",
+        event: "Spectacular Mark",
+        player: insights.playerStats[1].name,
+        speed: insights.playerStats[1].speed,
+        crowd: "Standing ovation",
+      },
+      {
+        time: "00:34:56",
+        event: "Crucial Tackle",
+        player: insights.playerStats[2].name,
+        speed: insights.playerStats[2].speed,
+        crowd: "Defensive roar",
+      },
+      {
+        time: "00:52:12",
+        event: "Assist Play",
+        player: insights.playerStats[3].name,
+        speed: insights.playerStats[3].speed,
+        crowd: "Building excitement",
+      },
+      {
+        time: "01:08:34",
+        event: "Match Winner",
+        player: insights.playerStats[4].name,
+        speed: insights.playerStats[4].speed,
+        crowd: "Stadium eruption",
+      },
+      {
+        time: "01:15:45",
+        event: "Final Siren",
+        player: "Multiple Players",
+        speed: "N/A",
+        crowd: "Celebration frenzy",
+      },
     ];
 
     const clipsData = `AFL ANALYTICS VIDEO CLIPS EXPORT
 
 Generated: ${new Date().toLocaleString()}
 Source Video: ${selectedVideoFile?.name}
-Analysis Type: ${selectedAnalysisType === "highlights" ? "Match Highlights" :
-              selectedAnalysisType === "player" ? "Player Tracking" :
-              selectedAnalysisType === "tactics" ? "Tactical Analysis" :
-              selectedAnalysisType === "performance" ? "Performance Metrics" : "Crowd Reactions"}
+Analysis Type: ${
+      selectedAnalysisType === "highlights"
+        ? "Match Highlights"
+        : selectedAnalysisType === "player"
+          ? "Player Tracking"
+          : selectedAnalysisType === "tactics"
+            ? "Tactical Analysis"
+            : selectedAnalysisType === "performance"
+              ? "Performance Metrics"
+              : "Crowd Reactions"
+    }
 
 ═══════════════════════════════════════════════════════════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
-${clipEvents.map((clip, index) => `
+${clipEvents
+  .map(
+    (clip, index) => `
 Clip ${index + 1}: ${clip.event}
   • Timestamp: ${clip.time}
   • Featured Player: ${clip.player}
@@ -462,26 +537,34 @@ Clip ${index + 1}: ${clip.event}
   • Crowd Reaction: ${clip.crowd}
   • Stands Most Active: ${insights.crowdDensity[Math.floor(Math.random() * insights.crowdDensity.length)].section}
   • Noise Level: ${(85 + Math.random() * 15).toFixed(1)} dB
-`).join('')}
+`,
+  )
+  .join("")}
 
 CLIP ANALYSIS SUMMARY
 ====================
 • Total clips identified: ${clipEvents.length}
 • Total duration: ${clipEvents.reduce((sum, _, index) => sum + Math.floor(Math.random() * 25 + 10), 0)} seconds
 • Average crowd noise: ${(80 + Math.random() * 20).toFixed(1)} dB
-• Most active stand: ${insights.crowdDensity.reduce((max, section) =>
-    parseFloat(section.density) > parseFloat(max.density) ? section : max
-  ).section}
+• Most active stand: ${
+      insights.crowdDensity.reduce((max, section) =>
+        parseFloat(section.density) > parseFloat(max.density) ? section : max,
+      ).section
+    }
 • Player tracking accuracy: 97.2%
 
 CROWD RESPONSE CORRELATION
 ==========================
-${clipEvents.map((clip, index) => `
+${clipEvents
+  .map(
+    (clip, index) => `
 ${clip.event} (${clip.time}):
   Crowd Response Intensity: ${(7 + Math.random() * 3).toFixed(1)}/10
   Stands Reacting: ${Math.floor(Math.random() * 3 + 3)} of ${insights.crowdDensity.length}
   Duration of Reaction: ${Math.floor(Math.random() * 15 + 5)}s
-`).join('')}
+`,
+  )
+  .join("")}
 
 EXPORT DETAILS
 ==============
