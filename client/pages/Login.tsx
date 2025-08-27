@@ -70,19 +70,45 @@ export default function Login() {
   const [resetStep, setResetStep] = useState(1); // 1: email, 2: code, 3: new password, 4: success
   const [resetMessage, setResetMessage] = useState("");
 
+  // Valid demo credentials for authentication
+  const validCredentials = [
+    { email: "demo@aflanalytics.com", password: "demo123" },
+    { email: "admin@aflanalytics.com", password: "admin123" },
+    { email: "coach@aflanalytics.com", password: "coach123" },
+    { email: "analyst@aflanalytics.com", password: "analyst123" }
+  ];
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Simulate login process
+    // Simulate login API call delay
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    if (loginForm.email && loginForm.password) {
+    // Check if both email and password are provided
+    if (!loginForm.email || !loginForm.password) {
+      setError("Please enter both email and password");
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate credentials against stored valid credentials
+    const isValidCredential = validCredentials.some(
+      (cred) =>
+        cred.email.toLowerCase() === loginForm.email.toLowerCase() &&
+        cred.password === loginForm.password
+    );
+
+    if (isValidCredential) {
+      // Store authentication state in localStorage
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userEmail', loginForm.email);
+
       // Successful login - redirect to dashboard
       navigate("/afl-dashboard");
     } else {
-      setError("Please enter valid credentials");
+      setError("Invalid email or password. Try demo@aflanalytics.com / demo123");
     }
 
     setIsLoading(false);
