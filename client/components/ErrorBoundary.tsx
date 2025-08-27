@@ -58,9 +58,13 @@ class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // Call the onError callback if provided
-    if (this.props.onError) {
-      this.props.onError(error, errorInfo);
+    // Call the onError callback if provided - wrap in try/catch to prevent cascading errors
+    try {
+      if (this.props.onError) {
+        this.props.onError(error, errorInfo);
+      }
+    } catch (callbackError) {
+      console.error("Error in ErrorBoundary onError callback:", callbackError);
     }
 
     // In a real app, you might want to send this to a logging service
