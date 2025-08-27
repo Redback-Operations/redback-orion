@@ -642,6 +642,22 @@ export default function AFLDashboard() {
       setIsVideoAnalyzing(false);
       setVideoAnalysisComplete(true);
 
+      // Mark the corresponding queue item as completed when UI analysis finishes
+      setProcessingQueue((prev) =>
+        prev.map((item) =>
+          item.id === newQueueItem.id
+            ? {
+                ...item,
+                status: "completed",
+                progress: 100,
+                processingStage: "analysis_complete",
+                completedTime: new Date().toISOString(),
+                estimatedCompletion: null,
+              }
+            : item,
+        ),
+      );
+
       // Store analysis results
       const analysisResults = {
         fileName: selectedVideoFile.name,
