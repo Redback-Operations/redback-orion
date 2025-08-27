@@ -1173,18 +1173,76 @@ export default function AFLDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer">
-                    <Video className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                    <div className="text-lg font-medium text-gray-700">
-                      Drop video files here
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      or click to browse
-                    </div>
-                    <div className="text-xs text-gray-400 mt-2">
-                      Supports MP4, MOV, AVI • Max 500MB
-                    </div>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoFileSelect}
+                      className="hidden"
+                      id="video-upload-dashboard"
+                    />
+                    <label htmlFor="video-upload-dashboard" className="cursor-pointer">
+                      <Video className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                      <div className="text-lg font-medium text-gray-700">
+                        {selectedVideoFile ? selectedVideoFile.name : "Drop video files here"}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        or click to browse
+                      </div>
+                      <div className="text-xs text-gray-400 mt-2">
+                        Supports MP4, MOV, AVI • Max 500MB
+                      </div>
+                    </label>
                   </div>
+
+                  {selectedVideoFile && (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Video className="w-4 h-4 text-blue-600" />
+                        <span className="font-medium">{selectedVideoFile.name}</span>
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1">
+                        Size: {(selectedVideoFile.size / 1024 / 1024).toFixed(1)} MB
+                      </div>
+                    </div>
+                  )}
+
+                  {videoAnalysisError && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="text-sm text-red-700">{videoAnalysisError}</div>
+                    </div>
+                  )}
+
+                  {isVideoUploading && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Uploading video...</span>
+                        <span>{videoUploadProgress}%</span>
+                      </div>
+                      <Progress value={videoUploadProgress} className="h-2" />
+                    </div>
+                  )}
+
+                  {isVideoAnalyzing && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Analyzing video...</span>
+                        <span>{videoAnalysisProgress}%</span>
+                      </div>
+                      <Progress value={videoAnalysisProgress} className="h-2" />
+                    </div>
+                  )}
+
+                  {videoAnalysisComplete && (
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <span className="text-sm text-green-700 font-medium">
+                          Analysis completed successfully!
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-3">
                     <div>
