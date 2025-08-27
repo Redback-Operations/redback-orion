@@ -800,11 +800,7 @@ export default function AFLDashboard() {
       setUserEmail(email);
     }
 
-    // Auto-add demo items if queue is empty
-    if (processingQueue.length === 0) {
-      addDemoProcessingItems();
-    }
-  }, [navigate, processingQueue.length]);
+  }, [navigate]);
 
   // Auto-open view modal for testing completed items
   useEffect(() => {
@@ -1699,7 +1695,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       >
                         <div className="font-medium">{player.name}</div>
                         <div className="text-sm text-gray-600">
-                          {player.team} ��� {player.position}
+                          {player.team} ����� {player.position}
                         </div>
                         <div className="text-xs text-green-600 mt-1">
                           Efficiency: {player.efficiency}%
