@@ -1519,7 +1519,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       >
                         <div className="font-medium">{player.name}</div>
                         <div className="text-sm text-gray-600">
-                          {player.team} • {player.position}
+                          {player.team} ��� {player.position}
                         </div>
                         <div className="text-xs text-green-600 mt-1">
                           Efficiency: {player.efficiency}%
@@ -3001,6 +3001,14 @@ Generated on: ${new Date().toLocaleString()}
                   >
                     <FileText className="w-4 h-4 mr-1" />
                     TXT
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setViewModalOpen(false)}
+                    className="ml-4"
+                  >
+                    Close
                   </Button>
                 </div>
               </div>
