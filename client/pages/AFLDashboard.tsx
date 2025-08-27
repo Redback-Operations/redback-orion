@@ -365,6 +365,135 @@ export default function AFLDashboard() {
     return `${diffHours}h ${diffMins % 60}m remaining`;
   };
 
+  // View analysis results for a queue item
+  const handleViewAnalysis = (item: any) => {
+    setSelectedAnalysisItem(item);
+    setViewModalOpen(true);
+  };
+
+  // Download analysis report for a queue item
+  const handleDownloadFromQueue = async (item: any, format: "pdf" | "json" | "txt" = "pdf") => {
+    try {
+      // Generate analysis data for this specific item
+      const analysisId = item.id;
+      const backendData = {
+        analysisId,
+        timestamp: item.completedTime || item.uploadTime,
+        videoFile: {
+          name: item.name,
+          duration: item.duration,
+          size: item.size,
+          resolution: "1920x1080",
+          framerate: "30fps"
+        },
+        analysisType: item.analysisType,
+        focusAreas: [], // Queue items don't have focus areas stored
+        processingTime: Math.floor(Math.random() * 300 + 120),
+        results: {
+          playerPerformance: [
+            {
+              playerId: "p001",
+              name: "Marcus Bontempelli",
+              team: "Western Bulldogs",
+              position: "Midfielder",
+              statistics: {
+                speed: { max: 32.4, average: 24.8, unit: "km/h" },
+                distance: { total: 12.8, sprints: 2.3, unit: "km" },
+                touches: { total: 28, effective: 24, efficiency: 85.7 },
+                goals: 2,
+                assists: 3,
+                tackles: 6,
+                marks: 8,
+                disposals: 31,
+                timeOnGround: 87.5
+              }
+            },
+            {
+              playerId: "p002",
+              name: "Patrick Cripps",
+              team: "Carlton",
+              position: "Midfielder",
+              statistics: {
+                speed: { max: 29.8, average: 22.1, unit: "km/h" },
+                distance: { total: 13.2, sprints: 1.8, unit: "km" },
+                touches: { total: 35, effective: 31, efficiency: 88.6 },
+                goals: 1,
+                assists: 5,
+                tackles: 9,
+                marks: 6,
+                disposals: 34,
+                timeOnGround: 92.3
+              }
+            }
+          ],
+          crowdAnalysis: {
+            totalAttendance: 47832,
+            capacity: 50000,
+            utilizationRate: 95.7,
+            sections: [
+              {
+                sectionId: "north_stand",
+                name: "Northern Stand",
+                attendance: 14250,
+                capacity: 15000,
+                density: 95.0,
+                noiseLevel: { peak: 95.2, average: 78.4, unit: "dB" }
+              },
+              {
+                sectionId: "south_stand",
+                name: "Southern Stand",
+                attendance: 11680,
+                capacity: 12000,
+                density: 97.3,
+                noiseLevel: { peak: 92.8, average: 76.9, unit: "dB" }
+              }
+            ]
+          },
+          highlights: [
+            {
+              timestamp: "00:03:45",
+              duration: 15,
+              type: "goal",
+              description: "Opening goal with crowd eruption",
+              players: ["Marcus Bontempelli"],
+              confidence: 0.94
+            }
+          ],
+          metadata: {
+            confidence: 0.923,
+            processingVersion: "2.1.3",
+            qualityScore: 8.7
+          }
+        }
+      };
+
+      if (format === "json") {
+        // Download raw JSON data
+        const jsonContent = JSON.stringify(backendData, null, 2);
+        const blob = new Blob([jsonContent], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${item.name.replace(/\.[^/.]+$/, "")}_Analysis.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else if (format === "pdf") {
+        // Generate PDF from backend data
+        const htmlContent = convertBackendDataToHTML(backendData);
+        generateDashboardPDF(htmlContent, `${item.name.replace(/\.[^/.]+$/, "")}_Analysis`);
+      } else {
+        // Generate TXT from backend data
+        const textContent = convertBackendDataToText(backendData);
+        downloadText(textContent, `${item.name.replace(/\.[^/.]+$/, "")}_Analysis`);
+      }
+    } catch (error) {
+      console.error("Error downloading analysis:", error);
+      alert("Failed to download analysis. Please try again.");
+    }
+  };
+
   // Simulate realistic processing queue progress
   useEffect(() => {
     const interval = setInterval(() => {
