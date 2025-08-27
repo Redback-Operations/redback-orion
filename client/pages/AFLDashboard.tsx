@@ -302,9 +302,13 @@ export default function AFLDashboard() {
         return <div className="w-3 h-3 rounded-full bg-green-500" />;
       case "analyzing":
       case "processing":
-        return <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />;
+        return (
+          <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />
+        );
       case "uploading":
-        return <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />;
+        return (
+          <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />
+        );
       case "queued":
         return <div className="w-3 h-3 rounded-full bg-gray-400" />;
       case "failed":
@@ -315,22 +319,26 @@ export default function AFLDashboard() {
   };
 
   const retryProcessing = (itemId: string) => {
-    setProcessingQueue(prev => prev.map(item =>
-      item.id === itemId
-        ? {
-            ...item,
-            status: "queued",
-            progress: 0,
-            processingStage: "queue_waiting",
-            retryCount: item.retryCount + 1,
-            estimatedCompletion: new Date(Date.now() + Math.random() * 3600000 + 1800000).toISOString()
-          }
-        : item
-    ));
+    setProcessingQueue((prev) =>
+      prev.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              status: "queued",
+              progress: 0,
+              processingStage: "queue_waiting",
+              retryCount: item.retryCount + 1,
+              estimatedCompletion: new Date(
+                Date.now() + Math.random() * 3600000 + 1800000,
+              ).toISOString(),
+            }
+          : item,
+      ),
+    );
   };
 
   const removeFromQueue = (itemId: string) => {
-    setProcessingQueue(prev => prev.filter(item => item.id !== itemId));
+    setProcessingQueue((prev) => prev.filter((item) => item.id !== itemId));
   };
 
   const formatTimeAgo = (timestamp: string) => {
@@ -342,7 +350,8 @@ export default function AFLDashboard() {
 
     if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins} min ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
     return time.toLocaleDateString();
   };
 
@@ -362,75 +371,88 @@ export default function AFLDashboard() {
   // Simulate realistic processing queue progress
   useEffect(() => {
     const interval = setInterval(() => {
-      setProcessingQueue(prev => prev.map(item => {
-        // Only update items that are actively processing
-        if (item.status === "analyzing" || item.status === "processing" || item.status === "uploading") {
-          const progressIncrement = Math.random() * 3 + 0.5; // Random increment between 0.5-3.5%
-          const newProgress = Math.min(100, item.progress + progressIncrement);
+      setProcessingQueue((prev) =>
+        prev.map((item) => {
+          // Only update items that are actively processing
+          if (
+            item.status === "analyzing" ||
+            item.status === "processing" ||
+            item.status === "uploading"
+          ) {
+            const progressIncrement = Math.random() * 3 + 0.5; // Random increment between 0.5-3.5%
+            const newProgress = Math.min(
+              100,
+              item.progress + progressIncrement,
+            );
 
-          // Simulate stage transitions
-          let newStage = item.processingStage;
-          let newStatus = item.status;
+            // Simulate stage transitions
+            let newStage = item.processingStage;
+            let newStatus = item.status;
 
-          if (item.status === "uploading" && newProgress >= 100) {
-            newStatus = "queued";
-            newStage = "queue_waiting";
+            if (item.status === "uploading" && newProgress >= 100) {
+              newStatus = "queued";
+              newStage = "queue_waiting";
+              return {
+                ...item,
+                status: newStatus,
+                progress: 0,
+                processingStage: newStage,
+              };
+            }
+
+            if (item.status === "queued" && Math.random() > 0.7) {
+              newStatus = "processing";
+              newStage = "preprocessing";
+              return {
+                ...item,
+                status: newStatus,
+                progress: 5,
+                processingStage: newStage,
+              };
+            }
+
+            if (
+              item.status === "processing" &&
+              item.progress > 30 &&
+              Math.random() > 0.8
+            ) {
+              newStatus = "analyzing";
+              newStage = "video_analysis";
+            }
+
+            if (newProgress >= 100) {
+              newStatus = "completed";
+              newStage = "analysis_complete";
+              return {
+                ...item,
+                status: newStatus,
+                progress: 100,
+                processingStage: newStage,
+                completedTime: new Date().toISOString(),
+                estimatedCompletion: null,
+              };
+            }
+
+            // Small chance of failure for realism
+            if (Math.random() < 0.001 && item.errorCount < 2) {
+              return {
+                ...item,
+                status: "failed",
+                processingStage: "error_state",
+                errorCount: item.errorCount + 1,
+              };
+            }
+
             return {
               ...item,
+              progress: newProgress,
               status: newStatus,
-              progress: 0,
               processingStage: newStage,
             };
           }
-
-          if (item.status === "queued" && Math.random() > 0.7) {
-            newStatus = "processing";
-            newStage = "preprocessing";
-            return {
-              ...item,
-              status: newStatus,
-              progress: 5,
-              processingStage: newStage,
-            };
-          }
-
-          if (item.status === "processing" && item.progress > 30 && Math.random() > 0.8) {
-            newStatus = "analyzing";
-            newStage = "video_analysis";
-          }
-
-          if (newProgress >= 100) {
-            newStatus = "completed";
-            newStage = "analysis_complete";
-            return {
-              ...item,
-              status: newStatus,
-              progress: 100,
-              processingStage: newStage,
-              completedTime: new Date().toISOString(),
-              estimatedCompletion: null,
-            };
-          }
-
-          // Small chance of failure for realism
-          if (Math.random() < 0.001 && item.errorCount < 2) {
-            return {
-              ...item,
-              status: "failed",
-              processingStage: "error_state",
-              errorCount: item.errorCount + 1,
-            };
-          }
-
-          return {
-            ...item,
-            progress: newProgress,
-            status: newStatus,
-            processingStage: newStage,
-          };
-        }
-        return item;
-      }));
+          return item;
+        }),
+      );
     }, 2000); // Update every 2 seconds
 
     return () => clearInterval(interval);
@@ -552,18 +574,23 @@ export default function AFLDashboard() {
       const newQueueItem = {
         id: `pq_${Date.now()}`,
         name: selectedVideoFile.name,
-        analysisType: selectedAnalysisType === "highlights"
-          ? "Highlight Generation"
-          : selectedAnalysisType === "player"
-            ? "Player Tracking"
-            : selectedAnalysisType === "tactics"
-              ? "Tactical Analysis"
-              : selectedAnalysisType === "performance"
-                ? "Performance Analysis"
-                : "Crowd Analysis",
+        analysisType:
+          selectedAnalysisType === "highlights"
+            ? "Highlight Generation"
+            : selectedAnalysisType === "player"
+              ? "Player Tracking"
+              : selectedAnalysisType === "tactics"
+                ? "Tactical Analysis"
+                : selectedAnalysisType === "performance"
+                  ? "Performance Analysis"
+                  : "Crowd Analysis",
         status: "completed" as const,
         progress: 100,
-        duration: `${Math.floor(Math.random() * 60 + 30)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+        duration: `${Math.floor(Math.random() * 60 + 30)}:${Math.floor(
+          Math.random() * 60,
+        )
+          .toString()
+          .padStart(2, "0")}`,
         size: `${(selectedVideoFile.size / (1024 * 1024)).toFixed(1)} MB`,
         uploadTime: new Date().toISOString(),
         completedTime: new Date().toISOString(),
@@ -575,7 +602,7 @@ export default function AFLDashboard() {
         retryCount: 0,
       };
 
-      setProcessingQueue(prev => [newQueueItem, ...prev]);
+      setProcessingQueue((prev) => [newQueueItem, ...prev]);
     } catch (error) {
       setIsVideoUploading(false);
       setIsVideoAnalyzing(false);
@@ -2184,12 +2211,17 @@ Generated on: ${new Date().toLocaleString()}
               <CardContent>
                 <div className="space-y-4">
                   {processingQueue.map((item) => (
-                    <div key={item.id} className="p-4 border rounded-lg bg-gradient-to-r from-white via-gray-50 to-white">
+                    <div
+                      key={item.id}
+                      className="p-4 border rounded-lg bg-gradient-to-r from-white via-gray-50 to-white"
+                    >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <StatusIcon status={item.status} />
                           <div className="flex-1">
-                            <div className="font-medium text-gray-900">{item.name}</div>
+                            <div className="font-medium text-gray-900">
+                              {item.name}
+                            </div>
                             <div className="text-sm text-gray-600 flex items-center gap-2">
                               <span>{item.analysisType}</span>
                               <span>•</span>
@@ -2199,7 +2231,10 @@ Generated on: ${new Date().toLocaleString()}
                               {item.priority === "high" && (
                                 <>
                                   <span>•</span>
-                                  <Badge variant="destructive" className="text-xs py-0 px-1">
+                                  <Badge
+                                    variant="destructive"
+                                    className="text-xs py-0 px-1"
+                                  >
                                     HIGH PRIORITY
                                   </Badge>
                                 </>
@@ -2212,7 +2247,8 @@ Generated on: ${new Date().toLocaleString()}
                             variant={
                               item.status === "completed"
                                 ? "default"
-                                : item.status === "analyzing" || item.status === "processing"
+                                : item.status === "analyzing" ||
+                                    item.status === "processing"
                                   ? "secondary"
                                   : item.status === "uploading"
                                     ? "outline"
@@ -2244,11 +2280,16 @@ Generated on: ${new Date().toLocaleString()}
                                     ? "Analyzing video content..."
                                     : "Processing..."}
                             </span>
-                            <span className="font-medium">{Math.round(item.progress)}%</span>
+                            <span className="font-medium">
+                              {Math.round(item.progress)}%
+                            </span>
                           </div>
                           <Progress value={item.progress} className="h-2" />
                           <div className="text-xs text-gray-500">
-                            Stage: {item.processingStage.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            Stage:{" "}
+                            {item.processingStage
+                              .replace(/_/g, " ")
+                              .replace(/\b\w/g, (l) => l.toUpperCase())}
                           </div>
                         </div>
                       )}
@@ -2257,23 +2298,35 @@ Generated on: ${new Date().toLocaleString()}
                         <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
                           <div className="flex items-center gap-2 text-red-800 text-sm">
                             <div className="w-4 h-4 rounded-full bg-red-500 flex-shrink-0" />
-                            <span>Processing failed after {item.errorCount} attempt{item.errorCount > 1 ? 's' : ''}</span>
+                            <span>
+                              Processing failed after {item.errorCount} attempt
+                              {item.errorCount > 1 ? "s" : ""}
+                            </span>
                           </div>
                           <div className="text-xs text-red-600 mt-1">
-                            Common causes: Unsupported format, corrupted file, or insufficient server resources
+                            Common causes: Unsupported format, corrupted file,
+                            or insufficient server resources
                           </div>
                         </div>
                       )}
 
                       <div className="flex justify-between items-center mt-3">
                         <div className="flex flex-col text-sm text-gray-500">
-                          <span>Uploaded: {formatTimeAgo(item.uploadTime)}</span>
-                          {item.status === "completed" && item.completedTime && (
-                            <span>Completed: {formatTimeAgo(item.completedTime)}</span>
-                          )}
-                          {item.estimatedCompletion && item.status !== "completed" && (
-                            <span>ETA: {formatETA(item.estimatedCompletion)}</span>
-                          )}
+                          <span>
+                            Uploaded: {formatTimeAgo(item.uploadTime)}
+                          </span>
+                          {item.status === "completed" &&
+                            item.completedTime && (
+                              <span>
+                                Completed: {formatTimeAgo(item.completedTime)}
+                              </span>
+                            )}
+                          {item.estimatedCompletion &&
+                            item.status !== "completed" && (
+                              <span>
+                                ETA: {formatETA(item.estimatedCompletion)}
+                              </span>
+                            )}
                         </div>
                         <div className="flex gap-2">
                           {item.status === "completed" && (
@@ -2309,7 +2362,8 @@ Generated on: ${new Date().toLocaleString()}
                               </Button>
                             </>
                           )}
-                          {(item.status === "queued" || item.status === "uploading") && (
+                          {(item.status === "queued" ||
+                            item.status === "uploading") && (
                             <Button
                               variant="outline"
                               size="sm"
@@ -2328,7 +2382,9 @@ Generated on: ${new Date().toLocaleString()}
                     <div className="text-center py-8 text-gray-500">
                       <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                       <p>No items in processing queue</p>
-                      <p className="text-sm">Upload a video to start analysis</p>
+                      <p className="text-sm">
+                        Upload a video to start analysis
+                      </p>
                     </div>
                   )}
                 </div>
