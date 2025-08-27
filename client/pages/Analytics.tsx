@@ -436,7 +436,7 @@ export default function Analytics() {
 
       switch (format.toLowerCase()) {
         case "json":
-          const insights = generateVideoInsights();
+          const textInsights = generateVideoInsights();
           const jsonData = {
             reportType,
             generatedOn: new Date().toISOString(),
@@ -446,38 +446,38 @@ export default function Analytics() {
               quarterScores: ["3.2 (20)", "5.4 (34)", "7.8 (50)", "12.11 (83)"],
               finalScore: "Team A: 83 - Team B: 76",
               duration: Math.floor(Math.random() * 120 + 90),
-              attendance: insights.crowdDensity.reduce(
+              attendance: textInsights.crowdDensity.reduce(
                 (sum, section) => sum + section.attendance,
                 0,
               ),
               weather: "Clear, 18°C, Light breeze",
             },
-            playerPerformance: insights.playerStats,
+            playerPerformance: textInsights.playerStats,
             crowdAnalysis: {
-              totalCapacity: insights.crowdDensity.reduce(
+              totalCapacity: textInsights.crowdDensity.reduce(
                 (sum, section) => sum + section.capacity,
                 0,
               ),
-              totalAttendance: insights.crowdDensity.reduce(
+              totalAttendance: textInsights.crowdDensity.reduce(
                 (sum, section) => sum + section.attendance,
                 0,
               ),
               overallDensity: (
-                (insights.crowdDensity.reduce(
+                (textInsights.crowdDensity.reduce(
                   (sum, section) => sum + section.attendance,
                   0,
                 ) /
-                  insights.crowdDensity.reduce(
+                  textInsights.crowdDensity.reduce(
                     (sum, section) => sum + section.capacity,
                     0,
                   )) *
                 100
               ).toFixed(1),
-              sectionBreakdown: insights.crowdDensity,
+              sectionBreakdown: textInsights.crowdDensity,
             },
-            keyEvents: insights.matchEvents,
+            keyEvents: textInsights.matchEvents,
             fieldAnalysis: {
-              heatMap: insights.heatMapZones,
+              heatMap: textInsights.heatMapZones,
               tacticalInsights: {
                 forwardPressure: "87%",
                 defensiveStructure: "Zone-based with man-on-man contests",
@@ -489,9 +489,9 @@ export default function Analytics() {
               trackingPoints: Math.floor(Math.random() * 50000 + 25000),
               playerDetectionAccuracy: "97.8%",
               ballTrackingPrecision: "94.2%",
-              sectionsMonitored: insights.crowdDensity.length,
-              keyMomentsIdentified: insights.matchEvents.length,
-              metricsCalculated: insights.playerStats.length * 14,
+              sectionsMonitored: textInsights.crowdDensity.length,
+              keyMomentsIdentified: textInsights.matchEvents.length,
+              metricsCalculated: textInsights.playerStats.length * 14,
             },
             summary: {
               analysisComplete: analysisComplete,
@@ -545,11 +545,11 @@ MATCH OVERVIEW
 Quarter Scores: 3.2 (20) | 5.4 (34) | 7.8 (50) | 12.11 (83)
 Final Score: Team A: 83 - Team B: 76
 Weather: Clear, 18°C, Light breeze
-Attendance: ${insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
+Attendance: ${textInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
 
 KEY MATCH EVENTS
 ================
-${insights.matchEvents
+${textInsights.matchEvents
   .map(
     (event) =>
       `${event.time} (Q${event.quarter}): ${event.event} - ${event.player}`,
@@ -558,7 +558,7 @@ ${insights.matchEvents
 
 DETAILED PLAYER PERFORMANCE ANALYSIS
 ====================================
-${insights.playerStats
+${textInsights.playerStats
   .map(
     (player) => `
 ${player.name}:
@@ -583,12 +583,12 @@ ${player.name}:
 
 CROWD DENSITY ANALYSIS
 ======================
-Total Stadium Capacity: ${insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0).toLocaleString()}
-Total Attendance: ${insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
-Overall Density: ${((insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
+Total Stadium Capacity: ${textInsights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0).toLocaleString()}
+Total Attendance: ${textInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
+Overall Density: ${((textInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / textInsights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
 
 Stand-by-Stand Analysis:
-${insights.crowdDensity
+${textInsights.crowdDensity
   .map(
     (section) => `
 ${section.section}:
@@ -604,7 +604,7 @@ ${section.section}:
 
 FIELD HEAT MAP ANALYSIS
 =======================
-${insights.heatMapZones
+${textInsights.heatMapZones
   .map(
     (zone) =>
       `${zone.zone}: ${zone.activity}% activity (${zone.events} events tracked)`,
@@ -624,9 +624,9 @@ VIDEO ANALYSIS SUMMARY
 • Total tracking points: ${(Math.random() * 50000 + 25000).toFixed(0)}
 • Player detection accuracy: 97.8%
 • Ball tracking precision: 94.2%
-• Crowd movement analysis: ${insights.crowdDensity.length} sections monitored
-• Key moments identified: ${insights.matchEvents.length}
-• Performance metrics calculated: ${insights.playerStats.length * 14}
+• Crowd movement analysis: ${textInsights.crowdDensity.length} sections monitored
+• Key moments identified: ${textInsights.matchEvents.length}
+• Performance metrics calculated: ${textInsights.playerStats.length * 14}
 
 This comprehensive analysis was generated by AFL Analytics Platform using advanced AI video processing technology.`;
 
