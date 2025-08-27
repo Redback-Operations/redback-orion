@@ -436,7 +436,7 @@ export default function Analytics() {
 
       switch (format.toLowerCase()) {
         case "json":
-          const textInsights = generateVideoInsights();
+          const jsonInsights = generateVideoInsights();
           const jsonData = {
             reportType,
             generatedOn: new Date().toISOString(),
