@@ -314,39 +314,50 @@ export default function Analytics() {
   const generateDynamicSummary = (insights: any, analysisType: string) => {
     const totalEvents = insights.matchEvents.length;
     const topPlayer = insights.playerStats.reduce((best: any, current: any) =>
-      parseFloat(current.efficiency) > parseFloat(best.efficiency) ? current : best
+      parseFloat(current.efficiency) > parseFloat(best.efficiency)
+        ? current
+        : best,
     );
-    const avgCrowdDensity = (insights.crowdDensity.reduce((sum: number, section: any) =>
-      sum + parseFloat(section.density), 0) / insights.crowdDensity.length).toFixed(1);
-    const totalAttendance = insights.crowdDensity.reduce((sum: number, section: any) =>
-      sum + section.attendance, 0);
-    const mostActiveZone = insights.heatMapZones.reduce((max: any, zone: any) =>
-      zone.activity > max.activity ? zone : max
+    const avgCrowdDensity = (
+      insights.crowdDensity.reduce(
+        (sum: number, section: any) => sum + parseFloat(section.density),
+        0,
+      ) / insights.crowdDensity.length
+    ).toFixed(1);
+    const totalAttendance = insights.crowdDensity.reduce(
+      (sum: number, section: any) => sum + section.attendance,
+      0,
+    );
+    const mostActiveZone = insights.heatMapZones.reduce(
+      (max: any, zone: any) => (zone.activity > max.activity ? zone : max),
     );
 
     return {
       overview: `Analysis of ${totalEvents} key match events with ${totalAttendance.toLocaleString()} attendees across ${insights.crowdDensity.length} stadium sections.`,
       performance: `Top performer: ${topPlayer.name} with ${topPlayer.efficiency}% efficiency, ${topPlayer.goals} goals, and ${topPlayer.tackles} tackles.`,
-      crowd: `Average crowd density: ${avgCrowdDensity}%. Most engaged section: ${insights.crowdDensity.reduce((max: any, section: any) =>
-        parseFloat(section.density) > parseFloat(max.density) ? section : max
-      ).section}`,
+      crowd: `Average crowd density: ${avgCrowdDensity}%. Most engaged section: ${
+        insights.crowdDensity.reduce((max: any, section: any) =>
+          parseFloat(section.density) > parseFloat(max.density) ? section : max,
+        ).section
+      }`,
       tactical: `Primary activity in ${mostActiveZone.zone} (${mostActiveZone.activity}% activity level) with ${mostActiveZone.events} tracked events.`,
-      insights: analysisType === 'highlights' ?
-        `${totalEvents} key highlights identified with crowd correlation analysis.` :
-        analysisType === 'player' ?
-        `${insights.playerStats.length} players tracked with comprehensive performance metrics.` :
-        analysisType === 'tactics' ?
-        `Tactical patterns analyzed across ${insights.heatMapZones.length} field zones.` :
-        `Performance data collected for ${insights.playerStats.length} players with ${Math.floor(Math.random() * 500 + 200)} data points per player.`
+      insights:
+        analysisType === "highlights"
+          ? `${totalEvents} key highlights identified with crowd correlation analysis.`
+          : analysisType === "player"
+            ? `${insights.playerStats.length} players tracked with comprehensive performance metrics.`
+            : analysisType === "tactics"
+              ? `Tactical patterns analyzed across ${insights.heatMapZones.length} field zones.`
+              : `Performance data collected for ${insights.playerStats.length} players with ${Math.floor(Math.random() * 500 + 200)} data points per player.`,
     };
   };
 
   // Generate PDF using HTML and browser print API
   const generatePDF = (content: string, fileName: string) => {
     // Create a new window for PDF generation
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (!printWindow) {
-      alert('Please allow popups to generate PDF reports');
+      alert("Please allow popups to generate PDF reports");
       return;
     }
 
@@ -636,11 +647,14 @@ export default function Analytics() {
 
         case "pdf":
           const pdfInsights = generateVideoInsights();
-          const dynamicSummary = generateDynamicSummary(pdfInsights, selectedAnalysis);
+          const dynamicSummary = generateDynamicSummary(
+            pdfInsights,
+            selectedAnalysis,
+          );
 
           const htmlContent = `
             <div class="section">
-              <h1>Video Analysis Report - ${reportType.replace(/_/g, ' ')}</h1>
+              <h1>Video Analysis Report - ${reportType.replace(/_/g, " ")}</h1>
               <div class="metric">
                 <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
                 <strong>Video File:</strong> ${selectedFile?.name || "Match_Analysis_Video.mp4"}<br>
@@ -660,17 +674,23 @@ export default function Analytics() {
 
             <div class="section">
               <h2>Key Match Events</h2>
-              ${pdfInsights.matchEvents.map(event => `
+              ${pdfInsights.matchEvents
+                .map(
+                  (event) => `
                 <div class="metric">
                   <strong>${event.time} (Q${event.quarter}):</strong> ${event.event} - ${event.player}
                 </div>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </div>
 
             <div class="section">
               <h2>Player Performance Analysis</h2>
               <div class="player-stats">
-                ${pdfInsights.playerStats.map(player => `
+                ${pdfInsights.playerStats
+                  .map(
+                    (player) => `
                   <div class="player-card">
                     <h3 style="margin: 0 0 8px 0; color: #2563eb;">${player.name}</h3>
                     <div><strong>Speed:</strong> ${player.speed} km/h</div>
@@ -679,7 +699,9 @@ export default function Analytics() {
                     <div><strong>Efficiency:</strong> ${player.efficiency}% | <strong>Time on Ground:</strong> ${player.timeOnGround}%</div>
                     <div><strong>Contested:</strong> ${player.contestedPossessions} | <strong>Uncontested:</strong> ${player.uncontestedPossessions}</div>
                   </div>
-                `).join('')}
+                `,
+                  )
+                  .join("")}
               </div>
             </div>
 
@@ -689,21 +711,29 @@ export default function Analytics() {
                 <strong>Total Attendance:</strong> ${pdfInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()} |
                 <strong>Overall Density:</strong> ${((pdfInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / pdfInsights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
               </div>
-              ${pdfInsights.crowdDensity.map(section => `
+              ${pdfInsights.crowdDensity
+                .map(
+                  (section) => `
                 <div class="crowd-section">
                   <strong>${section.section}:</strong> ${section.attendance.toLocaleString()} / ${section.capacity.toLocaleString()}
                   (${section.density}% density) | Noise: ${section.noiseLevel} dB | Peak Moments: ${section.peakMoments}
                 </div>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </div>
 
             <div class="section">
               <h2>Field Activity Analysis</h2>
-              ${pdfInsights.heatMapZones.map(zone => `
+              ${pdfInsights.heatMapZones
+                .map(
+                  (zone) => `
                 <div class="metric">
                   <strong>${zone.zone}:</strong> ${zone.activity}% activity (${zone.events} events tracked)
                 </div>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </div>
 
             <div class="section">
@@ -722,7 +752,10 @@ export default function Analytics() {
 
         case "txt":
           const txtInsights = generateVideoInsights();
-          const txtSummary = generateDynamicSummary(txtInsights, selectedAnalysis);
+          const txtSummary = generateDynamicSummary(
+            txtInsights,
+            selectedAnalysis,
+          );
 
           const textContent = `AFL ANALYTICS VIDEO ANALYSIS REPORT
 
@@ -740,20 +773,24 @@ ${txtSummary.insights}
 
 KEY MATCH EVENTS
 ===============
-${txtInsights.matchEvents.map(event => `${event.time} (Q${event.quarter}): ${event.event} - ${event.player}`).join('\n')}
+${txtInsights.matchEvents.map((event) => `${event.time} (Q${event.quarter}): ${event.event} - ${event.player}`).join("\n")}
 
 PLAYER PERFORMANCE
 ==================
-${txtInsights.playerStats.map(player => `
+${txtInsights.playerStats
+  .map(
+    (player) => `
 ${player.name}:
   Speed: ${player.speed} km/h | Goals: ${player.goals} | Tackles: ${player.tackles} | Assists: ${player.assists}
   Disposals: ${player.disposals} | Efficiency: ${player.efficiency}% | Time on Ground: ${player.timeOnGround}%
-`).join('')}
+`,
+  )
+  .join("")}
 
 CROWD ANALYSIS
 ==============
 Total Attendance: ${txtInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
-${txtInsights.crowdDensity.map(section => `${section.section}: ${section.density}% density, ${section.noiseLevel} dB`).join('\n')}
+${txtInsights.crowdDensity.map((section) => `${section.section}: ${section.density}% density, ${section.noiseLevel} dB`).join("\n")}
 
 Generated by AFL Analytics Platform
 `;

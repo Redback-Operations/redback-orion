@@ -310,37 +310,53 @@ export default function AFLDashboard() {
   };
 
   // Generate dynamic summaries for dashboard reports
-  const generateDynamicDashboardSummary = (insights: any, analysisType: string, focusAreas: string[]) => {
-    const totalAttendance = insights.crowdDensity.reduce((sum: number, section: any) => sum + section.attendance, 0);
-    const topPlayer = insights.playerStats.reduce((best: any, current: any) =>
-      parseFloat(current.efficiency) > parseFloat(best.efficiency) ? current : best
+  const generateDynamicDashboardSummary = (
+    insights: any,
+    analysisType: string,
+    focusAreas: string[],
+  ) => {
+    const totalAttendance = insights.crowdDensity.reduce(
+      (sum: number, section: any) => sum + section.attendance,
+      0,
     );
-    const avgCrowdDensity = (insights.crowdDensity.reduce((sum: number, section: any) =>
-      sum + parseFloat(section.density), 0) / insights.crowdDensity.length).toFixed(1);
+    const topPlayer = insights.playerStats.reduce((best: any, current: any) =>
+      parseFloat(current.efficiency) > parseFloat(best.efficiency)
+        ? current
+        : best,
+    );
+    const avgCrowdDensity = (
+      insights.crowdDensity.reduce(
+        (sum: number, section: any) => sum + parseFloat(section.density),
+        0,
+      ) / insights.crowdDensity.length
+    ).toFixed(1);
 
     return {
-      overview: `Comprehensive analysis of ${totalAttendance.toLocaleString()} attendees across ${insights.crowdDensity.length} stadium sections with ${focusAreas.length || 'general'} focus areas.`,
+      overview: `Comprehensive analysis of ${totalAttendance.toLocaleString()} attendees across ${insights.crowdDensity.length} stadium sections with ${focusAreas.length || "general"} focus areas.`,
       performance: `Top performer: ${topPlayer.name} achieved ${topPlayer.efficiency}% efficiency with ${topPlayer.goals} goals and ${topPlayer.tackles} tackles.`,
-      crowd: `Stadium operated at ${avgCrowdDensity}% average density with peak engagement in ${insights.crowdDensity.reduce((max: any, section: any) =>
-        parseFloat(section.density) > parseFloat(max.density) ? section : max
-      ).section}.`,
-      analysis: analysisType === 'highlights' ?
-        `Key highlight moments identified with real-time crowd correlation analysis.` :
-        analysisType === 'player' ?
-        `Individual player tracking completed for ${insights.playerStats.length} athletes with speed and positioning data.` :
-        analysisType === 'tactics' ?
-        `Tactical formations and strategic patterns analyzed throughout the match.` :
-        analysisType === 'performance' ?
-        `Comprehensive performance metrics calculated for all tracked players.` :
-        `Crowd engagement patterns analyzed across all stadium sections.`
+      crowd: `Stadium operated at ${avgCrowdDensity}% average density with peak engagement in ${
+        insights.crowdDensity.reduce((max: any, section: any) =>
+          parseFloat(section.density) > parseFloat(max.density) ? section : max,
+        ).section
+      }.`,
+      analysis:
+        analysisType === "highlights"
+          ? `Key highlight moments identified with real-time crowd correlation analysis.`
+          : analysisType === "player"
+            ? `Individual player tracking completed for ${insights.playerStats.length} athletes with speed and positioning data.`
+            : analysisType === "tactics"
+              ? `Tactical formations and strategic patterns analyzed throughout the match.`
+              : analysisType === "performance"
+                ? `Comprehensive performance metrics calculated for all tracked players.`
+                : `Crowd engagement patterns analyzed across all stadium sections.`,
     };
   };
 
   // PDF generation for dashboard reports
   const generateDashboardPDF = (content: string, fileName: string) => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (!printWindow) {
-      alert('Please allow popups to generate PDF reports');
+      alert("Please allow popups to generate PDF reports");
       return;
     }
 
@@ -438,16 +454,20 @@ export default function AFLDashboard() {
   };
 
   // Download handlers for reports and analysis
-  const handleDownloadReport = (format: string = 'txt') => {
+  const handleDownloadReport = (format: string = "txt") => {
     if (!videoAnalysisComplete || !selectedVideoFile) {
-      alert('Please complete video analysis first');
+      alert("Please complete video analysis first");
       return;
     }
 
     const insights = generateDashboardInsights();
-    const dynamicSummary = generateDynamicDashboardSummary(insights, selectedAnalysisType, selectedFocusAreas);
+    const dynamicSummary = generateDynamicDashboardSummary(
+      insights,
+      selectedAnalysisType,
+      selectedFocusAreas,
+    );
 
-    if (format === 'pdf') {
+    if (format === "pdf") {
       const htmlContent = `
         <div class="section">
           <h1>Video Analysis Dashboard Report</h1>
@@ -470,7 +490,9 @@ export default function AFLDashboard() {
         <div class="section">
           <h2>Player Performance Metrics</h2>
           <div class="player-grid">
-            ${insights.playerStats.map(player => `
+            ${insights.playerStats
+              .map(
+                (player) => `
               <div class="player-card">
                 <h3 style="margin: 0 0 8px 0; color: #059669;">${player.name}</h3>
                 <div><strong>Speed:</strong> ${player.speed} km/h | <strong>Goals:</strong> ${player.goals}</div>
@@ -478,7 +500,9 @@ export default function AFLDashboard() {
                 <div><strong>Disposals:</strong> ${player.disposals} | <strong>Efficiency:</strong> ${player.efficiency}%</div>
                 <div><strong>Time on Ground:</strong> ${player.timeOnGround}%</div>
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
         </div>
 
@@ -488,12 +512,16 @@ export default function AFLDashboard() {
             <strong>Total Attendance:</strong> ${insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()} |
             <strong>Overall Density:</strong> ${((insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
           </div>
-          ${insights.crowdDensity.map(section => `
+          ${insights.crowdDensity
+            .map(
+              (section) => `
             <div class="crowd-item">
               <strong>${section.section}:</strong> ${section.attendance.toLocaleString()} / ${section.capacity.toLocaleString()}
               (${section.density}% density) | Noise: ${section.noiseLevel} dB
             </div>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </div>
 
         <div class="section">
@@ -506,7 +534,10 @@ export default function AFLDashboard() {
         </div>
       `;
 
-      generateDashboardPDF(htmlContent, `AFL_Video_Analysis_${selectedAnalysisType}_${Date.now()}`);
+      generateDashboardPDF(
+        htmlContent,
+        `AFL_Video_Analysis_${selectedAnalysisType}_${Date.now()}`,
+      );
     } else {
       const textContent = `AFL ANALYTICS DASHBOARD REPORT
 
@@ -524,18 +555,25 @@ ${dynamicSummary.analysis}
 
 PLAYER PERFORMANCE
 ==================
-${insights.playerStats.map(player => `
-${player.name}: Speed ${player.speed} km/h, Goals ${player.goals}, Tackles ${player.tackles}, Efficiency ${player.efficiency}%`).join('\n')}
+${insights.playerStats
+  .map(
+    (player) => `
+${player.name}: Speed ${player.speed} km/h, Goals ${player.goals}, Tackles ${player.tackles}, Efficiency ${player.efficiency}%`,
+  )
+  .join("\n")}
 
 CROWD ANALYSIS
 ==============
 Total: ${insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()} attendees
-${insights.crowdDensity.map(section => `${section.section}: ${section.density}% density`).join('\n')}
+${insights.crowdDensity.map((section) => `${section.section}: ${section.density}% density`).join("\n")}
 
 Generated by AFL Analytics Platform
 `;
 
-      downloadText(textContent, `AFL_Video_Analysis_${selectedAnalysisType}_${Date.now()}`);
+      downloadText(
+        textContent,
+        `AFL_Video_Analysis_${selectedAnalysisType}_${Date.now()}`,
+      );
     }
   };
 
@@ -1831,7 +1869,7 @@ Generated on: ${new Date().toLocaleString()}
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDownloadReport('pdf')}
+                          onClick={() => handleDownloadReport("pdf")}
                           disabled={!videoAnalysisComplete}
                         >
                           <FileText className="w-4 h-4 mr-2" />
@@ -1840,7 +1878,7 @@ Generated on: ${new Date().toLocaleString()}
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDownloadReport('txt')}
+                          onClick={() => handleDownloadReport("txt")}
                           disabled={!videoAnalysisComplete}
                         >
                           <FileText className="w-4 h-4 mr-2" />
