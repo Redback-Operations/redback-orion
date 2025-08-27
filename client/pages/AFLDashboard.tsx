@@ -1230,7 +1230,24 @@ Export format: Metadata (txt)
                           {report.date} • {report.size} • {report.format}
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const reportContent = `AFL Analytics Report: ${report.name}
+
+Generated: ${report.date}
+Format: ${report.format}
+Size: ${report.size}
+
+This is a sample report from AFL Analytics Platform.
+Report details and analysis data would be included here in a real implementation.
+
+Generated on: ${new Date().toLocaleString()}
+`;
+                          downloadText(reportContent, `${report.name.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}`);
+                        }}
+                      >
                         <Download className="w-4 h-4" />
                       </Button>
                     </div>
