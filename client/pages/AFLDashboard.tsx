@@ -625,10 +625,19 @@ export default function AFLDashboard() {
         ),
       );
 
-      // Complete the UI state
+      // Complete the UI state and sync queue progress
       for (let i = 0; i <= 100; i += 2) {
         await new Promise((resolve) => setTimeout(resolve, 50));
         setVideoAnalysisProgress(i);
+
+        // Update queue item progress to match UI progress
+        setProcessingQueue((prev) =>
+          prev.map((item) =>
+            item.id === newQueueItem.id
+              ? { ...item, progress: Math.max(5, i) } // Keep minimum 5% from earlier
+              : item,
+          ),
+        );
       }
 
       setIsVideoAnalyzing(false);
