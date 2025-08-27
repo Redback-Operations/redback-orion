@@ -174,6 +174,17 @@ export default function AFLDashboard() {
   const [isLive, setIsLive] = useState(true);
   const [userEmail, setUserEmail] = useState("");
 
+  // Video upload states
+  const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
+  const [isVideoAnalyzing, setIsVideoAnalyzing] = useState(false);
+  const [videoAnalysisProgress, setVideoAnalysisProgress] = useState(0);
+  const [videoAnalysisComplete, setVideoAnalysisComplete] = useState(false);
+  const [videoAnalysisError, setVideoAnalysisError] = useState<string | null>(null);
+  const [selectedAnalysisType, setSelectedAnalysisType] = useState("highlights");
+  const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
+
   // Check authentication on component mount
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
