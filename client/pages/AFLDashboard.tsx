@@ -394,6 +394,102 @@ export default function AFLDashboard() {
     return `${diffHours}h ${diffMins % 60}m remaining`;
   };
 
+  // Generate dynamic chart data for analysis results
+  const generateAnalysisChartData = (item: any) => {
+    // Player performance data for charts
+    const playerStatsData = [
+      {
+        name: "Marcus Bontempelli",
+        goals: 2,
+        assists: 3,
+        tackles: 6,
+        marks: 8,
+        efficiency: 85.7,
+        maxSpeed: 32.4,
+        distance: 12.8,
+        disposals: 31,
+      },
+      {
+        name: "Patrick Cripps",
+        goals: 1,
+        assists: 5,
+        tackles: 9,
+        marks: 6,
+        efficiency: 88.6,
+        maxSpeed: 29.8,
+        distance: 13.2,
+        disposals: 34,
+      },
+      {
+        name: "Clayton Oliver",
+        goals: 0,
+        assists: 4,
+        tackles: 7,
+        marks: 5,
+        efficiency: 82.3,
+        maxSpeed: 28.1,
+        distance: 11.5,
+        disposals: 28,
+      },
+      {
+        name: "Christian Petracca",
+        goals: 3,
+        assists: 2,
+        tackles: 4,
+        marks: 7,
+        efficiency: 89.2,
+        maxSpeed: 31.8,
+        distance: 10.9,
+        disposals: 26,
+      },
+    ];
+
+    // Crowd density data for charts
+    const crowdDensityData = [
+      { section: "Northern Stand", density: 95.0, attendance: 14250, capacity: 15000, noiseLevel: 95.2 },
+      { section: "Southern Stand", density: 97.3, attendance: 11680, capacity: 12000, noiseLevel: 92.8 },
+      { section: "Eastern Wing", density: 88.5, attendance: 7080, capacity: 8000, noiseLevel: 87.4 },
+      { section: "Western Wing", density: 91.2, attendance: 7296, capacity: 8000, noiseLevel: 89.6 },
+      { section: "Premium Seats", density: 94.8, attendance: 2844, capacity: 3000, noiseLevel: 78.2 },
+      { section: "MCC Members", density: 89.1, attributes: 4455, capacity: 5000, noiseLevel: 82.1 },
+    ];
+
+    // Performance timeline data
+    const performanceTimelineData = [
+      { time: "Q1", goals: 3, tackles: 15, marks: 12, efficiency: 84 },
+      { time: "Q2", goals: 4, tackles: 18, marks: 14, efficiency: 87 },
+      { time: "Q3", goals: 2, tackles: 12, marks: 10, efficiency: 82 },
+      { time: "Q4", goals: 5, tackles: 20, marks: 16, efficiency: 89 },
+    ];
+
+    // Speed comparison data
+    const speedComparisonData = [
+      { player: "M. Bontempelli", maxSpeed: 32.4, avgSpeed: 24.8 },
+      { player: "P. Cripps", maxSpeed: 29.8, avgSpeed: 22.1 },
+      { player: "C. Oliver", maxSpeed: 28.1, avgSpeed: 21.5 },
+      { player: "C. Petracca", maxSpeed: 31.8, avgSpeed: 25.2 },
+    ];
+
+    return {
+      playerStats: playerStatsData,
+      crowdDensity: crowdDensityData,
+      performanceTimeline: performanceTimelineData,
+      speedComparison: speedComparisonData,
+    };
+  };
+
+  // Chart color schemes
+  const chartColors = {
+    primary: "#059669",
+    secondary: "#2563eb",
+    accent: "#dc2626",
+    warning: "#d97706",
+    success: "#16a34a",
+    purple: "#7c3aed",
+    pink: "#ec4899",
+    teal: "#0d9488",
+  };
+
   // View analysis results for a queue item
   const handleViewAnalysis = (item: any) => {
     setSelectedAnalysisItem(item);
@@ -1351,7 +1447,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════════════════════════════��═══════
+════════════��═══════���══════════════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
