@@ -1321,39 +1321,60 @@ export default function AFLDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium">
-                          Key Moments Detected
-                        </span>
-                        <Badge variant="secondary">12 events</Badge>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Goals (4), Marks (5), Tackles (3)
-                      </div>
+                  {!videoAnalysisComplete ? (
+                    <div className="text-center py-8">
+                      <Video className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        No Analysis Results Yet
+                      </h3>
+                      <p className="text-gray-600">
+                        Upload and analyze a video to see detailed insights here
+                      </p>
                     </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">
+                            Analysis Type: {selectedAnalysisType === 'highlights' ? 'Match Highlights' :
+                                          selectedAnalysisType === 'player' ? 'Player Tracking' :
+                                          selectedAnalysisType === 'tactics' ? 'Tactical Analysis' :
+                                          selectedAnalysisType === 'performance' ? 'Performance Metrics' : 'Crowd Reactions'}
+                          </span>
+                          <Badge variant="secondary">Complete</Badge>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Video: {selectedVideoFile?.name}
+                        </div>
+                      </div>
 
-                    <div className="p-4 bg-green-50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium">Player Performance</span>
-                        <Badge variant="secondary">Analysis Complete</Badge>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Top performer: M. Bontempelli (87% efficiency)
-                      </div>
-                    </div>
+                      {selectedFocusAreas.length > 0 && (
+                        <div className="p-4 bg-green-50 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium">Focus Areas Analyzed</span>
+                            <Badge variant="secondary">{selectedFocusAreas.length} areas</Badge>
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {selectedFocusAreas.join(', ')}
+                          </div>
+                        </div>
+                      )}
 
-                    <div className="p-4 bg-purple-50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium">Tactical Insights</span>
-                        <Badge variant="secondary">6 patterns</Badge>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        High forward pressure, contested possession focus
+                      <div className="p-4 bg-purple-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium">AI Insights Generated</span>
+                          <Badge variant="secondary">Ready</Badge>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {selectedAnalysisType === 'highlights' && 'Key moments and highlights identified'}
+                          {selectedAnalysisType === 'player' && 'Player movements and performance tracked'}
+                          {selectedAnalysisType === 'tactics' && 'Tactical patterns and strategies analyzed'}
+                          {selectedAnalysisType === 'performance' && 'Performance metrics calculated'}
+                          {selectedAnalysisType === 'crowd' && 'Crowd reactions and engagement measured'}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   <Separator />
 
