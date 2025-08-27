@@ -503,7 +503,7 @@ export default function Analytics() {
           break;
 
         case "csv":
-          const insights = generateVideoInsights();
+          const csvInsights = generateVideoInsights();
           const csvHeader =
             "Player,Speed (km/h),Goals,Tackles,Assists,Disposals,Marks,Handballs,Kicks,Efficiency (%),Time on Ground (%),Contested Possessions,Uncontested Possessions,Inside 50s,Clangers\n";
           const csvData = insights.playerStats
