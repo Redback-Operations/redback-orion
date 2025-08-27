@@ -446,38 +446,38 @@ export default function Analytics() {
               quarterScores: ["3.2 (20)", "5.4 (34)", "7.8 (50)", "12.11 (83)"],
               finalScore: "Team A: 83 - Team B: 76",
               duration: Math.floor(Math.random() * 120 + 90),
-              attendance: textInsights.crowdDensity.reduce(
+              attendance: jsonInsights.crowdDensity.reduce(
                 (sum, section) => sum + section.attendance,
                 0,
               ),
               weather: "Clear, 18°C, Light breeze",
             },
-            playerPerformance: textInsights.playerStats,
+            playerPerformance: jsonInsights.playerStats,
             crowdAnalysis: {
-              totalCapacity: textInsights.crowdDensity.reduce(
+              totalCapacity: jsonInsights.crowdDensity.reduce(
                 (sum, section) => sum + section.capacity,
                 0,
               ),
-              totalAttendance: textInsights.crowdDensity.reduce(
+              totalAttendance: jsonInsights.crowdDensity.reduce(
                 (sum, section) => sum + section.attendance,
                 0,
               ),
               overallDensity: (
-                (textInsights.crowdDensity.reduce(
+                (jsonInsights.crowdDensity.reduce(
                   (sum, section) => sum + section.attendance,
                   0,
                 ) /
-                  textInsights.crowdDensity.reduce(
+                  jsonInsights.crowdDensity.reduce(
                     (sum, section) => sum + section.capacity,
                     0,
                   )) *
                 100
               ).toFixed(1),
-              sectionBreakdown: textInsights.crowdDensity,
+              sectionBreakdown: jsonInsights.crowdDensity,
             },
-            keyEvents: textInsights.matchEvents,
+            keyEvents: jsonInsights.matchEvents,
             fieldAnalysis: {
-              heatMap: textInsights.heatMapZones,
+              heatMap: jsonInsights.heatMapZones,
               tacticalInsights: {
                 forwardPressure: "87%",
                 defensiveStructure: "Zone-based with man-on-man contests",
@@ -489,9 +489,9 @@ export default function Analytics() {
               trackingPoints: Math.floor(Math.random() * 50000 + 25000),
               playerDetectionAccuracy: "97.8%",
               ballTrackingPrecision: "94.2%",
-              sectionsMonitored: textInsights.crowdDensity.length,
-              keyMomentsIdentified: textInsights.matchEvents.length,
-              metricsCalculated: textInsights.playerStats.length * 14,
+              sectionsMonitored: jsonInsights.crowdDensity.length,
+              keyMomentsIdentified: jsonInsights.matchEvents.length,
+              metricsCalculated: jsonInsights.playerStats.length * 14,
             },
             summary: {
               analysisComplete: analysisComplete,
