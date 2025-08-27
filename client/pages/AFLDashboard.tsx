@@ -181,8 +181,11 @@ export default function AFLDashboard() {
   const [isVideoAnalyzing, setIsVideoAnalyzing] = useState(false);
   const [videoAnalysisProgress, setVideoAnalysisProgress] = useState(0);
   const [videoAnalysisComplete, setVideoAnalysisComplete] = useState(false);
-  const [videoAnalysisError, setVideoAnalysisError] = useState<string | null>(null);
-  const [selectedAnalysisType, setSelectedAnalysisType] = useState("highlights");
+  const [videoAnalysisError, setVideoAnalysisError] = useState<string | null>(
+    null,
+  );
+  const [selectedAnalysisType, setSelectedAnalysisType] =
+    useState("highlights");
   const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
 
   // Check authentication on component mount
@@ -210,20 +213,29 @@ export default function AFLDashboard() {
   };
 
   // Video upload handlers
-  const handleVideoFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileSelect = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       // Validate file type
-      const validTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime'];
+      const validTypes = [
+        "video/mp4",
+        "video/mov",
+        "video/avi",
+        "video/quicktime",
+      ];
       if (!validTypes.includes(file.type)) {
-        setVideoAnalysisError('Please select a valid video file (MP4, MOV, or AVI)');
+        setVideoAnalysisError(
+          "Please select a valid video file (MP4, MOV, or AVI)",
+        );
         return;
       }
 
       // Validate file size (max 500MB)
       const maxSize = 500 * 1024 * 1024; // 500MB in bytes
       if (file.size > maxSize) {
-        setVideoAnalysisError('File size must be less than 500MB');
+        setVideoAnalysisError("File size must be less than 500MB");
         return;
       }
 
@@ -237,13 +249,13 @@ export default function AFLDashboard() {
     if (checked) {
       setSelectedFocusAreas([...selectedFocusAreas, area]);
     } else {
-      setSelectedFocusAreas(selectedFocusAreas.filter(a => a !== area));
+      setSelectedFocusAreas(selectedFocusAreas.filter((a) => a !== area));
     }
   };
 
   const uploadAndAnalyzeVideo = async () => {
     if (!selectedVideoFile) {
-      setVideoAnalysisError('Please select a video file first');
+      setVideoAnalysisError("Please select a video file first");
       return;
     }
 
@@ -254,7 +266,7 @@ export default function AFLDashboard() {
 
       // Simulate file upload with real progress
       for (let i = 0; i <= 100; i += 5) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         setVideoUploadProgress(i);
       }
 
@@ -264,7 +276,7 @@ export default function AFLDashboard() {
 
       // Simulate video analysis with real progress
       for (let i = 0; i <= 100; i += 2) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
         setVideoAnalysisProgress(i);
       }
 
@@ -277,16 +289,22 @@ export default function AFLDashboard() {
         analysisType: selectedAnalysisType,
         focusAreas: selectedFocusAreas,
         timestamp: new Date().toISOString(),
-        fileSize: selectedVideoFile.size
+        fileSize: selectedVideoFile.size,
       };
 
-      const existingAnalyses = JSON.parse(localStorage.getItem('videoAnalyses') || '[]');
-      localStorage.setItem('videoAnalyses', JSON.stringify([...existingAnalyses, analysisResults]));
-
+      const existingAnalyses = JSON.parse(
+        localStorage.getItem("videoAnalyses") || "[]",
+      );
+      localStorage.setItem(
+        "videoAnalyses",
+        JSON.stringify([...existingAnalyses, analysisResults]),
+      );
     } catch (error) {
       setIsVideoUploading(false);
       setIsVideoAnalyzing(false);
-      setVideoAnalysisError(error instanceof Error ? error.message : 'Upload failed');
+      setVideoAnalysisError(
+        error instanceof Error ? error.message : "Upload failed",
+      );
     }
   };
 
@@ -1181,10 +1199,15 @@ export default function AFLDashboard() {
                       className="hidden"
                       id="video-upload-dashboard"
                     />
-                    <label htmlFor="video-upload-dashboard" className="cursor-pointer">
+                    <label
+                      htmlFor="video-upload-dashboard"
+                      className="cursor-pointer"
+                    >
                       <Video className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                       <div className="text-lg font-medium text-gray-700">
-                        {selectedVideoFile ? selectedVideoFile.name : "Drop video files here"}
+                        {selectedVideoFile
+                          ? selectedVideoFile.name
+                          : "Drop video files here"}
                       </div>
                       <div className="text-sm text-gray-500">
                         or click to browse
@@ -1199,17 +1222,22 @@ export default function AFLDashboard() {
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Video className="w-4 h-4 text-blue-600" />
-                        <span className="font-medium">{selectedVideoFile.name}</span>
+                        <span className="font-medium">
+                          {selectedVideoFile.name}
+                        </span>
                       </div>
                       <div className="text-sm text-gray-600 mt-1">
-                        Size: {(selectedVideoFile.size / 1024 / 1024).toFixed(1)} MB
+                        Size:{" "}
+                        {(selectedVideoFile.size / 1024 / 1024).toFixed(1)} MB
                       </div>
                     </div>
                   )}
 
                   {videoAnalysisError && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <div className="text-sm text-red-700">{videoAnalysisError}</div>
+                      <div className="text-sm text-red-700">
+                        {videoAnalysisError}
+                      </div>
                     </div>
                   )}
 
@@ -1249,7 +1277,10 @@ export default function AFLDashboard() {
                       <label className="text-sm font-medium">
                         Analysis Type
                       </label>
-                      <Select value={selectedAnalysisType} onValueChange={setSelectedAnalysisType}>
+                      <Select
+                        value={selectedAnalysisType}
+                        onValueChange={setSelectedAnalysisType}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -1290,7 +1321,9 @@ export default function AFLDashboard() {
                               type="checkbox"
                               className="rounded"
                               checked={selectedFocusAreas.includes(area)}
-                              onChange={(e) => handleFocusAreaChange(area, e.target.checked)}
+                              onChange={(e) =>
+                                handleFocusAreaChange(area, e.target.checked)
+                              }
                             />
                             <span className="text-sm">{area}</span>
                           </label>
@@ -1302,10 +1335,16 @@ export default function AFLDashboard() {
                   <Button
                     className="w-full bg-gradient-to-r from-green-600 to-blue-600"
                     onClick={uploadAndAnalyzeVideo}
-                    disabled={!selectedVideoFile || isVideoUploading || isVideoAnalyzing}
+                    disabled={
+                      !selectedVideoFile || isVideoUploading || isVideoAnalyzing
+                    }
                   >
                     <Zap className="w-4 h-4 mr-2" />
-                    {isVideoUploading ? 'Uploading...' : isVideoAnalyzing ? 'Analyzing...' : 'Start Analysis'}
+                    {isVideoUploading
+                      ? "Uploading..."
+                      : isVideoAnalyzing
+                        ? "Analyzing..."
+                        : "Start Analysis"}
                   </Button>
                 </CardContent>
               </Card>
@@ -1336,10 +1375,16 @@ export default function AFLDashboard() {
                       <div className="p-4 bg-blue-50 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">
-                            Analysis Type: {selectedAnalysisType === 'highlights' ? 'Match Highlights' :
-                                          selectedAnalysisType === 'player' ? 'Player Tracking' :
-                                          selectedAnalysisType === 'tactics' ? 'Tactical Analysis' :
-                                          selectedAnalysisType === 'performance' ? 'Performance Metrics' : 'Crowd Reactions'}
+                            Analysis Type:{" "}
+                            {selectedAnalysisType === "highlights"
+                              ? "Match Highlights"
+                              : selectedAnalysisType === "player"
+                                ? "Player Tracking"
+                                : selectedAnalysisType === "tactics"
+                                  ? "Tactical Analysis"
+                                  : selectedAnalysisType === "performance"
+                                    ? "Performance Metrics"
+                                    : "Crowd Reactions"}
                           </span>
                           <Badge variant="secondary">Complete</Badge>
                         </div>
@@ -1351,26 +1396,37 @@ export default function AFLDashboard() {
                       {selectedFocusAreas.length > 0 && (
                         <div className="p-4 bg-green-50 rounded-lg">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium">Focus Areas Analyzed</span>
-                            <Badge variant="secondary">{selectedFocusAreas.length} areas</Badge>
+                            <span className="font-medium">
+                              Focus Areas Analyzed
+                            </span>
+                            <Badge variant="secondary">
+                              {selectedFocusAreas.length} areas
+                            </Badge>
                           </div>
                           <div className="text-sm text-gray-600">
-                            {selectedFocusAreas.join(', ')}
+                            {selectedFocusAreas.join(", ")}
                           </div>
                         </div>
                       )}
 
                       <div className="p-4 bg-purple-50 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">AI Insights Generated</span>
+                          <span className="font-medium">
+                            AI Insights Generated
+                          </span>
                           <Badge variant="secondary">Ready</Badge>
                         </div>
                         <div className="text-sm text-gray-600">
-                          {selectedAnalysisType === 'highlights' && 'Key moments and highlights identified'}
-                          {selectedAnalysisType === 'player' && 'Player movements and performance tracked'}
-                          {selectedAnalysisType === 'tactics' && 'Tactical patterns and strategies analyzed'}
-                          {selectedAnalysisType === 'performance' && 'Performance metrics calculated'}
-                          {selectedAnalysisType === 'crowd' && 'Crowd reactions and engagement measured'}
+                          {selectedAnalysisType === "highlights" &&
+                            "Key moments and highlights identified"}
+                          {selectedAnalysisType === "player" &&
+                            "Player movements and performance tracked"}
+                          {selectedAnalysisType === "tactics" &&
+                            "Tactical patterns and strategies analyzed"}
+                          {selectedAnalysisType === "performance" &&
+                            "Performance metrics calculated"}
+                          {selectedAnalysisType === "crowd" &&
+                            "Crowd reactions and engagement measured"}
                         </div>
                       </div>
                     </div>
