@@ -254,6 +254,65 @@ export default function AFLDashboard() {
     setProcessingQueue((prev) => prev.filter((item) => item.id !== itemId));
   };
 
+  // Demo function to add sample processing items for demonstration
+  const addDemoProcessingItems = () => {
+    const demoItems = [
+      {
+        id: `demo_${Date.now()}_1`,
+        name: "Demo_Large_Match_Analysis.mp4",
+        analysisType: "Full Match Analysis",
+        status: "processing" as const,
+        progress: 35,
+        duration: "02:45:32",
+        size: "2.4 GB",
+        uploadTime: new Date(Date.now() - 300000).toISOString(), // 5 min ago
+        completedTime: null,
+        estimatedCompletion: new Date(Date.now() + 1200000).toISOString(), // 20 min from now
+        priority: "high" as const,
+        userId: "demo_user",
+        processingStage: "video_analysis",
+        errorCount: 0,
+        retryCount: 0,
+      },
+      {
+        id: `demo_${Date.now()}_2`,
+        name: "Demo_Failed_Upload.mov",
+        analysisType: "Player Tracking",
+        status: "failed" as const,
+        progress: 0,
+        duration: "01:15:22",
+        size: "1.8 GB",
+        uploadTime: new Date(Date.now() - 900000).toISOString(), // 15 min ago
+        completedTime: null,
+        estimatedCompletion: null,
+        priority: "medium" as const,
+        userId: "demo_user",
+        processingStage: "corrupted_segment",
+        errorCount: 2,
+        retryCount: 1,
+      },
+      {
+        id: `demo_${Date.now()}_3`,
+        name: "Demo_Completed_Analysis.mp4",
+        analysisType: "Highlight Generation",
+        status: "completed" as const,
+        progress: 100,
+        duration: "00:28:45",
+        size: "650 MB",
+        uploadTime: new Date(Date.now() - 1800000).toISOString(), // 30 min ago
+        completedTime: new Date(Date.now() - 600000).toISOString(), // 10 min ago
+        estimatedCompletion: null,
+        priority: "low" as const,
+        userId: "demo_user",
+        processingStage: "analysis_complete",
+        errorCount: 0,
+        retryCount: 0,
+      }
+    ];
+
+    setProcessingQueue(prev => [...demoItems, ...prev]);
+  };
+
   const formatTimeAgo = (timestamp: string) => {
     const now = new Date();
     const time = new Date(timestamp);
@@ -921,7 +980,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════════════════════════════════════
+════════════════════���══════════════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
