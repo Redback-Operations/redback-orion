@@ -799,11 +799,6 @@ export default function AFLDashboard() {
     if (email) {
       setUserEmail(email);
     }
-
-    // Auto-add demo processing items for testing
-    setTimeout(() => {
-      addDemoProcessingItems();
-    }, 1000);
   }, [navigate]);
 
   // Logout function
