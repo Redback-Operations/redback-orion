@@ -12,6 +12,7 @@ import AFLDashboard from "./pages/AFLDashboard";
 import PlayerPerformance from "./pages/PlayerPerformance";
 import CrowdMonitor from "./pages/CrowdMonitor";
 import Analytics from "./pages/Analytics";
+import Reports from "./pages/Reports";
 import ApiDiagnostics from "./pages/ApiDiagnostics";
 import NotFound from "./pages/NotFound";
 
