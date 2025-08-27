@@ -94,7 +94,9 @@ export default function Login() {
     }
 
     // Get stored user credentials from localStorage
-    const storedUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+    const storedUsers = JSON.parse(
+      localStorage.getItem("registeredUsers") || "[]",
+    );
 
     // Combine demo credentials with registered user credentials
     const allValidCredentials = [...validCredentials, ...storedUsers];
@@ -153,13 +155,18 @@ export default function Login() {
     }
 
     // Check if user already exists
-    const existingUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-    const userExists = existingUsers.some((user: any) =>
-      user.email.toLowerCase() === signupForm.email.toLowerCase()
+    const existingUsers = JSON.parse(
+      localStorage.getItem("registeredUsers") || "[]",
+    );
+    const userExists = existingUsers.some(
+      (user: any) =>
+        user.email.toLowerCase() === signupForm.email.toLowerCase(),
     );
 
     if (userExists) {
-      setError("An account with this email already exists. Please login instead.");
+      setError(
+        "An account with this email already exists. Please login instead.",
+      );
       setIsLoading(false);
       return;
     }
@@ -174,7 +181,7 @@ export default function Login() {
       firstName: signupForm.firstName,
       lastName: signupForm.lastName,
       organization: signupForm.organization,
-      role: signupForm.role
+      role: signupForm.role,
     };
 
     // Add new user to registered users list
