@@ -2414,9 +2414,17 @@ Generated on: ${new Date().toLocaleString()}
                     <div className="text-center py-8 text-gray-500">
                       <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                       <p>No items in processing queue</p>
-                      <p className="text-sm">
+                      <p className="text-sm mb-4">
                         Upload a video to start analysis
                       </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={addDemoProcessingItems}
+                        className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                      >
+                        Add Demo Processing Items
+                      </Button>
                     </div>
                   )}
                 </div>
