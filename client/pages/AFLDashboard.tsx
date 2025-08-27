@@ -189,6 +189,10 @@ export default function AFLDashboard() {
     useState("highlights");
   const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
 
+  // Analysis view modal state
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedAnalysisItem, setSelectedAnalysisItem] = useState<any>(null);
+
   // Processing Queue state - starts empty, only shows actual uploads
   const [processingQueue, setProcessingQueue] = useState<
     Array<{
