@@ -2800,6 +2800,189 @@ Generated on: ${new Date().toLocaleString()}
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Analysis View Modal */}
+      <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5" />
+              Analysis Results: {selectedAnalysisItem?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Complete analysis details for {selectedAnalysisItem?.analysisType}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedAnalysisItem && (
+            <div className="space-y-6">
+              {/* Analysis Overview */}
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">Video Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="text-sm">
+                      <span className="text-gray-600">Duration:</span> {selectedAnalysisItem.duration}
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-600">File Size:</span> {selectedAnalysisItem.size}
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-600">Analysis Type:</span> {selectedAnalysisItem.analysisType}
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-600">Completed:</span> {selectedAnalysisItem.completedTime ? formatTimeAgo(selectedAnalysisItem.completedTime) : 'N/A'}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">Processing Details</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="text-sm">
+                      <span className="text-gray-600">Priority:</span>
+                      <Badge variant={selectedAnalysisItem.priority === "high" ? "destructive" : selectedAnalysisItem.priority === "medium" ? "secondary" : "outline"} className="ml-2 text-xs">
+                        {selectedAnalysisItem.priority}
+                      </Badge>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-600">Status:</span>
+                      <Badge variant="default" className="ml-2 text-xs">
+                        {selectedAnalysisItem.status}
+                      </Badge>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-600">Stage:</span> {selectedAnalysisItem.processingStage.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-600">Progress:</span> {selectedAnalysisItem.progress}%
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Mock Analysis Results */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Analysis Results</h3>
+
+                {/* Player Performance */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Player Performance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <div className="font-medium">Marcus Bontempelli</div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          Goals: 2 | Tackles: 6 | Efficiency: 85.7%
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Max Speed: 32.4 km/h | Distance: 12.8 km
+                        </div>
+                      </div>
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <div className="font-medium">Patrick Cripps</div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          Goals: 1 | Tackles: 9 | Efficiency: 88.6%
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Max Speed: 29.8 km/h | Distance: 13.2 km
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Crowd Analysis */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Crowd Analysis</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <div className="text-sm">
+                          <span className="font-medium">Total Attendance:</span> 47,832
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-medium">Stadium Utilization:</span> 95.7%
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-sm">
+                          <span className="font-medium">Peak Noise Level:</span> 95.2 dB
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-medium">Average Density:</span> 96.2%
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Key Highlights */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Key Highlights</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="p-3 bg-yellow-50 rounded-lg">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-medium">Opening Goal</div>
+                            <div className="text-sm text-gray-600">00:03:45 - Marcus Bontempelli</div>
+                            <div className="text-sm text-gray-600">Opening goal with crowd eruption</div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">94% confidence</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Download Options */}
+              <div className="flex justify-between items-center pt-4 border-t">
+                <div className="text-sm text-gray-600">
+                  Download this analysis in different formats
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownloadFromQueue(selectedAnalysisItem, "pdf")}
+                  >
+                    <FileText className="w-4 h-4 mr-1" />
+                    PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownloadFromQueue(selectedAnalysisItem, "json")}
+                  >
+                    <Download className="w-4 h-4 mr-1" />
+                    JSON
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownloadFromQueue(selectedAnalysisItem, "txt")}
+                  >
+                    <FileText className="w-4 h-4 mr-1" />
+                    TXT
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
