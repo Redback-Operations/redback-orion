@@ -379,7 +379,10 @@ export default function AFLDashboard() {
   };
 
   // Download analysis report for a queue item
-  const handleDownloadFromQueue = async (item: any, format: "pdf" | "json" | "txt" = "pdf") => {
+  const handleDownloadFromQueue = async (
+    item: any,
+    format: "pdf" | "json" | "txt" = "pdf",
+  ) => {
     try {
       // Generate analysis data for this specific item
       const analysisId = item.id;
@@ -391,7 +394,7 @@ export default function AFLDashboard() {
           duration: item.duration,
           size: item.size,
           resolution: "1920x1080",
-          framerate: "30fps"
+          framerate: "30fps",
         },
         analysisType: item.analysisType,
         focusAreas: [], // Queue items don't have focus areas stored
@@ -412,8 +415,8 @@ export default function AFLDashboard() {
                 tackles: 6,
                 marks: 8,
                 disposals: 31,
-                timeOnGround: 87.5
-              }
+                timeOnGround: 87.5,
+              },
             },
             {
               playerId: "p002",
@@ -429,9 +432,9 @@ export default function AFLDashboard() {
                 tackles: 9,
                 marks: 6,
                 disposals: 34,
-                timeOnGround: 92.3
-              }
-            }
+                timeOnGround: 92.3,
+              },
+            },
           ],
           crowdAnalysis: {
             totalAttendance: 47832,
@@ -444,7 +447,7 @@ export default function AFLDashboard() {
                 attendance: 14250,
                 capacity: 15000,
                 density: 95.0,
-                noiseLevel: { peak: 95.2, average: 78.4, unit: "dB" }
+                noiseLevel: { peak: 95.2, average: 78.4, unit: "dB" },
               },
               {
                 sectionId: "south_stand",
@@ -452,9 +455,9 @@ export default function AFLDashboard() {
                 attendance: 11680,
                 capacity: 12000,
                 density: 97.3,
-                noiseLevel: { peak: 92.8, average: 76.9, unit: "dB" }
-              }
-            ]
+                noiseLevel: { peak: 92.8, average: 76.9, unit: "dB" },
+              },
+            ],
           },
           highlights: [
             {
@@ -463,15 +466,15 @@ export default function AFLDashboard() {
               type: "goal",
               description: "Opening goal with crowd eruption",
               players: ["Marcus Bontempelli"],
-              confidence: 0.94
-            }
+              confidence: 0.94,
+            },
           ],
           metadata: {
             confidence: 0.923,
             processingVersion: "2.1.3",
-            qualityScore: 8.7
-          }
-        }
+            qualityScore: 8.7,
+          },
+        },
       };
 
       if (format === "json") {
@@ -489,11 +492,17 @@ export default function AFLDashboard() {
       } else if (format === "pdf") {
         // Generate PDF from backend data
         const htmlContent = convertBackendDataToHTML(backendData);
-        generateDashboardPDF(htmlContent, `${item.name.replace(/\.[^/.]+$/, "")}_Analysis`);
+        generateDashboardPDF(
+          htmlContent,
+          `${item.name.replace(/\.[^/.]+$/, "")}_Analysis`,
+        );
       } else {
         // Generate TXT from backend data
         const textContent = convertBackendDataToText(backendData);
-        downloadText(textContent, `${item.name.replace(/\.[^/.]+$/, "")}_Analysis`);
+        downloadText(
+          textContent,
+          `${item.name.replace(/\.[^/.]+$/, "")}_Analysis`,
+        );
       }
     } catch (error) {
       console.error("Error downloading analysis:", error);
@@ -2749,15 +2758,27 @@ Generated on: ${new Date().toLocaleString()}
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleDownloadFromQueue(item, "pdf")}>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleDownloadFromQueue(item, "pdf")
+                                    }
+                                  >
                                     <FileText className="w-4 h-4 mr-2" />
                                     PDF Report
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleDownloadFromQueue(item, "json")}>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleDownloadFromQueue(item, "json")
+                                    }
+                                  >
                                     <Download className="w-4 h-4 mr-2" />
                                     JSON Data
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleDownloadFromQueue(item, "txt")}>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleDownloadFromQueue(item, "txt")
+                                    }
+                                  >
                                     <FileText className="w-4 h-4 mr-2" />
                                     Text Summary
                                   </DropdownMenuItem>
@@ -2849,28 +2870,45 @@ Generated on: ${new Date().toLocaleString()}
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="text-sm">
-                      <span className="text-gray-600">Duration:</span> {selectedAnalysisItem.duration}
+                      <span className="text-gray-600">Duration:</span>{" "}
+                      {selectedAnalysisItem.duration}
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-600">File Size:</span> {selectedAnalysisItem.size}
+                      <span className="text-gray-600">File Size:</span>{" "}
+                      {selectedAnalysisItem.size}
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-600">Analysis Type:</span> {selectedAnalysisItem.analysisType}
+                      <span className="text-gray-600">Analysis Type:</span>{" "}
+                      {selectedAnalysisItem.analysisType}
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-600">Completed:</span> {selectedAnalysisItem.completedTime ? formatTimeAgo(selectedAnalysisItem.completedTime) : 'N/A'}
+                      <span className="text-gray-600">Completed:</span>{" "}
+                      {selectedAnalysisItem.completedTime
+                        ? formatTimeAgo(selectedAnalysisItem.completedTime)
+                        : "N/A"}
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Processing Details</CardTitle>
+                    <CardTitle className="text-sm">
+                      Processing Details
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="text-sm">
                       <span className="text-gray-600">Priority:</span>
-                      <Badge variant={selectedAnalysisItem.priority === "high" ? "destructive" : selectedAnalysisItem.priority === "medium" ? "secondary" : "outline"} className="ml-2 text-xs">
+                      <Badge
+                        variant={
+                          selectedAnalysisItem.priority === "high"
+                            ? "destructive"
+                            : selectedAnalysisItem.priority === "medium"
+                              ? "secondary"
+                              : "outline"
+                        }
+                        className="ml-2 text-xs"
+                      >
                         {selectedAnalysisItem.priority}
                       </Badge>
                     </div>
@@ -2881,10 +2919,14 @@ Generated on: ${new Date().toLocaleString()}
                       </Badge>
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-600">Stage:</span> {selectedAnalysisItem.processingStage.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                      <span className="text-gray-600">Stage:</span>{" "}
+                      {selectedAnalysisItem.processingStage
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (l: string) => l.toUpperCase())}
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-600">Progress:</span> {selectedAnalysisItem.progress}%
+                      <span className="text-gray-600">Progress:</span>{" "}
+                      {selectedAnalysisItem.progress}%
                     </div>
                   </CardContent>
                 </Card>
@@ -2897,7 +2939,9 @@ Generated on: ${new Date().toLocaleString()}
                 {/* Player Performance */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Player Performance</CardTitle>
+                    <CardTitle className="text-base">
+                      Player Performance
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
@@ -2932,18 +2976,24 @@ Generated on: ${new Date().toLocaleString()}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <div className="text-sm">
-                          <span className="font-medium">Total Attendance:</span> 47,832
+                          <span className="font-medium">Total Attendance:</span>{" "}
+                          47,832
                         </div>
                         <div className="text-sm">
-                          <span className="font-medium">Stadium Utilization:</span> 95.7%
+                          <span className="font-medium">
+                            Stadium Utilization:
+                          </span>{" "}
+                          95.7%
                         </div>
                       </div>
                       <div className="space-y-2">
                         <div className="text-sm">
-                          <span className="font-medium">Peak Noise Level:</span> 95.2 dB
+                          <span className="font-medium">Peak Noise Level:</span>{" "}
+                          95.2 dB
                         </div>
                         <div className="text-sm">
-                          <span className="font-medium">Average Density:</span> 96.2%
+                          <span className="font-medium">Average Density:</span>{" "}
+                          96.2%
                         </div>
                       </div>
                     </div>
@@ -2961,10 +3011,16 @@ Generated on: ${new Date().toLocaleString()}
                         <div className="flex justify-between items-start">
                           <div>
                             <div className="font-medium">Opening Goal</div>
-                            <div className="text-sm text-gray-600">00:03:45 - Marcus Bontempelli</div>
-                            <div className="text-sm text-gray-600">Opening goal with crowd eruption</div>
+                            <div className="text-sm text-gray-600">
+                              00:03:45 - Marcus Bontempelli
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              Opening goal with crowd eruption
+                            </div>
                           </div>
-                          <Badge variant="secondary" className="text-xs">94% confidence</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            94% confidence
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -2981,7 +3037,9 @@ Generated on: ${new Date().toLocaleString()}
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDownloadFromQueue(selectedAnalysisItem, "pdf")}
+                    onClick={() =>
+                      handleDownloadFromQueue(selectedAnalysisItem, "pdf")
+                    }
                   >
                     <FileText className="w-4 h-4 mr-1" />
                     PDF
@@ -2989,7 +3047,9 @@ Generated on: ${new Date().toLocaleString()}
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDownloadFromQueue(selectedAnalysisItem, "json")}
+                    onClick={() =>
+                      handleDownloadFromQueue(selectedAnalysisItem, "json")
+                    }
                   >
                     <Download className="w-4 h-4 mr-1" />
                     JSON
@@ -2997,7 +3057,9 @@ Generated on: ${new Date().toLocaleString()}
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDownloadFromQueue(selectedAnalysisItem, "txt")}
+                    onClick={() =>
+                      handleDownloadFromQueue(selectedAnalysisItem, "txt")
+                    }
                   >
                     <FileText className="w-4 h-4 mr-1" />
                     TXT
