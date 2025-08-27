@@ -2344,6 +2344,9 @@ Generated on: ${new Date().toLocaleString()}
 
                   <div className="space-y-3">
                     <h4 className="font-medium">Export Analysis</h4>
+                    <p className="text-sm text-gray-600">
+                      Download analysis data from backend in different formats
+                    </p>
                     <div className="space-y-2">
                       <Button
                         variant="outline"
