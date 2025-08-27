@@ -282,6 +282,7 @@ export default function AFLDashboard() {
         processingStage: "video_analysis",
         errorCount: 0,
         retryCount: 0,
+        isUIControlled: false, // Demo items are controlled by simulation
       },
       {
         id: `demo_${Date.now()}_2`,
@@ -299,6 +300,7 @@ export default function AFLDashboard() {
         processingStage: "corrupted_segment",
         errorCount: 2,
         retryCount: 1,
+        isUIControlled: false, // Demo items are controlled by simulation
       },
       {
         id: `demo_${Date.now()}_3`,
@@ -316,6 +318,7 @@ export default function AFLDashboard() {
         processingStage: "analysis_complete",
         errorCount: 0,
         retryCount: 0,
+        isUIControlled: false, // Demo items are controlled by simulation
       },
     ];
 
