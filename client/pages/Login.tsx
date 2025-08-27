@@ -75,7 +75,7 @@ export default function Login() {
     { email: "demo@aflanalytics.com", password: "demo123" },
     { email: "admin@aflanalytics.com", password: "admin123" },
     { email: "coach@aflanalytics.com", password: "coach123" },
-    { email: "analyst@aflanalytics.com", password: "analyst123" }
+    { email: "analyst@aflanalytics.com", password: "analyst123" },
   ];
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -97,18 +97,20 @@ export default function Login() {
     const isValidCredential = validCredentials.some(
       (cred) =>
         cred.email.toLowerCase() === loginForm.email.toLowerCase() &&
-        cred.password === loginForm.password
+        cred.password === loginForm.password,
     );
 
     if (isValidCredential) {
       // Store authentication state in localStorage
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userEmail', loginForm.email);
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userEmail", loginForm.email);
 
       // Successful login - redirect to dashboard
       navigate("/afl-dashboard");
     } else {
-      setError("Invalid email or password. Try demo@aflanalytics.com / demo123");
+      setError(
+        "Invalid email or password. Try demo@aflanalytics.com / demo123",
+      );
     }
 
     setIsLoading(false);
@@ -120,8 +122,13 @@ export default function Login() {
     setError("");
 
     // Validate all required fields
-    if (!signupForm.firstName || !signupForm.lastName || !signupForm.email ||
-        !signupForm.password || !signupForm.organization) {
+    if (
+      !signupForm.firstName ||
+      !signupForm.lastName ||
+      !signupForm.email ||
+      !signupForm.password ||
+      !signupForm.organization
+    ) {
       setError("Please fill all required fields");
       setIsLoading(false);
       return;
@@ -143,9 +150,12 @@ export default function Login() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Store authentication state for new user
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('userEmail', signupForm.email);
-    localStorage.setItem('userName', `${signupForm.firstName} ${signupForm.lastName}`);
+    localStorage.setItem("isAuthenticated", "true");
+    localStorage.setItem("userEmail", signupForm.email);
+    localStorage.setItem(
+      "userName",
+      `${signupForm.firstName} ${signupForm.lastName}`,
+    );
 
     // Successful signup - redirect to dashboard
     navigate("/afl-dashboard");

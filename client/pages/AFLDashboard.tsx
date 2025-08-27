@@ -176,10 +176,10 @@ export default function AFLDashboard() {
 
   // Check authentication on component mount
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-    const email = localStorage.getItem('userEmail');
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    const email = localStorage.getItem("userEmail");
 
-    if (!isAuthenticated || isAuthenticated !== 'true') {
+    if (!isAuthenticated || isAuthenticated !== "true") {
       // Redirect to login if not authenticated
       navigate("/");
       return;
@@ -192,9 +192,9 @@ export default function AFLDashboard() {
 
   // Logout function
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
     navigate("/");
   };
 
