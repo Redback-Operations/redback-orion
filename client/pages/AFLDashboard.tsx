@@ -446,12 +446,48 @@ export default function AFLDashboard() {
 
     // Crowd density data for charts
     const crowdDensityData = [
-      { section: "Northern Stand", density: 95.0, attendance: 14250, capacity: 15000, noiseLevel: 95.2 },
-      { section: "Southern Stand", density: 97.3, attendance: 11680, capacity: 12000, noiseLevel: 92.8 },
-      { section: "Eastern Wing", density: 88.5, attendance: 7080, capacity: 8000, noiseLevel: 87.4 },
-      { section: "Western Wing", density: 91.2, attendance: 7296, capacity: 8000, noiseLevel: 89.6 },
-      { section: "Premium Seats", density: 94.8, attendance: 2844, capacity: 3000, noiseLevel: 78.2 },
-      { section: "MCC Members", density: 89.1, attributes: 4455, capacity: 5000, noiseLevel: 82.1 },
+      {
+        section: "Northern Stand",
+        density: 95.0,
+        attendance: 14250,
+        capacity: 15000,
+        noiseLevel: 95.2,
+      },
+      {
+        section: "Southern Stand",
+        density: 97.3,
+        attendance: 11680,
+        capacity: 12000,
+        noiseLevel: 92.8,
+      },
+      {
+        section: "Eastern Wing",
+        density: 88.5,
+        attendance: 7080,
+        capacity: 8000,
+        noiseLevel: 87.4,
+      },
+      {
+        section: "Western Wing",
+        density: 91.2,
+        attendance: 7296,
+        capacity: 8000,
+        noiseLevel: 89.6,
+      },
+      {
+        section: "Premium Seats",
+        density: 94.8,
+        attendance: 2844,
+        capacity: 3000,
+        noiseLevel: 78.2,
+      },
+      {
+        section: "MCC Members",
+        density: 89.1,
+        attributes: 4455,
+        capacity: 5000,
+        noiseLevel: 82.1,
+      },
     ];
 
     // Performance timeline data
@@ -3054,14 +3090,18 @@ Generated on: ${new Date().toLocaleString()}
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">Analysis Results</h3>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-50 text-green-700 border-green-200"
+                  >
                     <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
                     Analysis Complete
                   </Badge>
                 </div>
 
                 {(() => {
-                  const chartData = generateAnalysisChartData(selectedAnalysisItem);
+                  const chartData =
+                    generateAnalysisChartData(selectedAnalysisItem);
 
                   return (
                     <>
@@ -3076,29 +3116,59 @@ Generated on: ${new Date().toLocaleString()}
                         <CardContent>
                           <Tabs defaultValue="overview" className="space-y-4">
                             <TabsList className="grid w-full grid-cols-4">
-                              <TabsTrigger value="overview">Overview</TabsTrigger>
-                              <TabsTrigger value="goals">Goals & Assists</TabsTrigger>
-                              <TabsTrigger value="speed">Speed Analysis</TabsTrigger>
-                              <TabsTrigger value="efficiency">Efficiency</TabsTrigger>
+                              <TabsTrigger value="overview">
+                                Overview
+                              </TabsTrigger>
+                              <TabsTrigger value="goals">
+                                Goals & Assists
+                              </TabsTrigger>
+                              <TabsTrigger value="speed">
+                                Speed Analysis
+                              </TabsTrigger>
+                              <TabsTrigger value="efficiency">
+                                Efficiency
+                              </TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="overview" className="space-y-4">
                               <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
-                                  <RadarChart data={chartData.playerStats.map(player => ({
-                                    player: player.name.split(' ')[1], // Last name only for chart
-                                    Goals: player.goals * 10, // Scale for better visualization
-                                    Assists: player.assists * 10,
-                                    Tackles: player.tackles * 5,
-                                    Marks: player.marks * 5,
-                                    Efficiency: player.efficiency,
-                                  }))}>
+                                  <RadarChart
+                                    data={chartData.playerStats.map(
+                                      (player) => ({
+                                        player: player.name.split(" ")[1], // Last name only for chart
+                                        Goals: player.goals * 10, // Scale for better visualization
+                                        Assists: player.assists * 10,
+                                        Tackles: player.tackles * 5,
+                                        Marks: player.marks * 5,
+                                        Efficiency: player.efficiency,
+                                      }),
+                                    )}
+                                  >
                                     <PolarGrid />
                                     <PolarAngleAxis dataKey="player" />
                                     <PolarRadiusAxis domain={[0, 100]} />
-                                    <Radar name="Goals" dataKey="Goals" stroke={chartColors.primary} fill={chartColors.primary} fillOpacity={0.3} />
-                                    <Radar name="Assists" dataKey="Assists" stroke={chartColors.secondary} fill={chartColors.secondary} fillOpacity={0.3} />
-                                    <Radar name="Tackles" dataKey="Tackles" stroke={chartColors.accent} fill={chartColors.accent} fillOpacity={0.3} />
+                                    <Radar
+                                      name="Goals"
+                                      dataKey="Goals"
+                                      stroke={chartColors.primary}
+                                      fill={chartColors.primary}
+                                      fillOpacity={0.3}
+                                    />
+                                    <Radar
+                                      name="Assists"
+                                      dataKey="Assists"
+                                      stroke={chartColors.secondary}
+                                      fill={chartColors.secondary}
+                                      fillOpacity={0.3}
+                                    />
+                                    <Radar
+                                      name="Tackles"
+                                      dataKey="Tackles"
+                                      stroke={chartColors.accent}
+                                      fill={chartColors.accent}
+                                      fillOpacity={0.3}
+                                    />
                                     <Legend />
                                     <Tooltip />
                                   </RadarChart>
@@ -3106,10 +3176,16 @@ Generated on: ${new Date().toLocaleString()}
                               </div>
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {chartData.playerStats.map((player, index) => (
-                                  <div key={index} className="p-3 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg border">
-                                    <div className="font-medium text-sm">{player.name}</div>
+                                  <div
+                                    key={index}
+                                    className="p-3 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg border"
+                                  >
+                                    <div className="font-medium text-sm">
+                                      {player.name}
+                                    </div>
                                     <div className="text-xs text-gray-600 mt-1">
-                                      Goals: {player.goals} | Efficiency: {player.efficiency}%
+                                      Goals: {player.goals} | Efficiency:{" "}
+                                      {player.efficiency}%
                                     </div>
                                     <div className="text-xs text-gray-600">
                                       Speed: {player.maxSpeed} km/h
@@ -3124,12 +3200,25 @@ Generated on: ${new Date().toLocaleString()}
                                 <ResponsiveContainer width="100%" height="100%">
                                   <BarChart data={chartData.playerStats}>
                                     <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                                    <XAxis
+                                      dataKey="name"
+                                      angle={-45}
+                                      textAnchor="end"
+                                      height={80}
+                                    />
                                     <YAxis />
                                     <Tooltip />
                                     <Legend />
-                                    <Bar dataKey="goals" fill={chartColors.primary} name="Goals" />
-                                    <Bar dataKey="assists" fill={chartColors.secondary} name="Assists" />
+                                    <Bar
+                                      dataKey="goals"
+                                      fill={chartColors.primary}
+                                      name="Goals"
+                                    />
+                                    <Bar
+                                      dataKey="assists"
+                                      fill={chartColors.secondary}
+                                      name="Assists"
+                                    />
                                   </BarChart>
                                 </ResponsiveContainer>
                               </div>
@@ -3141,11 +3230,33 @@ Generated on: ${new Date().toLocaleString()}
                                   <AreaChart data={chartData.speedComparison}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="player" />
-                                    <YAxis label={{ value: 'Speed (km/h)', angle: -90, position: 'insideLeft' }} />
+                                    <YAxis
+                                      label={{
+                                        value: "Speed (km/h)",
+                                        angle: -90,
+                                        position: "insideLeft",
+                                      }}
+                                    />
                                     <Tooltip />
                                     <Legend />
-                                    <Area type="monotone" dataKey="maxSpeed" stackId="1" stroke={chartColors.accent} fill={chartColors.accent} fillOpacity={0.6} name="Max Speed" />
-                                    <Area type="monotone" dataKey="avgSpeed" stackId="2" stroke={chartColors.primary} fill={chartColors.primary} fillOpacity={0.6} name="Avg Speed" />
+                                    <Area
+                                      type="monotone"
+                                      dataKey="maxSpeed"
+                                      stackId="1"
+                                      stroke={chartColors.accent}
+                                      fill={chartColors.accent}
+                                      fillOpacity={0.6}
+                                      name="Max Speed"
+                                    />
+                                    <Area
+                                      type="monotone"
+                                      dataKey="avgSpeed"
+                                      stackId="2"
+                                      stroke={chartColors.primary}
+                                      fill={chartColors.primary}
+                                      fillOpacity={0.6}
+                                      name="Avg Speed"
+                                    />
                                   </AreaChart>
                                 </ResponsiveContainer>
                               </div>
@@ -3156,10 +3267,27 @@ Generated on: ${new Date().toLocaleString()}
                                 <ResponsiveContainer width="100%" height="100%">
                                   <LineChart data={chartData.playerStats}>
                                     <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
-                                    <YAxis label={{ value: 'Efficiency (%)', angle: -90, position: 'insideLeft' }} />
+                                    <XAxis
+                                      dataKey="name"
+                                      angle={-45}
+                                      textAnchor="end"
+                                      height={80}
+                                    />
+                                    <YAxis
+                                      label={{
+                                        value: "Efficiency (%)",
+                                        angle: -90,
+                                        position: "insideLeft",
+                                      }}
+                                    />
                                     <Tooltip />
-                                    <Line type="monotone" dataKey="efficiency" stroke={chartColors.success} strokeWidth={3} dot={{ r: 6 }} />
+                                    <Line
+                                      type="monotone"
+                                      dataKey="efficiency"
+                                      stroke={chartColors.success}
+                                      strokeWidth={3}
+                                      dot={{ r: 6 }}
+                                    />
                                   </LineChart>
                                 </ResponsiveContainer>
                               </div>
@@ -3181,20 +3309,36 @@ Generated on: ${new Date().toLocaleString()}
                             <div className="space-y-4">
                               <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-                                  <div className="text-2xl font-bold text-blue-800">47,832</div>
-                                  <div className="text-sm text-blue-600">Total Attendance</div>
+                                  <div className="text-2xl font-bold text-blue-800">
+                                    47,832
+                                  </div>
+                                  <div className="text-sm text-blue-600">
+                                    Total Attendance
+                                  </div>
                                 </div>
                                 <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200">
-                                  <div className="text-2xl font-bold text-green-800">95.7%</div>
-                                  <div className="text-sm text-green-600">Stadium Utilization</div>
+                                  <div className="text-2xl font-bold text-green-800">
+                                    95.7%
+                                  </div>
+                                  <div className="text-sm text-green-600">
+                                    Stadium Utilization
+                                  </div>
                                 </div>
                                 <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
-                                  <div className="text-2xl font-bold text-orange-800">95.2 dB</div>
-                                  <div className="text-sm text-orange-600">Peak Noise Level</div>
+                                  <div className="text-2xl font-bold text-orange-800">
+                                    95.2 dB
+                                  </div>
+                                  <div className="text-sm text-orange-600">
+                                    Peak Noise Level
+                                  </div>
                                 </div>
                                 <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border border-purple-200">
-                                  <div className="text-2xl font-bold text-purple-800">92.8%</div>
-                                  <div className="text-sm text-purple-600">Avg Section Density</div>
+                                  <div className="text-2xl font-bold text-purple-800">
+                                    92.8%
+                                  </div>
+                                  <div className="text-sm text-purple-600">
+                                    Avg Section Density
+                                  </div>
                                 </div>
                               </div>
 
@@ -3208,13 +3352,30 @@ Generated on: ${new Date().toLocaleString()}
                                       outerRadius={60}
                                       fill="#8884d8"
                                       dataKey="attendance"
-                                      label={({ section, attendance }) => `${section}: ${attendance.toLocaleString()}`}
+                                      label={({ section, attendance }) =>
+                                        `${section}: ${attendance.toLocaleString()}`
+                                      }
                                     >
-                                      {chartData.crowdDensity.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={Object.values(chartColors)[index % Object.values(chartColors).length]} />
-                                      ))}
+                                      {chartData.crowdDensity.map(
+                                        (entry, index) => (
+                                          <Cell
+                                            key={`cell-${index}`}
+                                            fill={
+                                              Object.values(chartColors)[
+                                                index %
+                                                  Object.values(chartColors)
+                                                    .length
+                                              ]
+                                            }
+                                          />
+                                        ),
+                                      )}
                                     </Pie>
-                                    <Tooltip formatter={(value) => value.toLocaleString()} />
+                                    <Tooltip
+                                      formatter={(value) =>
+                                        value.toLocaleString()
+                                      }
+                                    />
                                   </PieChart>
                                 </ResponsiveContainer>
                               </div>
@@ -3223,32 +3384,57 @@ Generated on: ${new Date().toLocaleString()}
                             <div className="space-y-4">
                               <div className="h-64">
                                 <ResponsiveContainer width="100%" height="100%">
-                                  <BarChart data={chartData.crowdDensity} layout="horizontal">
+                                  <BarChart
+                                    data={chartData.crowdDensity}
+                                    layout="horizontal"
+                                  >
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis type="number" domain={[0, 100]} />
-                                    <YAxis type="category" dataKey="section" width={100} />
+                                    <YAxis
+                                      type="category"
+                                      dataKey="section"
+                                      width={100}
+                                    />
                                     <Tooltip />
-                                    <Bar dataKey="density" fill={chartColors.teal} name="Density %" />
+                                    <Bar
+                                      dataKey="density"
+                                      fill={chartColors.teal}
+                                      name="Density %"
+                                    />
                                   </BarChart>
                                 </ResponsiveContainer>
                               </div>
 
                               <div className="space-y-2">
-                                {chartData.crowdDensity.map((section, index) => (
-                                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                                    <div className="text-sm font-medium">{section.section}</div>
-                                    <div className="flex items-center gap-2 text-sm">
-                                      <span>{section.attendance?.toLocaleString() || section.attributes?.toLocaleString()}</span>
-                                      <div className="w-12 bg-gray-200 rounded-full h-2">
-                                        <div
-                                          className="bg-blue-600 h-2 rounded-full"
-                                          style={{ width: `${section.density}%` }}
-                                        />
+                                {chartData.crowdDensity.map(
+                                  (section, index) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                                    >
+                                      <div className="text-sm font-medium">
+                                        {section.section}
                                       </div>
-                                      <span className="text-xs text-gray-600">{section.density}%</span>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <span>
+                                          {section.attendance?.toLocaleString() ||
+                                            section.attributes?.toLocaleString()}
+                                        </span>
+                                        <div className="w-12 bg-gray-200 rounded-full h-2">
+                                          <div
+                                            className="bg-blue-600 h-2 rounded-full"
+                                            style={{
+                                              width: `${section.density}%`,
+                                            }}
+                                          />
+                                        </div>
+                                        <span className="text-xs text-gray-600">
+                                          {section.density}%
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  ),
+                                )}
                               </div>
                             </div>
                           </div>
@@ -3273,9 +3459,33 @@ Generated on: ${new Date().toLocaleString()}
                                   <YAxis />
                                   <Tooltip />
                                   <Legend />
-                                  <Area type="monotone" dataKey="goals" stackId="1" stroke={chartColors.accent} fill={chartColors.accent} fillOpacity={0.7} name="Goals" />
-                                  <Area type="monotone" dataKey="tackles" stackId="2" stroke={chartColors.primary} fill={chartColors.primary} fillOpacity={0.7} name="Tackles" />
-                                  <Area type="monotone" dataKey="marks" stackId="3" stroke={chartColors.secondary} fill={chartColors.secondary} fillOpacity={0.7} name="Marks" />
+                                  <Area
+                                    type="monotone"
+                                    dataKey="goals"
+                                    stackId="1"
+                                    stroke={chartColors.accent}
+                                    fill={chartColors.accent}
+                                    fillOpacity={0.7}
+                                    name="Goals"
+                                  />
+                                  <Area
+                                    type="monotone"
+                                    dataKey="tackles"
+                                    stackId="2"
+                                    stroke={chartColors.primary}
+                                    fill={chartColors.primary}
+                                    fillOpacity={0.7}
+                                    name="Tackles"
+                                  />
+                                  <Area
+                                    type="monotone"
+                                    dataKey="marks"
+                                    stackId="3"
+                                    stroke={chartColors.secondary}
+                                    fill={chartColors.secondary}
+                                    fillOpacity={0.7}
+                                    name="Marks"
+                                  />
                                 </AreaChart>
                               </ResponsiveContainer>
                             </div>
@@ -3284,11 +3494,21 @@ Generated on: ${new Date().toLocaleString()}
                               <div className="p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
                                 <div className="flex justify-between items-start">
                                   <div>
-                                    <div className="font-medium text-yellow-800">Key Moment: Opening Goal</div>
-                                    <div className="text-sm text-yellow-700 mt-1">00:03:45 - Marcus Bontempelli</div>
-                                    <div className="text-sm text-yellow-600">Spectacular opening goal with explosive crowd reaction</div>
+                                    <div className="font-medium text-yellow-800">
+                                      Key Moment: Opening Goal
+                                    </div>
+                                    <div className="text-sm text-yellow-700 mt-1">
+                                      00:03:45 - Marcus Bontempelli
+                                    </div>
+                                    <div className="text-sm text-yellow-600">
+                                      Spectacular opening goal with explosive
+                                      crowd reaction
+                                    </div>
                                   </div>
-                                  <Badge variant="secondary" className="bg-yellow-200 text-yellow-800 border-yellow-300">
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-yellow-200 text-yellow-800 border-yellow-300"
+                                  >
                                     94% confidence
                                   </Badge>
                                 </div>
@@ -3297,11 +3517,21 @@ Generated on: ${new Date().toLocaleString()}
                               <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200">
                                 <div className="flex justify-between items-start">
                                   <div>
-                                    <div className="font-medium text-green-800">Peak Performance</div>
-                                    <div className="text-sm text-green-700 mt-1">Q4 - Final Quarter</div>
-                                    <div className="text-sm text-green-600">Highest efficiency and goal conversion rate</div>
+                                    <div className="font-medium text-green-800">
+                                      Peak Performance
+                                    </div>
+                                    <div className="text-sm text-green-700 mt-1">
+                                      Q4 - Final Quarter
+                                    </div>
+                                    <div className="text-sm text-green-600">
+                                      Highest efficiency and goal conversion
+                                      rate
+                                    </div>
                                   </div>
-                                  <Badge variant="secondary" className="bg-green-200 text-green-800 border-green-300">
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-green-200 text-green-800 border-green-300"
+                                  >
                                     89% efficiency
                                   </Badge>
                                 </div>
@@ -3324,25 +3554,40 @@ Generated on: ${new Date().toLocaleString()}
                             <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                               <div className="flex items-center gap-2 mb-2">
                                 <TrendingUp className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-blue-800">Top Performer</span>
+                                <span className="font-medium text-blue-800">
+                                  Top Performer
+                                </span>
                               </div>
-                              <div className="text-sm text-blue-700">Patrick Cripps leads with 88.6% efficiency and strong defensive stats</div>
+                              <div className="text-sm text-blue-700">
+                                Patrick Cripps leads with 88.6% efficiency and
+                                strong defensive stats
+                              </div>
                             </div>
 
                             <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
                               <div className="flex items-center gap-2 mb-2">
                                 <Users className="w-4 h-4 text-green-600" />
-                                <span className="font-medium text-green-800">Crowd Impact</span>
+                                <span className="font-medium text-green-800">
+                                  Crowd Impact
+                                </span>
                               </div>
-                              <div className="text-sm text-green-700">Southern Stand achieved 97.3% density with peak engagement during key moments</div>
+                              <div className="text-sm text-green-700">
+                                Southern Stand achieved 97.3% density with peak
+                                engagement during key moments
+                              </div>
                             </div>
 
                             <div className="p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg border border-purple-200">
                               <div className="flex items-center gap-2 mb-2">
                                 <BarChart3 className="w-4 h-4 text-purple-600" />
-                                <span className="font-medium text-purple-800">Match Flow</span>
+                                <span className="font-medium text-purple-800">
+                                  Match Flow
+                                </span>
                               </div>
-                              <div className="text-sm text-purple-700">Q4 showed highest intensity with 5 goals and 89% team efficiency</div>
+                              <div className="text-sm text-purple-700">
+                                Q4 showed highest intensity with 5 goals and 89%
+                                team efficiency
+                              </div>
                             </div>
                           </div>
 
@@ -3352,11 +3597,14 @@ Generated on: ${new Date().toLocaleString()}
                                 <div className="w-2 h-2 rounded-full bg-white" />
                               </div>
                               <div>
-                                <div className="font-medium text-gray-800">Analysis Quality Score: 9.2/10</div>
+                                <div className="font-medium text-gray-800">
+                                  Analysis Quality Score: 9.2/10
+                                </div>
                                 <div className="text-sm text-gray-600 mt-1">
-                                  High-confidence analysis with 94.8% accuracy across all tracking metrics.
-                                  Player movement detection: 98.1% | Crowd behavior correlation: 92.3% |
-                                  Event identification: 96.7%
+                                  High-confidence analysis with 94.8% accuracy
+                                  across all tracking metrics. Player movement
+                                  detection: 98.1% | Crowd behavior correlation:
+                                  92.3% | Event identification: 96.7%
                                 </div>
                               </div>
                             </div>
