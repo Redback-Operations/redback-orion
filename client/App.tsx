@@ -75,7 +75,10 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/home" element={<AFLDashboard />} />
               <Route path="/afl-dashboard" element={<AFLDashboard />} />
-              <Route path="/player-performance" element={<PlayerPerformance />} />
+              <Route
+                path="/player-performance"
+                element={<PlayerPerformance />}
+              />
               <Route path="/crowd-monitor" element={<CrowdMonitor />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/video-analysis" element={<Analytics />} />

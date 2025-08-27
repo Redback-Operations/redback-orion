@@ -7,7 +7,7 @@ let root: ReturnType<typeof createRoot> | null = null;
 
 function initializeApp() {
   const container = document.getElementById("root");
-  
+
   if (!container) {
     throw new Error("Could not find root element");
   }

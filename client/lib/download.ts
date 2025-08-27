@@ -5,17 +5,20 @@
 export function downloadFile(
   content: string | Blob,
   filename: string,
-  mimeType: string = "text/plain"
+  mimeType: string = "text/plain",
 ): void {
   try {
-    const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
+    const blob =
+      content instanceof Blob
+        ? content
+        : new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    
+
     a.href = url;
     a.download = filename;
     a.style.display = "none";
-    
+
     try {
       document.body.appendChild(a);
       a.click();
@@ -45,21 +48,33 @@ export function downloadFile(
  */
 export function downloadJSON(data: any, filename: string): void {
   const content = JSON.stringify(data, null, 2);
-  downloadFile(content, filename.endsWith(".json") ? filename : `${filename}.json`, "application/json");
+  downloadFile(
+    content,
+    filename.endsWith(".json") ? filename : `${filename}.json`,
+    "application/json",
+  );
 }
 
 /**
  * Downloads CSV data as a file
  */
 export function downloadCSV(data: string, filename: string): void {
-  downloadFile(data, filename.endsWith(".csv") ? filename : `${filename}.csv`, "text/csv");
+  downloadFile(
+    data,
+    filename.endsWith(".csv") ? filename : `${filename}.csv`,
+    "text/csv",
+  );
 }
 
 /**
  * Downloads text content as a file
  */
 export function downloadText(content: string, filename: string): void {
-  downloadFile(content, filename.endsWith(".txt") ? filename : `${filename}.txt`, "text/plain");
+  downloadFile(
+    content,
+    filename.endsWith(".txt") ? filename : `${filename}.txt`,
+    "text/plain",
+  );
 }
 
 /**
@@ -69,22 +84,34 @@ export function useDownload() {
   const handleDownload = (
     content: string | Blob,
     filename: string,
-    mimeType?: string
+    mimeType?: string,
   ) => {
     downloadFile(content, filename, mimeType);
   };
 
   const downloadJSON = (data: any, filename: string) => {
     const content = JSON.stringify(data, null, 2);
-    handleDownload(content, filename.endsWith(".json") ? filename : `${filename}.json`, "application/json");
+    handleDownload(
+      content,
+      filename.endsWith(".json") ? filename : `${filename}.json`,
+      "application/json",
+    );
   };
 
   const downloadCSV = (data: string, filename: string) => {
-    handleDownload(data, filename.endsWith(".csv") ? filename : `${filename}.csv`, "text/csv");
+    handleDownload(
+      data,
+      filename.endsWith(".csv") ? filename : `${filename}.csv`,
+      "text/csv",
+    );
   };
 
   const downloadText = (content: string, filename: string) => {
-    handleDownload(content, filename.endsWith(".txt") ? filename : `${filename}.txt`, "text/plain");
+    handleDownload(
+      content,
+      filename.endsWith(".txt") ? filename : `${filename}.txt`,
+      "text/plain",
+    );
   };
 
   return {

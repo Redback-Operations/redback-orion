@@ -88,13 +88,16 @@ class ErrorBoundary extends Component<Props, State> {
     try {
       const errorDetails = this.getErrorDetails();
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(errorDetails).then(() => {
-          console.log("Error details copied to clipboard");
-        }).catch((error) => {
-          console.error("Failed to copy to clipboard:", error);
-          // Fallback: try to select text or show alert
-          this.fallbackCopy(errorDetails);
-        });
+        navigator.clipboard
+          .writeText(errorDetails)
+          .then(() => {
+            console.log("Error details copied to clipboard");
+          })
+          .catch((error) => {
+            console.error("Failed to copy to clipboard:", error);
+            // Fallback: try to select text or show alert
+            this.fallbackCopy(errorDetails);
+          });
       } else {
         this.fallbackCopy(errorDetails);
       }
@@ -116,7 +119,7 @@ class ErrorBoundary extends Component<Props, State> {
       textArea.select();
 
       try {
-        document.execCommand('copy');
+        document.execCommand("copy");
         console.log("Error details copied using fallback method");
       } finally {
         if (textArea.parentNode) {
