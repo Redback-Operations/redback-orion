@@ -806,6 +806,16 @@ export default function AFLDashboard() {
     }
   }, [navigate, processingQueue.length]);
 
+  // Auto-open view modal for testing completed items
+  useEffect(() => {
+    const completedItem = processingQueue.find(item => item.status === 'completed');
+    if (completedItem && !viewModalOpen && processingQueue.length > 0) {
+      setTimeout(() => {
+        handleViewAnalysis(completedItem);
+      }, 2000); // Wait 2 seconds to let the page load
+    }
+  }, [processingQueue, viewModalOpen]);
+
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
