@@ -120,6 +120,72 @@ export default function Login() {
     });
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Simulate sending reset email
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    if (resetForm.email) {
+      setResetMessage(`Reset link sent to ${resetForm.email}`);
+      setResetStep(2);
+    } else {
+      setError("Please enter a valid email address");
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleVerifyResetCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Simulate code verification
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    if (resetForm.resetCode === "123456") {
+      setResetStep(3);
+    } else {
+      setError("Invalid verification code. Try '123456' for demo.");
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    if (resetForm.newPassword !== resetForm.confirmNewPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate password reset
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    setResetStep(4);
+    setIsLoading(false);
+  };
+
+  const closeResetModal = () => {
+    setIsResetModalOpen(false);
+    setResetStep(1);
+    setResetForm({
+      email: "",
+      resetCode: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
+    setError("");
+    setResetMessage("");
+  };
+
   const features = [
     {
       icon: Activity,
