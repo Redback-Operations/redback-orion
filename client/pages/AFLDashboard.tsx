@@ -213,6 +213,7 @@ export default function AFLDashboard() {
       processingStage: string;
       errorCount: number;
       retryCount: number;
+      isUIControlled?: boolean;
     }>
   >([]);
 
