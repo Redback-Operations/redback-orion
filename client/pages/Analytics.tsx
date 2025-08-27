@@ -270,14 +270,25 @@ export default function Analytics() {
   const startAnalysis = async () => {
     setIsAnalyzing(true);
     setAnalysisProgress(0);
+    setAnalysisError(null);
 
-    for (let i = 0; i <= 100; i += 2) {
-      await new Promise((resolve) => setTimeout(resolve, 150));
-      setAnalysisProgress(i);
+    try {
+      for (let i = 0; i <= 100; i += 2) {
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        setAnalysisProgress(i);
+
+        // Simulate potential error during analysis
+        if (Math.random() < 0.1 && i > 50) { // 10% chance of error after 50%
+          throw new Error("Video analysis failed: Unable to process video format");
+        }
+      }
+
+      setIsAnalyzing(false);
+      setAnalysisComplete(true);
+    } catch (error) {
+      setIsAnalyzing(false);
+      setAnalysisError(error instanceof Error ? error.message : "Analysis failed");
     }
-
-    setIsAnalyzing(false);
-    setAnalysisComplete(true);
   };
 
   const handleUploadAndAnalyze = () => {
