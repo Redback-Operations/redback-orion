@@ -1249,7 +1249,7 @@ export default function AFLDashboard() {
                       <label className="text-sm font-medium">
                         Analysis Type
                       </label>
-                      <Select defaultValue="highlights">
+                      <Select value={selectedAnalysisType} onValueChange={setSelectedAnalysisType}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
