@@ -29,6 +29,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Activity,
   Users,
   BarChart3,
@@ -1313,7 +1319,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════════════════════════════��═══════
+════════════════════���══════���═══════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
