@@ -34,7 +34,10 @@ export default function NotFound() {
               AFL Analytics
             </span>
           </Link>
-          <Badge variant="outline" className="text-orange-600 border-orange-200">
+          <Badge
+            variant="outline"
+            className="text-orange-600 border-orange-200"
+          >
             404 Error
           </Badge>
         </div>
@@ -55,8 +58,8 @@ export default function NotFound() {
             </CardHeader>
             <CardContent className="space-y-6">
               <p className="text-gray-600">
-                Don't worry! This happens sometimes. You can go back to the previous page
-                or navigate to one of our main sections below.
+                Don't worry! This happens sometimes. You can go back to the
+                previous page or navigate to one of our main sections below.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -105,7 +108,9 @@ export default function NotFound() {
                       <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center">
                         <Icon className="w-4 h-4 text-green-600" />
                       </div>
-                      <span className="font-medium text-gray-700">{page.name}</span>
+                      <span className="font-medium text-gray-700">
+                        {page.name}
+                      </span>
                     </Link>
                   );
                 })}

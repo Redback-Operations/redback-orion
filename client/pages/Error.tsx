@@ -8,15 +8,15 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  Activity, 
-  Home, 
-  ArrowLeft, 
-  RefreshCw, 
+import {
+  Activity,
+  Home,
+  ArrowLeft,
+  RefreshCw,
   AlertCircle,
   Bug,
   Wifi,
-  Server
+  Server,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -37,7 +37,7 @@ export default function Error({
   code,
   details,
   onRetry,
-  showRetry = true
+  showRetry = true,
 }: ErrorPageProps) {
   const navigate = useNavigate();
 
@@ -51,8 +51,9 @@ export default function Error({
           badge: "Network Error",
           badgeVariant: "secondary" as const,
           defaultTitle: "Connection Problem",
-          defaultMessage: "Unable to connect to AFL Analytics servers. Please check your internet connection and try again.",
-          defaultCode: "NETWORK_ERROR"
+          defaultMessage:
+            "Unable to connect to AFL Analytics servers. Please check your internet connection and try again.",
+          defaultCode: "NETWORK_ERROR",
         };
       case "server":
         return {
@@ -62,8 +63,9 @@ export default function Error({
           badge: "Server Error",
           badgeVariant: "destructive" as const,
           defaultTitle: "Server Error",
-          defaultMessage: "Our servers are experiencing technical difficulties. Our team has been notified and is working to resolve this issue.",
-          defaultCode: code || "500"
+          defaultMessage:
+            "Our servers are experiencing technical difficulties. Our team has been notified and is working to resolve this issue.",
+          defaultCode: code || "500",
         };
       case "unauthorized":
         return {
@@ -73,8 +75,9 @@ export default function Error({
           badge: "Unauthorized",
           badgeVariant: "secondary" as const,
           defaultTitle: "Access Denied",
-          defaultMessage: "You don't have permission to access this resource. Please sign in with appropriate credentials.",
-          defaultCode: "401"
+          defaultMessage:
+            "You don't have permission to access this resource. Please sign in with appropriate credentials.",
+          defaultCode: "401",
         };
       case "forbidden":
         return {
@@ -84,8 +87,9 @@ export default function Error({
           badge: "Forbidden",
           badgeVariant: "secondary" as const,
           defaultTitle: "Access Forbidden",
-          defaultMessage: "You don't have the required permissions to access this resource.",
-          defaultCode: "403"
+          defaultMessage:
+            "You don't have the required permissions to access this resource.",
+          defaultCode: "403",
         };
       default:
         return {
@@ -95,8 +99,9 @@ export default function Error({
           badge: "Error",
           badgeVariant: "secondary" as const,
           defaultTitle: "Something Went Wrong",
-          defaultMessage: "An unexpected error occurred. Please try again or contact support if the problem persists.",
-          defaultCode: code || "ERROR"
+          defaultMessage:
+            "An unexpected error occurred. Please try again or contact support if the problem persists.",
+          defaultCode: code || "ERROR",
         };
     }
   };
@@ -137,7 +142,9 @@ export default function Error({
         <div className="max-w-2xl w-full">
           <Card className="text-center border-0 shadow-lg">
             <CardHeader className="pb-6">
-              <div className={`w-20 h-20 bg-gradient-to-br ${config.bgColor} rounded-full flex items-center justify-center mx-auto mb-4`}>
+              <div
+                className={`w-20 h-20 bg-gradient-to-br ${config.bgColor} rounded-full flex items-center justify-center mx-auto mb-4`}
+              >
                 <Icon className={`w-10 h-10 ${config.color}`} />
               </div>
               <CardTitle className="text-3xl">
@@ -167,11 +174,7 @@ export default function Error({
                     Try Again
                   </Button>
                 )}
-                <Button
-                  asChild
-                  variant="outline"
-                  className="flex-1"
-                >
+                <Button asChild variant="outline" className="flex-1">
                   <Link to="/afl-dashboard">
                     <Home className="w-4 h-4 mr-2" />
                     Go to Dashboard
@@ -189,7 +192,9 @@ export default function Error({
 
               {type === "server" && (
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h4 className="font-medium text-blue-900 mb-2">What can you do?</h4>
+                  <h4 className="font-medium text-blue-900 mb-2">
+                    What can you do?
+                  </h4>
                   <ul className="text-sm text-blue-700 space-y-1 text-left">
                     <li>• Wait a few minutes and try again</li>
                     <li>• Check our status page for ongoing issues</li>
@@ -201,7 +206,9 @@ export default function Error({
 
               {type === "network" && (
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h4 className="font-medium text-blue-900 mb-2">Troubleshooting steps:</h4>
+                  <h4 className="font-medium text-blue-900 mb-2">
+                    Troubleshooting steps:
+                  </h4>
                   <ul className="text-sm text-blue-700 space-y-1 text-left">
                     <li>• Check your internet connection</li>
                     <li>• Disable VPN if you're using one</li>
@@ -213,9 +220,13 @@ export default function Error({
 
               {(type === "unauthorized" || type === "forbidden") && (
                 <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <h4 className="font-medium text-yellow-900 mb-2">Need access?</h4>
+                  <h4 className="font-medium text-yellow-900 mb-2">
+                    Need access?
+                  </h4>
                   <ul className="text-sm text-yellow-700 space-y-1 text-left">
-                    <li>• Make sure you're signed in with the correct account</li>
+                    <li>
+                      • Make sure you're signed in with the correct account
+                    </li>
                     <li>• Contact your administrator for access permissions</li>
                     <li>• Verify your subscription includes this feature</li>
                   </ul>

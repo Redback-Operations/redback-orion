@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
     queries: {
       retry: (failureCount, error) => {
         // Don't retry on 4xx errors
-        if (error && typeof error === 'object' && 'status' in error) {
+        if (error && typeof error === "object" && "status" in error) {
           const status = (error as any).status;
           if (status >= 400 && status < 500) {
             return false;
@@ -38,10 +38,12 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <ErrorBoundary onError={(error, errorInfo) => {
-    // In a real app, send this to your logging service
-    console.error("Global error caught:", error, errorInfo);
-  }}>
+  <ErrorBoundary
+    onError={(error, errorInfo) => {
+      // In a real app, send this to your logging service
+      console.error("Global error caught:", error, errorInfo);
+    }}
+  >
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />

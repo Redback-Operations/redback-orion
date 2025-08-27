@@ -9,14 +9,14 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  Activity, 
-  Home, 
-  RefreshCw, 
+import {
+  Activity,
+  Home,
+  RefreshCw,
   Bug,
   AlertTriangle,
   Copy,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -52,7 +52,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-    
+
     this.setState({
       error,
       errorInfo,
@@ -125,9 +125,7 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
                   AFL Analytics
                 </span>
               </Link>
-              <Badge variant="destructive">
-                Application Error
-              </Badge>
+              <Badge variant="destructive">Application Error</Badge>
             </div>
           </header>
 
@@ -139,16 +137,20 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
                   <div className="w-20 h-20 bg-gradient-to-br from-red-100 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Bug className="w-10 h-10 text-red-600" />
                   </div>
-                  <CardTitle className="text-3xl">Something Went Wrong</CardTitle>
+                  <CardTitle className="text-3xl">
+                    Something Went Wrong
+                  </CardTitle>
                   <CardDescription className="text-lg">
-                    An unexpected error occurred in the application. Our team has been notified.
+                    An unexpected error occurred in the application. Our team
+                    has been notified.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Error:</strong> {this.state.error?.message || "An unknown error occurred"}
+                      <strong>Error:</strong>{" "}
+                      {this.state.error?.message || "An unknown error occurred"}
                     </AlertDescription>
                   </Alert>
 
@@ -168,11 +170,7 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
                       <RefreshCw className="w-4 h-4 mr-2" />
                       Reload Page
                     </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="flex-1"
-                    >
+                    <Button asChild variant="outline" className="flex-1">
                       <Link to="/afl-dashboard">
                         <Home className="w-4 h-4 mr-2" />
                         Go Home
@@ -184,16 +182,21 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
                   <div className="mt-6">
                     <Button
                       variant="ghost"
-                      onClick={() => this.setState({ showDetails: !this.state.showDetails })}
+                      onClick={() =>
+                        this.setState({ showDetails: !this.state.showDetails })
+                      }
                       className="text-sm"
                     >
-                      {this.state.showDetails ? "Hide" : "Show"} Technical Details
+                      {this.state.showDetails ? "Hide" : "Show"} Technical
+                      Details
                     </Button>
 
                     {this.state.showDetails && (
                       <div className="mt-4 p-4 bg-gray-50 rounded-lg border text-left">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-gray-900">Error Details</h4>
+                          <h4 className="font-medium text-gray-900">
+                            Error Details
+                          </h4>
                           <Button
                             size="sm"
                             variant="outline"
@@ -212,16 +215,26 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
 
                   {/* Help Section */}
                   <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h4 className="font-medium text-blue-900 mb-2">Need Help?</h4>
+                    <h4 className="font-medium text-blue-900 mb-2">
+                      Need Help?
+                    </h4>
                     <ul className="text-sm text-blue-700 space-y-1 text-left">
-                      <li>• Try refreshing the page or going back to the dashboard</li>
+                      <li>
+                        • Try refreshing the page or going back to the dashboard
+                      </li>
                       <li>• Clear your browser cache and cookies</li>
                       <li>• Contact support if the error persists</li>
-                      <li>• Include the error details above when reporting the issue</li>
+                      <li>
+                        • Include the error details above when reporting the
+                        issue
+                      </li>
                     </ul>
                     <div className="mt-3 flex gap-2">
                       <Button size="sm" variant="outline" asChild>
-                        <a href="mailto:support@aflanalytics.com" className="flex items-center">
+                        <a
+                          href="mailto:support@aflanalytics.com"
+                          className="flex items-center"
+                        >
                           <ExternalLink className="w-3 h-3 mr-1" />
                           Contact Support
                         </a>
@@ -245,7 +258,7 @@ export default ErrorBoundary;
 // Higher-order component for wrapping components with error boundary
 export function withErrorBoundary<T extends object>(
   Component: React.ComponentType<T>,
-  onError?: (error: Error, errorInfo: ErrorInfo) => void
+  onError?: (error: Error, errorInfo: ErrorInfo) => void,
 ) {
   return function WrappedComponent(props: T) {
     return (

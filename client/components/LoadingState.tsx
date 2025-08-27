@@ -9,14 +9,14 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Loader2, 
-  RefreshCw, 
-  AlertCircle, 
-  Wifi, 
+import {
+  Loader2,
+  RefreshCw,
+  AlertCircle,
+  Wifi,
   Server,
   Clock,
-  CheckCircle
+  CheckCircle,
 } from "lucide-react";
 
 interface LoadingStateProps {
@@ -97,15 +97,28 @@ export default function LoadingState({
   // Error state
   if (error) {
     const errorMessage = typeof error === "string" ? error : error.message;
-    const isNetworkError = errorMessage.toLowerCase().includes("network") || 
-                          errorMessage.toLowerCase().includes("fetch");
-    const isServerError = errorMessage.toLowerCase().includes("server") || 
-                         errorMessage.includes("5");
+    const isNetworkError =
+      errorMessage.toLowerCase().includes("network") ||
+      errorMessage.toLowerCase().includes("fetch");
+    const isServerError =
+      errorMessage.toLowerCase().includes("server") ||
+      errorMessage.includes("5");
 
-    const ErrorIcon = isNetworkError ? Wifi : isServerError ? Server : AlertCircle;
-    const errorColor = isNetworkError ? "text-blue-600" : isServerError ? "text-red-600" : "text-orange-600";
-    const bgColor = isNetworkError ? "bg-blue-50 border-blue-200" : 
-                   isServerError ? "bg-red-50 border-red-200" : "bg-orange-50 border-orange-200";
+    const ErrorIcon = isNetworkError
+      ? Wifi
+      : isServerError
+        ? Server
+        : AlertCircle;
+    const errorColor = isNetworkError
+      ? "text-blue-600"
+      : isServerError
+        ? "text-red-600"
+        : "text-orange-600";
+    const bgColor = isNetworkError
+      ? "bg-blue-50 border-blue-200"
+      : isServerError
+        ? "bg-red-50 border-red-200"
+        : "bg-orange-50 border-orange-200";
 
     if (variant === "inline") {
       return (
@@ -130,7 +143,11 @@ export default function LoadingState({
           <CardContent className="p-8 text-center">
             <ErrorIcon className={`w-12 h-12 mx-auto mb-4 ${errorColor}`} />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {isNetworkError ? "Connection Error" : isServerError ? "Server Error" : "Error"}
+              {isNetworkError
+                ? "Connection Error"
+                : isServerError
+                  ? "Server Error"
+                  : "Error"}
             </h3>
             <p className="text-gray-600 mb-4">{errorMessage}</p>
             {showRetry && onRetry && (
@@ -151,7 +168,11 @@ export default function LoadingState({
           <ErrorIcon className={`w-6 h-6 ${errorColor} mt-1 flex-shrink-0`} />
           <div className="flex-1">
             <h3 className="font-medium text-gray-900 mb-1">
-              {isNetworkError ? "Connection Problem" : isServerError ? "Server Error" : "Something went wrong"}
+              {isNetworkError
+                ? "Connection Problem"
+                : isServerError
+                  ? "Server Error"
+                  : "Something went wrong"}
             </h3>
             <p className="text-gray-600 mb-3">{errorMessage}</p>
             {showRetry && onRetry && (
@@ -183,7 +204,9 @@ export default function LoadingState({
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Clock className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{emptyText}</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {emptyText}
+            </h3>
             <p className="text-gray-600">{emptyDescription}</p>
           </CardContent>
         </Card>
@@ -235,7 +258,7 @@ export const DataWrapper = ({
   error,
   children,
   emptyMessage = "No data available",
-  onRetry
+  onRetry,
 }: DataWrapperProps) => {
   const isEmpty = !data || (Array.isArray(data) && data.length === 0);
 
@@ -254,12 +277,12 @@ export const DataWrapper = ({
 };
 
 // Success state component
-export const SuccessState = ({ 
-  message = "Success!", 
+export const SuccessState = ({
+  message = "Success!",
   description,
-  action 
-}: { 
-  message?: string; 
+  action,
+}: {
+  message?: string;
   description?: string;
   action?: ReactNode;
 }) => (

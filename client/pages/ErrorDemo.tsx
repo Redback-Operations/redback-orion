@@ -9,17 +9,25 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import MobileNavigation from "@/components/MobileNavigation";
-import Error, { NetworkError, ServerError, UnauthorizedError, ForbiddenError } from "@/pages/Error";
-import LoadingState, { DataWrapper, SuccessState } from "@/components/LoadingState";
-import { 
-  Activity, 
-  Bug, 
-  Wifi, 
-  Server, 
-  Shield, 
+import Error, {
+  NetworkError,
+  ServerError,
+  UnauthorizedError,
+  ForbiddenError,
+} from "@/pages/Error";
+import LoadingState, {
+  DataWrapper,
+  SuccessState,
+} from "@/components/LoadingState";
+import {
+  Activity,
+  Bug,
+  Wifi,
+  Server,
+  Shield,
   AlertTriangle,
   Loader2,
-  CheckCircle
+  CheckCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -38,7 +46,9 @@ export default function ErrorDemo() {
 
   const handleJavaScriptError = () => {
     // This will trigger the ErrorBoundary
-    throw new Error("This is a test JavaScript error for ErrorBoundary demonstration");
+    throw new Error(
+      "This is a test JavaScript error for ErrorBoundary demonstration",
+    );
   };
 
   const simulateNetworkError = () => {
@@ -52,7 +62,7 @@ export default function ErrorDemo() {
   const simulateLoadingState = () => {
     setIsLoading(true);
     setDataState({ ...dataState, isLoading: true, error: null });
-    
+
     setTimeout(() => {
       setIsLoading(false);
       setDataState({
@@ -83,11 +93,13 @@ export default function ErrorDemo() {
       case "forbidden":
         return <ForbiddenError onRetry={() => setCurrentDemo(null)} />;
       case "general":
-        return <Error 
-          title="General Error Demo"
-          message="This is a demonstration of a general error page."
-          onRetry={() => setCurrentDemo(null)}
-        />;
+        return (
+          <Error
+            title="General Error Demo"
+            message="This is a demonstration of a general error page."
+            onRetry={() => setCurrentDemo(null)}
+          />
+        );
       default:
         break;
     }
@@ -109,7 +121,10 @@ export default function ErrorDemo() {
                 Test different error states and fallback pages
               </p>
             </div>
-            <Badge variant="outline" className="text-orange-600 border-orange-200">
+            <Badge
+              variant="outline"
+              className="text-orange-600 border-orange-200"
+            >
               Development Only
             </Badge>
           </div>
@@ -134,7 +149,8 @@ export default function ErrorDemo() {
                 >
                   <Wifi className="w-6 h-6 text-blue-600" />
                   <span className="text-center">
-                    Network Error<br />
+                    Network Error
+                    <br />
                     <small className="text-gray-500">Connection issues</small>
                   </span>
                 </Button>
@@ -146,7 +162,8 @@ export default function ErrorDemo() {
                 >
                   <Server className="w-6 h-6 text-red-600" />
                   <span className="text-center">
-                    Server Error<br />
+                    Server Error
+                    <br />
                     <small className="text-gray-500">500 Internal Error</small>
                   </span>
                 </Button>
@@ -158,7 +175,8 @@ export default function ErrorDemo() {
                 >
                   <Shield className="w-6 h-6 text-yellow-600" />
                   <span className="text-center">
-                    Unauthorized<br />
+                    Unauthorized
+                    <br />
                     <small className="text-gray-500">401 Access Denied</small>
                   </span>
                 </Button>
@@ -170,7 +188,8 @@ export default function ErrorDemo() {
                 >
                   <AlertTriangle className="w-6 h-6 text-orange-600" />
                   <span className="text-center">
-                    Forbidden<br />
+                    Forbidden
+                    <br />
                     <small className="text-gray-500">403 Forbidden</small>
                   </span>
                 </Button>
@@ -182,7 +201,8 @@ export default function ErrorDemo() {
                 >
                   <Bug className="w-6 h-6 text-purple-600" />
                   <span className="text-center">
-                    General Error<br />
+                    General Error
+                    <br />
                     <small className="text-gray-500">Generic error page</small>
                   </span>
                 </Button>
@@ -194,8 +214,11 @@ export default function ErrorDemo() {
                 >
                   <AlertTriangle className="w-6 h-6" />
                   <span className="text-center">
-                    JavaScript Error<br />
-                    <small className="text-gray-500">Triggers ErrorBoundary</small>
+                    JavaScript Error
+                    <br />
+                    <small className="text-gray-500">
+                      Triggers ErrorBoundary
+                    </small>
                   </span>
                 </Button>
               </div>
@@ -237,9 +260,9 @@ export default function ErrorDemo() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <h4 className="font-medium">Inline Loading</h4>
-                  <LoadingState 
-                    isLoading={isLoading} 
-                    variant="inline" 
+                  <LoadingState
+                    isLoading={isLoading}
+                    variant="inline"
                     loadingText="Fetching data..."
                   >
                     <div className="p-3 bg-green-50 border border-green-200 rounded">
@@ -250,15 +273,15 @@ export default function ErrorDemo() {
 
                 <div className="space-y-3">
                   <h4 className="font-medium">Card Loading</h4>
-                  <LoadingState 
-                    isLoading={isLoading} 
-                    variant="card" 
+                  <LoadingState
+                    isLoading={isLoading}
+                    variant="card"
                     loadingText="Processing..."
                   >
                     <Card>
                       <CardContent className="p-4">
-                        <SuccessState 
-                          message="Success!" 
+                        <SuccessState
+                          message="Success!"
                           description="Your data has been loaded."
                         />
                       </CardContent>
@@ -268,15 +291,21 @@ export default function ErrorDemo() {
 
                 <div className="space-y-3">
                   <h4 className="font-medium">Skeleton Loading</h4>
-                  <LoadingState 
-                    isLoading={isLoading} 
-                    variant="skeleton" 
+                  <LoadingState
+                    isLoading={isLoading}
+                    variant="skeleton"
                     skeletonRows={4}
                   >
                     <div className="space-y-2">
-                      <div className="p-2 bg-gray-50 rounded">Sample data row 1</div>
-                      <div className="p-2 bg-gray-50 rounded">Sample data row 2</div>
-                      <div className="p-2 bg-gray-50 rounded">Sample data row 3</div>
+                      <div className="p-2 bg-gray-50 rounded">
+                        Sample data row 1
+                      </div>
+                      <div className="p-2 bg-gray-50 rounded">
+                        Sample data row 2
+                      </div>
+                      <div className="p-2 bg-gray-50 rounded">
+                        Sample data row 3
+                      </div>
                     </div>
                   </LoadingState>
                 </div>
@@ -316,14 +345,10 @@ export default function ErrorDemo() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/login">
-                    Login Page
-                  </Link>
+                  <Link to="/login">Login Page</Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/nonexistent-page">
-                    Test 404 Page
-                  </Link>
+                  <Link to="/nonexistent-page">Test 404 Page</Link>
                 </Button>
               </div>
             </CardContent>
