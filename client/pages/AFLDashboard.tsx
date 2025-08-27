@@ -1286,7 +1286,12 @@ export default function AFLDashboard() {
                             key={area}
                             className="flex items-center space-x-2"
                           >
-                            <input type="checkbox" className="rounded" />
+                            <input
+                              type="checkbox"
+                              className="rounded"
+                              checked={selectedFocusAreas.includes(area)}
+                              onChange={(e) => handleFocusAreaChange(area, e.target.checked)}
+                            />
                             <span className="text-sm">{area}</span>
                           </label>
                         ))}
