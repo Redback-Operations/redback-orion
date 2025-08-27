@@ -341,6 +341,81 @@ export default function Analytics() {
     };
   };
 
+  // Generate PDF using HTML and browser print API
+  const generatePDF = (content: string, fileName: string) => {
+    // Create a new window for PDF generation
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow popups to generate PDF reports');
+      return;
+    }
+
+    // HTML template for PDF
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>AFL Analytics Report</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              margin: 40px;
+              line-height: 1.6;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 3px solid #2563eb;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
+            }
+            .logo {
+              color: #2563eb;
+              font-size: 28px;
+              font-weight: bold;
+              margin-bottom: 5px;
+            }
+            .subtitle {
+              color: #666;
+              font-size: 14px;
+            }
+            h1 { color: #2563eb; font-size: 24px; margin: 30px 0 15px 0; }
+            h2 { color: #059669; font-size: 18px; margin: 25px 0 10px 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
+            .metric { background: #f8fafc; padding: 10px; margin: 8px 0; border-left: 4px solid #2563eb; }
+            .section { margin-bottom: 25px; }
+            .player-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0; }
+            .player-card { background: #f9fafb; padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb; }
+            .crowd-section { background: #ecfdf5; padding: 10px; margin: 5px 0; border-radius: 4px; }
+            @media print {
+              body { margin: 20px; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="logo">AFL Analytics</div>
+            <div class="subtitle">Professional Sports Analytics Platform</div>
+          </div>
+          <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+            <button onclick="window.print()" style="background: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Generate PDF</button>
+            <button onclick="window.close()" style="background: #6b7280; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">Close</button>
+          </div>
+          ${content}
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+
+    // Auto-trigger print dialog after a short delay
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
+
   // Generate realistic AFL video analysis data
   const generateVideoInsights = () => {
     const players = [
