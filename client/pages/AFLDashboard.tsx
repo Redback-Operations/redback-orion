@@ -447,19 +447,87 @@ export default function AFLDashboard() {
       setIsVideoUploading(true);
       setVideoUploadProgress(0);
 
+      // Create queue item immediately when upload starts
+      const newQueueItem = {
+        id: `pq_${Date.now()}`,
+        name: selectedVideoFile.name,
+        analysisType:
+          selectedAnalysisType === "highlights"
+            ? "Highlight Generation"
+            : selectedAnalysisType === "player"
+              ? "Player Tracking"
+              : selectedAnalysisType === "tactics"
+                ? "Tactical Analysis"
+                : selectedAnalysisType === "performance"
+                  ? "Performance Analysis"
+                  : "Crowd Analysis",
+        status: "uploading" as const,
+        progress: 0,
+        duration: `${Math.floor(Math.random() * 60 + 30)}:${Math.floor(
+          Math.random() * 60,
+        )
+          .toString()
+          .padStart(2, "0")}`,
+        size: `${(selectedVideoFile.size / (1024 * 1024)).toFixed(1)} MB`,
+        uploadTime: new Date().toISOString(),
+        completedTime: null,
+        estimatedCompletion: new Date(Date.now() + Math.random() * 600000 + 300000).toISOString(), // 5-15 minutes
+        priority: selectedFocusAreas.length > 2 ? "high" : Math.random() > 0.5 ? "medium" : "low",
+        userId: "current_user",
+        processingStage: "file_upload",
+        errorCount: 0,
+        retryCount: 0,
+      };
+
+      // Add to processing queue immediately
+      setProcessingQueue((prev) => [newQueueItem, ...prev]);
+
       // Simulate file upload with real progress
       for (let i = 0; i <= 100; i += 5) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         setVideoUploadProgress(i);
+
+        // Update the queue item progress during upload
+        setProcessingQueue((prev) => prev.map(item =>
+          item.id === newQueueItem.id
+            ? { ...item, progress: i }
+            : item
+        ));
       }
 
       setIsVideoUploading(false);
       setIsVideoAnalyzing(true);
       setVideoAnalysisProgress(0);
 
-      // Simulate video analysis with real progress
+      // Move to queued status after upload completes
+      setProcessingQueue((prev) => prev.map(item =>
+        item.id === newQueueItem.id
+          ? {
+              ...item,
+              status: "queued",
+              progress: 0,
+              processingStage: "queue_waiting"
+            }
+          : item
+      ));
+
+      // Simulate quick transition to processing (the useEffect will handle detailed progression)
+      setTimeout(() => {
+        setProcessingQueue((prev) => prev.map(item =>
+          item.id === newQueueItem.id
+            ? {
+                ...item,
+                status: "processing",
+                progress: 5,
+                processingStage: "preprocessing"
+              }
+            : item
+        ));
+      }, 2000);
+
+      // Complete the UI state
       for (let i = 0; i <= 100; i += 2) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 50));
         setVideoAnalysisProgress(i);
       }
 
@@ -483,45 +551,24 @@ export default function AFLDashboard() {
         JSON.stringify([...existingAnalyses, analysisResults]),
       );
 
-      // Add completed analysis to processing queue
-      const newQueueItem = {
-        id: `pq_${Date.now()}`,
-        name: selectedVideoFile.name,
-        analysisType:
-          selectedAnalysisType === "highlights"
-            ? "Highlight Generation"
-            : selectedAnalysisType === "player"
-              ? "Player Tracking"
-              : selectedAnalysisType === "tactics"
-                ? "Tactical Analysis"
-                : selectedAnalysisType === "performance"
-                  ? "Performance Analysis"
-                  : "Crowd Analysis",
-        status: "completed" as const,
-        progress: 100,
-        duration: `${Math.floor(Math.random() * 60 + 30)}:${Math.floor(
-          Math.random() * 60,
-        )
-          .toString()
-          .padStart(2, "0")}`,
-        size: `${(selectedVideoFile.size / (1024 * 1024)).toFixed(1)} MB`,
-        uploadTime: new Date().toISOString(),
-        completedTime: new Date().toISOString(),
-        estimatedCompletion: null,
-        priority: "medium" as const,
-        userId: "current_user",
-        processingStage: "analysis_complete" as const,
-        errorCount: 0,
-        retryCount: 0,
-      };
-
-      setProcessingQueue((prev) => [newQueueItem, ...prev]);
     } catch (error) {
       setIsVideoUploading(false);
       setIsVideoAnalyzing(false);
       setVideoAnalysisError(
         error instanceof Error ? error.message : "Upload failed",
       );
+
+      // Mark the queue item as failed if there was an error
+      setProcessingQueue((prev) => prev.map(item =>
+        item.name === selectedVideoFile?.name && item.status === "uploading"
+          ? {
+              ...item,
+              status: "failed",
+              processingStage: "upload_error",
+              errorCount: 1
+            }
+          : item
+      ));
     }
   };
 
