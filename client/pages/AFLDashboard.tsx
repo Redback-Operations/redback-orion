@@ -808,7 +808,9 @@ export default function AFLDashboard() {
 
   // Auto-open view modal for testing completed items
   useEffect(() => {
-    const completedItem = processingQueue.find(item => item.status === 'completed');
+    const completedItem = processingQueue.find(
+      (item) => item.status === "completed",
+    );
     if (completedItem && !viewModalOpen && processingQueue.length > 0) {
       setTimeout(() => {
         handleViewAnalysis(completedItem);
@@ -3131,7 +3133,9 @@ Generated on: ${new Date().toLocaleString()}
                             {/* Player Stats Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                               <div className="p-3 bg-blue-50 rounded-lg">
-                                <div className="font-medium">Marcus Bontempelli</div>
+                                <div className="font-medium">
+                                  Marcus Bontempelli
+                                </div>
                                 <div className="text-sm text-gray-600 mt-1">
                                   Goals: 2 | Tackles: 6 | Efficiency: 85.7%
                                 </div>
@@ -3140,7 +3144,9 @@ Generated on: ${new Date().toLocaleString()}
                                 </div>
                               </div>
                               <div className="p-3 bg-green-50 rounded-lg">
-                                <div className="font-medium">Patrick Cripps</div>
+                                <div className="font-medium">
+                                  Patrick Cripps
+                                </div>
                                 <div className="text-sm text-gray-600 mt-1">
                                   Goals: 1 | Tackles: 9 | Efficiency: 88.6%
                                 </div>
@@ -3149,7 +3155,9 @@ Generated on: ${new Date().toLocaleString()}
                                 </div>
                               </div>
                               <div className="p-3 bg-purple-50 rounded-lg">
-                                <div className="font-medium">Clayton Oliver</div>
+                                <div className="font-medium">
+                                  Clayton Oliver
+                                </div>
                                 <div className="text-sm text-gray-600 mt-1">
                                   Goals: 0 | Tackles: 7 | Efficiency: 82.3%
                                 </div>
@@ -3158,7 +3166,9 @@ Generated on: ${new Date().toLocaleString()}
                                 </div>
                               </div>
                               <div className="p-3 bg-orange-50 rounded-lg">
-                                <div className="font-medium">Christian Petracca</div>
+                                <div className="font-medium">
+                                  Christian Petracca
+                                </div>
                                 <div className="text-sm text-gray-600 mt-1">
                                   Goals: 3 | Tackles: 4 | Efficiency: 89.2%
                                 </div>
@@ -3172,8 +3182,13 @@ Generated on: ${new Date().toLocaleString()}
                             <div className="h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
                               <div className="text-center">
                                 <BarChart3 className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-                                <div className="text-lg font-medium text-gray-600">Performance Charts</div>
-                                <div className="text-sm text-gray-500">Interactive visualizations will be displayed here</div>
+                                <div className="text-lg font-medium text-gray-600">
+                                  Performance Charts
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  Interactive visualizations will be displayed
+                                  here
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -3192,19 +3207,35 @@ Generated on: ${new Date().toLocaleString()}
                           <div className="space-y-4">
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                               <div className="p-3 bg-green-50 rounded-lg">
-                                <div className="font-medium">Northern Stand</div>
-                                <div className="text-sm text-gray-600">14,250 / 15,000 (95.0%)</div>
-                                <div className="text-sm text-gray-600">Noise: 95.2 dB peak</div>
+                                <div className="font-medium">
+                                  Northern Stand
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  14,250 / 15,000 (95.0%)
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  Noise: 95.2 dB peak
+                                </div>
                               </div>
                               <div className="p-3 bg-blue-50 rounded-lg">
-                                <div className="font-medium">Southern Stand</div>
-                                <div className="text-sm text-gray-600">11,680 / 12,000 (97.3%)</div>
-                                <div className="text-sm text-gray-600">Noise: 92.8 dB peak</div>
+                                <div className="font-medium">
+                                  Southern Stand
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  11,680 / 12,000 (97.3%)
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  Noise: 92.8 dB peak
+                                </div>
                               </div>
                               <div className="p-3 bg-purple-50 rounded-lg">
                                 <div className="font-medium">Eastern Wing</div>
-                                <div className="text-sm text-gray-600">7,080 / 8,000 (88.5%)</div>
-                                <div className="text-sm text-gray-600">Noise: 87.4 dB peak</div>
+                                <div className="text-sm text-gray-600">
+                                  7,080 / 8,000 (88.5%)
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  Noise: 87.4 dB peak
+                                </div>
                               </div>
                             </div>
 
@@ -3212,8 +3243,12 @@ Generated on: ${new Date().toLocaleString()}
                             <div className="h-48 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
                               <div className="text-center">
                                 <Users className="w-10 h-10 mx-auto text-blue-400 mb-2" />
-                                <div className="text-lg font-medium text-blue-600">Crowd Density Charts</div>
-                                <div className="text-sm text-blue-500">Stadium utilization and movement patterns</div>
+                                <div className="text-lg font-medium text-blue-600">
+                                  Crowd Density Charts
+                                </div>
+                                <div className="text-sm text-blue-500">
+                                  Stadium utilization and movement patterns
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -3231,16 +3266,30 @@ Generated on: ${new Date().toLocaleString()}
                         <CardContent>
                           <div className="space-y-3">
                             <div className="p-3 bg-yellow-50 border-l-4 border-yellow-400">
-                              <div className="font-medium">00:03:45 - Opening Goal</div>
-                              <div className="text-sm text-gray-600">Marcus Bontempelli scores with crowd eruption (94% confidence)</div>
+                              <div className="font-medium">
+                                00:03:45 - Opening Goal
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                Marcus Bontempelli scores with crowd eruption
+                                (94% confidence)
+                              </div>
                             </div>
                             <div className="p-3 bg-green-50 border-l-4 border-green-400">
-                              <div className="font-medium">00:18:23 - Spectacular Mark</div>
-                              <div className="text-sm text-gray-600">Defensive mark leads to standing ovation (91% confidence)</div>
+                              <div className="font-medium">
+                                00:18:23 - Spectacular Mark
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                Defensive mark leads to standing ovation (91%
+                                confidence)
+                              </div>
                             </div>
                             <div className="p-3 bg-blue-50 border-l-4 border-blue-400">
-                              <div className="font-medium">00:34:56 - Crucial Tackle</div>
-                              <div className="text-sm text-gray-600">Game-changing defensive play (88% confidence)</div>
+                              <div className="font-medium">
+                                00:34:56 - Crucial Tackle
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                Game-changing defensive play (88% confidence)
+                              </div>
                             </div>
                           </div>
                         </CardContent>
@@ -3259,28 +3308,37 @@ Generated on: ${new Date().toLocaleString()}
                             <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                               <div className="flex items-center gap-2 mb-2">
                                 <TrendingUp className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-blue-800">Top Performer</span>
+                                <span className="font-medium text-blue-800">
+                                  Top Performer
+                                </span>
                               </div>
                               <div className="text-sm text-blue-700">
-                                Patrick Cripps leads with 88.6% efficiency and strong defensive stats
+                                Patrick Cripps leads with 88.6% efficiency and
+                                strong defensive stats
                               </div>
                             </div>
                             <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
                               <div className="flex items-center gap-2 mb-2">
                                 <Users className="w-4 h-4 text-green-600" />
-                                <span className="font-medium text-green-800">Crowd Impact</span>
+                                <span className="font-medium text-green-800">
+                                  Crowd Impact
+                                </span>
                               </div>
                               <div className="text-sm text-green-700">
-                                Southern Stand achieved 97.3% density with peak engagement
+                                Southern Stand achieved 97.3% density with peak
+                                engagement
                               </div>
                             </div>
                             <div className="p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg border border-purple-200">
                               <div className="flex items-center gap-2 mb-2">
                                 <BarChart3 className="w-4 h-4 text-purple-600" />
-                                <span className="font-medium text-purple-800">Match Flow</span>
+                                <span className="font-medium text-purple-800">
+                                  Match Flow
+                                </span>
                               </div>
                               <div className="text-sm text-purple-700">
-                                Q4 showed highest intensity with 5 goals and 89% efficiency
+                                Q4 showed highest intensity with 5 goals and 89%
+                                efficiency
                               </div>
                             </div>
                           </div>
@@ -3290,9 +3348,12 @@ Generated on: ${new Date().toLocaleString()}
                                 <div className="w-2 h-2 rounded-full bg-white" />
                               </div>
                               <div>
-                                <div className="font-medium text-gray-800">Analysis Quality Score: 9.2/10</div>
+                                <div className="font-medium text-gray-800">
+                                  Analysis Quality Score: 9.2/10
+                                </div>
                                 <div className="text-sm text-gray-600 mt-1">
-                                  High-confidence analysis with 94.8% accuracy across all tracking metrics
+                                  High-confidence analysis with 94.8% accuracy
+                                  across all tracking metrics
                                 </div>
                               </div>
                             </div>
