@@ -608,6 +608,206 @@ export default function Login() {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <Dialog open={isResetModalOpen} onOpenChange={setIsResetModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {resetStep > 1 && resetStep < 4 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setResetStep(Math.max(1, resetStep - 1))}
+                  className="p-0 h-6 w-6"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              )}
+              {resetStep === 1 && "Reset Password"}
+              {resetStep === 2 && "Enter Verification Code"}
+              {resetStep === 3 && "Create New Password"}
+              {resetStep === 4 && "Password Reset Complete"}
+            </DialogTitle>
+            <DialogDescription>
+              {resetStep === 1 && "Enter your email to receive a reset link"}
+              {resetStep === 2 && "Check your email for a verification code"}
+              {resetStep === 3 && "Enter your new password"}
+              {resetStep === 4 && "Your password has been successfully reset"}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {resetMessage && resetStep === 2 && (
+              <Alert>
+                <Mail className="h-4 w-4" />
+                <AlertDescription>{resetMessage}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Step 1: Email Input */}
+            {resetStep === 1 && (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="resetEmail">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="resetEmail"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={resetForm.email}
+                      onChange={(e) =>
+                        setResetForm({ ...resetForm, email: e.target.value })
+                      }
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Sending Reset Link...
+                    </div>
+                  ) : (
+                    "Send Reset Link"
+                  )}
+                </Button>
+              </form>
+            )}
+
+            {/* Step 2: Verification Code */}
+            {resetStep === 2 && (
+              <form onSubmit={handleVerifyResetCode} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="resetCode">Verification Code</Label>
+                  <Input
+                    id="resetCode"
+                    type="text"
+                    placeholder="Enter 6-digit code"
+                    value={resetForm.resetCode}
+                    onChange={(e) =>
+                      setResetForm({ ...resetForm, resetCode: e.target.value })
+                    }
+                    maxLength={6}
+                    required
+                  />
+                  <p className="text-xs text-gray-600">
+                    For demo purposes, use code: <strong>123456</strong>
+                  </p>
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Verifying...
+                    </div>
+                  ) : (
+                    "Verify Code"
+                  )}
+                </Button>
+              </form>
+            )}
+
+            {/* Step 3: New Password */}
+            {resetStep === 3 && (
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      placeholder="Enter new password"
+                      value={resetForm.newPassword}
+                      onChange={(e) =>
+                        setResetForm({
+                          ...resetForm,
+                          newPassword: e.target.value,
+                        })
+                      }
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="confirmNewPassword"
+                      type="password"
+                      placeholder="Confirm new password"
+                      value={resetForm.confirmNewPassword}
+                      onChange={(e) =>
+                        setResetForm({
+                          ...resetForm,
+                          confirmNewPassword: e.target.value,
+                        })
+                      }
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Resetting Password...
+                    </div>
+                  ) : (
+                    "Reset Password"
+                  )}
+                </Button>
+              </form>
+            )}
+
+            {/* Step 4: Success */}
+            {resetStep === 4 && (
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-green-900">Success!</h3>
+                  <p className="text-sm text-green-700">
+                    Your password has been reset successfully.
+                  </p>
+                </div>
+                <Button
+                  onClick={closeResetModal}
+                  className="w-full"
+                >
+                  Continue to Sign In
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
