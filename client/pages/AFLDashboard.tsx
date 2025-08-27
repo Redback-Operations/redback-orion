@@ -799,7 +799,12 @@ export default function AFLDashboard() {
     if (email) {
       setUserEmail(email);
     }
-  }, [navigate]);
+
+    // Auto-add demo items if queue is empty
+    if (processingQueue.length === 0) {
+      addDemoProcessingItems();
+    }
+  }, [navigate, processingQueue.length]);
 
   // Logout function
   const handleLogout = () => {
