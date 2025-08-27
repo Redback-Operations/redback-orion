@@ -41,6 +41,7 @@ import {
   Calendar,
   FileText,
   Settings,
+  LogOut,
 } from "lucide-react";
 
 // Mock data for the dashboard
@@ -240,6 +241,7 @@ export default function AFLDashboard() {
                 Settings
               </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
             </div>
