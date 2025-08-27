@@ -2355,15 +2355,24 @@ Generated on: ${new Date().toLocaleString()}
                         <Download className="w-4 h-4 mr-2" />
                         Video Clips
                       </Button>
-                      <div className="grid grid-cols-2 gap-1">
+                      <div className="grid grid-cols-3 gap-1">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleDownloadReport("pdf")}
                           disabled={!videoAnalysisComplete}
                         >
-                          <FileText className="w-4 h-4 mr-2" />
-                          PDF Report
+                          <FileText className="w-4 h-4 mr-1" />
+                          PDF
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownloadReport("json")}
+                          disabled={!videoAnalysisComplete}
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          JSON
                         </Button>
                         <Button
                           variant="outline"
@@ -2371,8 +2380,8 @@ Generated on: ${new Date().toLocaleString()}
                           onClick={() => handleDownloadReport("txt")}
                           disabled={!videoAnalysisComplete}
                         >
-                          <FileText className="w-4 h-4 mr-2" />
-                          Text Report
+                          <FileText className="w-4 h-4 mr-1" />
+                          TXT
                         </Button>
                       </div>
                     </div>
