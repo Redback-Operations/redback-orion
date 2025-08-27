@@ -197,8 +197,8 @@ export default function MobileNavigation() {
 
       {/* Bottom Navigation for Mobile */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-40">
-        <div className="grid grid-cols-4 gap-1">
-          {navigationItems.slice(1, 5).map((item) => {
+        <div className="grid grid-cols-5 gap-1">
+          {navigationItems.slice(1, 6).map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
 
