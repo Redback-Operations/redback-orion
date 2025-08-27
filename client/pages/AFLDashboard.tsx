@@ -2720,11 +2720,21 @@ Generated on: ${new Date().toLocaleString()}
                         <div className="flex gap-2">
                           {item.status === "completed" && (
                             <>
-                              <Button variant="outline" size="sm">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleViewAnalysis(item)}
+                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                              >
                                 <Eye className="w-4 h-4 mr-1" />
                                 View
                               </Button>
-                              <Button variant="outline" size="sm">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDownloadFromQueue(item, "pdf")}
+                                className="text-green-600 border-green-600 hover:bg-green-50"
+                              >
                                 <Download className="w-4 h-4 mr-1" />
                                 Download
                               </Button>
