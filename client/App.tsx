@@ -15,6 +15,7 @@ import CrowdMonitor from "./pages/CrowdMonitor";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import ApiDiagnostics from "./pages/ApiDiagnostics";
+import ErrorDemo from "./pages/ErrorDemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
