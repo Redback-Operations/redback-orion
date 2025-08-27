@@ -795,17 +795,16 @@ export default function AFLDashboard() {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userEmail", "demo@aflanalytics.com");
       setUserEmail("demo@aflanalytics.com");
-
-      // Auto-add demo processing items for testing
-      setTimeout(() => {
-        addDemoProcessingItems();
-      }, 1000);
-      return;
     }
 
     if (email) {
       setUserEmail(email);
     }
+
+    // Always add demo items for testing
+    setTimeout(() => {
+      addDemoProcessingItems();
+    }, 500);
   }, [navigate]);
 
   // Logout function
@@ -1537,7 +1536,7 @@ ${clip.event} (${clip.time}):
 EXPORT DETAILS
 ==============
 • Export Format: Metadata Analysis (TXT)
-��� Processing Time: ${Math.floor(Math.random() * 3 + 1)} minutes
+• Processing Time: ${Math.floor(Math.random() * 3 + 1)} minutes
 • Clips Ready for Download: ${clipEvents.length}
 • Analysis Confidence: 94.8%
 
