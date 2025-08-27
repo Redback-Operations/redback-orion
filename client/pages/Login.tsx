@@ -14,6 +14,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Activity,
   Users,
   BarChart3,
@@ -27,6 +35,8 @@ import {
   Mail,
   Lock,
   Building,
+  ArrowLeft,
+  CheckCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
