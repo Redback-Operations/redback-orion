@@ -148,6 +148,7 @@ export default function Analytics() {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [analysisData, setAnalysisData] = useState(generateAnalysisData());
   const [selectedAnalysis, setSelectedAnalysis] = useState("highlights");
+  const [customReportFormat, setCustomReportFormat] = useState("pdf");
   const [videoMetadata, setVideoMetadata] = useState({
     title: "",
     description: "",
