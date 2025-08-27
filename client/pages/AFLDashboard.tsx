@@ -2736,15 +2736,33 @@ Generated on: ${new Date().toLocaleString()}
                                 <Eye className="w-4 h-4 mr-1" />
                                 View
                               </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDownloadFromQueue(item, "pdf")}
-                                className="text-green-600 border-green-600 hover:bg-green-50"
-                              >
-                                <Download className="w-4 h-4 mr-1" />
-                                Download
-                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-green-600 border-green-600 hover:bg-green-50"
+                                  >
+                                    <Download className="w-4 h-4 mr-1" />
+                                    Download
+                                    <ChevronDown className="w-3 h-3 ml-1" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleDownloadFromQueue(item, "pdf")}>
+                                    <FileText className="w-4 h-4 mr-2" />
+                                    PDF Report
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleDownloadFromQueue(item, "json")}>
+                                    <Download className="w-4 h-4 mr-2" />
+                                    JSON Data
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleDownloadFromQueue(item, "txt")}>
+                                    <FileText className="w-4 h-4 mr-2" />
+                                    Text Summary
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </>
                           )}
                           {item.status === "failed" && (
