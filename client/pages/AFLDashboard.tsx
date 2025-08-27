@@ -165,11 +165,37 @@ const crowdZones = [
 ];
 
 export default function AFLDashboard() {
+  const navigate = useNavigate();
   const [selectedPlayer, setSelectedPlayer] = useState(mockPlayers[0]);
   const [comparisonPlayer, setComparisonPlayer] = useState(mockPlayers[1]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
   const [isLive, setIsLive] = useState(true);
+  const [userEmail, setUserEmail] = useState("");
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    const email = localStorage.getItem('userEmail');
+
+    if (!isAuthenticated || isAuthenticated !== 'true') {
+      // Redirect to login if not authenticated
+      navigate("/");
+      return;
+    }
+
+    if (email) {
+      setUserEmail(email);
+    }
+  }, [navigate]);
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    navigate("/");
+  };
 
   const filteredPlayers = mockPlayers.filter(
     (player) =>
