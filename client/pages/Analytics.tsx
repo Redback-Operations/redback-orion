@@ -635,113 +635,130 @@ export default function Analytics() {
           break;
 
         case "pdf":
+          const pdfInsights = generateVideoInsights();
+          const dynamicSummary = generateDynamicSummary(pdfInsights, selectedAnalysis);
+
+          const htmlContent = `
+            <div class="section">
+              <h1>Video Analysis Report - ${reportType.replace(/_/g, ' ')}</h1>
+              <div class="metric">
+                <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
+                <strong>Video File:</strong> ${selectedFile?.name || "Match_Analysis_Video.mp4"}<br>
+                <strong>Analysis Type:</strong> ${selectedAnalysis}<br>
+                <strong>Duration:</strong> ${Math.floor(Math.random() * 120 + 90)} minutes
+              </div>
+            </div>
+
+            <div class="section">
+              <h2>Executive Summary</h2>
+              <div class="metric">${dynamicSummary.overview}</div>
+              <div class="metric">${dynamicSummary.performance}</div>
+              <div class="metric">${dynamicSummary.crowd}</div>
+              <div class="metric">${dynamicSummary.tactical}</div>
+              <div class="metric">${dynamicSummary.insights}</div>
+            </div>
+
+            <div class="section">
+              <h2>Key Match Events</h2>
+              ${pdfInsights.matchEvents.map(event => `
+                <div class="metric">
+                  <strong>${event.time} (Q${event.quarter}):</strong> ${event.event} - ${event.player}
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="section">
+              <h2>Player Performance Analysis</h2>
+              <div class="player-stats">
+                ${pdfInsights.playerStats.map(player => `
+                  <div class="player-card">
+                    <h3 style="margin: 0 0 8px 0; color: #2563eb;">${player.name}</h3>
+                    <div><strong>Speed:</strong> ${player.speed} km/h</div>
+                    <div><strong>Goals:</strong> ${player.goals} | <strong>Tackles:</strong> ${player.tackles} | <strong>Assists:</strong> ${player.assists}</div>
+                    <div><strong>Disposals:</strong> ${player.disposals} (${player.kicks} kicks, ${player.handballs} handballs)</div>
+                    <div><strong>Efficiency:</strong> ${player.efficiency}% | <strong>Time on Ground:</strong> ${player.timeOnGround}%</div>
+                    <div><strong>Contested:</strong> ${player.contestedPossessions} | <strong>Uncontested:</strong> ${player.uncontestedPossessions}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="section">
+              <h2>Crowd Density Analysis</h2>
+              <div class="metric">
+                <strong>Total Attendance:</strong> ${pdfInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()} |
+                <strong>Overall Density:</strong> ${((pdfInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / pdfInsights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
+              </div>
+              ${pdfInsights.crowdDensity.map(section => `
+                <div class="crowd-section">
+                  <strong>${section.section}:</strong> ${section.attendance.toLocaleString()} / ${section.capacity.toLocaleString()}
+                  (${section.density}% density) | Noise: ${section.noiseLevel} dB | Peak Moments: ${section.peakMoments}
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="section">
+              <h2>Field Activity Analysis</h2>
+              ${pdfInsights.heatMapZones.map(zone => `
+                <div class="metric">
+                  <strong>${zone.zone}:</strong> ${zone.activity}% activity (${zone.events} events tracked)
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="section">
+              <h2>Technical Metrics</h2>
+              <div class="metric">
+                <strong>Player Detection Accuracy:</strong> 97.8% |
+                <strong>Ball Tracking Precision:</strong> 94.2%<br>
+                <strong>Data Points Collected:</strong> ${(Math.random() * 50000 + 25000).toFixed(0)} |
+                <strong>Processing Time:</strong> ${Math.floor(Math.random() * 5 + 2)} minutes
+              </div>
+            </div>
+          `;
+
+          generatePDF(htmlContent, fileName);
+          break;
+
         case "txt":
-          const textInsights = generateVideoInsights();
-          const textContent = `AFL ANALYTICS VIDEO ANALYSIS REPORT - ${reportType.toUpperCase()}
+          const txtInsights = generateVideoInsights();
+          const txtSummary = generateDynamicSummary(txtInsights, selectedAnalysis);
+
+          const textContent = `AFL ANALYTICS VIDEO ANALYSIS REPORT
 
 Generated: ${new Date().toLocaleString()}
-Video File: ${selectedFile?.name || "Sample_Match_Video.mp4"}
+Video File: ${selectedFile?.name || "Match_Analysis_Video.mp4"}
 Analysis Type: ${selectedAnalysis}
-Duration: ${Math.floor(Math.random() * 120 + 90)} minutes
 
-═══════════════════════════════════════════════════════════════════
-
-MATCH OVERVIEW
-==============
-Quarter Scores: 3.2 (20) | 5.4 (34) | 7.8 (50) | 12.11 (83)
-Final Score: Team A: 83 - Team B: 76
-Weather: Clear, 18°C, Light breeze
-Attendance: ${textInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
+EXECUTIVE SUMMARY
+================
+${txtSummary.overview}
+${txtSummary.performance}
+${txtSummary.crowd}
+${txtSummary.tactical}
+${txtSummary.insights}
 
 KEY MATCH EVENTS
-================
-${textInsights.matchEvents
-  .map(
-    (event) =>
-      `${event.time} (Q${event.quarter}): ${event.event} - ${event.player}`,
-  )
-  .join("\n")}
+===============
+${txtInsights.matchEvents.map(event => `${event.time} (Q${event.quarter}): ${event.event} - ${event.player}`).join('\n')}
 
-DETAILED PLAYER PERFORMANCE ANALYSIS
-====================================
-${textInsights.playerStats
-  .map(
-    (player) => `
+PLAYER PERFORMANCE
+==================
+${txtInsights.playerStats.map(player => `
 ${player.name}:
-  Performance Metrics:
-  • Speed (Max): ${player.speed} km/h
-  • Goals: ${player.goals}
-  • Tackles: ${player.tackles}
-  • Assists: ${player.assists}
-  • Disposals: ${player.disposals} (${player.kicks} kicks, ${player.handballs} handballs)
-  • Marks: ${player.marks}
-  • Efficiency: ${player.efficiency}%
-  • Time on Ground: ${player.timeOnGround}%
+  Speed: ${player.speed} km/h | Goals: ${player.goals} | Tackles: ${player.tackles} | Assists: ${player.assists}
+  Disposals: ${player.disposals} | Efficiency: ${player.efficiency}% | Time on Ground: ${player.timeOnGround}%
+`).join('')}
 
-  Possession Breakdown:
-  • Contested: ${player.contestedPossessions}
-  • Uncontested: ${player.uncontestedPossessions}
-  • Inside 50s: ${player.inside50s}
-  • Clangers: ${player.clangers}
-`,
-  )
-  .join("\n")}
+CROWD ANALYSIS
+==============
+Total Attendance: ${txtInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
+${txtInsights.crowdDensity.map(section => `${section.section}: ${section.density}% density, ${section.noiseLevel} dB`).join('\n')}
 
-CROWD DENSITY ANALYSIS
-======================
-Total Stadium Capacity: ${textInsights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0).toLocaleString()}
-Total Attendance: ${textInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
-Overall Density: ${((textInsights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / textInsights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
+Generated by AFL Analytics Platform
+`;
 
-Stand-by-Stand Analysis:
-${textInsights.crowdDensity
-  .map(
-    (section) => `
-${section.section}:
-  • Capacity: ${section.capacity.toLocaleString()}
-  • Attendance: ${section.attendance.toLocaleString()}
-  • Density: ${section.density}%
-  • Movement Index: ${section.avgMovement}/20
-  • Noise Level: ${section.noiseLevel} dB
-  • Peak Reaction Moments: ${section.peakMoments}
-`,
-  )
-  .join("")}
-
-FIELD HEAT MAP ANALYSIS
-=======================
-${textInsights.heatMapZones
-  .map(
-    (zone) =>
-      `${zone.zone}: ${zone.activity}% activity (${zone.events} events tracked)`,
-  )
-  .join("\n")}
-
-TACTICAL INSIGHTS
-=================
-• Ball movement patterns favor quick transition through midfield
-• Forward pressure intensity: High (87%)
-• Defensive structure: Zone-based with man-on-man contests
-• Set piece efficiency: 73% from stoppages
-• Turnover rate: 15.2% (League avg: 18.1%)
-
-VIDEO ANALYSIS SUMMARY
-======================
-• Total tracking points: ${(Math.random() * 50000 + 25000).toFixed(0)}
-• Player detection accuracy: 97.8%
-• Ball tracking precision: 94.2%
-• Crowd movement analysis: ${textInsights.crowdDensity.length} sections monitored
-• Key moments identified: ${textInsights.matchEvents.length}
-• Performance metrics calculated: ${textInsights.playerStats.length * 14}
-
-This comprehensive analysis was generated by AFL Analytics Platform using advanced AI video processing technology.`;
-
-          if (format.toLowerCase() === "pdf") {
-            // For PDF format, we'll use a PDF-like filename but still download as text
-            downloadFile(textContent, `${fileName}.pdf`, "application/pdf");
-          } else {
-            downloadText(textContent, fileName);
-          }
+          downloadText(textContent, fileName);
           break;
 
         default:
