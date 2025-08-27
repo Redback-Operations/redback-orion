@@ -46,6 +46,12 @@ const navigationItems = [
     description: "Video analysis & reports",
   },
   {
+    name: "Reports",
+    href: "/reports",
+    icon: Download,
+    description: "Download & manage reports",
+  },
+  {
     name: "API Diagnostics",
     href: "/api-diagnostics",
     icon: Terminal,
