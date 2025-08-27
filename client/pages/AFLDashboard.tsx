@@ -2387,6 +2387,11 @@ Generated on: ${new Date().toLocaleString()}
                           TXT
                         </Button>
                       </div>
+                      <div className="text-xs text-gray-500 mt-2 space-y-1">
+                        <div><strong>PDF:</strong> Formatted report for printing/sharing</div>
+                        <div><strong>JSON:</strong> Raw backend data for developers</div>
+                        <div><strong>TXT:</strong> Plain text summary for analysis</div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
