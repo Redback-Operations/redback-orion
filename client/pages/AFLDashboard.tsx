@@ -799,6 +799,22 @@ export default function AFLDashboard() {
       // Auto-add demo processing items for testing
       setTimeout(() => {
         addDemoProcessingItems();
+
+        // Test the view modal with mock data after 2 seconds
+        setTimeout(() => {
+          const mockItem = {
+            id: "test_123",
+            name: "Test_Analysis.mp4",
+            analysisType: "Full Match Analysis",
+            status: "completed",
+            duration: "02:15:30",
+            size: "1.8 GB",
+            uploadTime: new Date().toISOString(),
+            completedTime: new Date().toISOString(),
+          };
+          setSelectedAnalysisItem(mockItem);
+          setViewModalOpen(true);
+        }, 2000);
       }, 1000);
       return;
     }
