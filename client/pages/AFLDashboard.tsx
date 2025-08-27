@@ -354,12 +354,12 @@ export default function AFLDashboard() {
     const interval = setInterval(() => {
       setProcessingQueue((prev) =>
         prev.map((item) => {
-          // Only update items that are actively processing AND not currently being uploaded by UI
+          // Only update items that are actively processing AND not controlled by UI
           if (
             (item.status === "analyzing" ||
               item.status === "processing" ||
               item.status === "uploading") &&
-            item.userId === "demo_user" // Only process demo items, not current user uploads
+            !item.isUIControlled // Exclude items controlled by UI upload flow
           ) {
             // Variable progress based on file size and complexity
             const sizeMultiplier = parseFloat(item.size) > 1000 ? 0.5 : 1; // Slower for large files
