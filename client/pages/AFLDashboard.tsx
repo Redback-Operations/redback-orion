@@ -305,7 +305,6 @@ export default function AFLDashboard() {
     setProcessingQueue((prev) => prev.filter((item) => item.id !== itemId));
   };
 
-
   const formatTimeAgo = (timestamp: string) => {
     const now = new Date();
     const time = new Date(timestamp);
@@ -738,9 +737,7 @@ export default function AFLDashboard() {
     if (email) {
       setUserEmail(email);
     }
-
   }, [navigate]);
-
 
   // Logout function
   const handleLogout = () => {
