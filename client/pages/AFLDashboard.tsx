@@ -56,6 +56,7 @@ import {
   FileText,
   Settings,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 
 // Mock data for the dashboard
@@ -1319,7 +1320,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════���═══════════════════════��═══════
+════════════════════���══════════════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
