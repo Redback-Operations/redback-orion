@@ -506,7 +506,7 @@ export default function Analytics() {
           const csvInsights = generateVideoInsights();
           const csvHeader =
             "Player,Speed (km/h),Goals,Tackles,Assists,Disposals,Marks,Handballs,Kicks,Efficiency (%),Time on Ground (%),Contested Possessions,Uncontested Possessions,Inside 50s,Clangers\n";
-          const csvData = insights.playerStats
+          const csvData = csvInsights.playerStats
             .map(
               (player) =>
                 `"${player.name}",${player.speed},${player.goals},${player.tackles},${player.assists},${player.disposals},${player.marks},${player.handballs},${player.kicks},${player.efficiency},${player.timeOnGround},${player.contestedPossessions},${player.uncontestedPossessions},${player.inside50s},${player.clangers}`,
@@ -516,7 +516,7 @@ export default function Analytics() {
           // Add crowd density data
           const crowdCsvHeader =
             "\n\nCrowd Density Analysis\nSection,Capacity,Attendance,Density (%),Movement Index,Noise Level (dB),Peak Moments\n";
-          const crowdCsvData = insights.crowdDensity
+          const crowdCsvData = csvInsights.crowdDensity
             .map(
               (section) =>
                 `"${section.section}",${section.capacity},${section.attendance},${section.density},${section.avgMovement},${section.noiseLevel},${section.peakMoments}`,
@@ -538,7 +538,7 @@ Video File: ${selectedFile?.name || "Sample_Match_Video.mp4"}
 Analysis Type: ${selectedAnalysis}
 Duration: ${Math.floor(Math.random() * 120 + 90)} minutes
 
-═══════════════════════════════════════════════════════════════════
+���══════════════════════════════════════════════════════════════════
 
 MATCH OVERVIEW
 ==============
