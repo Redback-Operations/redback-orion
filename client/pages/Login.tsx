@@ -93,8 +93,14 @@ export default function Login() {
       return;
     }
 
-    // Validate credentials against stored valid credentials
-    const isValidCredential = validCredentials.some(
+    // Get stored user credentials from localStorage
+    const storedUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+
+    // Combine demo credentials with registered user credentials
+    const allValidCredentials = [...validCredentials, ...storedUsers];
+
+    // Validate credentials against all valid credentials
+    const isValidCredential = allValidCredentials.some(
       (cred) =>
         cred.email.toLowerCase() === loginForm.email.toLowerCase() &&
         cred.password === loginForm.password,
@@ -109,7 +115,7 @@ export default function Login() {
       navigate("/afl-dashboard");
     } else {
       setError(
-        "Invalid email or password. Try demo@aflanalytics.com / demo123",
+        "Invalid email or password. Try demo@aflanalytics.com / demo123 or use your signup credentials",
       );
     }
 
@@ -146,8 +152,34 @@ export default function Login() {
       return;
     }
 
+    // Check if user already exists
+    const existingUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+    const userExists = existingUsers.some((user: any) =>
+      user.email.toLowerCase() === signupForm.email.toLowerCase()
+    );
+
+    if (userExists) {
+      setError("An account with this email already exists. Please login instead.");
+      setIsLoading(false);
+      return;
+    }
+
     // Simulate signup API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Create new user object
+    const newUser = {
+      email: signupForm.email,
+      password: signupForm.password,
+      firstName: signupForm.firstName,
+      lastName: signupForm.lastName,
+      organization: signupForm.organization,
+      role: signupForm.role
+    };
+
+    // Add new user to registered users list
+    const updatedUsers = [...existingUsers, newUser];
+    localStorage.setItem("registeredUsers", JSON.stringify(updatedUsers));
 
     // Store authentication state for new user
     localStorage.setItem("isAuthenticated", "true");
