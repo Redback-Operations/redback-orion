@@ -582,6 +582,7 @@ export default function AFLDashboard() {
         processingStage: "file_upload",
         errorCount: 0,
         retryCount: 0,
+        isUIControlled: true, // Flag to indicate this item is controlled by UI flow
       };
 
       // Add to processing queue immediately
