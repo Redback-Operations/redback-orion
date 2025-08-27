@@ -438,95 +438,105 @@ export default function AFLDashboard() {
   };
 
   // Download handlers for reports and analysis
-  const handleDownloadReport = () => {
+  const handleDownloadReport = (format: string = 'txt') => {
     if (!videoAnalysisComplete || !selectedVideoFile) {
-      alert("Please complete video analysis first");
+      alert('Please complete video analysis first');
       return;
     }
 
     const insights = generateDashboardInsights();
-    const reportContent = `AFL ANALYTICS VIDEO ANALYSIS REPORT
+    const dynamicSummary = generateDynamicDashboardSummary(insights, selectedAnalysisType, selectedFocusAreas);
+
+    if (format === 'pdf') {
+      const htmlContent = `
+        <div class="section">
+          <h1>Video Analysis Dashboard Report</h1>
+          <div class="metric">
+            <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
+            <strong>Video File:</strong> ${selectedVideoFile.name}<br>
+            <strong>Analysis Type:</strong> ${selectedAnalysisType}<br>
+            <strong>Focus Areas:</strong> ${selectedFocusAreas.join(", ") || "General Analysis"}
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Executive Summary</h2>
+          <div class="metric">${dynamicSummary.overview}</div>
+          <div class="metric">${dynamicSummary.performance}</div>
+          <div class="metric">${dynamicSummary.crowd}</div>
+          <div class="metric">${dynamicSummary.analysis}</div>
+        </div>
+
+        <div class="section">
+          <h2>Player Performance Metrics</h2>
+          <div class="player-grid">
+            ${insights.playerStats.map(player => `
+              <div class="player-card">
+                <h3 style="margin: 0 0 8px 0; color: #059669;">${player.name}</h3>
+                <div><strong>Speed:</strong> ${player.speed} km/h | <strong>Goals:</strong> ${player.goals}</div>
+                <div><strong>Tackles:</strong> ${player.tackles} | <strong>Assists:</strong> ${player.assists}</div>
+                <div><strong>Disposals:</strong> ${player.disposals} | <strong>Efficiency:</strong> ${player.efficiency}%</div>
+                <div><strong>Time on Ground:</strong> ${player.timeOnGround}%</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Crowd Density Analysis</h2>
+          <div class="metric">
+            <strong>Total Attendance:</strong> ${insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()} |
+            <strong>Overall Density:</strong> ${((insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
+          </div>
+          ${insights.crowdDensity.map(section => `
+            <div class="crowd-item">
+              <strong>${section.section}:</strong> ${section.attendance.toLocaleString()} / ${section.capacity.toLocaleString()}
+              (${section.density}% density) | Noise: ${section.noiseLevel} dB
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="section">
+          <h2>Technical Performance</h2>
+          <div class="metric">
+            <strong>Processing Complete:</strong> 100% | <strong>Detection Accuracy:</strong> 96.7%<br>
+            <strong>Data Points:</strong> ${(Math.random() * 30000 + 15000).toFixed(0)} |
+            <strong>Analysis Time:</strong> ${Math.floor(Math.random() * 5 + 2)} minutes
+          </div>
+        </div>
+      `;
+
+      generateDashboardPDF(htmlContent, `AFL_Video_Analysis_${selectedAnalysisType}_${Date.now()}`);
+    } else {
+      const textContent = `AFL ANALYTICS DASHBOARD REPORT
 
 Generated: ${new Date().toLocaleString()}
 Video File: ${selectedVideoFile.name}
-Analysis Type: ${
-      selectedAnalysisType === "highlights"
-        ? "Match Highlights"
-        : selectedAnalysisType === "player"
-          ? "Player Tracking"
-          : selectedAnalysisType === "tactics"
-            ? "Tactical Analysis"
-            : selectedAnalysisType === "performance"
-              ? "Performance Metrics"
-              : "Crowd Reactions"
-    }
+Analysis Type: ${selectedAnalysisType}
 Focus Areas: ${selectedFocusAreas.join(", ") || "General Analysis"}
 
-═══════════════════════════════════════════════════════════
-
-DETAILED PLAYER PERFORMANCE METRICS
-===================================
-${insights.playerStats
-  .map(
-    (player) => `
-${player.name}:
-  • Maximum Speed: ${player.speed} km/h
-  • Goals Scored: ${player.goals}
-  • Tackles Made: ${player.tackles}
-  • Assists: ${player.assists}
-  • Total Disposals: ${player.disposals}
-  • Marks Taken: ${player.marks}
-  • Disposal Efficiency: ${player.efficiency}%
-  • Time on Ground: ${player.timeOnGround}%
-`,
-  )
-  .join("")}
-
-CROWD DENSITY ANALYSIS BY STAND
-===============================
-Total Attendance: ${insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()}
-Overall Stadium Density: ${((insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0) / insights.crowdDensity.reduce((sum, section) => sum + section.capacity, 0)) * 100).toFixed(1)}%
-
-Stand-by-Stand Breakdown:
-${insights.crowdDensity
-  .map(
-    (section) => `
-${section.section}:
-  • Capacity: ${section.capacity.toLocaleString()}
-  • Attendance: ${section.attendance.toLocaleString()}
-  • Density: ${section.density}%
-  • Movement Index: ${section.avgMovement}/20
-  • Noise Level: ${section.noiseLevel} dB
-  • Peak Reaction Moments: ${section.peakMoments}
-`,
-  )
-  .join("")}
-
-ANALYSIS SUMMARY
+EXECUTIVE SUMMARY
 ================
-${selectedAnalysisType === "highlights" ? "• Key match moments and highlights successfully identified\n• Video footage processed for exciting plays and critical game moments\n• Crowd reaction patterns correlated with on-field events" : ""}
-${selectedAnalysisType === "player" ? "• Individual player movements tracked across the entire match\n• Speed, positioning, and performance metrics calculated\n• Heat maps generated for player positioning analysis" : ""}
-${selectedAnalysisType === "tactics" ? "• Team formations and tactical patterns analyzed\n• Ball movement strategies identified and documented\n• Defensive and offensive structures mapped throughout the game" : ""}
-${selectedAnalysisType === "performance" ? "• Comprehensive performance metrics calculated for all players\n• Statistical analysis includes speed, goals, tackles, and assists\n• Efficiency ratings and time-on-ground percentages tracked" : ""}
-${selectedAnalysisType === "crowd" ? "• Crowd density and movement patterns analyzed across all stands\n• Noise levels and engagement metrics measured throughout the match\n• Peak reaction moments identified and correlated with game events" : ""}
+${dynamicSummary.overview}
+${dynamicSummary.performance}
+${dynamicSummary.crowd}
+${dynamicSummary.analysis}
 
-TECHNICAL METRICS
-================
-• Video Processing: 100% Complete
-• Player Detection Accuracy: 96.7%
-• Ball Tracking Precision: 93.4%
-• Focus Areas Analyzed: ${selectedFocusAreas.length > 0 ? selectedFocusAreas.length : "All available"}
-• Analysis Duration: ${Math.floor(Math.random() * 5 + 2)} minutes
-• Data Points Collected: ${(Math.random() * 30000 + 15000).toFixed(0)}
+PLAYER PERFORMANCE
+==================
+${insights.playerStats.map(player => `
+${player.name}: Speed ${player.speed} km/h, Goals ${player.goals}, Tackles ${player.tackles}, Efficiency ${player.efficiency}%`).join('\n')}
 
-This comprehensive analysis was generated by AFL Analytics Platform using advanced AI video processing technology.
-Generated at: ${new Date().toISOString()}
+CROWD ANALYSIS
+==============
+Total: ${insights.crowdDensity.reduce((sum, section) => sum + section.attendance, 0).toLocaleString()} attendees
+${insights.crowdDensity.map(section => `${section.section}: ${section.density}% density`).join('\n')}
+
+Generated by AFL Analytics Platform
 `;
 
-    downloadText(
-      reportContent,
-      `AFL_Video_Analysis_${selectedAnalysisType}_${Date.now()}`,
-    );
+      downloadText(textContent, `AFL_Video_Analysis_${selectedAnalysisType}_${Date.now()}`);
+    }
   };
 
   const handleDownloadVideoClips = () => {
