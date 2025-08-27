@@ -310,6 +310,69 @@ export default function Analytics() {
     }
   };
 
+  // Generate realistic AFL video analysis data
+  const generateVideoInsights = () => {
+    const players = [
+      "Marcus Bontempelli", "Patrick Cripps", "Clayton Oliver", "Lachie Neale",
+      "Dustin Martin", "Jeremy Cameron", "Tom Hawkins", "Charlie Curnow",
+      "Jack Steele", "Andrew Brayshaw", "Christian Petracca", "Max Gawn"
+    ];
+
+    const stadiumSections = [
+      "MCC Members", "AFL Members", "Southern Stand", "Olympic Stand",
+      "Ponsford Stand", "Great Southern Stand", "Premium Seating", "General Admission"
+    ];
+
+    const playerStats = players.slice(0, 8).map((player, index) => ({
+      name: player,
+      speed: (25 + Math.random() * 10).toFixed(1), // km/h
+      goals: Math.floor(Math.random() * 5),
+      tackles: Math.floor(Math.random() * 15 + 5),
+      assists: Math.floor(Math.random() * 8),
+      disposals: Math.floor(Math.random() * 25 + 15),
+      marks: Math.floor(Math.random() * 12 + 3),
+      handballs: Math.floor(Math.random() * 20 + 10),
+      kicks: Math.floor(Math.random() * 20 + 10),
+      efficiency: (65 + Math.random() * 30).toFixed(1),
+      timeOnGround: Math.floor(Math.random() * 30 + 70), // percentage
+      contestedPossessions: Math.floor(Math.random() * 15 + 5),
+      uncontestedPossessions: Math.floor(Math.random() * 20 + 10),
+      inside50s: Math.floor(Math.random() * 8),
+      clangers: Math.floor(Math.random() * 5)
+    }));
+
+    const crowdDensity = stadiumSections.map(section => ({
+      section,
+      capacity: Math.floor(Math.random() * 8000 + 2000),
+      attendance: Math.floor(Math.random() * 7000 + 1500),
+      density: (70 + Math.random() * 25).toFixed(1), // percentage
+      avgMovement: (5 + Math.random() * 15).toFixed(1), // movement index
+      noiseLevel: (60 + Math.random() * 30).toFixed(1), // decibels
+      peakMoments: Math.floor(Math.random() * 8 + 2)
+    }));
+
+    const matchEvents = [
+      { time: "00:03:45", event: "First Goal", player: playerStats[0].name, quarter: 1 },
+      { time: "00:12:23", event: "Mark of the Day", player: playerStats[1].name, quarter: 1 },
+      { time: "00:28:56", event: "Spectacular Tackle", player: playerStats[2].name, quarter: 2 },
+      { time: "00:31:12", event: "Long Range Goal", player: playerStats[3].name, quarter: 2 },
+      { time: "00:45:34", event: "50m Penalty", player: playerStats[4].name, quarter: 3 },
+      { time: "00:67:21", event: "Crucial Save", player: playerStats[5].name, quarter: 4 },
+      { time: "00:78:45", event: "Match Winning Goal", player: playerStats[6].name, quarter: 4 }
+    ];
+
+    const heatMapZones = [
+      { zone: "Forward 50", activity: 78, events: 45 },
+      { zone: "Midfield", activity: 92, events: 67 },
+      { zone: "Defensive 50", activity: 65, events: 38 },
+      { zone: "Centre Square", activity: 88, events: 52 },
+      { zone: "Wing Left", activity: 71, events: 29 },
+      { zone: "Wing Right", activity: 74, events: 32 }
+    ];
+
+    return { playerStats, crowdDensity, matchEvents, heatMapZones };
+  };
+
   const generateReport = async (reportType: string, format: string = "txt") => {
     setIsGeneratingReport(true);
     setReportsError(null);
