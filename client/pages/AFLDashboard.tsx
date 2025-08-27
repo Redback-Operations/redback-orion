@@ -1500,11 +1500,21 @@ Export format: Metadata (txt)
                   <div className="space-y-3">
                     <h4 className="font-medium">Export Analysis</h4>
                     <div className="grid grid-cols-2 gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownloadVideoClips}
+                        disabled={!videoAnalysisComplete}
+                      >
                         <Download className="w-4 h-4 mr-2" />
                         Video Clips
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownloadReport}
+                        disabled={!videoAnalysisComplete}
+                      >
                         <FileText className="w-4 h-4 mr-2" />
                         Report
                       </Button>
