@@ -292,11 +292,12 @@ export default function AFLDashboard() {
             item.status === "processing" ||
             item.status === "uploading"
           ) {
-            const progressIncrement = Math.random() * 3 + 0.5; // Random increment between 0.5-3.5%
-            const newProgress = Math.min(
-              100,
-              item.progress + progressIncrement,
-            );
+            // Variable progress based on file size and complexity
+            const sizeMultiplier = parseFloat(item.size) > 1000 ? 0.5 : 1; // Slower for large files
+            const complexityMultiplier = item.analysisType === "Full Match Analysis" ? 0.3 :
+                                       item.analysisType === "Tactical Analysis" ? 0.6 : 1;
+            const progressIncrement = Math.random() * 3 * sizeMultiplier * complexityMultiplier + 0.5;
+            const newProgress = Math.min(100, item.progress + progressIncrement);
 
             // Simulate stage transitions
             let newStage = item.processingStage;
@@ -346,12 +347,24 @@ export default function AFLDashboard() {
               };
             }
 
-            // Small chance of failure for realism
-            if (Math.random() < 0.001 && item.errorCount < 2) {
+            // Realistic failure scenarios based on file characteristics
+            const failureChance = parseFloat(item.size) > 2000 ? 0.005 : // Higher chance for very large files
+                                 item.analysisType === "Tactical Analysis" ? 0.003 : // Complex analysis more prone to failure
+                                 item.retryCount > 0 ? 0.001 : // Lower chance if already retried
+                                 0.002; // Base failure chance
+
+            if (Math.random() < failureChance && item.errorCount < 2 && item.progress > 10) {
+              const errorReasons = [
+                "insufficient_memory",
+                "corrupted_segment",
+                "processing_timeout",
+                "unsupported_codec",
+                "server_overload"
+              ];
               return {
                 ...item,
                 status: "failed",
-                processingStage: "error_state",
+                processingStage: errorReasons[Math.floor(Math.random() * errorReasons.length)],
                 errorCount: item.errorCount + 1,
               };
             }
