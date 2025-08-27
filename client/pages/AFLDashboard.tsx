@@ -547,6 +547,35 @@ export default function AFLDashboard() {
         "videoAnalyses",
         JSON.stringify([...existingAnalyses, analysisResults]),
       );
+
+      // Add completed analysis to processing queue
+      const newQueueItem = {
+        id: `pq_${Date.now()}`,
+        name: selectedVideoFile.name,
+        analysisType: selectedAnalysisType === "highlights"
+          ? "Highlight Generation"
+          : selectedAnalysisType === "player"
+            ? "Player Tracking"
+            : selectedAnalysisType === "tactics"
+              ? "Tactical Analysis"
+              : selectedAnalysisType === "performance"
+                ? "Performance Analysis"
+                : "Crowd Analysis",
+        status: "completed" as const,
+        progress: 100,
+        duration: `${Math.floor(Math.random() * 60 + 30)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+        size: `${(selectedVideoFile.size / (1024 * 1024)).toFixed(1)} MB`,
+        uploadTime: new Date().toISOString(),
+        completedTime: new Date().toISOString(),
+        estimatedCompletion: null,
+        priority: "medium" as const,
+        userId: "current_user",
+        processingStage: "analysis_complete" as const,
+        errorCount: 0,
+        retryCount: 0,
+      };
+
+      setProcessingQueue(prev => [newQueueItem, ...prev]);
     } catch (error) {
       setIsVideoUploading(false);
       setIsVideoAnalyzing(false);
@@ -892,7 +921,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-═══════════════════════════════════════════════════════════
+════════════════════���══════════════════════════════════════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
