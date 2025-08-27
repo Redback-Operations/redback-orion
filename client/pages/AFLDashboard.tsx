@@ -253,6 +253,8 @@ export default function AFLDashboard() {
               estimatedCompletion: new Date(
                 Date.now() + Math.random() * 3600000 + 1800000,
               ).toISOString(),
+              // If this was a UI-controlled item, it should remain so after retry
+              isUIControlled: item.isUIControlled || false,
             }
           : item,
       ),
@@ -1178,7 +1180,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════════════════════════════��═══════
+═══════════════════������══════════════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
