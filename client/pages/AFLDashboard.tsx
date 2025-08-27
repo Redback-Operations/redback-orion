@@ -190,23 +190,31 @@ export default function AFLDashboard() {
   const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
 
   // Processing Queue state - starts empty, only shows actual uploads
-  const [processingQueue, setProcessingQueue] = useState<Array<{
-    id: string;
-    name: string;
-    analysisType: string;
-    status: "uploading" | "queued" | "processing" | "analyzing" | "completed" | "failed";
-    progress: number;
-    duration: string;
-    size: string;
-    uploadTime: string;
-    completedTime: string | null;
-    estimatedCompletion: string | null;
-    priority: "low" | "medium" | "high";
-    userId: string;
-    processingStage: string;
-    errorCount: number;
-    retryCount: number;
-  }>>([]);
+  const [processingQueue, setProcessingQueue] = useState<
+    Array<{
+      id: string;
+      name: string;
+      analysisType: string;
+      status:
+        | "uploading"
+        | "queued"
+        | "processing"
+        | "analyzing"
+        | "completed"
+        | "failed";
+      progress: number;
+      duration: string;
+      size: string;
+      uploadTime: string;
+      completedTime: string | null;
+      estimatedCompletion: string | null;
+      priority: "low" | "medium" | "high";
+      userId: string;
+      processingStage: string;
+      errorCount: number;
+      retryCount: number;
+    }>
+  >([]);
 
   // Processing queue management functions
   const StatusIcon = ({ status }: { status: string }) => {
@@ -307,10 +315,10 @@ export default function AFLDashboard() {
         processingStage: "analysis_complete",
         errorCount: 0,
         retryCount: 0,
-      }
+      },
     ];
 
-    setProcessingQueue(prev => [...demoItems, ...prev]);
+    setProcessingQueue((prev) => [...demoItems, ...prev]);
   };
 
   const formatTimeAgo = (timestamp: string) => {
@@ -353,10 +361,18 @@ export default function AFLDashboard() {
           ) {
             // Variable progress based on file size and complexity
             const sizeMultiplier = parseFloat(item.size) > 1000 ? 0.5 : 1; // Slower for large files
-            const complexityMultiplier = item.analysisType === "Full Match Analysis" ? 0.3 :
-                                       item.analysisType === "Tactical Analysis" ? 0.6 : 1;
-            const progressIncrement = Math.random() * 3 * sizeMultiplier * complexityMultiplier + 0.5;
-            const newProgress = Math.min(100, item.progress + progressIncrement);
+            const complexityMultiplier =
+              item.analysisType === "Full Match Analysis"
+                ? 0.3
+                : item.analysisType === "Tactical Analysis"
+                  ? 0.6
+                  : 1;
+            const progressIncrement =
+              Math.random() * 3 * sizeMultiplier * complexityMultiplier + 0.5;
+            const newProgress = Math.min(
+              100,
+              item.progress + progressIncrement,
+            );
 
             // Simulate stage transitions
             let newStage = item.processingStage;
@@ -407,23 +423,32 @@ export default function AFLDashboard() {
             }
 
             // Realistic failure scenarios based on file characteristics
-            const failureChance = parseFloat(item.size) > 2000 ? 0.005 : // Higher chance for very large files
-                                 item.analysisType === "Tactical Analysis" ? 0.003 : // Complex analysis more prone to failure
-                                 item.retryCount > 0 ? 0.001 : // Lower chance if already retried
-                                 0.002; // Base failure chance
+            const failureChance =
+              parseFloat(item.size) > 2000
+                ? 0.005 // Higher chance for very large files
+                : item.analysisType === "Tactical Analysis"
+                  ? 0.003 // Complex analysis more prone to failure
+                  : item.retryCount > 0
+                    ? 0.001 // Lower chance if already retried
+                    : 0.002; // Base failure chance
 
-            if (Math.random() < failureChance && item.errorCount < 2 && item.progress > 10) {
+            if (
+              Math.random() < failureChance &&
+              item.errorCount < 2 &&
+              item.progress > 10
+            ) {
               const errorReasons = [
                 "insufficient_memory",
                 "corrupted_segment",
                 "processing_timeout",
                 "unsupported_codec",
-                "server_overload"
+                "server_overload",
               ];
               return {
                 ...item,
                 status: "failed",
-                processingStage: errorReasons[Math.floor(Math.random() * errorReasons.length)],
+                processingStage:
+                  errorReasons[Math.floor(Math.random() * errorReasons.length)],
                 errorCount: item.errorCount + 1,
               };
             }
@@ -543,8 +568,15 @@ export default function AFLDashboard() {
         size: `${(selectedVideoFile.size / (1024 * 1024)).toFixed(1)} MB`,
         uploadTime: new Date().toISOString(),
         completedTime: null,
-        estimatedCompletion: new Date(Date.now() + Math.random() * 600000 + 300000).toISOString(), // 5-15 minutes
-        priority: selectedFocusAreas.length > 2 ? "high" : Math.random() > 0.5 ? "medium" : "low",
+        estimatedCompletion: new Date(
+          Date.now() + Math.random() * 600000 + 300000,
+        ).toISOString(), // 5-15 minutes
+        priority:
+          selectedFocusAreas.length > 2
+            ? "high"
+            : Math.random() > 0.5
+              ? "medium"
+              : "low",
         userId: "current_user",
         processingStage: "file_upload",
         errorCount: 0,
@@ -560,11 +592,11 @@ export default function AFLDashboard() {
         setVideoUploadProgress(i);
 
         // Update the queue item progress during upload
-        setProcessingQueue((prev) => prev.map(item =>
-          item.id === newQueueItem.id
-            ? { ...item, progress: i }
-            : item
-        ));
+        setProcessingQueue((prev) =>
+          prev.map((item) =>
+            item.id === newQueueItem.id ? { ...item, progress: i } : item,
+          ),
+        );
       }
 
       setIsVideoUploading(false);
@@ -572,29 +604,33 @@ export default function AFLDashboard() {
       setVideoAnalysisProgress(0);
 
       // Move to queued status after upload completes
-      setProcessingQueue((prev) => prev.map(item =>
-        item.id === newQueueItem.id
-          ? {
-              ...item,
-              status: "queued",
-              progress: 0,
-              processingStage: "queue_waiting"
-            }
-          : item
-      ));
-
-      // Simulate quick transition to processing (the useEffect will handle detailed progression)
-      setTimeout(() => {
-        setProcessingQueue((prev) => prev.map(item =>
+      setProcessingQueue((prev) =>
+        prev.map((item) =>
           item.id === newQueueItem.id
             ? {
                 ...item,
-                status: "processing",
-                progress: 5,
-                processingStage: "preprocessing"
+                status: "queued",
+                progress: 0,
+                processingStage: "queue_waiting",
               }
-            : item
-        ));
+            : item,
+        ),
+      );
+
+      // Simulate quick transition to processing (the useEffect will handle detailed progression)
+      setTimeout(() => {
+        setProcessingQueue((prev) =>
+          prev.map((item) =>
+            item.id === newQueueItem.id
+              ? {
+                  ...item,
+                  status: "processing",
+                  progress: 5,
+                  processingStage: "preprocessing",
+                }
+              : item,
+          ),
+        );
       }, 2000);
 
       // Complete the UI state
@@ -622,7 +658,6 @@ export default function AFLDashboard() {
         "videoAnalyses",
         JSON.stringify([...existingAnalyses, analysisResults]),
       );
-
     } catch (error) {
       setIsVideoUploading(false);
       setIsVideoAnalyzing(false);
@@ -631,16 +666,18 @@ export default function AFLDashboard() {
       );
 
       // Mark the queue item as failed if there was an error
-      setProcessingQueue((prev) => prev.map(item =>
-        item.name === selectedVideoFile?.name && item.status === "uploading"
-          ? {
-              ...item,
-              status: "failed",
-              processingStage: "upload_error",
-              errorCount: 1
-            }
-          : item
-      ));
+      setProcessingQueue((prev) =>
+        prev.map((item) =>
+          item.name === selectedVideoFile?.name && item.status === "uploading"
+            ? {
+                ...item,
+                status: "failed",
+                processingStage: "upload_error",
+                errorCount: 1,
+              }
+            : item,
+        ),
+      );
     }
   };
 
