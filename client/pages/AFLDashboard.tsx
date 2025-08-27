@@ -802,17 +802,6 @@ export default function AFLDashboard() {
 
   }, [navigate]);
 
-  // Auto-open view modal for testing completed items
-  useEffect(() => {
-    const completedItem = processingQueue.find(
-      (item) => item.status === "completed",
-    );
-    if (completedItem && !viewModalOpen && processingQueue.length > 0) {
-      setTimeout(() => {
-        handleViewAnalysis(completedItem);
-      }, 2000); // Wait 2 seconds to let the page load
-    }
-  }, [processingQueue, viewModalOpen]);
 
   // Logout function
   const handleLogout = () => {
@@ -1695,7 +1684,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       >
                         <div className="font-medium">{player.name}</div>
                         <div className="text-sm text-gray-600">
-                          {player.team} ����� {player.position}
+                          {player.team} ��� {player.position}
                         </div>
                         <div className="text-xs text-green-600 mt-1">
                           Efficiency: {player.efficiency}%
