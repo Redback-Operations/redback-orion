@@ -530,7 +530,7 @@ export default function Analytics() {
 
         case "pdf":
         case "txt":
-          const insights = generateVideoInsights();
+          const textInsights = generateVideoInsights();
           const textContent = `AFL ANALYTICS VIDEO ANALYSIS REPORT - ${reportType.toUpperCase()}
 
 Generated: ${new Date().toLocaleString()}
@@ -538,7 +538,7 @@ Video File: ${selectedFile?.name || "Sample_Match_Video.mp4"}
 Analysis Type: ${selectedAnalysis}
 Duration: ${Math.floor(Math.random() * 120 + 90)} minutes
 
-���══════════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════════
 
 MATCH OVERVIEW
 ==============
