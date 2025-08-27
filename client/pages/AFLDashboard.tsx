@@ -617,29 +617,13 @@ export default function AFLDashboard() {
           item.id === newQueueItem.id
             ? {
                 ...item,
-                status: "queued",
-                progress: 0,
-                processingStage: "queue_waiting",
+                status: "analyzing", // Start analyzing immediately since this is UI-controlled
+                progress: 5,
+                processingStage: "video_analysis",
               }
             : item,
         ),
       );
-
-      // Simulate quick transition to processing (the useEffect will handle detailed progression)
-      setTimeout(() => {
-        setProcessingQueue((prev) =>
-          prev.map((item) =>
-            item.id === newQueueItem.id
-              ? {
-                  ...item,
-                  status: "processing",
-                  progress: 5,
-                  processingStage: "preprocessing",
-                }
-              : item,
-          ),
-        );
-      }, 2000);
 
       // Complete the UI state
       for (let i = 0; i <= 100; i += 2) {
@@ -1180,7 +1164,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-═══════════════════������══════════════════════════════��═══════
+════════════════════���══════════════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
