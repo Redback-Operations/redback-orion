@@ -19,17 +19,40 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error) => {
-        // Don't retry on 4xx errors
-        if (error && typeof error === "object" && "status" in error) {
-          const status = (error as any).status;
-          if (status >= 400 && status < 500) {
-            return false;
+        try {
+          // Don't retry on 4xx errors
+          if (error && typeof error === "object" && "status" in error) {
+            const status = (error as any).status;
+            if (status >= 400 && status < 500) {
+              return false;
+            }
           }
+          return failureCount < 3;
+        } catch (retryError) {
+          console.error("Error in retry logic:", retryError);
+          return false;
         }
-        return failureCount < 3;
       },
       staleTime: 5 * 60 * 1000, // 5 minutes
       cacheTime: 10 * 60 * 1000, // 10 minutes
+      refetchOnWindowFocus: false, // Prevent unnecessary refetches that could cause errors
+    },
+    mutations: {
+      retry: (failureCount, error) => {
+        try {
+          // Don't retry mutations on client errors
+          if (error && typeof error === "object" && "status" in error) {
+            const status = (error as any).status;
+            if (status >= 400 && status < 500) {
+              return false;
+            }
+          }
+          return failureCount < 2; // Fewer retries for mutations
+        } catch (retryError) {
+          console.error("Error in mutation retry logic:", retryError);
+          return false;
+        }
+      },
     },
   },
 });
