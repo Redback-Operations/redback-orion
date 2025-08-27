@@ -209,6 +209,87 @@ export default function AFLDashboard() {
     navigate("/");
   };
 
+  // Video upload handlers
+  const handleVideoFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime'];
+      if (!validTypes.includes(file.type)) {
+        setVideoAnalysisError('Please select a valid video file (MP4, MOV, or AVI)');
+        return;
+      }
+
+      // Validate file size (max 500MB)
+      const maxSize = 500 * 1024 * 1024; // 500MB in bytes
+      if (file.size > maxSize) {
+        setVideoAnalysisError('File size must be less than 500MB');
+        return;
+      }
+
+      setSelectedVideoFile(file);
+      setVideoAnalysisError(null);
+      setVideoAnalysisComplete(false);
+    }
+  };
+
+  const handleFocusAreaChange = (area: string, checked: boolean) => {
+    if (checked) {
+      setSelectedFocusAreas([...selectedFocusAreas, area]);
+    } else {
+      setSelectedFocusAreas(selectedFocusAreas.filter(a => a !== area));
+    }
+  };
+
+  const uploadAndAnalyzeVideo = async () => {
+    if (!selectedVideoFile) {
+      setVideoAnalysisError('Please select a video file first');
+      return;
+    }
+
+    try {
+      setVideoAnalysisError(null);
+      setIsVideoUploading(true);
+      setVideoUploadProgress(0);
+
+      // Simulate file upload with real progress
+      for (let i = 0; i <= 100; i += 5) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        setVideoUploadProgress(i);
+      }
+
+      setIsVideoUploading(false);
+      setIsVideoAnalyzing(true);
+      setVideoAnalysisProgress(0);
+
+      // Simulate video analysis with real progress
+      for (let i = 0; i <= 100; i += 2) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        setVideoAnalysisProgress(i);
+      }
+
+      setIsVideoAnalyzing(false);
+      setVideoAnalysisComplete(true);
+
+      // Store analysis results
+      const analysisResults = {
+        fileName: selectedVideoFile.name,
+        analysisType: selectedAnalysisType,
+        focusAreas: selectedFocusAreas,
+        timestamp: new Date().toISOString(),
+        fileSize: selectedVideoFile.size
+      };
+
+      const existingAnalyses = JSON.parse(localStorage.getItem('videoAnalyses') || '[]');
+      localStorage.setItem('videoAnalyses', JSON.stringify([...existingAnalyses, analysisResults]));
+
+    } catch (error) {
+      setIsVideoUploading(false);
+      setIsVideoAnalyzing(false);
+      setVideoAnalysisError(error instanceof Error ? error.message : 'Upload failed');
+    }
+  };
+
   const filteredPlayers = mockPlayers.filter(
     (player) =>
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
