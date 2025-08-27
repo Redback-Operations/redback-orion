@@ -405,6 +405,7 @@ export default function Login() {
                           </div>
                           <button
                             type="button"
+                            onClick={() => setIsResetModalOpen(true)}
                             className="text-sm text-blue-600 hover:underline"
                           >
                             Forgot password?
