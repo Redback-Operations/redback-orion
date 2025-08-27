@@ -790,38 +790,15 @@ export default function AFLDashboard() {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
     const email = localStorage.getItem("userEmail");
 
-    // Temporarily set demo auth for testing
     if (!isAuthenticated || isAuthenticated !== "true") {
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userEmail", "demo@aflanalytics.com");
-      setUserEmail("demo@aflanalytics.com");
+      // Redirect to login if not authenticated
+      navigate("/");
+      return;
     }
 
     if (email) {
       setUserEmail(email);
     }
-
-    // Always add demo items for testing
-    setTimeout(() => {
-      addDemoProcessingItems();
-
-      // Auto-test view modal after demo items are loaded
-      setTimeout(() => {
-        const completedItem = {
-          id: "demo_completed_123",
-          name: "Demo_Completed_Analysis.mp4",
-          analysisType: "Highlight Generation",
-          status: "completed",
-          duration: "00:28:45",
-          size: "650 MB",
-          uploadTime: new Date(Date.now() - 1800000).toISOString(),
-          completedTime: new Date(Date.now() - 600000).toISOString(),
-          priority: "low",
-          processingStage: "analysis_complete",
-        };
-        handleViewAnalysis(completedItem);
-      }, 1000);
-    }, 500);
   }, [navigate]);
 
   // Logout function
@@ -1619,7 +1596,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="video" className="space-y-6">
+        <Tabs defaultValue="performance" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger
               value="performance"
@@ -3123,7 +3100,9 @@ Generated on: ${new Date().toLocaleString()}
                 </div>
 
                 {(() => {
-                  // Simple mock data to avoid chart rendering issues
+                  const chartData =
+                    generateAnalysisChartData(selectedAnalysisItem);
+
                   return (
                     <>
                       {/* Player Performance Analysis with Charts */}
