@@ -795,6 +795,11 @@ export default function AFLDashboard() {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userEmail", "demo@aflanalytics.com");
       setUserEmail("demo@aflanalytics.com");
+
+      // Auto-add demo processing items for testing
+      setTimeout(() => {
+        addDemoProcessingItems();
+      }, 1000);
       return;
     }
 
