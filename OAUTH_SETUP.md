@@ -63,7 +63,7 @@ You need an active Apple Developer Account to set up Sign In with Apple.
 3. Configure the service:
    - Primary App ID: Select the App ID you created
    - Web Domain: Your domain (e.g., `localhost` for development)
-   - Return URLs: 
+   - Return URLs:
      - Development: `http://localhost:8080/api/auth/apple/callback`
      - Production: `https://yourdomain.com/api/auth/apple/callback`
 
@@ -93,6 +93,7 @@ To set these environment variables in your Builder.io project:
 2. Or manually set them in your deployment environment
 
 Example for setting via DevServerControl:
+
 ```
 GOOGLE_CLIENT_ID=your-actual-google-client-id
 GOOGLE_CLIENT_SECRET=your-actual-google-client-secret
@@ -111,7 +112,7 @@ JWT_SECRET=your-super-secure-jwt-secret
 
 ### Apple OAuth Test Flow
 
-1. Click "Continue with Apple" button  
+1. Click "Continue with Apple" button
 2. You'll be redirected to Apple's Sign In page
 3. Enter your Apple ID credentials
 4. Choose to share or hide your email

@@ -7,7 +7,7 @@ import {
   handleGoogleCallback,
   initiateAppleAuth,
   handleAppleCallback,
-  verifyToken
+  verifyToken,
 } from "./routes/oauth";
 
 export function createServer() {

@@ -4,7 +4,7 @@ export interface OAuthUser {
   email: string;
   name: string;
   picture?: string;
-  provider: 'google' | 'apple';
+  provider: "google" | "apple";
 }
 
 export interface GoogleOAuthConfig {
@@ -32,11 +32,11 @@ export interface OAuthResponse {
 // OAuth endpoints
 export const OAUTH_ENDPOINTS = {
   google: {
-    auth: '/api/auth/google',
-    callback: '/api/auth/google/callback',
+    auth: "/api/auth/google",
+    callback: "/api/auth/google/callback",
   },
   apple: {
-    auth: '/api/auth/apple',
-    callback: '/api/auth/apple/callback',
+    auth: "/api/auth/apple",
+    callback: "/api/auth/apple/callback",
   },
 } as const;
