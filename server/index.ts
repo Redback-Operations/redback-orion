@@ -26,5 +26,12 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // OAuth routes
+  app.get("/api/auth/google", initiateGoogleAuth);
+  app.get("/api/auth/google/callback", handleGoogleCallback);
+  app.get("/api/auth/apple", initiateAppleAuth);
+  app.post("/api/auth/apple/callback", handleAppleCallback);
+  app.post("/api/auth/verify-token", verifyToken);
+
   return app;
 }
