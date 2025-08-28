@@ -23,6 +23,8 @@
   "dependencies": {
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "google-auth-library": "^10.3.0",
+    "jsonwebtoken": "^9.0.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {
