@@ -220,6 +220,51 @@ export default function Login() {
     });
   };
 
+  // OAuth authentication handlers
+  const handleGoogleAuth = () => {
+    window.location.href = "/api/auth/google";
+  };
+
+  const handleAppleAuth = () => {
+    window.location.href = "/api/auth/apple";
+  };
+
+  // Handle OAuth callback from URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authStatus = urlParams.get('auth');
+    const token = urlParams.get('token');
+    const userParam = urlParams.get('user');
+    const errorMessage = urlParams.get('message');
+
+    if (authStatus === 'success' && token && userParam) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userParam));
+
+        // Store authentication data
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("userName", user.name);
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("authProvider", user.provider);
+
+        // Clear URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Redirect to dashboard
+        navigate("/afl-dashboard");
+
+      } catch (error) {
+        console.error('Error parsing OAuth user data:', error);
+        setError("Authentication failed. Please try again.");
+      }
+    } else if (authStatus === 'error' && errorMessage) {
+      setError(decodeURIComponent(errorMessage));
+      // Clear URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [navigate]);
+
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
