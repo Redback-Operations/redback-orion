@@ -1793,7 +1793,6 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
             </div>
           </TabsContent>
 
-
           {/* Crowd Monitoring Dashboard */}
           <TabsContent value="crowd" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">

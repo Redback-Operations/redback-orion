@@ -72,15 +72,15 @@ const aflPlayers = [
       freeKicksAgainst: 1,
       efficiency: 78.5,
       contestedPossessions: 12,
-      uncontestedPossessions: 22
+      uncontestedPossessions: 22,
     },
     performanceData: [
-      { round: 'R18', score: 85 },
-      { round: 'R19', score: 92 },
-      { round: 'R20', score: 78 },
-      { round: 'R21', score: 88 },
-      { round: 'R22', score: 95 },
-    ]
+      { round: "R18", score: 85 },
+      { round: "R19", score: 92 },
+      { round: "R20", score: 78 },
+      { round: "R21", score: 88 },
+      { round: "R22", score: 95 },
+    ],
   },
   {
     id: 2,
@@ -105,15 +105,15 @@ const aflPlayers = [
       freeKicksAgainst: 2,
       efficiency: 85.2,
       contestedPossessions: 18,
-      uncontestedPossessions: 24
+      uncontestedPossessions: 24,
     },
     performanceData: [
-      { round: 'R18', score: 88 },
-      { round: 'R19', score: 91 },
-      { round: 'R20', score: 85 },
-      { round: 'R21', score: 93 },
-      { round: 'R22', score: 89 },
-    ]
+      { round: "R18", score: 88 },
+      { round: "R19", score: 91 },
+      { round: "R20", score: 85 },
+      { round: "R21", score: 93 },
+      { round: "R22", score: 89 },
+    ],
   },
   {
     id: 3,
@@ -138,15 +138,15 @@ const aflPlayers = [
       freeKicksAgainst: 1,
       efficiency: 82.7,
       contestedPossessions: 20,
-      uncontestedPossessions: 18
+      uncontestedPossessions: 18,
     },
     performanceData: [
-      { round: 'R18', score: 90 },
-      { round: 'R19', score: 87 },
-      { round: 'R20', score: 92 },
-      { round: 'R21', score: 85 },
-      { round: 'R22', score: 91 },
-    ]
+      { round: "R18", score: 90 },
+      { round: "R19", score: 87 },
+      { round: "R20", score: 92 },
+      { round: "R21", score: 85 },
+      { round: "R22", score: 91 },
+    ],
   },
   {
     id: 4,
@@ -171,36 +171,42 @@ const aflPlayers = [
       freeKicksAgainst: 0,
       efficiency: 89.4,
       contestedPossessions: 10,
-      uncontestedPossessions: 18
+      uncontestedPossessions: 18,
     },
     performanceData: [
-      { round: 'R18', score: 82 },
-      { round: 'R19', score: 89 },
-      { round: 'R20', score: 91 },
-      { round: 'R21', score: 87 },
-      { round: 'R22', score: 85 },
-    ]
-  }
+      { round: "R18", score: 82 },
+      { round: "R19", score: 89 },
+      { round: "R20", score: 91 },
+      { round: "R21", score: 87 },
+      { round: "R22", score: 85 },
+    ],
+  },
 ];
 
 export default function PlayerPerformance() {
   const [isLive, setIsLive] = useState(true);
-  const [selectedPlayers, setSelectedPlayers] = useState([aflPlayers[0], aflPlayers[1]]);
+  const [selectedPlayers, setSelectedPlayers] = useState([
+    aflPlayers[0],
+    aflPlayers[1],
+  ]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
   const [selectedPosition, setSelectedPosition] = useState("all");
 
-  const teams = ["all", ...Array.from(new Set(aflPlayers.map(p => p.team)))];
-  const positions = ["all", ...Array.from(new Set(aflPlayers.map(p => p.position)))];
+  const teams = ["all", ...Array.from(new Set(aflPlayers.map((p) => p.team)))];
+  const positions = [
+    "all",
+    ...Array.from(new Set(aflPlayers.map((p) => p.position))),
+  ];
 
   const filteredPlayers = aflPlayers.filter(
     (player) =>
       player.fullName.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedTeam === "all" || player.team === selectedTeam) &&
-      (selectedPosition === "all" || player.position === selectedPosition)
+      (selectedPosition === "all" || player.position === selectedPosition),
   );
 
-  const AFLPlayerCard = ({ player }: { player: typeof aflPlayers[0] }) => (
+  const AFLPlayerCard = ({ player }: { player: (typeof aflPlayers)[0] }) => (
     <div className="relative w-full max-w-sm mx-auto">
       {/* AFL Logo */}
       <div className="absolute top-4 left-4 z-10">
@@ -212,14 +218,14 @@ export default function PlayerPerformance() {
       </div>
 
       {/* Main Card */}
-      <div 
+      <div
         className="relative h-80 rounded-lg overflow-hidden shadow-lg"
         style={{ backgroundColor: player.teamColor }}
       >
         {/* Player Image Area */}
         <div className="relative h-full w-full">
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          
+
           {/* Player Name */}
           <div className="absolute top-16 left-4 right-4">
             <h2 className="text-white font-bold text-xl tracking-wide">
@@ -238,7 +244,9 @@ export default function PlayerPerformance() {
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-yellow-400 to-yellow-500 p-4">
             <div className="grid grid-cols-3 gap-2 text-black">
               <div className="text-center">
-                <div className="font-bold text-lg">{player.stats.disposals}</div>
+                <div className="font-bold text-lg">
+                  {player.stats.disposals}
+                </div>
                 <div className="text-xs font-medium">DISPOSALS</div>
               </div>
               <div className="text-center">
@@ -246,7 +254,9 @@ export default function PlayerPerformance() {
                 <div className="text-xs font-medium">KICKS</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg">{player.stats.handballs}</div>
+                <div className="font-bold text-lg">
+                  {player.stats.handballs}
+                </div>
                 <div className="text-xs font-medium">HANDBALLS</div>
               </div>
             </div>
@@ -270,7 +280,10 @@ export default function PlayerPerformance() {
       <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
         <div className="bg-white rounded-full p-2 shadow-lg">
           <div className="text-xs font-bold text-center px-2">
-            {player.team.split(' ').map(word => word[0]).join('')}
+            {player.team
+              .split(" ")
+              .map((word) => word[0])
+              .join("")}
           </div>
         </div>
       </div>
@@ -292,8 +305,13 @@ export default function PlayerPerformance() {
 
           {/* Header */}
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Player Performance Analytics</h1>
-            <p className="text-gray-600">Compare AFL players with detailed statistics and performance metrics</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Player Performance Analytics
+            </h1>
+            <p className="text-gray-600">
+              Compare AFL players with detailed statistics and performance
+              metrics
+            </p>
           </div>
 
           {/* Filters Section */}
@@ -307,7 +325,9 @@ export default function PlayerPerformance() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Search Players</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Search Players
+                  </label>
                   <Input
                     placeholder="Search by name..."
                     value={searchTerm}
@@ -315,9 +335,11 @@ export default function PlayerPerformance() {
                     className="w-full"
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Filter by Team</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Filter by Team
+                  </label>
                   <Select value={selectedTeam} onValueChange={setSelectedTeam}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select team" />
@@ -333,8 +355,13 @@ export default function PlayerPerformance() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Filter by Position</label>
-                  <Select value={selectedPosition} onValueChange={setSelectedPosition}>
+                  <label className="block text-sm font-medium mb-2">
+                    Filter by Position
+                  </label>
+                  <Select
+                    value={selectedPosition}
+                    onValueChange={setSelectedPosition}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select position" />
                     </SelectTrigger>
@@ -352,12 +379,17 @@ export default function PlayerPerformance() {
               {/* Player Selection Dropdowns */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Select Player 1</label>
-                  <Select 
-                    value={selectedPlayers[0]?.id.toString()} 
+                  <label className="block text-sm font-medium mb-2">
+                    Select Player 1
+                  </label>
+                  <Select
+                    value={selectedPlayers[0]?.id.toString()}
                     onValueChange={(value) => {
-                      const player = filteredPlayers.find(p => p.id.toString() === value);
-                      if (player) setSelectedPlayers([player, selectedPlayers[1]]);
+                      const player = filteredPlayers.find(
+                        (p) => p.id.toString() === value,
+                      );
+                      if (player)
+                        setSelectedPlayers([player, selectedPlayers[1]]);
                     }}
                   >
                     <SelectTrigger>
@@ -365,7 +397,10 @@ export default function PlayerPerformance() {
                     </SelectTrigger>
                     <SelectContent>
                       {filteredPlayers.map((player) => (
-                        <SelectItem key={player.id} value={player.id.toString()}>
+                        <SelectItem
+                          key={player.id}
+                          value={player.id.toString()}
+                        >
                           {player.fullName} ({player.team})
                         </SelectItem>
                       ))}
@@ -374,12 +409,17 @@ export default function PlayerPerformance() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Select Player 2</label>
-                  <Select 
-                    value={selectedPlayers[1]?.id.toString()} 
+                  <label className="block text-sm font-medium mb-2">
+                    Select Player 2
+                  </label>
+                  <Select
+                    value={selectedPlayers[1]?.id.toString()}
                     onValueChange={(value) => {
-                      const player = filteredPlayers.find(p => p.id.toString() === value);
-                      if (player) setSelectedPlayers([selectedPlayers[0], player]);
+                      const player = filteredPlayers.find(
+                        (p) => p.id.toString() === value,
+                      );
+                      if (player)
+                        setSelectedPlayers([selectedPlayers[0], player]);
                     }}
                   >
                     <SelectTrigger>
@@ -387,7 +427,10 @@ export default function PlayerPerformance() {
                     </SelectTrigger>
                     <SelectContent>
                       {filteredPlayers.map((player) => (
-                        <SelectItem key={player.id} value={player.id.toString()}>
+                        <SelectItem
+                          key={player.id}
+                          value={player.id.toString()}
+                        >
                           {player.fullName} ({player.team})
                         </SelectItem>
                       ))}
@@ -416,7 +459,9 @@ export default function PlayerPerformance() {
             <Card>
               <CardHeader>
                 <CardTitle>Performance Over Time</CardTitle>
-                <CardDescription>Last 5 rounds performance comparison</CardDescription>
+                <CardDescription>
+                  Last 5 rounds performance comparison
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -426,17 +471,17 @@ export default function PlayerPerformance() {
                     <YAxis domain={[70, 100]} />
                     <Tooltip />
                     <Legend />
-                    <Line 
-                      dataKey="score" 
+                    <Line
+                      dataKey="score"
                       data={selectedPlayers[0]?.performanceData || []}
-                      stroke="#8884d8" 
+                      stroke="#8884d8"
                       strokeWidth={3}
                       name={selectedPlayers[0]?.fullName || "Player 1"}
                     />
-                    <Line 
-                      dataKey="score" 
+                    <Line
+                      dataKey="score"
                       data={selectedPlayers[1]?.performanceData || []}
-                      stroke="#82ca9d" 
+                      stroke="#82ca9d"
                       strokeWidth={3}
                       name={selectedPlayers[1]?.fullName || "Player 2"}
                     />
@@ -453,35 +498,51 @@ export default function PlayerPerformance() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={[
-                    {
-                      metric: 'Disposals',
-                      [selectedPlayers[0]?.fullName || 'Player 1']: selectedPlayers[0]?.stats.disposals || 0,
-                      [selectedPlayers[1]?.fullName || 'Player 2']: selectedPlayers[1]?.stats.disposals || 0,
-                    },
-                    {
-                      metric: 'Kicks',
-                      [selectedPlayers[0]?.fullName || 'Player 1']: selectedPlayers[0]?.stats.kicks || 0,
-                      [selectedPlayers[1]?.fullName || 'Player 2']: selectedPlayers[1]?.stats.kicks || 0,
-                    },
-                    {
-                      metric: 'Marks',
-                      [selectedPlayers[0]?.fullName || 'Player 1']: selectedPlayers[0]?.stats.marks || 0,
-                      [selectedPlayers[1]?.fullName || 'Player 2']: selectedPlayers[1]?.stats.marks || 0,
-                    },
-                    {
-                      metric: 'Tackles',
-                      [selectedPlayers[0]?.fullName || 'Player 1']: selectedPlayers[0]?.stats.tackles || 0,
-                      [selectedPlayers[1]?.fullName || 'Player 2']: selectedPlayers[1]?.stats.tackles || 0,
-                    },
-                  ]}>
+                  <BarChart
+                    data={[
+                      {
+                        metric: "Disposals",
+                        [selectedPlayers[0]?.fullName || "Player 1"]:
+                          selectedPlayers[0]?.stats.disposals || 0,
+                        [selectedPlayers[1]?.fullName || "Player 2"]:
+                          selectedPlayers[1]?.stats.disposals || 0,
+                      },
+                      {
+                        metric: "Kicks",
+                        [selectedPlayers[0]?.fullName || "Player 1"]:
+                          selectedPlayers[0]?.stats.kicks || 0,
+                        [selectedPlayers[1]?.fullName || "Player 2"]:
+                          selectedPlayers[1]?.stats.kicks || 0,
+                      },
+                      {
+                        metric: "Marks",
+                        [selectedPlayers[0]?.fullName || "Player 1"]:
+                          selectedPlayers[0]?.stats.marks || 0,
+                        [selectedPlayers[1]?.fullName || "Player 2"]:
+                          selectedPlayers[1]?.stats.marks || 0,
+                      },
+                      {
+                        metric: "Tackles",
+                        [selectedPlayers[0]?.fullName || "Player 1"]:
+                          selectedPlayers[0]?.stats.tackles || 0,
+                        [selectedPlayers[1]?.fullName || "Player 2"]:
+                          selectedPlayers[1]?.stats.tackles || 0,
+                      },
+                    ]}
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="metric" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey={selectedPlayers[0]?.fullName || 'Player 1'} fill="#ef4444" />
-                    <Bar dataKey={selectedPlayers[1]?.fullName || 'Player 2'} fill="#3b82f6" />
+                    <Bar
+                      dataKey={selectedPlayers[0]?.fullName || "Player 1"}
+                      fill="#ef4444"
+                    />
+                    <Bar
+                      dataKey={selectedPlayers[1]?.fullName || "Player 2"}
+                      fill="#3b82f6"
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -499,27 +560,35 @@ export default function PlayerPerformance() {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-2">Statistic</th>
-                      <th className="text-center p-2">{selectedPlayers[0]?.fullName}</th>
-                      <th className="text-center p-2">{selectedPlayers[1]?.fullName}</th>
+                      <th className="text-center p-2">
+                        {selectedPlayers[0]?.fullName}
+                      </th>
+                      <th className="text-center p-2">
+                        {selectedPlayers[1]?.fullName}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      { key: 'disposals', label: 'Disposals' },
-                      { key: 'kicks', label: 'Kicks' },
-                      { key: 'handballs', label: 'Handballs' },
-                      { key: 'marks', label: 'Marks' },
-                      { key: 'tackles', label: 'Tackles' },
-                      { key: 'efficiency', label: 'Efficiency %' },
-                      { key: 'goalsAccuracy', label: 'Goals Accuracy %' },
+                      { key: "disposals", label: "Disposals" },
+                      { key: "kicks", label: "Kicks" },
+                      { key: "handballs", label: "Handballs" },
+                      { key: "marks", label: "Marks" },
+                      { key: "tackles", label: "Tackles" },
+                      { key: "efficiency", label: "Efficiency %" },
+                      { key: "goalsAccuracy", label: "Goals Accuracy %" },
                     ].map((stat) => (
                       <tr key={stat.key} className="border-b hover:bg-gray-50">
                         <td className="p-2 font-medium">{stat.label}</td>
                         <td className="p-2 text-center">
-                          {selectedPlayers[0]?.stats[stat.key as keyof typeof selectedPlayers[0]['stats']] || 0}
+                          {selectedPlayers[0]?.stats[
+                            stat.key as keyof (typeof selectedPlayers)[0]["stats"]
+                          ] || 0}
                         </td>
                         <td className="p-2 text-center">
-                          {selectedPlayers[1]?.stats[stat.key as keyof typeof selectedPlayers[1]['stats']] || 0}
+                          {selectedPlayers[1]?.stats[
+                            stat.key as keyof (typeof selectedPlayers)[1]["stats"]
+                          ] || 0}
                         </td>
                       </tr>
                     ))}
