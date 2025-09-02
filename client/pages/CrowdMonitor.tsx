@@ -433,10 +433,11 @@ export default function CrowdMonitor() {
           </div>
 
           <Tabs value={viewMode} onValueChange={setViewMode} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="heatmap">Heat Map</TabsTrigger>
               <TabsTrigger value="list">Zone Details</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
             </TabsList>
 
             <TabsContent value="heatmap" className="space-y-4">
