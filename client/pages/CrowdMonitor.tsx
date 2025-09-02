@@ -939,7 +939,7 @@ export default function CrowdMonitor() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Timeline className="w-5 h-5" />
+                    <Calendar className="w-5 h-5" />
                     Crowd Density Timeline
                   </CardTitle>
                   <CardDescription>
