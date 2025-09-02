@@ -45,8 +45,8 @@ const players = [
       marks: 8,
       tackles: 6,
       goals: 2,
-      efficiency: 87
-    }
+      efficiency: 87,
+    },
   },
   {
     id: 2,
@@ -60,8 +60,8 @@ const players = [
       marks: 6,
       tackles: 4,
       goals: 3,
-      efficiency: 82
-    }
+      efficiency: 82,
+    },
   },
   {
     id: 3,
@@ -75,9 +75,9 @@ const players = [
       marks: 7,
       tackles: 8,
       goals: 1,
-      efficiency: 84
-    }
-  }
+      efficiency: 84,
+    },
+  },
 ];
 
 export default function PlayerPerformance() {
@@ -86,33 +86,41 @@ export default function PlayerPerformance() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
 
-  const teams = ["all", ...Array.from(new Set(players.map(p => p.team)))];
+  const teams = ["all", ...Array.from(new Set(players.map((p) => p.team)))];
 
   const filteredPlayers = players.filter(
     (player) =>
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedTeam === "all" || player.team === selectedTeam)
+      (selectedTeam === "all" || player.team === selectedTeam),
   );
 
-  const StatBox = ({ label, value, color }: { label: string; value: string | number; color: string }) => (
+  const StatBox = ({
+    label,
+    value,
+    color,
+  }: {
+    label: string;
+    value: string | number;
+    color: string;
+  }) => (
     <div className={`p-4 rounded-lg text-center ${color}`}>
       <div className="text-2xl font-bold text-white mb-1">{value}</div>
       <div className="text-sm text-white/90">{label}</div>
     </div>
   );
 
-  const ComparisonBar = ({ 
-    label, 
-    player1Name, 
-    player1Value, 
-    player2Name, 
-    player2Value 
-  }: { 
-    label: string; 
-    player1Name: string; 
-    player1Value: number; 
-    player2Name: string; 
-    player2Value: number; 
+  const ComparisonBar = ({
+    label,
+    player1Name,
+    player1Value,
+    player2Name,
+    player2Value,
+  }: {
+    label: string;
+    player1Name: string;
+    player1Value: number;
+    player2Name: string;
+    player2Value: number;
   }) => {
     const maxValue = Math.max(player1Value, player2Value);
     const player1Percentage = (player1Value / maxValue) * 100;
@@ -122,28 +130,34 @@ export default function PlayerPerformance() {
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
           <span className="font-medium">{label}</span>
-          <span className="text-gray-600">{player1Value} vs {player2Value}</span>
+          <span className="text-gray-600">
+            {player1Value} vs {player2Value}
+          </span>
         </div>
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-xs w-20 text-blue-600">{player1Name}</span>
             <div className="flex-1 bg-gray-200 rounded-full h-6">
-              <div 
+              <div
                 className="bg-blue-500 h-6 rounded-full flex items-center justify-end pr-2"
                 style={{ width: `${player1Percentage}%` }}
               >
-                <span className="text-white text-xs font-medium">{player1Value}</span>
+                <span className="text-white text-xs font-medium">
+                  {player1Value}
+                </span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs w-20 text-orange-600">{player2Name}</span>
             <div className="flex-1 bg-gray-200 rounded-full h-6">
-              <div 
+              <div
                 className="bg-orange-500 h-6 rounded-full flex items-center justify-end pr-2"
                 style={{ width: `${player2Percentage}%` }}
               >
-                <span className="text-white text-xs font-medium">{player2Value}</span>
+                <span className="text-white text-xs font-medium">
+                  {player2Value}
+                </span>
               </div>
             </div>
           </div>
@@ -162,15 +176,25 @@ export default function PlayerPerformance() {
               <Activity className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">AFL Analytics</h1>
-              <p className="text-sm text-gray-600">Real-time insights & player analytics</p>
+              <h1 className="text-lg font-semibold text-gray-900">
+                AFL Analytics
+              </h1>
+              <p className="text-sm text-gray-600">
+                Real-time insights & player analytics
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Badge className="bg-red-500">LIVE</Badge>
-            <span className="text-sm text-gray-600">Welcome, demo@aflanalytics.com</span>
-            <Button variant="outline" size="sm">Settings</Button>
-            <Button variant="outline" size="sm">Logout</Button>
+            <span className="text-sm text-gray-600">
+              Welcome, demo@aflanalytics.com
+            </span>
+            <Button variant="outline" size="sm">
+              Settings
+            </Button>
+            <Button variant="outline" size="sm">
+              Logout
+            </Button>
           </div>
         </div>
       </header>
@@ -180,28 +204,28 @@ export default function PlayerPerformance() {
         <div className="px-4">
           <Tabs defaultValue="player-performance" className="w-full">
             <TabsList className="h-12 bg-transparent border-0 gap-8">
-              <TabsTrigger 
-                value="player-performance" 
+              <TabsTrigger
+                value="player-performance"
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
               >
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Player Performance
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="crowd-monitor"
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
               >
                 <Users className="w-4 h-4 mr-2" />
                 Crowd Monitor
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="reports"
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Reports
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="video-analysis"
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
               >
@@ -223,17 +247,24 @@ export default function PlayerPerformance() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Search Players</label>
+                        <label className="text-sm font-medium mb-2 block">
+                          Search Players
+                        </label>
                         <Input
                           placeholder="Search by name..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                       </div>
-                      
+
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Filter by Team</label>
-                        <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+                        <label className="text-sm font-medium mb-2 block">
+                          Filter by Team
+                        </label>
+                        <Select
+                          value={selectedTeam}
+                          onValueChange={setSelectedTeam}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="All Teams" />
                           </SelectTrigger>
@@ -259,8 +290,12 @@ export default function PlayerPerformance() {
                             }`}
                             onClick={() => setSelectedPlayer(player)}
                           >
-                            <div className="font-medium text-sm">{player.name}</div>
-                            <div className="text-xs text-gray-600">{player.team}</div>
+                            <div className="font-medium text-sm">
+                              {player.name}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {player.team}
+                            </div>
                             <div className="flex items-center gap-1 mt-1">
                               {[...Array(5)].map((_, i) => (
                                 <Star
@@ -272,7 +307,9 @@ export default function PlayerPerformance() {
                                   }`}
                                 />
                               ))}
-                              <span className="text-xs text-gray-600 ml-1">{player.position}</span>
+                              <span className="text-xs text-gray-600 ml-1">
+                                {player.position}
+                              </span>
                             </div>
                           </div>
                         ))}
@@ -293,12 +330,36 @@ export default function PlayerPerformance() {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-6 gap-4">
-                        <StatBox label="Kicks" value={selectedPlayer.stats.kicks} color="bg-blue-500" />
-                        <StatBox label="Handballs" value={selectedPlayer.stats.handballs} color="bg-green-500" />
-                        <StatBox label="Marks" value={selectedPlayer.stats.marks} color="bg-purple-500" />
-                        <StatBox label="Tackles" value={selectedPlayer.stats.tackles} color="bg-red-500" />
-                        <StatBox label="Goals" value={selectedPlayer.stats.goals} color="bg-orange-500" />
-                        <StatBox label="Efficiency" value={`${selectedPlayer.stats.efficiency}%`} color="bg-teal-500" />
+                        <StatBox
+                          label="Kicks"
+                          value={selectedPlayer.stats.kicks}
+                          color="bg-blue-500"
+                        />
+                        <StatBox
+                          label="Handballs"
+                          value={selectedPlayer.stats.handballs}
+                          color="bg-green-500"
+                        />
+                        <StatBox
+                          label="Marks"
+                          value={selectedPlayer.stats.marks}
+                          color="bg-purple-500"
+                        />
+                        <StatBox
+                          label="Tackles"
+                          value={selectedPlayer.stats.tackles}
+                          color="bg-red-500"
+                        />
+                        <StatBox
+                          label="Goals"
+                          value={selectedPlayer.stats.goals}
+                          color="bg-orange-500"
+                        />
+                        <StatBox
+                          label="Efficiency"
+                          value={`${selectedPlayer.stats.efficiency}%`}
+                          color="bg-teal-500"
+                        />
                       </div>
                     </CardContent>
                   </Card>
@@ -307,7 +368,9 @@ export default function PlayerPerformance() {
                   <Card>
                     <CardHeader>
                       <CardTitle>Player Comparison</CardTitle>
-                      <CardDescription>Compare Marcus Bontempelli with another player</CardDescription>
+                      <CardDescription>
+                        Compare Marcus Bontempelli with another player
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="flex items-center gap-4 mb-4">
@@ -316,8 +379,12 @@ export default function PlayerPerformance() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="dustin-martin">Dustin Martin (Richmond)</SelectItem>
-                            <SelectItem value="patrick-dangerfield">Patrick Dangerfield (Geelong)</SelectItem>
+                            <SelectItem value="dustin-martin">
+                              Dustin Martin (Richmond)
+                            </SelectItem>
+                            <SelectItem value="patrick-dangerfield">
+                              Patrick Dangerfield (Geelong)
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -368,21 +435,27 @@ export default function PlayerPerformance() {
             <TabsContent value="crowd-monitor">
               <div className="p-6">
                 <h2 className="text-2xl font-bold">Crowd Monitor</h2>
-                <p className="text-gray-600">Stadium crowd analytics and safety monitoring</p>
+                <p className="text-gray-600">
+                  Stadium crowd analytics and safety monitoring
+                </p>
               </div>
             </TabsContent>
 
             <TabsContent value="reports">
               <div className="p-6">
                 <h2 className="text-2xl font-bold">Reports</h2>
-                <p className="text-gray-600">Generate and download analytical reports</p>
+                <p className="text-gray-600">
+                  Generate and download analytical reports
+                </p>
               </div>
             </TabsContent>
 
             <TabsContent value="video-analysis">
               <div className="p-6">
                 <h2 className="text-2xl font-bold">Video Analysis</h2>
-                <p className="text-gray-600">AI-powered video analysis and insights</p>
+                <p className="text-gray-600">
+                  AI-powered video analysis and insights
+                </p>
               </div>
             </TabsContent>
           </Tabs>
