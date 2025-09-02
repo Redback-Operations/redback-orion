@@ -756,6 +756,55 @@ export default function CrowdMonitor() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5" />
+                      Zone Details
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {["Low", "Low-Medium", "Medium", "High", "Critical"].map(
+                        (level, index) => {
+                          const ranges = [
+                            { min: 0, max: 49, color: "bg-green-500" },
+                            { min: 50, max: 69, color: "bg-yellow-500" },
+                            { min: 70, max: 84, color: "bg-amber-500" },
+                            { min: 85, max: 94, color: "bg-orange-500" },
+                            { min: 95, max: 100, color: "bg-red-600" },
+                          ];
+                          const range = ranges[index];
+                          const zonesInRange = crowdZones.filter(
+                            (zone) =>
+                              zone.density >= range.min &&
+                              zone.density <= range.max,
+                          ).length;
+                          const percentage =
+                            (zonesInRange / crowdZones.length) * 100;
+
+                          return (
+                            <div key={level} className="space-y-1">
+                              <div className="flex justify-between text-sm">
+                                <span>
+                                  {level} ({range.min}-{range.max}%)
+                                </span>
+                                <span>{zonesInRange} zones</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full ${range.color}`}
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        },
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
                       <Clock className="w-5 h-5" />
                       Wait Times & Flow
                     </CardTitle>
