@@ -28,12 +28,6 @@ const navigationItems = [
     description: "Player stats & analysis",
   },
   {
-    name: "Live Match",
-    href: "/afl-dashboard",
-    icon: Activity,
-    description: "Real-time match data",
-  },
-  {
     name: "Crowd Monitor",
     href: "/crowd-monitor",
     icon: Users,
