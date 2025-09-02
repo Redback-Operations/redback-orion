@@ -203,6 +203,7 @@ export default function CrowdMonitor() {
   const [selectedZone, setSelectedZone] = useState(crowdZones[0]);
   const [viewMode, setViewMode] = useState("heatmap");
   const [timeRange, setTimeRange] = useState("live");
+  const [timelineData, setTimelineData] = useState(generateTimelineData());
 
   // Simulate real-time crowd updates
   useEffect(() => {
