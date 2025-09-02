@@ -2673,10 +2673,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           </div>
                         ))}
 
-                        {/* Live indicator */}
+                        {/* Stadium info */}
                         <div className="absolute top-2 right-2 flex items-center gap-2">
-                          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                          <span className="text-xs font-medium text-gray-700">LIVE</span>
+                          <span className="text-xs font-medium text-gray-700 bg-white/80 px-2 py-1 rounded">MCG</span>
                         </div>
                       </div>
 
