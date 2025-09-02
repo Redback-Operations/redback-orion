@@ -241,13 +241,6 @@ export default function AFLDashboard() {
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const [selectedCard, setSelectedCard] = useState(null);
 
-  // Initialize selectedCard when component mounts
-  useEffect(() => {
-    if (playerCards.length > 0 && !selectedCard) {
-      setSelectedCard(playerCards[0]);
-    }
-  }, [playerCards, selectedCard]);
-
   // Expanded card state
   const [expandedCardId, setExpandedCardId] = useState(null);
 
