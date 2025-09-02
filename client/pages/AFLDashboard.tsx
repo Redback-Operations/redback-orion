@@ -1607,6 +1607,13 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
     setExpandedCardId(expandedCardId === card.id ? null : card.id);
   };
 
+  // Initialize selectedCard when component mounts
+  useEffect(() => {
+    if (playerCards.length > 0 && !selectedCard) {
+      setSelectedCard(playerCards[0]);
+    }
+  }, [playerCards, selectedCard]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
