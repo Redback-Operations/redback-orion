@@ -1499,7 +1499,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Brisbane Lions",
       number: 7,
       background: "from-red-800 to-red-900",
-      image: "https://images.pexels.com/photos/29388609/pexels-photo-29388609.jpeg",
+      image: "https://images.pexels.com/photos/159666/rugby-runner-player-running-159666.jpeg",
       stats: {
         goalAccuracy: 67,
         handballs: 16,
@@ -1515,7 +1515,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Western Bulldogs",
       number: 4,
       background: "from-orange-600 to-orange-700",
-      image: "https://images.pexels.com/photos/34514/spot-runs-start-la.jpg",
+      image: "https://images.pexels.com/photos/3886235/pexels-photo-3886235.jpeg",
       stats: {
         goalAccuracy: 60,
         handballs: 18,
@@ -1531,7 +1531,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Carlton",
       number: 9,
       background: "from-blue-800 to-blue-900",
-      image: "https://images.pexels.com/photos/14262637/pexels-photo-14262637.jpeg",
+      image: "https://images.pexels.com/photos/33637334/pexels-photo-33637334.jpeg",
       stats: {
         goalAccuracy: 100,
         handballs: 12,
