@@ -241,6 +241,10 @@ export default function AFLDashboard() {
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const [selectedCard, setSelectedCard] = useState(null);
 
+  // Player card modal state
+  const [showPlayerModal, setShowPlayerModal] = useState(false);
+  const [modalPlayerCard, setModalPlayerCard] = useState(null);
+
   // Video upload states
   const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
   const [isVideoUploading, setIsVideoUploading] = useState(false);
