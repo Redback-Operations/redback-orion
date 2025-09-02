@@ -2813,21 +2813,27 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="space-y-2">
                           <div className="flex justify-between">
                             <span>Total Zones:</span>
-                            <span className="font-medium">8</span>
+                            <span className="font-medium">{crowdZones.length}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Safe Zones:</span>
-                            <span className="font-medium text-green-600">3</span>
+                            <span className="font-medium text-green-600">
+                              {crowdZones.filter(zone => zone.density < 85).length}
+                            </span>
                           </div>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between">
                             <span>Alert Zones:</span>
-                            <span className="font-medium text-orange-600">2</span>
+                            <span className="font-medium text-orange-600">
+                              {crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Critical Zones:</span>
-                            <span className="font-medium text-red-600">3</span>
+                            <span className="font-medium text-red-600">
+                              {crowdZones.filter(zone => zone.density >= 95).length}
+                            </span>
                           </div>
                         </div>
                       </div>
