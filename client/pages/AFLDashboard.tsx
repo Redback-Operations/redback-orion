@@ -2666,43 +2666,89 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="relative bg-green-100 rounded-lg p-6 min-h-64">
-                        {/* Stadium representation */}
-                        <div className="absolute inset-4 border-2 border-green-600 rounded-lg">
-                          <div className="absolute inset-2 border border-green-400 rounded-lg bg-green-200">
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-medium text-green-800">
-                              FIELD
-                            </div>
+                      <div className="relative bg-green-50 rounded-lg p-4 min-h-80">
+                        {/* AFL Ground - Oval Shape */}
+                        <div
+                          className="absolute inset-6 border-4 border-green-600 bg-green-200"
+                          style={{
+                            borderRadius: "50%",
+                            clipPath: "ellipse(45% 40% at 50% 50%)"
+                          }}
+                        >
+                          {/* Goal squares */}
+                          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-green-700 bg-green-300"></div>
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-green-700 bg-green-300"></div>
+
+                          {/* Center circle */}
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 border-2 border-green-700 rounded-full"></div>
+
+                          {/* AFL text */}
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-green-800 mt-6">
+                            AFL GROUND
                           </div>
                         </div>
 
-                        {/* Zone overlays */}
-                        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-red-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-                          Northern (95%)
-                        </div>
-                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-                          Southern (95%)
-                        </div>
-                        <div className="absolute left-2 top-1/2 transform -translate-y-1/2 rotate-90 bg-green-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-                          Eastern (85%)
-                        </div>
-                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 -rotate-90 bg-red-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-                          Western (95%)
+                        {/* Dynamic Zone overlays */}
+                        {crowdZones.map((zone, index) => (
+                          <div
+                            key={index}
+                            className="absolute transition-all duration-1000 cursor-pointer hover:scale-105"
+                            style={{
+                              ...zone.position,
+                              backgroundColor: zone.color,
+                              opacity: (zone.density / 100) * 0.8 + 0.2,
+                              borderRadius: "8px",
+                              border: "2px solid rgba(255,255,255,0.8)",
+                            }}
+                            title={`${zone.zone}: ${zone.current.toLocaleString()}/${zone.capacity.toLocaleString()} (${zone.density}%)`}
+                          >
+                            <div className="p-2 text-white text-center">
+                              <div className="text-xs font-medium leading-tight">
+                                {zone.zone.split(' ')[0]}
+                              </div>
+                              <div className="text-xs font-bold">
+                                {zone.density}%
+                              </div>
+                              <div className="text-xs opacity-90">
+                                {zone.current.toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Live indicator */}
+                        <div className="absolute top-2 right-2 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                          <span className="text-xs font-medium text-gray-700">LIVE</span>
                         </div>
                       </div>
 
-                      <div className="mt-4 flex justify-between items-center text-xs">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-green-500 rounded"></div>
-                          <span>Low Density</span>
+                      {/* Enhanced Legend */}
+                      <div className="mt-4 space-y-2">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-green-500 rounded"></div>
+                            <span>Low (0-49%)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+                            <span>Medium (50-84%)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-orange-500 rounded"></div>
+                            <span>High (85-94%)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-red-600 rounded"></div>
+                            <span>Critical (95%+)</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                          <span>Medium Density</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-red-500 rounded"></div>
-                          <span>High Density</span>
+
+                        {/* Summary stats */}
+                        <div className="flex justify-between items-center text-xs bg-gray-50 p-2 rounded">
+                          <span>Total Attendance: <strong>{crowdZones.reduce((sum, zone) => sum + zone.current, 0).toLocaleString()}</strong></span>
+                          <span>Avg Density: <strong>{Math.round(crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length)}%</strong></span>
+                          <span>Critical Zones: <strong className="text-red-600">{crowdZones.filter(zone => zone.density >= 95).length}</strong></span>
                         </div>
                       </div>
                     </CardContent>
