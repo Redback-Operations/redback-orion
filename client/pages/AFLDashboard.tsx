@@ -202,6 +202,31 @@ const crowdZones = [
   },
 ];
 
+type QueueItem = {
+  id: string;
+  name: string;
+  analysisType: string;
+  status:
+    | "uploading"
+    | "queued"
+    | "processing"
+    | "analyzing"
+    | "completed"
+    | "failed";
+  progress: number;
+  duration: string;
+  size: string;
+  uploadTime: string;
+  completedTime: string | null;
+  estimatedCompletion: string | null;
+  priority: "low" | "medium" | "high";
+  userId: string;
+  processingStage: string;
+  errorCount: number;
+  retryCount: number;
+  isUIControlled?: boolean;
+};
+
 export default function AFLDashboard() {
   const navigate = useNavigate();
   const [selectedPlayer, setSelectedPlayer] = useState(mockPlayers[0]);
@@ -1421,7 +1446,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════════════════════════════��═══════
+════════════════════���═════════��════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
