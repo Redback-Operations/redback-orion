@@ -800,7 +800,7 @@ export default function AFLDashboard() {
       setVideoUploadProgress(0);
 
       // Create queue item immediately when upload starts
-      const newQueueItem = {
+      const newQueueItem: QueueItem = {
         id: `pq_${Date.now()}`,
         name: selectedVideoFile.name,
         analysisType:
@@ -813,7 +813,7 @@ export default function AFLDashboard() {
                 : selectedAnalysisType === "performance"
                   ? "Performance Analysis"
                   : "Crowd Analysis",
-        status: "uploading" as const,
+        status: "uploading",
         progress: 0,
         duration: `${Math.floor(Math.random() * 60 + 30)}:${Math.floor(
           Math.random() * 60,
@@ -836,7 +836,7 @@ export default function AFLDashboard() {
         processingStage: "file_upload",
         errorCount: 0,
         retryCount: 0,
-        isUIControlled: true, // Flag to indicate this item is controlled by UI flow
+        isUIControlled: true,
       };
 
       // Add to processing queue immediately
