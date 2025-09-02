@@ -229,10 +229,31 @@ export default function CrowdMonitor() {
           };
         }),
       );
+
+      // Update timeline data
+      setTimelineData(prevData => {
+        const newEntry = {
+          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          totalAttendance: prevData[prevData.length - 1]?.totalAttendance + (Math.random() - 0.5) * 500 || 55000,
+          averageDensity: 0,
+          criticalZones: 0,
+          highDensityZones: 0,
+        };
+
+        // Calculate current metrics
+        const total = crowdZones.reduce((sum, zone) => sum + zone.current, 0);
+        const capacity = crowdZones.reduce((sum, zone) => sum + zone.capacity, 0);
+        newEntry.totalAttendance = total;
+        newEntry.averageDensity = Math.round((total / capacity) * 100);
+        newEntry.criticalZones = crowdZones.filter(zone => zone.density >= 95).length;
+        newEntry.highDensityZones = crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length;
+
+        return [...prevData.slice(-23), newEntry];
+      });
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isLive]);
+  }, [isLive, crowdZones]);
 
   const totalCapacity = crowdZones.reduce(
     (sum, zone) => sum + zone.capacity,
