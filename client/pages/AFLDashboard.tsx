@@ -1698,7 +1698,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="absolute top-3 left-3 z-20">
                           <div className="bg-white rounded-full p-2 shadow-md">
                             <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">AFL</span>
+                              <span className="text-white font-bold text-xs">
+                                AFL
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1715,8 +1717,12 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           />
                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
                           <div className="absolute top-12 left-3 right-3 z-10">
-                            <h3 className="text-white font-bold text-lg leading-tight">DAYNE ZORKO</h3>
-                            <p className="text-white/80 text-sm">Brisbane Lions</p>
+                            <h3 className="text-white font-bold text-lg leading-tight">
+                              DAYNE ZORKO
+                            </h3>
+                            <p className="text-white/80 text-sm">
+                              Brisbane Lions
+                            </p>
                           </div>
                           <div className="absolute bottom-16 left-3 right-3 z-10">
                             <div className="bg-black/80 backdrop-blur-sm rounded p-3">
@@ -1760,7 +1766,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="absolute top-3 left-3 z-20">
                           <div className="bg-white rounded-full p-2 shadow-md">
                             <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">AFL</span>
+                              <span className="text-white font-bold text-xs">
+                                AFL
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1777,8 +1785,12 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           />
                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
                           <div className="absolute top-12 left-3 right-3 z-10">
-                            <h3 className="text-white font-bold text-lg leading-tight">MARCUS BONTEMPELLI</h3>
-                            <p className="text-white/80 text-sm">Western Bulldogs</p>
+                            <h3 className="text-white font-bold text-lg leading-tight">
+                              MARCUS BONTEMPELLI
+                            </h3>
+                            <p className="text-white/80 text-sm">
+                              Western Bulldogs
+                            </p>
                           </div>
                           <div className="absolute bottom-16 left-3 right-3 z-10">
                             <div className="bg-black/80 backdrop-blur-sm rounded p-3">
@@ -1822,7 +1834,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="absolute top-3 left-3 z-20">
                           <div className="bg-white rounded-full p-2 shadow-md">
                             <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">AFL</span>
+                              <span className="text-white font-bold text-xs">
+                                AFL
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1839,7 +1853,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           />
                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
                           <div className="absolute top-12 left-3 right-3 z-10">
-                            <h3 className="text-white font-bold text-lg leading-tight">PATRICK CRIPPS</h3>
+                            <h3 className="text-white font-bold text-lg leading-tight">
+                              PATRICK CRIPPS
+                            </h3>
                             <p className="text-white/80 text-sm">Carlton</p>
                           </div>
                           <div className="absolute bottom-16 left-3 right-3 z-10">
@@ -1884,7 +1900,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="absolute top-3 left-3 z-20">
                           <div className="bg-white rounded-full p-2 shadow-md">
                             <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">AFL</span>
+                              <span className="text-white font-bold text-xs">
+                                AFL
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1901,7 +1919,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           />
                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
                           <div className="absolute top-12 left-3 right-3 z-10">
-                            <h3 className="text-white font-bold text-lg leading-tight">DUSTIN MARTIN</h3>
+                            <h3 className="text-white font-bold text-lg leading-tight">
+                              DUSTIN MARTIN
+                            </h3>
                             <p className="text-white/80 text-sm">Richmond</p>
                           </div>
                           <div className="absolute bottom-16 left-3 right-3 z-10">
