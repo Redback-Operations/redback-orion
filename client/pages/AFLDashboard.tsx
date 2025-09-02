@@ -2725,31 +2725,33 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="text-center p-4 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">
-                          47,326
+                          {crowdZones.reduce((sum, zone) => sum + zone.current, 0).toLocaleString()}
                         </div>
                         <div className="text-sm text-gray-600">
-                          Average Attendance
+                          Current Attendance
                         </div>
                         <div className="text-xs text-green-600 mt-1">
-                          +3.2% vs last season
+                          Live Stadium Data
                         </div>
                       </div>
                       <div className="text-center p-4 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">89%</div>
+                        <div className="text-2xl font-bold text-green-600">
+                          {Math.round(crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length)}%
+                        </div>
                         <div className="text-sm text-gray-600">
-                          Average Capacity
+                          Average Density
                         </div>
                         <div className="text-xs text-green-600 mt-1">
-                          +5.1% vs last season
+                          Across {crowdZones.length} zones
                         </div>
                       </div>
                       <div className="text-center p-4 bg-purple-50 rounded-lg">
                         <div className="text-2xl font-bold text-purple-600">
-                          2:45 PM
+                          {crowdZones.reduce((sum, zone) => sum + zone.capacity, 0).toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600">Peak Entry Time</div>
+                        <div className="text-sm text-gray-600">Total Capacity</div>
                         <div className="text-xs text-gray-600 mt-1">
-                          15 min before bounce
+                          Stadium Maximum
                         </div>
                       </div>
                     </div>
