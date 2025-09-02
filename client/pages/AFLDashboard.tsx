@@ -1997,11 +1997,11 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() =>
-                              setSelectedCardIndex(
-                                Math.max(0, selectedCardIndex - 1),
-                              )
-                            }
+                            onClick={() => {
+                              const newIndex = Math.max(0, selectedCardIndex - 1);
+                              setSelectedCardIndex(newIndex);
+                              setSelectedCard(playerCards[newIndex]);
+                            }}
                             disabled={selectedCardIndex === 0}
                           >
                             ← Previous
@@ -2012,14 +2012,14 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() =>
-                              setSelectedCardIndex(
-                                Math.min(
-                                  playerCards.length - 1,
-                                  selectedCardIndex + 1,
-                                ),
-                              )
-                            }
+                            onClick={() => {
+                              const newIndex = Math.min(
+                                playerCards.length - 1,
+                                selectedCardIndex + 1,
+                              );
+                              setSelectedCardIndex(newIndex);
+                              setSelectedCard(playerCards[newIndex]);
+                            }}
                             disabled={
                               selectedCardIndex === playerCards.length - 1
                             }
