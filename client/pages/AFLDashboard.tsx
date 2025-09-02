@@ -2915,15 +2915,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <AreaChart
-                          data={[
-                            { time: "12:00", attendance: 35000, density: 58, critical: 0, high: 1 },
-                            { time: "13:00", attendance: 42000, density: 70, critical: 1, high: 2 },
-                            { time: "14:00", attendance: 48000, density: 80, critical: 2, high: 3 },
-                            { time: "15:00", attendance: 53000, density: 88, critical: 3, high: 2 },
-                            { time: "16:00", attendance: 55000, density: 92, critical: 3, high: 3 },
-                            { time: "17:00", attendance: 52000, density: 87, critical: 2, high: 3 },
-                            { time: "18:00", attendance: 48000, density: 80, critical: 1, high: 2 }
-                          ]}
+                          data={generateTimelineFromStadiumData(crowdZones)}
                         >
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="time" tick={{ fontSize: 12 }} />
