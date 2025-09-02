@@ -1496,15 +1496,16 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Brisbane Lions",
       number: 7,
       background: "from-red-800 to-red-900",
-      image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
       stats: {
         goalAccuracy: 67,
         handballs: 16,
         disposals: 34,
         kicks: 18,
         marks: 8,
-        tackles: 6
-      }
+        tackles: 6,
+      },
     },
     {
       id: 2,
@@ -1512,15 +1513,16 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Western Bulldogs",
       number: 4,
       background: "from-orange-600 to-orange-700",
-      image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
       stats: {
         goalAccuracy: 60,
         handballs: 18,
         disposals: 42,
         kicks: 24,
         marks: 10,
-        tackles: 8
-      }
+        tackles: 8,
+      },
     },
     {
       id: 3,
@@ -1528,15 +1530,16 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Carlton",
       number: 9,
       background: "from-blue-800 to-blue-900",
-      image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
       stats: {
         goalAccuracy: 100,
         handballs: 12,
         disposals: 38,
         kicks: 26,
         marks: 7,
-        tackles: 9
-      }
+        tackles: 9,
+      },
     },
     {
       id: 4,
@@ -1544,16 +1547,17 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Richmond",
       number: 4,
       background: "from-yellow-500 to-yellow-600",
-      image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      image:
+        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
       stats: {
         goalAccuracy: 80,
         handballs: 8,
         disposals: 28,
         kicks: 20,
         marks: 6,
-        tackles: 4
-      }
-    }
+        tackles: 4,
+      },
+    },
   ];
 
   // Player comparison chart data
@@ -1561,33 +1565,33 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
     {
       stat: "Kicks",
       [selectedPlayer.name]: selectedPlayer.kicks,
-      [comparisonPlayer.name]: comparisonPlayer.kicks
+      [comparisonPlayer.name]: comparisonPlayer.kicks,
     },
     {
       stat: "Handballs",
       [selectedPlayer.name]: selectedPlayer.handballs,
-      [comparisonPlayer.name]: comparisonPlayer.handballs
+      [comparisonPlayer.name]: comparisonPlayer.handballs,
     },
     {
       stat: "Marks",
       [selectedPlayer.name]: selectedPlayer.marks,
-      [comparisonPlayer.name]: comparisonPlayer.marks
+      [comparisonPlayer.name]: comparisonPlayer.marks,
     },
     {
       stat: "Tackles",
       [selectedPlayer.name]: selectedPlayer.tackles,
-      [comparisonPlayer.name]: comparisonPlayer.tackles
+      [comparisonPlayer.name]: comparisonPlayer.tackles,
     },
     {
       stat: "Goals",
       [selectedPlayer.name]: selectedPlayer.goals,
-      [comparisonPlayer.name]: comparisonPlayer.goals
+      [comparisonPlayer.name]: comparisonPlayer.goals,
     },
     {
       stat: "Efficiency",
       [selectedPlayer.name]: selectedPlayer.efficiency,
-      [comparisonPlayer.name]: comparisonPlayer.efficiency
-    }
+      [comparisonPlayer.name]: comparisonPlayer.efficiency,
+    },
   ];
 
   const filteredPlayers = mockPlayers.filter(
@@ -1810,7 +1814,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </Button>
                     </CardTitle>
                     <CardDescription>
-                      AFL player cards with photos and jersey numbers - Click cards to interact
+                      AFL player cards with photos and jersey numbers - Click
+                      cards to interact
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -1825,7 +1830,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                             <div className="absolute top-3 left-3 z-20">
                               <div className="bg-white rounded-full p-2 shadow-md">
                                 <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                                  <span className="text-white font-bold text-xs">AFL</span>
+                                  <span className="text-white font-bold text-xs">
+                                    AFL
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -1834,7 +1841,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 #{card.number}
                               </div>
                             </div>
-                            <div className={`relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b ${card.background}`}>
+                            <div
+                              className={`relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b ${card.background}`}
+                            >
                               <img
                                 src={card.image}
                                 alt={card.name}
@@ -1845,22 +1854,30 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 <h3 className="text-white font-bold text-lg leading-tight">
                                   {card.name}
                                 </h3>
-                                <p className="text-white/80 text-sm">{card.team}</p>
+                                <p className="text-white/80 text-sm">
+                                  {card.team}
+                                </p>
                               </div>
                               <div className="absolute bottom-16 left-3 right-3 z-10">
                                 <div className="bg-black/80 backdrop-blur-sm rounded p-3">
                                   <div className="text-white text-xs space-y-1">
                                     <div className="flex justify-between">
                                       <span>GOAL ACCURACY:</span>
-                                      <span className="font-bold">{card.stats.goalAccuracy}%</span>
+                                      <span className="font-bold">
+                                        {card.stats.goalAccuracy}%
+                                      </span>
                                     </div>
                                     <div className="flex justify-between">
                                       <span>HANDBALLS:</span>
-                                      <span className="font-bold">{card.stats.handballs}</span>
+                                      <span className="font-bold">
+                                        {card.stats.handballs}
+                                      </span>
                                     </div>
                                     <div className="flex justify-between">
                                       <span>DISPOSALS:</span>
-                                      <span className="font-bold">{card.stats.disposals}</span>
+                                      <span className="font-bold">
+                                        {card.stats.disposals}
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
@@ -1868,15 +1885,21 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
                                 <div className="grid grid-cols-3 gap-2 text-white text-center">
                                   <div>
-                                    <div className="font-bold text-lg">{card.stats.kicks}</div>
+                                    <div className="font-bold text-lg">
+                                      {card.stats.kicks}
+                                    </div>
                                     <div className="text-xs">KICKS</div>
                                   </div>
                                   <div>
-                                    <div className="font-bold text-lg">{card.stats.marks}</div>
+                                    <div className="font-bold text-lg">
+                                      {card.stats.marks}
+                                    </div>
                                     <div className="text-xs">MARKS</div>
                                   </div>
                                   <div>
-                                    <div className="font-bold text-lg">{card.stats.tackles}</div>
+                                    <div className="font-bold text-lg">
+                                      {card.stats.tackles}
+                                    </div>
                                     <div className="text-xs">TACKLES</div>
                                   </div>
                                 </div>
@@ -1891,7 +1914,11 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setSelectedCardIndex(Math.max(0, selectedCardIndex - 1))}
+                            onClick={() =>
+                              setSelectedCardIndex(
+                                Math.max(0, selectedCardIndex - 1),
+                              )
+                            }
                             disabled={selectedCardIndex === 0}
                           >
                             ← Previous
@@ -1902,8 +1929,17 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setSelectedCardIndex(Math.min(playerCards.length - 1, selectedCardIndex + 1))}
-                            disabled={selectedCardIndex === playerCards.length - 1}
+                            onClick={() =>
+                              setSelectedCardIndex(
+                                Math.min(
+                                  playerCards.length - 1,
+                                  selectedCardIndex + 1,
+                                ),
+                              )
+                            }
+                            disabled={
+                              selectedCardIndex === playerCards.length - 1
+                            }
                           >
                             Next →
                           </Button>
@@ -1911,7 +1947,12 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
 
                         <div
                           className="relative w-full max-w-sm mx-auto cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                          onClick={() => handleCardClick(playerCards[selectedCardIndex], selectedCardIndex)}
+                          onClick={() =>
+                            handleCardClick(
+                              playerCards[selectedCardIndex],
+                              selectedCardIndex,
+                            )
+                          }
                         >
                           {(() => {
                             const card = playerCards[selectedCardIndex];
@@ -1920,7 +1961,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 <div className="absolute top-3 left-3 z-20">
                                   <div className="bg-white rounded-full p-2 shadow-md">
                                     <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                                      <span className="text-white font-bold text-xs">AFL</span>
+                                      <span className="text-white font-bold text-xs">
+                                        AFL
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
@@ -1929,7 +1972,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                     #{card.number}
                                   </div>
                                 </div>
-                                <div className={`relative h-96 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b ${card.background}`}>
+                                <div
+                                  className={`relative h-96 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b ${card.background}`}
+                                >
                                   <img
                                     src={card.image}
                                     alt={card.name}
@@ -1940,22 +1985,30 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                     <h3 className="text-white font-bold text-xl leading-tight">
                                       {card.name}
                                     </h3>
-                                    <p className="text-white/80 text-base">{card.team}</p>
+                                    <p className="text-white/80 text-base">
+                                      {card.team}
+                                    </p>
                                   </div>
                                   <div className="absolute bottom-20 left-3 right-3 z-10">
                                     <div className="bg-black/80 backdrop-blur-sm rounded p-4">
                                       <div className="text-white text-sm space-y-2">
                                         <div className="flex justify-between">
                                           <span>GOAL ACCURACY:</span>
-                                          <span className="font-bold">{card.stats.goalAccuracy}%</span>
+                                          <span className="font-bold">
+                                            {card.stats.goalAccuracy}%
+                                          </span>
                                         </div>
                                         <div className="flex justify-between">
                                           <span>HANDBALLS:</span>
-                                          <span className="font-bold">{card.stats.handballs}</span>
+                                          <span className="font-bold">
+                                            {card.stats.handballs}
+                                          </span>
                                         </div>
                                         <div className="flex justify-between">
                                           <span>DISPOSALS:</span>
-                                          <span className="font-bold">{card.stats.disposals}</span>
+                                          <span className="font-bold">
+                                            {card.stats.disposals}
+                                          </span>
                                         </div>
                                       </div>
                                     </div>
@@ -1963,15 +2016,21 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-4 z-10">
                                     <div className="grid grid-cols-3 gap-2 text-white text-center">
                                       <div>
-                                        <div className="font-bold text-xl">{card.stats.kicks}</div>
+                                        <div className="font-bold text-xl">
+                                          {card.stats.kicks}
+                                        </div>
                                         <div className="text-sm">KICKS</div>
                                       </div>
                                       <div>
-                                        <div className="font-bold text-xl">{card.stats.marks}</div>
+                                        <div className="font-bold text-xl">
+                                          {card.stats.marks}
+                                        </div>
                                         <div className="text-sm">MARKS</div>
                                       </div>
                                       <div>
-                                        <div className="font-bold text-xl">{card.stats.tackles}</div>
+                                        <div className="font-bold text-xl">
+                                          {card.stats.tackles}
+                                        </div>
                                         <div className="text-sm">TACKLES</div>
                                       </div>
                                     </div>
@@ -1984,10 +2043,15 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
 
                         {selectedCard && (
                           <div className="text-center text-sm text-gray-600 max-w-md">
-                            <p>Click the card to interact • Use navigation buttons to browse • Toggle "View All" to see all cards</p>
+                            <p>
+                              Click the card to interact • Use navigation
+                              buttons to browse • Toggle "View All" to see all
+                              cards
+                            </p>
                             {selectedCard && (
                               <p className="mt-2 font-medium">
-                                Current: {selectedCard.name} from {selectedCard.team}
+                                Current: {selectedCard.name} from{" "}
+                                {selectedCard.team}
                               </p>
                             )}
                           </div>
@@ -2037,80 +2101,88 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Progress Bar Comparison */}
                       <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-700">Statistical Comparison</h4>
-                        {["kicks", "handballs", "marks", "tackles", "goals"].map(
-                          (stat) => (
-                            <div key={stat} className="space-y-2">
-                              <div className="flex justify-between text-sm">
-                                <span className="capitalize">{stat}</span>
-                                <span>
-                                  {
-                                    selectedPlayer[
+                        <h4 className="text-sm font-semibold text-gray-700">
+                          Statistical Comparison
+                        </h4>
+                        {[
+                          "kicks",
+                          "handballs",
+                          "marks",
+                          "tackles",
+                          "goals",
+                        ].map((stat) => (
+                          <div key={stat} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="capitalize">{stat}</span>
+                              <span>
+                                {
+                                  selectedPlayer[
+                                    stat as keyof typeof selectedPlayer
+                                  ]
+                                }{" "}
+                                vs{" "}
+                                {
+                                  comparisonPlayer[
+                                    stat as keyof typeof comparisonPlayer
+                                  ]
+                                }
+                              </span>
+                            </div>
+                            <div className="flex gap-2">
+                              <div className="flex-1">
+                                <Progress
+                                  value={
+                                    ((selectedPlayer[
                                       stat as keyof typeof selectedPlayer
-                                    ]
-                                  }{" "}
-                                  vs{" "}
-                                  {
-                                    comparisonPlayer[
-                                      stat as keyof typeof comparisonPlayer
-                                    ]
+                                    ] as number) /
+                                      Math.max(
+                                        selectedPlayer[
+                                          stat as keyof typeof selectedPlayer
+                                        ] as number,
+                                        comparisonPlayer[
+                                          stat as keyof typeof comparisonPlayer
+                                        ] as number,
+                                      )) *
+                                    100
                                   }
-                                </span>
-                              </div>
-                              <div className="flex gap-2">
-                                <div className="flex-1">
-                                  <Progress
-                                    value={
-                                      ((selectedPlayer[
-                                        stat as keyof typeof selectedPlayer
-                                      ] as number) /
-                                        Math.max(
-                                          selectedPlayer[
-                                            stat as keyof typeof selectedPlayer
-                                          ] as number,
-                                          comparisonPlayer[
-                                            stat as keyof typeof comparisonPlayer
-                                          ] as number,
-                                        )) *
-                                      100
-                                    }
-                                    className="h-2"
-                                  />
-                                  <div className="text-xs text-gray-600 mt-1">
-                                    {selectedPlayer.name}
-                                  </div>
+                                  className="h-2"
+                                />
+                                <div className="text-xs text-gray-600 mt-1">
+                                  {selectedPlayer.name}
                                 </div>
-                                <div className="flex-1">
-                                  <Progress
-                                    value={
-                                      ((comparisonPlayer[
-                                        stat as keyof typeof comparisonPlayer
-                                      ] as number) /
-                                        Math.max(
-                                          selectedPlayer[
-                                            stat as keyof typeof selectedPlayer
-                                          ] as number,
-                                          comparisonPlayer[
-                                            stat as keyof typeof comparisonPlayer
-                                          ] as number,
-                                        )) *
-                                      100
-                                    }
-                                    className="h-2"
-                                  />
-                                  <div className="text-xs text-gray-600 mt-1">
-                                    {comparisonPlayer.name}
-                                  </div>
+                              </div>
+                              <div className="flex-1">
+                                <Progress
+                                  value={
+                                    ((comparisonPlayer[
+                                      stat as keyof typeof comparisonPlayer
+                                    ] as number) /
+                                      Math.max(
+                                        selectedPlayer[
+                                          stat as keyof typeof selectedPlayer
+                                        ] as number,
+                                        comparisonPlayer[
+                                          stat as keyof typeof comparisonPlayer
+                                        ] as number,
+                                      )) *
+                                    100
+                                  }
+                                  className="h-2"
+                                />
+                                <div className="text-xs text-gray-600 mt-1">
+                                  {comparisonPlayer.name}
                                 </div>
                               </div>
                             </div>
-                          ),
-                        )}
+                          </div>
+                        ))}
                       </div>
 
                       {/* Line Chart Comparison */}
                       <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-700">Performance Trend</h4>
+                        <h4 className="text-sm font-semibold text-gray-700">
+                          Performance Trend
+                        </h4>
                         <div className="h-64 w-full">
                           <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={playerComparisonData}>
@@ -2125,9 +2197,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                               <YAxis tick={{ fontSize: 12 }} />
                               <Tooltip
                                 contentStyle={{
-                                  backgroundColor: '#f8f9fa',
-                                  border: '1px solid #e9ecef',
-                                  borderRadius: '6px'
+                                  backgroundColor: "#f8f9fa",
+                                  border: "1px solid #e9ecef",
+                                  borderRadius: "6px",
                                 }}
                               />
                               <Legend />
@@ -2136,22 +2208,31 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 dataKey={selectedPlayer.name}
                                 stroke="#059669"
                                 strokeWidth={3}
-                                dot={{ fill: '#059669', strokeWidth: 2, r: 4 }}
-                                activeDot={{ r: 6, stroke: '#059669', strokeWidth: 2 }}
+                                dot={{ fill: "#059669", strokeWidth: 2, r: 4 }}
+                                activeDot={{
+                                  r: 6,
+                                  stroke: "#059669",
+                                  strokeWidth: 2,
+                                }}
                               />
                               <Line
                                 type="monotone"
                                 dataKey={comparisonPlayer.name}
                                 stroke="#2563eb"
                                 strokeWidth={3}
-                                dot={{ fill: '#2563eb', strokeWidth: 2, r: 4 }}
-                                activeDot={{ r: 6, stroke: '#2563eb', strokeWidth: 2 }}
+                                dot={{ fill: "#2563eb", strokeWidth: 2, r: 4 }}
+                                activeDot={{
+                                  r: 6,
+                                  stroke: "#2563eb",
+                                  strokeWidth: 2,
+                                }}
                               />
                             </LineChart>
                           </ResponsiveContainer>
                         </div>
                         <div className="text-xs text-gray-600 text-center">
-                          Performance metrics comparison between selected players
+                          Performance metrics comparison between selected
+                          players
                         </div>
                       </div>
                     </div>
