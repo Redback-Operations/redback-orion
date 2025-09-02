@@ -1499,7 +1499,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Brisbane Lions",
       number: 7,
       background: "from-red-800 to-red-900",
-      image: "https://images.pexels.com/photos/159666/rugby-runner-player-running-159666.jpeg",
+      image: "https://images.pexels.com/photos/31517042/pexels-photo-31517042.jpeg",
       stats: {
         goalAccuracy: 67,
         handballs: 16,
@@ -1515,7 +1515,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Western Bulldogs",
       number: 4,
       background: "from-orange-600 to-orange-700",
-      image: "https://images.pexels.com/photos/3886235/pexels-photo-3886235.jpeg",
+      image: "https://images.pexels.com/photos/2204166/pexels-photo-2204166.jpeg",
       stats: {
         goalAccuracy: 60,
         handballs: 18,
@@ -1531,7 +1531,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Carlton",
       number: 9,
       background: "from-blue-800 to-blue-900",
-      image: "https://images.pexels.com/photos/33637334/pexels-photo-33637334.jpeg",
+      image: "https://images.pexels.com/photos/33680708/pexels-photo-33680708.jpeg",
       stats: {
         goalAccuracy: 100,
         handballs: 12,
@@ -1547,7 +1547,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Richmond",
       number: 3,
       background: "from-yellow-500 to-yellow-600",
-      image: "https://images.pexels.com/photos/6078307/pexels-photo-6078307.jpeg",
+      image: "https://images.pexels.com/photos/9632073/pexels-photo-9632073.jpeg",
       stats: {
         goalAccuracy: 80,
         handballs: 8,
