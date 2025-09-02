@@ -267,6 +267,67 @@ export default function CrowdMonitor() {
     (zone) => zone.density >= 85 && zone.density < 95,
   );
 
+  // Prepare pie chart data
+  const pieChartData = [
+    {
+      name: "Low (0-49%)",
+      value: crowdZones.filter(zone => zone.density < 50).length,
+      color: "#22c55e",
+      zones: crowdZones.filter(zone => zone.density < 50),
+    },
+    {
+      name: "Low-Medium (50-69%)",
+      value: crowdZones.filter(zone => zone.density >= 50 && zone.density < 70).length,
+      color: "#eab308",
+      zones: crowdZones.filter(zone => zone.density >= 50 && zone.density < 70),
+    },
+    {
+      name: "Medium (70-84%)",
+      value: crowdZones.filter(zone => zone.density >= 70 && zone.density < 85).length,
+      color: "#f59e0b",
+      zones: crowdZones.filter(zone => zone.density >= 70 && zone.density < 85),
+    },
+    {
+      name: "High (85-94%)",
+      value: crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length,
+      color: "#f97316",
+      zones: crowdZones.filter(zone => zone.density >= 85 && zone.density < 95),
+    },
+    {
+      name: "Critical (95%+)",
+      value: crowdZones.filter(zone => zone.density >= 95).length,
+      color: "#dc2626",
+      zones: crowdZones.filter(zone => zone.density >= 95),
+    },
+  ].filter(item => item.value > 0);
+
+  // Custom tooltip for pie chart
+  const renderPieTooltip = (active: boolean, payload: any[]) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-3 border rounded-lg shadow-lg">
+          <p className="font-medium">{data.name}</p>
+          <p className="text-sm text-gray-600">
+            {data.value} zone{data.value !== 1 ? 's' : ''}
+          </p>
+          {data.zones.length > 0 && (
+            <div className="mt-2 text-xs">
+              <p className="font-medium">Zones:</p>
+              {data.zones.slice(0, 3).map((zone: any) => (
+                <p key={zone.id}>• {zone.name}</p>
+              ))}
+              {data.zones.length > 3 && (
+                <p>... and {data.zones.length - 3} more</p>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       <MobileNavigation />
