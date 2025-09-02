@@ -2219,21 +2219,17 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           })()}
                         </div>
 
-                        {selectedCard && (
-                          <div className="text-center text-sm text-gray-600 max-w-md">
-                            <p>
-                              Click the card to interact • Use navigation
-                              buttons to browse • Toggle "View All" to see all
-                              cards
-                            </p>
-                            {selectedCard && (
-                              <p className="mt-2 font-medium">
-                                Current: {selectedCard.name} from{" "}
-                                {selectedCard.team}
-                              </p>
-                            )}
-                          </div>
-                        )}
+                        <div className="text-center text-sm text-gray-600 max-w-md">
+                          <p>
+                            Click the card to interact • Use navigation
+                            buttons to browse • Toggle "View All" to see all
+                            cards
+                          </p>
+                          <p className="mt-2 font-medium">
+                            Current: {playerCards[selectedCardIndex].name} from{" "}
+                            {playerCards[selectedCardIndex].team}
+                          </p>
+                        </div>
                       </div>
                     )}
                   </CardContent>
