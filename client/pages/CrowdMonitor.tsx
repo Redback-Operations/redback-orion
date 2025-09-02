@@ -175,6 +175,28 @@ const getDensityLabel = (density: number) => {
   return "Low";
 };
 
+// Generate historical timeline data
+const generateTimelineData = () => {
+  const now = new Date();
+  const data = [];
+
+  for (let i = 23; i >= 0; i--) {
+    const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+    const baseAttendance = 55000 + Math.sin((i / 24) * Math.PI * 2) * 10000;
+    const variation = (Math.random() - 0.5) * 5000;
+
+    data.push({
+      time: time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      totalAttendance: Math.round(baseAttendance + variation),
+      averageDensity: Math.round(((baseAttendance + variation) / 60000) * 100),
+      criticalZones: Math.floor(Math.random() * 3),
+      highDensityZones: Math.floor(Math.random() * 5) + 1,
+    });
+  }
+
+  return data;
+};
+
 export default function CrowdMonitor() {
   const [isLive, setIsLive] = useState(true);
   const [crowdZones, setCrowdZones] = useState(generateCrowdData());
