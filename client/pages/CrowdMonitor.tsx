@@ -934,6 +934,193 @@ export default function CrowdMonitor() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            <TabsContent value="timeline" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Timeline className="w-5 h-5" />
+                    Crowd Density Timeline
+                  </CardTitle>
+                  <CardDescription>
+                    Historical crowd data and density trends over the last 24 hours
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={timelineData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="time"
+                          tick={{ fontSize: 12 }}
+                          interval={2}
+                        />
+                        <YAxis
+                          yAxisId="attendance"
+                          orientation="left"
+                          tick={{ fontSize: 12 }}
+                          label={{ value: 'Attendance', angle: -90, position: 'insideLeft' }}
+                        />
+                        <YAxis
+                          yAxisId="density"
+                          orientation="right"
+                          tick={{ fontSize: 12 }}
+                          label={{ value: 'Density %', angle: 90, position: 'insideRight' }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'white',
+                            border: '1px solid #ccc',
+                            borderRadius: '8px',
+                            fontSize: '12px'
+                          }}
+                          formatter={(value, name) => {
+                            if (name === 'totalAttendance') return [value.toLocaleString(), 'Total Attendance'];
+                            if (name === 'averageDensity') return [`${value}%`, 'Average Density'];
+                            if (name === 'criticalZones') return [value, 'Critical Zones'];
+                            if (name === 'highDensityZones') return [value, 'High Density Zones'];
+                            return [value, name];
+                          }}
+                        />
+                        <Legend />
+                        <Area
+                          yAxisId="attendance"
+                          type="monotone"
+                          dataKey="totalAttendance"
+                          stackId="1"
+                          stroke="#3b82f6"
+                          fill="#3b82f6"
+                          fillOpacity={0.6}
+                          name="Total Attendance"
+                        />
+                        <Area
+                          yAxisId="density"
+                          type="monotone"
+                          dataKey="averageDensity"
+                          stackId="2"
+                          stroke="#10b981"
+                          fill="#10b981"
+                          fillOpacity={0.6}
+                          name="Average Density %"
+                        />
+                        <Area
+                          yAxisId="density"
+                          type="monotone"
+                          dataKey="criticalZones"
+                          stackId="3"
+                          stroke="#ef4444"
+                          fill="#ef4444"
+                          fillOpacity={0.8}
+                          name="Critical Zones"
+                        />
+                        <Area
+                          yAxisId="density"
+                          type="monotone"
+                          dataKey="highDensityZones"
+                          stackId="4"
+                          stroke="#f97316"
+                          fill="#f97316"
+                          fillOpacity={0.8}
+                          name="High Density Zones"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Peak Hours</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {timelineData
+                        .sort((a, b) => b.totalAttendance - a.totalAttendance)
+                        .slice(0, 3)
+                        .map((entry, index) => (
+                          <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                            <span className="text-sm font-medium">{entry.time}</span>
+                            <div className="text-right">
+                              <div className="text-sm font-bold">
+                                {entry.totalAttendance.toLocaleString()}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {entry.averageDensity}% density
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Density Trends</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="p-3 bg-blue-50 rounded">
+                        <div className="text-lg font-bold text-blue-700">
+                          {Math.round(
+                            timelineData.reduce((sum, entry) => sum + entry.averageDensity, 0) /
+                            timelineData.length
+                          )}%
+                        </div>
+                        <div className="text-sm text-blue-600">24h Average Density</div>
+                      </div>
+
+                      <div className="p-3 bg-red-50 rounded">
+                        <div className="text-lg font-bold text-red-700">
+                          {Math.max(...timelineData.map(entry => entry.criticalZones))}
+                        </div>
+                        <div className="text-sm text-red-600">Max Critical Zones</div>
+                      </div>
+
+                      <div className="p-3 bg-orange-50 rounded">
+                        <div className="text-lg font-bold text-orange-700">
+                          {Math.max(...timelineData.map(entry => entry.highDensityZones))}
+                        </div>
+                        <div className="text-sm text-orange-600">Max High Density Zones</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Capacity Insights</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="p-3 bg-green-50 rounded">
+                        <div className="text-lg font-bold text-green-700">
+                          {((timelineData[timelineData.length - 1]?.totalAttendance || 0) / totalCapacity * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-sm text-green-600">Current Stadium Fill</div>
+                      </div>
+
+                      <div className="p-3 bg-purple-50 rounded">
+                        <div className="text-lg font-bold text-purple-700">
+                          {Math.max(...timelineData.map(entry => entry.totalAttendance)).toLocaleString()}
+                        </div>
+                        <div className="text-sm text-purple-600">Peak Attendance</div>
+                      </div>
+
+                      <div className="p-3 bg-gray-50 rounded">
+                        <div className="text-lg font-bold text-gray-700">
+                          {(totalCapacity - (timelineData[timelineData.length - 1]?.totalAttendance || 0)).toLocaleString()}
+                        </div>
+                        <div className="text-sm text-gray-600">Available Capacity</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
           </Tabs>
         </div>
       </div>
