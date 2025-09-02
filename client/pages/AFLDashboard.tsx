@@ -631,7 +631,7 @@ export default function AFLDashboard() {
 
             // Simulate stage transitions
             let newStage = item.processingStage;
-            let newStatus = item.status;
+            let newStatus: QueueItem["status"] = item.status;
 
             if (item.status === "uploading" && newProgress >= 100) {
               newStatus = "queued";
