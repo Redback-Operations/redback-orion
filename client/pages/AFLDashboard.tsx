@@ -1811,7 +1811,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <CardTitle className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Activity className="w-5 h-5" />
-                        Player Trading Cards
+                        Player Profiles
                       </div>
                       <Button
                         variant="outline"
@@ -1822,8 +1822,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </Button>
                     </CardTitle>
                     <CardDescription>
-                      AFL player cards with photos and jersey numbers - Click
-                      cards to interact
+                      View AFL player profiles with stats and performance data
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
