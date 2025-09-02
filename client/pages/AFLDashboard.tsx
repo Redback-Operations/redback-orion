@@ -2821,7 +2821,43 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 <Cell key={`cell-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
-                            <Tooltip />
+                            <Tooltip
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const data = payload[0].payload;
+                                  const densityRange = data.name;
+                                  let zones = [];
+
+                                  if (densityRange.includes("Low (0-49%)")) {
+                                    zones = crowdZones.filter(zone => zone.density < 50);
+                                  } else if (densityRange.includes("Medium (50-84%)")) {
+                                    zones = crowdZones.filter(zone => zone.density >= 50 && zone.density < 85);
+                                  } else if (densityRange.includes("High (85-94%)")) {
+                                    zones = crowdZones.filter(zone => zone.density >= 85 && zone.density < 95);
+                                  } else if (densityRange.includes("Critical (95%+)")) {
+                                    zones = crowdZones.filter(zone => zone.density >= 95);
+                                  }
+
+                                  return (
+                                    <div className="bg-white p-3 border rounded-lg shadow-lg">
+                                      <p className="font-medium">{data.name}</p>
+                                      <p className="text-sm text-gray-600">
+                                        {data.value} zone{data.value !== 1 ? 's' : ''}
+                                      </p>
+                                      {zones.length > 0 && (
+                                        <div className="mt-2 text-xs">
+                                          <p className="font-medium">Zones:</p>
+                                          {zones.map((zone) => (
+                                            <p key={zone.zone}>• {zone.zone} ({zone.density}%)</p>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
                             <Legend
                               verticalAlign="bottom"
                               height={36}
