@@ -18,12 +18,7 @@ import {
 } from "@/components/ui/select";
 import MobileNavigation from "@/components/MobileNavigation";
 import LiveClock from "@/components/LiveClock";
-import {
-  Search,
-  Filter,
-  Activity,
-  BarChart3,
-} from "lucide-react";
+import { Search, Filter, Activity, BarChart3 } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -45,7 +40,8 @@ const aflPlayers = [
     team: "Brisbane Lions",
     teamAbbr: "BRI",
     number: "7",
-    image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+    image:
+      "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
     teamColor: "#8B0000",
     stats: {
       disposals: 34,
@@ -58,8 +54,8 @@ const aflPlayers = [
       efficiency: 78.5,
       goalAccuracy: 67,
       contestedPossessions: 12,
-      uncontestedPossessions: 22
-    }
+      uncontestedPossessions: 22,
+    },
   },
   {
     id: 2,
@@ -67,7 +63,8 @@ const aflPlayers = [
     team: "Western Bulldogs",
     teamAbbr: "WBD",
     number: "4",
-    image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+    image:
+      "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
     teamColor: "#FF6B35",
     stats: {
       disposals: 42,
@@ -80,8 +77,8 @@ const aflPlayers = [
       efficiency: 85.2,
       goalAccuracy: 60,
       contestedPossessions: 18,
-      uncontestedPossessions: 24
-    }
+      uncontestedPossessions: 24,
+    },
   },
   {
     id: 3,
@@ -89,7 +86,8 @@ const aflPlayers = [
     team: "Carlton",
     teamAbbr: "CAR",
     number: "9",
-    image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+    image:
+      "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
     teamColor: "#1E3A8A",
     stats: {
       disposals: 38,
@@ -102,8 +100,8 @@ const aflPlayers = [
       efficiency: 82.7,
       goalAccuracy: 100,
       contestedPossessions: 20,
-      uncontestedPossessions: 18
-    }
+      uncontestedPossessions: 18,
+    },
   },
   {
     id: 4,
@@ -111,7 +109,8 @@ const aflPlayers = [
     team: "Richmond",
     teamAbbr: "RIC",
     number: "4",
-    image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+    image:
+      "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
     teamColor: "#FFDD00",
     stats: {
       disposals: 28,
@@ -124,44 +123,46 @@ const aflPlayers = [
       efficiency: 89.4,
       goalAccuracy: 80,
       contestedPossessions: 10,
-      uncontestedPossessions: 18
-    }
-  }
+      uncontestedPossessions: 18,
+    },
+  },
 ];
 
 // Chart data for analytics
 const possessionData = [
-  { time: '12', possession: 45 },
-  { time: '8', possession: 38 },
-  { time: '20', possession: 52 },
-  { time: '30', possession: 48 },
+  { time: "12", possession: 45 },
+  { time: "8", possession: 38 },
+  { time: "20", possession: 52 },
+  { time: "30", possession: 48 },
 ];
 
 const playerMetricsData = [
   {
-    name: 'Player Stats',
-    'Dayne Zorko': 78.5,
-    'Marcus Bontempelli': 85.2,
-    'Patrick Cripps': 82.7,
-    'Dustin Martin': 89.4,
-  }
+    name: "Player Stats",
+    "Dayne Zorko": 78.5,
+    "Marcus Bontempelli": 85.2,
+    "Patrick Cripps": 82.7,
+    "Dustin Martin": 89.4,
+  },
 ];
 
 export default function PlayerPerformance() {
   const [isLive, setIsLive] = useState(true);
-  const [selectedPlayers, setSelectedPlayers] = useState(aflPlayers.slice(0, 4));
+  const [selectedPlayers, setSelectedPlayers] = useState(
+    aflPlayers.slice(0, 4),
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
 
-  const teams = ["all", ...Array.from(new Set(aflPlayers.map(p => p.team)))];
+  const teams = ["all", ...Array.from(new Set(aflPlayers.map((p) => p.team)))];
 
   const filteredPlayers = aflPlayers.filter(
     (player) =>
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedTeam === "all" || player.team === selectedTeam)
+      (selectedTeam === "all" || player.team === selectedTeam),
   );
 
-  const AFLTradingCard = ({ player }: { player: typeof aflPlayers[0] }) => (
+  const AFLTradingCard = ({ player }: { player: (typeof aflPlayers)[0] }) => (
     <div className="relative w-full max-w-xs mx-auto">
       {/* AFL Logo */}
       <div className="absolute top-3 left-3 z-20">
@@ -182,17 +183,17 @@ export default function PlayerPerformance() {
       {/* Main Card */}
       <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200">
         {/* Background Image/Color */}
-        <div 
+        <div
           className="absolute inset-0"
           style={{ backgroundColor: player.teamColor }}
         >
           {/* Player Image */}
-          <img 
+          <img
             src={player.image}
             alt={player.name}
             className="w-full h-full object-cover opacity-20"
           />
-          
+
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
         </div>
@@ -270,16 +271,20 @@ export default function PlayerPerformance() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Search Players</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Search Players
+                  </label>
                   <Input
                     placeholder="Search by name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Filter by Team</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Filter by Team
+                  </label>
                   <Select value={selectedTeam} onValueChange={setSelectedTeam}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select team" />
@@ -318,11 +323,11 @@ export default function PlayerPerformance() {
                     <XAxis dataKey="time" />
                     <YAxis />
                     <Tooltip />
-                    <Area 
-                      type="monotone" 
-                      dataKey="possession" 
-                      stroke="#3b82f6" 
-                      fill="#3b82f6" 
+                    <Area
+                      type="monotone"
+                      dataKey="possession"
+                      stroke="#3b82f6"
+                      fill="#3b82f6"
                       fillOpacity={0.3}
                     />
                   </AreaChart>
@@ -377,13 +382,27 @@ export default function PlayerPerformance() {
                     {filteredPlayers.map((player) => (
                       <tr key={player.id} className="border-b hover:bg-gray-50">
                         <td className="p-3 font-medium">{player.name}</td>
-                        <td className="p-3 text-center">{player.stats.disposals}</td>
-                        <td className="p-3 text-center">{player.stats.kicks}</td>
-                        <td className="p-3 text-center">{player.stats.handballs}</td>
-                        <td className="p-3 text-center">{player.stats.marks}</td>
-                        <td className="p-3 text-center">{player.stats.tackles}</td>
-                        <td className="p-3 text-center">{player.stats.goals}</td>
-                        <td className="p-3 text-center">{player.stats.efficiency}%</td>
+                        <td className="p-3 text-center">
+                          {player.stats.disposals}
+                        </td>
+                        <td className="p-3 text-center">
+                          {player.stats.kicks}
+                        </td>
+                        <td className="p-3 text-center">
+                          {player.stats.handballs}
+                        </td>
+                        <td className="p-3 text-center">
+                          {player.stats.marks}
+                        </td>
+                        <td className="p-3 text-center">
+                          {player.stats.tackles}
+                        </td>
+                        <td className="p-3 text-center">
+                          {player.stats.goals}
+                        </td>
+                        <td className="p-3 text-center">
+                          {player.stats.efficiency}%
+                        </td>
                       </tr>
                     ))}
                   </tbody>
