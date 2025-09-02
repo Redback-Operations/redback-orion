@@ -1427,7 +1427,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════════════════════════════��═══════
+════════════════════���══════════════════════════════��══════��
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
@@ -1796,284 +1796,204 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                 {/* AFL Trading Cards */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Activity className="w-5 h-5" />
-                      Player Trading Cards
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-5 h-5" />
+                        Player Trading Cards
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAllCards(!showAllCards)}
+                      >
+                        {showAllCards ? "Show One" : "View All"}
+                      </Button>
                     </CardTitle>
                     <CardDescription>
-                      AFL player cards with photos and jersey numbers
+                      AFL player cards with photos and jersey numbers - Click cards to interact
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {/* Dayne Zorko Card */}
-                      <div className="relative w-full max-w-xs mx-auto">
-                        <div className="absolute top-3 left-3 z-20">
-                          <div className="bg-white rounded-full p-2 shadow-md">
-                            <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">
-                                AFL
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="absolute top-3 right-3 z-20">
-                          <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
-                            #7
-                          </div>
-                        </div>
-                        <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b from-red-800 to-red-900">
-                          <img
-                            src="https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800"
-                            alt="Dayne Zorko"
-                            className="w-full h-full object-cover opacity-30"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-                          <div className="absolute top-12 left-3 right-3 z-10">
-                            <h3 className="text-white font-bold text-lg leading-tight">
-                              DAYNE ZORKO
-                            </h3>
-                            <p className="text-white/80 text-sm">
-                              Brisbane Lions
-                            </p>
-                          </div>
-                          <div className="absolute bottom-16 left-3 right-3 z-10">
-                            <div className="bg-black/80 backdrop-blur-sm rounded p-3">
-                              <div className="text-white text-xs space-y-1">
-                                <div className="flex justify-between">
-                                  <span>GOAL ACCURACY:</span>
-                                  <span className="font-bold">67%</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>HANDBALLS:</span>
-                                  <span className="font-bold">16</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>DISPOSALS:</span>
-                                  <span className="font-bold">34</span>
+                    {showAllCards ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {playerCards.map((card, index) => (
+                          <div
+                            key={card.id}
+                            className="relative w-full max-w-xs mx-auto cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                            onClick={() => handleCardClick(card, index)}
+                          >
+                            <div className="absolute top-3 left-3 z-20">
+                              <div className="bg-white rounded-full p-2 shadow-md">
+                                <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+                                  <span className="text-white font-bold text-xs">AFL</span>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
-                            <div className="grid grid-cols-3 gap-2 text-white text-center">
-                              <div>
-                                <div className="font-bold text-lg">18</div>
-                                <div className="text-xs">KICKS</div>
+                            <div className="absolute top-3 right-3 z-20">
+                              <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
+                                #{card.number}
                               </div>
-                              <div>
-                                <div className="font-bold text-lg">8</div>
-                                <div className="text-xs">MARKS</div>
+                            </div>
+                            <div className={`relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b ${card.background}`}>
+                              <img
+                                src={card.image}
+                                alt={card.name}
+                                className="w-full h-full object-cover opacity-60"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                              <div className="absolute top-12 left-3 right-3 z-10">
+                                <h3 className="text-white font-bold text-lg leading-tight">
+                                  {card.name}
+                                </h3>
+                                <p className="text-white/80 text-sm">{card.team}</p>
                               </div>
-                              <div>
-                                <div className="font-bold text-lg">6</div>
-                                <div className="text-xs">TACKLES</div>
+                              <div className="absolute bottom-16 left-3 right-3 z-10">
+                                <div className="bg-black/80 backdrop-blur-sm rounded p-3">
+                                  <div className="text-white text-xs space-y-1">
+                                    <div className="flex justify-between">
+                                      <span>GOAL ACCURACY:</span>
+                                      <span className="font-bold">{card.stats.goalAccuracy}%</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>HANDBALLS:</span>
+                                      <span className="font-bold">{card.stats.handballs}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>DISPOSALS:</span>
+                                      <span className="font-bold">{card.stats.disposals}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
+                                <div className="grid grid-cols-3 gap-2 text-white text-center">
+                                  <div>
+                                    <div className="font-bold text-lg">{card.stats.kicks}</div>
+                                    <div className="text-xs">KICKS</div>
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-lg">{card.stats.marks}</div>
+                                    <div className="text-xs">MARKS</div>
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-lg">{card.stats.tackles}</div>
+                                    <div className="text-xs">TACKLES</div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
+                    ) : (
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="flex items-center space-x-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedCardIndex(Math.max(0, selectedCardIndex - 1))}
+                            disabled={selectedCardIndex === 0}
+                          >
+                            ← Previous
+                          </Button>
+                          <span className="text-sm text-gray-600">
+                            {selectedCardIndex + 1} of {playerCards.length}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedCardIndex(Math.min(playerCards.length - 1, selectedCardIndex + 1))}
+                            disabled={selectedCardIndex === playerCards.length - 1}
+                          >
+                            Next →
+                          </Button>
+                        </div>
 
-                      {/* Marcus Bontempelli Card */}
-                      <div className="relative w-full max-w-xs mx-auto">
-                        <div className="absolute top-3 left-3 z-20">
-                          <div className="bg-white rounded-full p-2 shadow-md">
-                            <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">
-                                AFL
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="absolute top-3 right-3 z-20">
-                          <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
-                            #4
-                          </div>
-                        </div>
-                        <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b from-orange-600 to-orange-700">
-                          <img
-                            src="https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800"
-                            alt="Marcus Bontempelli"
-                            className="w-full h-full object-cover opacity-30"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-                          <div className="absolute top-12 left-3 right-3 z-10">
-                            <h3 className="text-white font-bold text-lg leading-tight">
-                              MARCUS BONTEMPELLI
-                            </h3>
-                            <p className="text-white/80 text-sm">
-                              Western Bulldogs
-                            </p>
-                          </div>
-                          <div className="absolute bottom-16 left-3 right-3 z-10">
-                            <div className="bg-black/80 backdrop-blur-sm rounded p-3">
-                              <div className="text-white text-xs space-y-1">
-                                <div className="flex justify-between">
-                                  <span>GOAL ACCURACY:</span>
-                                  <span className="font-bold">60%</span>
+                        <div
+                          className="relative w-full max-w-sm mx-auto cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                          onClick={() => handleCardClick(playerCards[selectedCardIndex], selectedCardIndex)}
+                        >
+                          {(() => {
+                            const card = playerCards[selectedCardIndex];
+                            return (
+                              <>
+                                <div className="absolute top-3 left-3 z-20">
+                                  <div className="bg-white rounded-full p-2 shadow-md">
+                                    <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+                                      <span className="text-white font-bold text-xs">AFL</span>
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>HANDBALLS:</span>
-                                  <span className="font-bold">18</span>
+                                <div className="absolute top-3 right-3 z-20">
+                                  <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
+                                    #{card.number}
+                                  </div>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>DISPOSALS:</span>
-                                  <span className="font-bold">42</span>
+                                <div className={`relative h-96 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b ${card.background}`}>
+                                  <img
+                                    src={card.image}
+                                    alt={card.name}
+                                    className="w-full h-full object-cover opacity-60"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                                  <div className="absolute top-12 left-3 right-3 z-10">
+                                    <h3 className="text-white font-bold text-xl leading-tight">
+                                      {card.name}
+                                    </h3>
+                                    <p className="text-white/80 text-base">{card.team}</p>
+                                  </div>
+                                  <div className="absolute bottom-20 left-3 right-3 z-10">
+                                    <div className="bg-black/80 backdrop-blur-sm rounded p-4">
+                                      <div className="text-white text-sm space-y-2">
+                                        <div className="flex justify-between">
+                                          <span>GOAL ACCURACY:</span>
+                                          <span className="font-bold">{card.stats.goalAccuracy}%</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span>HANDBALLS:</span>
+                                          <span className="font-bold">{card.stats.handballs}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span>DISPOSALS:</span>
+                                          <span className="font-bold">{card.stats.disposals}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-4 z-10">
+                                    <div className="grid grid-cols-3 gap-2 text-white text-center">
+                                      <div>
+                                        <div className="font-bold text-xl">{card.stats.kicks}</div>
+                                        <div className="text-sm">KICKS</div>
+                                      </div>
+                                      <div>
+                                        <div className="font-bold text-xl">{card.stats.marks}</div>
+                                        <div className="text-sm">MARKS</div>
+                                      </div>
+                                      <div>
+                                        <div className="font-bold text-xl">{card.stats.tackles}</div>
+                                        <div className="text-sm">TACKLES</div>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
-                            <div className="grid grid-cols-3 gap-2 text-white text-center">
-                              <div>
-                                <div className="font-bold text-lg">24</div>
-                                <div className="text-xs">KICKS</div>
-                              </div>
-                              <div>
-                                <div className="font-bold text-lg">10</div>
-                                <div className="text-xs">MARKS</div>
-                              </div>
-                              <div>
-                                <div className="font-bold text-lg">8</div>
-                                <div className="text-xs">TACKLES</div>
-                              </div>
-                            </div>
-                          </div>
+                              </>
+                            );
+                          })()}
                         </div>
-                      </div>
 
-                      {/* Patrick Cripps Card */}
-                      <div className="relative w-full max-w-xs mx-auto">
-                        <div className="absolute top-3 left-3 z-20">
-                          <div className="bg-white rounded-full p-2 shadow-md">
-                            <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">
-                                AFL
-                              </span>
-                            </div>
+                        {selectedCard && (
+                          <div className="text-center text-sm text-gray-600 max-w-md">
+                            <p>Click the card to interact • Use navigation buttons to browse • Toggle "View All" to see all cards</p>
+                            {selectedCard && (
+                              <p className="mt-2 font-medium">
+                                Current: {selectedCard.name} from {selectedCard.team}
+                              </p>
+                            )}
                           </div>
-                        </div>
-                        <div className="absolute top-3 right-3 z-20">
-                          <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
-                            #9
-                          </div>
-                        </div>
-                        <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b from-blue-800 to-blue-900">
-                          <img
-                            src="https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800"
-                            alt="Patrick Cripps"
-                            className="w-full h-full object-cover opacity-30"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-                          <div className="absolute top-12 left-3 right-3 z-10">
-                            <h3 className="text-white font-bold text-lg leading-tight">
-                              PATRICK CRIPPS
-                            </h3>
-                            <p className="text-white/80 text-sm">Carlton</p>
-                          </div>
-                          <div className="absolute bottom-16 left-3 right-3 z-10">
-                            <div className="bg-black/80 backdrop-blur-sm rounded p-3">
-                              <div className="text-white text-xs space-y-1">
-                                <div className="flex justify-between">
-                                  <span>GOAL ACCURACY:</span>
-                                  <span className="font-bold">100%</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>HANDBALLS:</span>
-                                  <span className="font-bold">12</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>DISPOSALS:</span>
-                                  <span className="font-bold">38</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
-                            <div className="grid grid-cols-3 gap-2 text-white text-center">
-                              <div>
-                                <div className="font-bold text-lg">26</div>
-                                <div className="text-xs">KICKS</div>
-                              </div>
-                              <div>
-                                <div className="font-bold text-lg">7</div>
-                                <div className="text-xs">MARKS</div>
-                              </div>
-                              <div>
-                                <div className="font-bold text-lg">9</div>
-                                <div className="text-xs">TACKLES</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                        )}
                       </div>
-
-                      {/* Dustin Martin Card */}
-                      <div className="relative w-full max-w-xs mx-auto">
-                        <div className="absolute top-3 left-3 z-20">
-                          <div className="bg-white rounded-full p-2 shadow-md">
-                            <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">
-                                AFL
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="absolute top-3 right-3 z-20">
-                          <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
-                            #4
-                          </div>
-                        </div>
-                        <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b from-yellow-500 to-yellow-600">
-                          <img
-                            src="https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800"
-                            alt="Dustin Martin"
-                            className="w-full h-full object-cover opacity-30"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-                          <div className="absolute top-12 left-3 right-3 z-10">
-                            <h3 className="text-white font-bold text-lg leading-tight">
-                              DUSTIN MARTIN
-                            </h3>
-                            <p className="text-white/80 text-sm">Richmond</p>
-                          </div>
-                          <div className="absolute bottom-16 left-3 right-3 z-10">
-                            <div className="bg-black/80 backdrop-blur-sm rounded p-3">
-                              <div className="text-white text-xs space-y-1">
-                                <div className="flex justify-between">
-                                  <span>GOAL ACCURACY:</span>
-                                  <span className="font-bold">80%</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>HANDBALLS:</span>
-                                  <span className="font-bold">8</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span>DISPOSALS:</span>
-                                  <span className="font-bold">28</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
-                            <div className="grid grid-cols-3 gap-2 text-white text-center">
-                              <div>
-                                <div className="font-bold text-lg">20</div>
-                                <div className="text-xs">KICKS</div>
-                              </div>
-                              <div>
-                                <div className="font-bold text-lg">6</div>
-                                <div className="text-xs">MARKS</div>
-                              </div>
-                              <div>
-                                <div className="font-bold text-lg">4</div>
-                                <div className="text-xs">TACKLES</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
 
