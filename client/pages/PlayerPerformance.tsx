@@ -16,400 +16,376 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MobileNavigation from "@/components/MobileNavigation";
 import LiveClock from "@/components/LiveClock";
-import { Search, Filter, Activity, BarChart3 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Legend,
-} from "recharts";
+  Search,
+  Filter,
+  Activity,
+  BarChart3,
+  Users,
+  FileText,
+  Video,
+  Star,
+} from "lucide-react";
 
-// AFL Player data matching the reference image style
-const aflPlayers = [
+// Player data
+const players = [
   {
     id: 1,
-    name: "DAYNE ZORKO",
-    team: "Brisbane Lions",
-    teamAbbr: "BRI",
-    number: "7",
-    image:
-      "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
-    teamColor: "#8B0000",
+    name: "Marcus Bontempelli",
+    team: "Western Bulldogs",
+    rating: 4.8,
+    position: "Midfielder",
     stats: {
-      disposals: 34,
-      kicks: 18,
-      handballs: 16,
+      kicks: 28,
+      handballs: 12,
       marks: 8,
       tackles: 6,
       goals: 2,
-      behinds: 1,
-      efficiency: 78.5,
-      goalAccuracy: 67,
-      contestedPossessions: 12,
-      uncontestedPossessions: 22,
-    },
+      efficiency: 87
+    }
   },
   {
     id: 2,
-    name: "MARCUS BONTEMPELLI",
-    team: "Western Bulldogs",
-    teamAbbr: "WBD",
-    number: "4",
-    image:
-      "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
-    teamColor: "#FF6B35",
-    stats: {
-      disposals: 42,
-      kicks: 24,
-      handballs: 18,
-      marks: 10,
-      tackles: 8,
-      goals: 3,
-      behinds: 2,
-      efficiency: 85.2,
-      goalAccuracy: 60,
-      contestedPossessions: 18,
-      uncontestedPossessions: 24,
-    },
-  },
-  {
-    id: 3,
-    name: "PATRICK CRIPPS",
-    team: "Carlton",
-    teamAbbr: "CAR",
-    number: "9",
-    image:
-      "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
-    teamColor: "#1E3A8A",
-    stats: {
-      disposals: 38,
-      kicks: 26,
-      handballs: 12,
-      marks: 7,
-      tackles: 9,
-      goals: 1,
-      behinds: 0,
-      efficiency: 82.7,
-      goalAccuracy: 100,
-      contestedPossessions: 20,
-      uncontestedPossessions: 18,
-    },
-  },
-  {
-    id: 4,
-    name: "DUSTIN MARTIN",
+    name: "Dustin Martin",
     team: "Richmond",
-    teamAbbr: "RIC",
-    number: "4",
-    image:
-      "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
-    teamColor: "#FFDD00",
+    rating: 4.6,
+    position: "Forward",
     stats: {
-      disposals: 28,
-      kicks: 20,
+      kicks: 22,
       handballs: 8,
       marks: 6,
       tackles: 4,
-      goals: 4,
-      behinds: 1,
-      efficiency: 89.4,
-      goalAccuracy: 80,
-      contestedPossessions: 10,
-      uncontestedPossessions: 18,
-    },
+      goals: 3,
+      efficiency: 82
+    }
   },
-];
-
-// Chart data for analytics
-const possessionData = [
-  { time: "12", possession: 45 },
-  { time: "8", possession: 38 },
-  { time: "20", possession: 52 },
-  { time: "30", possession: 48 },
-];
-
-const playerMetricsData = [
   {
-    name: "Player Stats",
-    "Dayne Zorko": 78.5,
-    "Marcus Bontempelli": 85.2,
-    "Patrick Cripps": 82.7,
-    "Dustin Martin": 89.4,
-  },
+    id: 3,
+    name: "Patrick Dangerfield",
+    team: "Geelong",
+    rating: 4.7,
+    position: "Midfielder",
+    stats: {
+      kicks: 25,
+      handballs: 15,
+      marks: 7,
+      tackles: 8,
+      goals: 1,
+      efficiency: 84
+    }
+  }
 ];
 
 export default function PlayerPerformance() {
   const [isLive, setIsLive] = useState(true);
-  const [selectedPlayers, setSelectedPlayers] = useState(
-    aflPlayers.slice(0, 4),
-  );
+  const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
 
-  const teams = ["all", ...Array.from(new Set(aflPlayers.map((p) => p.team)))];
+  const teams = ["all", ...Array.from(new Set(players.map(p => p.team)))];
 
-  const filteredPlayers = aflPlayers.filter(
+  const filteredPlayers = players.filter(
     (player) =>
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedTeam === "all" || player.team === selectedTeam),
+      (selectedTeam === "all" || player.team === selectedTeam)
   );
 
-  const AFLTradingCard = ({ player }: { player: (typeof aflPlayers)[0] }) => (
-    <div className="relative w-full max-w-xs mx-auto">
-      {/* AFL Logo */}
-      <div className="absolute top-3 left-3 z-20">
-        <div className="bg-white rounded-full p-2 shadow-md">
-          <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-xs">AFL</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Player Number */}
-      <div className="absolute top-3 right-3 z-20">
-        <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
-          #{player.number}
-        </div>
-      </div>
-
-      {/* Main Card */}
-      <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200">
-        {/* Background Image/Color */}
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: player.teamColor }}
-        >
-          {/* Player Image */}
-          <img
-            src={player.image}
-            alt={player.name}
-            className="w-full h-full object-cover opacity-20"
-          />
-
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-        </div>
-
-        {/* Player Name */}
-        <div className="absolute top-12 left-3 right-3 z-10">
-          <h3 className="text-white font-bold text-lg leading-tight">
-            {player.name}
-          </h3>
-          <p className="text-white/80 text-sm">{player.teamAbbr}</p>
-        </div>
-
-        {/* Performance Stats Box */}
-        <div className="absolute bottom-16 left-3 right-3 z-10">
-          <div className="bg-black/80 backdrop-blur-sm rounded p-3">
-            <div className="text-white text-xs space-y-1">
-              <div className="flex justify-between">
-                <span>GOAL ACCURACY:</span>
-                <span className="font-bold">{player.stats.goalAccuracy}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>HANDBALLS:</span>
-                <span className="font-bold">{player.stats.handballs}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>DISPOSALS:</span>
-                <span className="font-bold">{player.stats.disposals}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Stats Bar */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
-          <div className="grid grid-cols-3 gap-2 text-white text-center">
-            <div>
-              <div className="font-bold text-lg">{player.stats.kicks}</div>
-              <div className="text-xs">KICKS</div>
-            </div>
-            <div>
-              <div className="font-bold text-lg">{player.stats.marks}</div>
-              <div className="text-xs">MARKS</div>
-            </div>
-            <div>
-              <div className="font-bold text-lg">{player.stats.tackles}</div>
-              <div className="text-xs">TACKLES</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  const StatBox = ({ label, value, color }: { label: string; value: string | number; color: string }) => (
+    <div className={`p-4 rounded-lg text-center ${color}`}>
+      <div className="text-2xl font-bold text-white mb-1">{value}</div>
+      <div className="text-sm text-white/90">{label}</div>
     </div>
   );
 
+  const ComparisonBar = ({ 
+    label, 
+    player1Name, 
+    player1Value, 
+    player2Name, 
+    player2Value 
+  }: { 
+    label: string; 
+    player1Name: string; 
+    player1Value: number; 
+    player2Name: string; 
+    player2Value: number; 
+  }) => {
+    const maxValue = Math.max(player1Value, player2Value);
+    const player1Percentage = (player1Value / maxValue) * 100;
+    const player2Percentage = (player2Value / maxValue) * 100;
+
+    return (
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="font-medium">{label}</span>
+          <span className="text-gray-600">{player1Value} vs {player2Value}</span>
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs w-20 text-blue-600">{player1Name}</span>
+            <div className="flex-1 bg-gray-200 rounded-full h-6">
+              <div 
+                className="bg-blue-500 h-6 rounded-full flex items-center justify-end pr-2"
+                style={{ width: `${player1Percentage}%` }}
+              >
+                <span className="text-white text-xs font-medium">{player1Value}</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs w-20 text-orange-600">{player2Name}</span>
+            <div className="flex-1 bg-gray-200 rounded-full h-6">
+              <div 
+                className="bg-orange-500 h-6 rounded-full flex items-center justify-end pr-2"
+                style={{ width: `${player2Percentage}%` }}
+              >
+                <span className="text-white text-xs font-medium">{player2Value}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <MobileNavigation />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Activity className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">AFL Analytics</h1>
+              <p className="text-sm text-gray-600">Real-time insights & player analytics</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge className="bg-red-500">LIVE</Badge>
+            <span className="text-sm text-gray-600">Welcome, demo@aflanalytics.com</span>
+            <Button variant="outline" size="sm">Settings</Button>
+            <Button variant="outline" size="sm">Logout</Button>
+          </div>
+        </div>
+      </header>
 
-      <div className="lg:ml-64 pb-16 lg:pb-0">
-        <div className="p-6 space-y-6">
-          {/* Live Clock */}
-          <LiveClock
-            isLive={isLive}
-            onToggleLive={setIsLive}
-            matchTime={{ quarter: 2, timeRemaining: "15:23" }}
-          />
+      {/* Main Navigation Tabs */}
+      <div className="bg-white border-b">
+        <div className="px-4">
+          <Tabs defaultValue="player-performance" className="w-full">
+            <TabsList className="h-12 bg-transparent border-0 gap-8">
+              <TabsTrigger 
+                value="player-performance" 
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Player Performance
+              </TabsTrigger>
+              <TabsTrigger 
+                value="crowd-monitor"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Crowd Monitor
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reports"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Reports
+              </TabsTrigger>
+              <TabsTrigger 
+                value="video-analysis"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
+              >
+                <Video className="w-4 h-4 mr-2" />
+                Video Analysis
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="w-5 h-5" />
-                Player Filters
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Search Players
-                  </label>
-                  <Input
-                    placeholder="Search by name..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+            <TabsContent value="player-performance" className="mt-0">
+              <div className="grid grid-cols-12 gap-6 p-6">
+                {/* Left Sidebar - Player Search & Filters */}
+                <div className="col-span-3">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Search className="w-4 h-4" />
+                        Player Search & Filters
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Search Players</label>
+                        <Input
+                          placeholder="Search by name..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Filter by Team</label>
+                        <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="All Teams" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {teams.map((team) => (
+                              <SelectItem key={team} value={team}>
+                                {team === "all" ? "All Teams" : team}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Player List */}
+                      <div className="space-y-2 pt-4">
+                        {filteredPlayers.map((player) => (
+                          <div
+                            key={player.id}
+                            className={`p-3 rounded-lg cursor-pointer transition-colors border ${
+                              selectedPlayer.id === player.id
+                                ? "bg-blue-50 border-blue-200"
+                                : "bg-white border-gray-200 hover:bg-gray-50"
+                            }`}
+                            onClick={() => setSelectedPlayer(player)}
+                          >
+                            <div className="font-medium text-sm">{player.name}</div>
+                            <div className="text-xs text-gray-600">{player.team}</div>
+                            <div className="flex items-center gap-1 mt-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-3 h-3 ${
+                                    i < Math.floor(player.rating)
+                                      ? "text-yellow-400 fill-current"
+                                      : "text-gray-300"
+                                  }`}
+                                />
+                              ))}
+                              <span className="text-xs text-gray-600 ml-1">{player.position}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Filter by Team
-                  </label>
-                  <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select team" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {teams.map((team) => (
-                        <SelectItem key={team} value={team}>
-                          {team === "all" ? "All Teams" : team}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* Main Content Area */}
+                <div className="col-span-9 space-y-6">
+                  {/* Player Statistics */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        <span>Player Statistics - {selectedPlayer.name}</span>
+                        <Badge variant="outline">Western Bulldogs</Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-6 gap-4">
+                        <StatBox label="Kicks" value={selectedPlayer.stats.kicks} color="bg-blue-500" />
+                        <StatBox label="Handballs" value={selectedPlayer.stats.handballs} color="bg-green-500" />
+                        <StatBox label="Marks" value={selectedPlayer.stats.marks} color="bg-purple-500" />
+                        <StatBox label="Tackles" value={selectedPlayer.stats.tackles} color="bg-red-500" />
+                        <StatBox label="Goals" value={selectedPlayer.stats.goals} color="bg-orange-500" />
+                        <StatBox label="Efficiency" value={`${selectedPlayer.stats.efficiency}%`} color="bg-teal-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Player Comparison */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Player Comparison</CardTitle>
+                      <CardDescription>Compare Marcus Bontempelli with another player</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        <Select defaultValue="dustin-martin">
+                          <SelectTrigger className="w-48">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="dustin-martin">Dustin Martin (Richmond)</SelectItem>
+                            <SelectItem value="patrick-dangerfield">Patrick Dangerfield (Geelong)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-4">
+                        <ComparisonBar
+                          label="Kicks"
+                          player1Name="Marcus Bontempelli"
+                          player1Value={28}
+                          player2Name="Dustin Martin"
+                          player2Value={22}
+                        />
+                        <ComparisonBar
+                          label="Handballs"
+                          player1Name="Marcus Bontempelli"
+                          player1Value={12}
+                          player2Name="Dustin Martin"
+                          player2Value={8}
+                        />
+                        <ComparisonBar
+                          label="Marks"
+                          player1Name="Marcus Bontempelli"
+                          player1Value={8}
+                          player2Name="Dustin Martin"
+                          player2Value={6}
+                        />
+                        <ComparisonBar
+                          label="Tackles"
+                          player1Name="Marcus Bontempelli"
+                          player1Value={6}
+                          player2Name="Dustin Martin"
+                          player2Value={4}
+                        />
+                        <ComparisonBar
+                          label="Goals"
+                          player1Name="Marcus Bontempelli"
+                          player1Value={2}
+                          player2Name="Dustin Martin"
+                          player2Value={3}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </TabsContent>
 
-          {/* Player Cards Grid - Matching the reference image layout */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            {filteredPlayers.slice(0, 4).map((player) => (
-              <AFLTradingCard key={player.id} player={player} />
-            ))}
-          </div>
-
-          {/* Analytics Charts Section - Matching the reference image */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Possession Over Time Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Possession Over Time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <AreaChart data={possessionData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area
-                      type="monotone"
-                      dataKey="possession"
-                      stroke="#3b82f6"
-                      fill="#3b82f6"
-                      fillOpacity={0.3}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Player Metrics Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Player Metrics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={playerMetricsData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="Dayne Zorko" fill="#ef4444" />
-                    <Bar dataKey="Marcus Bontempelli" fill="#f97316" />
-                    <Bar dataKey="Patrick Cripps" fill="#3b82f6" />
-                    <Bar dataKey="Dustin Martin" fill="#eab308" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Individual Player Statistics */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Individual Statistics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-3">Player</th>
-                      <th className="text-center p-3">Disposals</th>
-                      <th className="text-center p-3">Kicks</th>
-                      <th className="text-center p-3">Handballs</th>
-                      <th className="text-center p-3">Marks</th>
-                      <th className="text-center p-3">Tackles</th>
-                      <th className="text-center p-3">Goals</th>
-                      <th className="text-center p-3">Efficiency</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredPlayers.map((player) => (
-                      <tr key={player.id} className="border-b hover:bg-gray-50">
-                        <td className="p-3 font-medium">{player.name}</td>
-                        <td className="p-3 text-center">
-                          {player.stats.disposals}
-                        </td>
-                        <td className="p-3 text-center">
-                          {player.stats.kicks}
-                        </td>
-                        <td className="p-3 text-center">
-                          {player.stats.handballs}
-                        </td>
-                        <td className="p-3 text-center">
-                          {player.stats.marks}
-                        </td>
-                        <td className="p-3 text-center">
-                          {player.stats.tackles}
-                        </td>
-                        <td className="p-3 text-center">
-                          {player.stats.goals}
-                        </td>
-                        <td className="p-3 text-center">
-                          {player.stats.efficiency}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <TabsContent value="crowd-monitor">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold">Crowd Monitor</h2>
+                <p className="text-gray-600">Stadium crowd analytics and safety monitoring</p>
               </div>
-            </CardContent>
-          </Card>
+            </TabsContent>
+
+            <TabsContent value="reports">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold">Reports</h2>
+                <p className="text-gray-600">Generate and download analytical reports</p>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="video-analysis">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold">Video Analysis</h2>
+                <p className="text-gray-600">AI-powered video analysis and insights</p>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
