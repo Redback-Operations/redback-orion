@@ -164,43 +164,88 @@ const matchEvents = [
   },
 ];
 
-const crowdZones = [
-  {
-    zone: "Northern Stand",
-    capacity: 15000,
-    current: 13200,
-    density: 88,
-    trend: "up",
-  },
-  {
-    zone: "Southern Stand",
-    capacity: 12000,
-    current: 11400,
-    density: 95,
-    trend: "stable",
-  },
-  {
-    zone: "Eastern Wing",
-    capacity: 8000,
-    current: 6800,
-    density: 85,
-    trend: "down",
-  },
-  {
-    zone: "Western Wing",
-    capacity: 8000,
-    current: 7600,
-    density: 95,
-    trend: "up",
-  },
-  {
-    zone: "Premium Seating",
-    capacity: 3000,
-    current: 2850,
-    density: 95,
-    trend: "stable",
-  },
-];
+// Generate dynamic crowd zones for AFL ground
+const generateAFLCrowdZones = () => {
+  const baseZones = [
+    {
+      zone: "Northern Stand",
+      capacity: 15000,
+      position: { top: "5%", left: "25%", width: "50%", height: "15%" },
+      color: "#ef4444",
+    },
+    {
+      zone: "Southern Stand",
+      capacity: 12000,
+      position: { bottom: "5%", left: "25%", width: "50%", height: "15%" },
+      color: "#dc2626",
+    },
+    {
+      zone: "Eastern Wing",
+      capacity: 8000,
+      position: { top: "25%", right: "5%", width: "15%", height: "50%" },
+      color: "#f59e0b",
+    },
+    {
+      zone: "Western Wing",
+      capacity: 8000,
+      position: { top: "25%", left: "5%", width: "15%", height: "50%" },
+      color: "#dc2626",
+    },
+    {
+      zone: "Northeast Corner",
+      capacity: 5000,
+      position: { top: "15%", right: "15%", width: "20%", height: "20%" },
+      color: "#f97316",
+    },
+    {
+      zone: "Northwest Corner",
+      capacity: 5000,
+      position: { top: "15%", left: "15%", width: "20%", height: "20%" },
+      color: "#eab308",
+    },
+    {
+      zone: "Southeast Corner",
+      capacity: 5000,
+      position: { bottom: "15%", right: "15%", width: "20%", height: "20%" },
+      color: "#f97316",
+    },
+    {
+      zone: "Southwest Corner",
+      capacity: 5000,
+      position: { bottom: "15%", left: "15%", width: "20%", height: "20%" },
+      color: "#f59e0b",
+    },
+  ];
+
+  return baseZones.map((zone) => {
+    // Simulate realistic crowd fluctuations
+    const variation = (Math.random() - 0.5) * 0.1; // ±10% variation
+    const baseOccupancy = 0.75 + variation; // Base 75% occupancy with variation
+    const current = Math.round(zone.capacity * Math.max(0.4, Math.min(0.98, baseOccupancy)));
+    const density = Math.round((current / zone.capacity) * 100);
+
+    // Dynamic color based on density
+    let color = "#22c55e"; // green - low
+    if (density >= 95) color = "#dc2626"; // red - critical
+    else if (density >= 85) color = "#f97316"; // orange - high
+    else if (density >= 70) color = "#f59e0b"; // amber - medium
+    else if (density >= 50) color = "#eab308"; // yellow - low-medium
+
+    // Random trend
+    const trends = ["up", "down", "stable"];
+    const trend = trends[Math.floor(Math.random() * trends.length)];
+
+    return {
+      ...zone,
+      current,
+      density,
+      trend,
+      color,
+    };
+  });
+};
+
+const [crowdZones, setCrowdZones] = useState(generateAFLCrowdZones());
 
 type QueueItem = {
   id: string;
