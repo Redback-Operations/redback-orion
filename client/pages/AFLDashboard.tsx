@@ -1538,7 +1538,7 @@ ${clip.event} (${clip.time}):
 
 EXPORT DETAILS
 ==============
-�� Export Format: Metadata Analysis (TXT)
+• Export Format: Metadata Analysis (TXT)
 • Processing Time: ${Math.floor(Math.random() * 3 + 1)} minutes
 • Clips Ready for Download: ${clipEvents.length}
 • Analysis Confidence: 94.8%
@@ -2812,10 +2812,14 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                               }
                               labelLine={false}
                             >
-                              <Cell fill="#22c55e" />
-                              <Cell fill="#f59e0b" />
-                              <Cell fill="#f97316" />
-                              <Cell fill="#dc2626" />
+                              {[
+                                { name: "Low (0-49%)", value: crowdZones.filter(zone => zone.density < 50).length, color: "#22c55e" },
+                                { name: "Medium (50-84%)", value: crowdZones.filter(zone => zone.density >= 50 && zone.density < 85).length, color: "#f59e0b" },
+                                { name: "High (85-94%)", value: crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length, color: "#f97316" },
+                                { name: "Critical (95%+)", value: crowdZones.filter(zone => zone.density >= 95).length, color: "#dc2626" }
+                              ].filter(item => item.value > 0).map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
                             </Pie>
                             <Tooltip />
                             <Legend
