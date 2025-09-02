@@ -1538,7 +1538,7 @@ ${clip.event} (${clip.time}):
 
 EXPORT DETAILS
 ==============
-• Export Format: Metadata Analysis (TXT)
+�� Export Format: Metadata Analysis (TXT)
 • Processing Time: ${Math.floor(Math.random() * 3 + 1)} minutes
 • Clips Ready for Download: ${clipEvents.length}
 • Analysis Confidence: 94.8%
@@ -3000,27 +3000,18 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                          <span className="text-sm font-medium">16:00</span>
-                          <div className="text-right">
-                            <div className="text-sm font-bold">55,000</div>
-                            <div className="text-xs text-gray-600">92% density</div>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                          <span className="text-sm font-medium">15:00</span>
-                          <div className="text-right">
-                            <div className="text-sm font-bold">53,000</div>
-                            <div className="text-xs text-gray-600">88% density</div>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                          <span className="text-sm font-medium">17:00</span>
-                          <div className="text-right">
-                            <div className="text-sm font-bold">52,000</div>
-                            <div className="text-xs text-gray-600">87% density</div>
-                          </div>
-                        </div>
+                        {generateTimelineFromStadiumData(crowdZones)
+                          .sort((a, b) => b.attendance - a.attendance)
+                          .slice(0, 3)
+                          .map((entry, index) => (
+                            <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                              <span className="text-sm font-medium">{entry.time}</span>
+                              <div className="text-right">
+                                <div className="text-sm font-bold">{entry.attendance.toLocaleString()}</div>
+                                <div className="text-xs text-gray-600">{entry.density}% density</div>
+                              </div>
+                            </div>
+                          ))}
                       </div>
                     </CardContent>
                   </Card>
@@ -3032,16 +3023,22 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <CardContent>
                       <div className="space-y-3">
                         <div className="p-3 bg-blue-50 rounded">
-                          <div className="text-lg font-bold text-blue-700">79%</div>
-                          <div className="text-sm text-blue-600">Average Density</div>
+                          <div className="text-lg font-bold text-blue-700">
+                            {Math.round(crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length)}%
+                          </div>
+                          <div className="text-sm text-blue-600">Current Average Density</div>
                         </div>
                         <div className="p-3 bg-red-50 rounded">
-                          <div className="text-lg font-bold text-red-700">3</div>
-                          <div className="text-sm text-red-600">Max Critical Zones</div>
+                          <div className="text-lg font-bold text-red-700">
+                            {crowdZones.filter(zone => zone.density >= 95).length}
+                          </div>
+                          <div className="text-sm text-red-600">Critical Zones</div>
                         </div>
                         <div className="p-3 bg-orange-50 rounded">
-                          <div className="text-lg font-bold text-orange-700">3</div>
-                          <div className="text-sm text-orange-600">Max High Density Zones</div>
+                          <div className="text-lg font-bold text-orange-700">
+                            {crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length}
+                          </div>
+                          <div className="text-sm text-orange-600">High Density Zones</div>
                         </div>
                       </div>
                     </CardContent>
@@ -3054,15 +3051,21 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <CardContent>
                       <div className="space-y-3">
                         <div className="p-3 bg-green-50 rounded">
-                          <div className="text-lg font-bold text-green-700">92%</div>
+                          <div className="text-lg font-bold text-green-700">
+                            {Math.round((crowdZones.reduce((sum, zone) => sum + zone.current, 0) / crowdZones.reduce((sum, zone) => sum + zone.capacity, 0)) * 100)}%
+                          </div>
                           <div className="text-sm text-green-600">Current Stadium Fill</div>
                         </div>
                         <div className="p-3 bg-purple-50 rounded">
-                          <div className="text-lg font-bold text-purple-700">55,000</div>
-                          <div className="text-sm text-purple-600">Peak Attendance</div>
+                          <div className="text-lg font-bold text-purple-700">
+                            {crowdZones.reduce((sum, zone) => sum + zone.current, 0).toLocaleString()}
+                          </div>
+                          <div className="text-sm text-purple-600">Current Attendance</div>
                         </div>
                         <div className="p-3 bg-gray-50 rounded">
-                          <div className="text-lg font-bold text-gray-700">5,000</div>
+                          <div className="text-lg font-bold text-gray-700">
+                            {(crowdZones.reduce((sum, zone) => sum + zone.capacity, 0) - crowdZones.reduce((sum, zone) => sum + zone.current, 0)).toLocaleString()}
+                          </div>
                           <div className="text-sm text-gray-600">Available Capacity</div>
                         </div>
                       </div>
