@@ -2033,7 +2033,11 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         </div>
 
                         <div
-                          className="relative w-full max-w-sm mx-auto cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                          className={`relative w-full mx-auto cursor-pointer transform transition-all duration-500 hover:shadow-xl ${
+                            expandedCardId === playerCards[selectedCardIndex].id
+                              ? 'max-w-2xl scale-105'
+                              : 'max-w-sm hover:scale-105'
+                          }`}
                           onClick={() =>
                             handleCardClick(
                               playerCards[selectedCardIndex],
@@ -2043,6 +2047,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         >
                           {(() => {
                             const card = playerCards[selectedCardIndex];
+                            const isExpanded = expandedCardId === card.id;
                             return (
                               <>
                                 <div className="absolute top-3 left-3 z-20">
@@ -2059,26 +2064,66 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                     #{card.number}
                                   </div>
                                 </div>
+                                {isExpanded && (
+                                  <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
+                                    <div className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                                      EXPANDED VIEW
+                                    </div>
+                                  </div>
+                                )}
                                 <div
-                                  className={`relative h-96 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b ${card.background}`}
+                                  className={`relative rounded-lg overflow-hidden shadow-lg border-2 bg-gradient-to-b ${card.background} transition-all duration-500 ${
+                                    isExpanded ? 'h-[600px] border-green-400' : 'h-96 border-gray-200'
+                                  }`}
                                 >
                                   <img
                                     src={card.image}
                                     alt={card.name}
-                                    className="w-full h-full object-cover opacity-60"
+                                    className={`w-full h-full object-cover transition-opacity duration-500 ${
+                                      isExpanded ? 'opacity-90' : 'opacity-60'
+                                    }`}
                                   />
-                                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-                                  <div className="absolute top-12 left-3 right-3 z-10">
-                                    <h3 className="text-white font-bold text-xl leading-tight">
+                                  <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-500 ${
+                                    isExpanded
+                                      ? 'from-transparent via-black/20 to-black/90'
+                                      : 'from-transparent via-transparent to-black/80'
+                                  }`} />
+                                  <div className={`absolute left-3 right-3 z-10 transition-all duration-500 ${
+                                    isExpanded ? 'top-16' : 'top-12'
+                                  }`}>
+                                    <h3 className={`text-white font-bold leading-tight transition-all duration-500 ${
+                                      isExpanded ? 'text-3xl' : 'text-xl'
+                                    }`}>
                                       {card.name}
                                     </h3>
-                                    <p className="text-white/80 text-base">
+                                    <p className={`text-white/80 transition-all duration-500 ${
+                                      isExpanded ? 'text-xl' : 'text-base'
+                                    }`}>
                                       {card.team}
                                     </p>
+                                    {isExpanded && (
+                                      <div className="mt-4 flex gap-3 opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.3s_forwards]">
+                                        <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-sm">
+                                          🏆 Season MVP
+                                        </div>
+                                        <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-sm">
+                                          ⭐ Top Performer
+                                        </div>
+                                        <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-sm">
+                                          💪 Best Midfielder
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
-                                  <div className="absolute bottom-20 left-3 right-3 z-10">
-                                    <div className="bg-black/80 backdrop-blur-sm rounded p-4">
-                                      <div className="text-white text-sm space-y-2">
+                                  <div className={`absolute left-3 right-3 z-10 transition-all duration-500 ${
+                                    isExpanded ? 'bottom-40' : 'bottom-20'
+                                  }`}>
+                                    <div className={`bg-black/80 backdrop-blur-sm rounded transition-all duration-500 ${
+                                      isExpanded ? 'p-6' : 'p-4'
+                                    }`}>
+                                      <div className={`text-white space-y-2 transition-all duration-500 ${
+                                        isExpanded ? 'text-base' : 'text-sm'
+                                      }`}>
                                         <div className="flex justify-between">
                                           <span>GOAL ACCURACY:</span>
                                           <span className="font-bold">
@@ -2097,30 +2142,80 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                             {card.stats.disposals}
                                           </span>
                                         </div>
+                                        {isExpanded && (
+                                          <div className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.4s_forwards]">
+                                            <div className="border-t border-white/20 my-3"></div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                              <div className="flex justify-between">
+                                                <span>EFFICIENCY:</span>
+                                                <span className="font-bold">87%</span>
+                                              </div>
+                                              <div className="flex justify-between">
+                                                <span>INTERCEPTS:</span>
+                                                <span className="font-bold">3</span>
+                                              </div>
+                                              <div className="flex justify-between">
+                                                <span>CONTESTED MARKS:</span>
+                                                <span className="font-bold">4</span>
+                                              </div>
+                                              <div className="flex justify-between">
+                                                <span>ONE PERCENTERS:</span>
+                                                <span className="font-bold">7</span>
+                                              </div>
+                                            </div>
+                                            <div className="border-t border-white/20 mt-3 pt-3">
+                                              <div className="text-center">
+                                                <span className="text-white/70 text-sm">MATCH RATING</span>
+                                                <div className="text-yellow-400 text-2xl font-bold">★ 9.2/10</div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
-                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-4 z-10">
-                                    <div className="grid grid-cols-3 gap-2 text-white text-center">
+                                  <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 z-10 transition-all duration-500 ${
+                                    isExpanded ? 'p-6' : 'p-4'
+                                  }`}>
+                                    <div className={`grid grid-cols-3 gap-2 text-white text-center transition-all duration-500 ${
+                                      isExpanded ? 'mb-3' : ''
+                                    }`}>
                                       <div>
-                                        <div className="font-bold text-xl">
+                                        <div className={`font-bold transition-all duration-500 ${
+                                          isExpanded ? 'text-2xl' : 'text-xl'
+                                        }`}>
                                           {card.stats.kicks}
                                         </div>
-                                        <div className="text-sm">KICKS</div>
+                                        <div className={`transition-all duration-500 ${
+                                          isExpanded ? 'text-base' : 'text-sm'
+                                        }`}>KICKS</div>
                                       </div>
                                       <div>
-                                        <div className="font-bold text-xl">
+                                        <div className={`font-bold transition-all duration-500 ${
+                                          isExpanded ? 'text-2xl' : 'text-xl'
+                                        }`}>
                                           {card.stats.marks}
                                         </div>
-                                        <div className="text-sm">MARKS</div>
+                                        <div className={`transition-all duration-500 ${
+                                          isExpanded ? 'text-base' : 'text-sm'
+                                        }`}>MARKS</div>
                                       </div>
                                       <div>
-                                        <div className="font-bold text-xl">
+                                        <div className={`font-bold transition-all duration-500 ${
+                                          isExpanded ? 'text-2xl' : 'text-xl'
+                                        }`}>
                                           {card.stats.tackles}
                                         </div>
-                                        <div className="text-sm">TACKLES</div>
+                                        <div className={`transition-all duration-500 ${
+                                          isExpanded ? 'text-base' : 'text-sm'
+                                        }`}>TACKLES</div>
                                       </div>
                                     </div>
+                                    {isExpanded && (
+                                      <div className="text-center text-white/80 text-sm opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.5s_forwards]">
+                                        Click again to collapse • Background image more visible • Full player details shown
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </>
