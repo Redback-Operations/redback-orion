@@ -50,6 +50,7 @@ import {
   Eye,
   AlertTriangle,
   RefreshCw,
+  Loader2,
 } from "lucide-react";
 
 // Mock API endpoints and their status
@@ -792,7 +793,7 @@ export default function ApiDiagnostics() {
                       >
                         {isTesting ? (
                           <>
-                            <Loader className="w-4 h-4 mr-2 animate-spin" />
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             Testing...
                           </>
                         ) : (
