@@ -1608,6 +1608,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
   const handleCardClick = (card, index) => {
     setSelectedCard(card);
     setSelectedCardIndex(index);
+    setModalPlayerCard(card);
+    setShowPlayerModal(true);
   };
 
   return (
