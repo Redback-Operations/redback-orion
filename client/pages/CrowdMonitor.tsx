@@ -681,48 +681,74 @@ export default function CrowdMonitor() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5" />
-                      Density Distribution
+                      <PieChart className="w-5 h-5" />
+                      Density Distribution Pie Chart
                     </CardTitle>
+                    <CardDescription>
+                      Visual breakdown of zones by density levels
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
-                      {["Low", "Low-Medium", "Medium", "High", "Critical"].map(
-                        (level, index) => {
-                          const ranges = [
-                            { min: 0, max: 49, color: "bg-green-500" },
-                            { min: 50, max: 69, color: "bg-yellow-500" },
-                            { min: 70, max: 84, color: "bg-amber-500" },
-                            { min: 85, max: 94, color: "bg-orange-500" },
-                            { min: 95, max: 100, color: "bg-red-600" },
-                          ];
-                          const range = ranges[index];
-                          const zonesInRange = crowdZones.filter(
-                            (zone) =>
-                              zone.density >= range.min &&
-                              zone.density <= range.max,
-                          ).length;
-                          const percentage =
-                            (zonesInRange / crowdZones.length) * 100;
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPieChart>
+                          <Pie
+                            data={pieChartData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={120}
+                            paddingAngle={2}
+                            dataKey="value"
+                            label={({ value, percent }) =>
+                              value > 0 ? `${value} (${(percent * 100).toFixed(0)}%)` : ''
+                            }
+                            labelLine={false}
+                          >
+                            {pieChartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip content={({ active, payload }) => renderPieTooltip(active, payload)} />
+                          <Legend
+                            verticalAlign="bottom"
+                            height={36}
+                            formatter={(value) => (
+                              <span className="text-sm">{value}</span>
+                            )}
+                          />
+                        </RechartsPieChart>
+                      </ResponsiveContainer>
+                    </div>
 
-                          return (
-                            <div key={level} className="space-y-1">
-                              <div className="flex justify-between text-sm">
-                                <span>
-                                  {level} ({range.min}-{range.max}%)
-                                </span>
-                                <span>{zonesInRange} zones</span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div
-                                  className={`h-2 rounded-full ${range.color}`}
-                                  style={{ width: `${percentage}%` }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        },
-                      )}
+                    {/* Summary below chart */}
+                    <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>Total Zones:</span>
+                          <span className="font-medium">{crowdZones.length}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Safe Zones:</span>
+                          <span className="font-medium text-green-600">
+                            {crowdZones.filter(zone => zone.density < 85).length}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>Alert Zones:</span>
+                          <span className="font-medium text-orange-600">
+                            {highDensityZones.length}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Critical Zones:</span>
+                          <span className="font-medium text-red-600">
+                            {criticalZones.length}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
