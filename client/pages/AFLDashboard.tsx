@@ -245,8 +245,6 @@ const generateAFLCrowdZones = () => {
   });
 };
 
-const [crowdZones, setCrowdZones] = useState(generateAFLCrowdZones());
-
 type QueueItem = {
   id: string;
   name: string;
