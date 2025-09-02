@@ -1545,7 +1545,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       id: 4,
       name: "DUSTIN MARTIN",
       team: "Richmond",
-      number: 4,
+      number: 3,
       background: "from-yellow-500 to-yellow-600",
       image: "https://images.pexels.com/photos/6078307/pexels-photo-6078307.jpeg",
       stats: {
@@ -1898,7 +1898,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                         🏆 Season MVP
                                       </div>
                                       <div className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-xs">
-                                        ⭐ Top Performer
+                                        ��� Top Performer
                                       </div>
                                     </div>
                                   )}
