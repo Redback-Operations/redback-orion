@@ -1607,8 +1607,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
   const handleCardClick = (card, index) => {
     setSelectedCard(card);
     setSelectedCardIndex(index);
-    setModalPlayerCard(card);
-    setShowPlayerModal(true);
+    // Toggle expanded state
+    setExpandedCardId(expandedCardId === card.id ? null : card.id);
   };
 
   return (
