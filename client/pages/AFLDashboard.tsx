@@ -276,48 +276,8 @@ export default function AFLDashboard() {
   const [isLive, setIsLive] = useState(true);
   const [userEmail, setUserEmail] = useState("");
 
-  // Dynamic crowd zones state
-  const [crowdZones, setCrowdZones] = useState(generateAFLCrowdZones());
-
-  // Real-time crowd data updates
-  useEffect(() => {
-    if (!isLive) return;
-
-    const interval = setInterval(() => {
-      setCrowdZones(prevZones =>
-        prevZones.map(zone => {
-          // Simulate realistic crowd fluctuations
-          const change = (Math.random() - 0.5) * 0.05; // ±5% change
-          const newOccupancyRate = Math.max(0.4, Math.min(0.98,
-            (zone.current / zone.capacity) + change));
-          const newCurrent = Math.round(zone.capacity * newOccupancyRate);
-          const newDensity = Math.round((newCurrent / zone.capacity) * 100);
-
-          // Update color based on new density
-          let newColor = "#22c55e"; // green - low
-          if (newDensity >= 95) newColor = "#dc2626"; // red - critical
-          else if (newDensity >= 85) newColor = "#f97316"; // orange - high
-          else if (newDensity >= 70) newColor = "#f59e0b"; // amber - medium
-          else if (newDensity >= 50) newColor = "#eab308"; // yellow - low-medium
-
-          // Update trend based on change
-          let newTrend = "stable";
-          if (newCurrent > zone.current + 50) newTrend = "up";
-          else if (newCurrent < zone.current - 50) newTrend = "down";
-
-          return {
-            ...zone,
-            current: newCurrent,
-            density: newDensity,
-            color: newColor,
-            trend: newTrend,
-          };
-        })
-      );
-    }, 3000); // Update every 3 seconds
-
-    return () => clearInterval(interval);
-  }, [isLive]);
+  // Static crowd zones data
+  const crowdZones = getStaticAFLCrowdZones();
 
   // Player card display state
   const [showAllCards, setShowAllCards] = useState(false);
