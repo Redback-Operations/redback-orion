@@ -186,7 +186,10 @@ const generateTimelineData = () => {
     const variation = (Math.random() - 0.5) * 5000;
 
     data.push({
-      time: time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      time: time.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       totalAttendance: Math.round(baseAttendance + variation),
       averageDensity: Math.round(((baseAttendance + variation) / 60000) * 100),
       criticalZones: Math.floor(Math.random() * 3),
@@ -231,10 +234,15 @@ export default function CrowdMonitor() {
       );
 
       // Update timeline data
-      setTimelineData(prevData => {
+      setTimelineData((prevData) => {
         const newEntry = {
-          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-          totalAttendance: prevData[prevData.length - 1]?.totalAttendance + (Math.random() - 0.5) * 500 || 55000,
+          time: new Date().toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          totalAttendance:
+            prevData[prevData.length - 1]?.totalAttendance +
+              (Math.random() - 0.5) * 500 || 55000,
           averageDensity: 0,
           criticalZones: 0,
           highDensityZones: 0,
@@ -242,11 +250,18 @@ export default function CrowdMonitor() {
 
         // Calculate current metrics
         const total = crowdZones.reduce((sum, zone) => sum + zone.current, 0);
-        const capacity = crowdZones.reduce((sum, zone) => sum + zone.capacity, 0);
+        const capacity = crowdZones.reduce(
+          (sum, zone) => sum + zone.capacity,
+          0,
+        );
         newEntry.totalAttendance = total;
         newEntry.averageDensity = Math.round((total / capacity) * 100);
-        newEntry.criticalZones = crowdZones.filter(zone => zone.density >= 95).length;
-        newEntry.highDensityZones = crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length;
+        newEntry.criticalZones = crowdZones.filter(
+          (zone) => zone.density >= 95,
+        ).length;
+        newEntry.highDensityZones = crowdZones.filter(
+          (zone) => zone.density >= 85 && zone.density < 95,
+        ).length;
 
         return [...prevData.slice(-23), newEntry];
       });
@@ -271,35 +286,47 @@ export default function CrowdMonitor() {
   const pieChartData = [
     {
       name: "Low (0-49%)",
-      value: crowdZones.filter(zone => zone.density < 50).length,
+      value: crowdZones.filter((zone) => zone.density < 50).length,
       color: "#22c55e",
-      zones: crowdZones.filter(zone => zone.density < 50),
+      zones: crowdZones.filter((zone) => zone.density < 50),
     },
     {
       name: "Low-Medium (50-69%)",
-      value: crowdZones.filter(zone => zone.density >= 50 && zone.density < 70).length,
+      value: crowdZones.filter(
+        (zone) => zone.density >= 50 && zone.density < 70,
+      ).length,
       color: "#eab308",
-      zones: crowdZones.filter(zone => zone.density >= 50 && zone.density < 70),
+      zones: crowdZones.filter(
+        (zone) => zone.density >= 50 && zone.density < 70,
+      ),
     },
     {
       name: "Medium (70-84%)",
-      value: crowdZones.filter(zone => zone.density >= 70 && zone.density < 85).length,
+      value: crowdZones.filter(
+        (zone) => zone.density >= 70 && zone.density < 85,
+      ).length,
       color: "#f59e0b",
-      zones: crowdZones.filter(zone => zone.density >= 70 && zone.density < 85),
+      zones: crowdZones.filter(
+        (zone) => zone.density >= 70 && zone.density < 85,
+      ),
     },
     {
       name: "High (85-94%)",
-      value: crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length,
+      value: crowdZones.filter(
+        (zone) => zone.density >= 85 && zone.density < 95,
+      ).length,
       color: "#f97316",
-      zones: crowdZones.filter(zone => zone.density >= 85 && zone.density < 95),
+      zones: crowdZones.filter(
+        (zone) => zone.density >= 85 && zone.density < 95,
+      ),
     },
     {
       name: "Critical (95%+)",
-      value: crowdZones.filter(zone => zone.density >= 95).length,
+      value: crowdZones.filter((zone) => zone.density >= 95).length,
       color: "#dc2626",
-      zones: crowdZones.filter(zone => zone.density >= 95),
+      zones: crowdZones.filter((zone) => zone.density >= 95),
     },
-  ].filter(item => item.value > 0);
+  ].filter((item) => item.value > 0);
 
   // Custom tooltip for pie chart
   const renderPieTooltip = (active: boolean, payload: any[]) => {
@@ -309,7 +336,7 @@ export default function CrowdMonitor() {
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-medium">{data.name}</p>
           <p className="text-sm text-gray-600">
-            {data.value} zone{data.value !== 1 ? 's' : ''}
+            {data.value} zone{data.value !== 1 ? "s" : ""}
           </p>
           {data.zones.length > 0 && (
             <div className="mt-2 text-xs">
@@ -701,7 +728,9 @@ export default function CrowdMonitor() {
                             paddingAngle={2}
                             dataKey="value"
                             label={({ value, percent }) =>
-                              value > 0 ? `${value} (${(percent * 100).toFixed(0)}%)` : ''
+                              value > 0
+                                ? `${value} (${(percent * 100).toFixed(0)}%)`
+                                : ""
                             }
                             labelLine={false}
                           >
@@ -709,7 +738,11 @@ export default function CrowdMonitor() {
                               <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
                           </Pie>
-                          <Tooltip content={({ active, payload }) => renderPieTooltip(active, payload)} />
+                          <Tooltip
+                            content={({ active, payload }) =>
+                              renderPieTooltip(active, payload)
+                            }
+                          />
                           <Legend
                             verticalAlign="bottom"
                             height={36}
@@ -726,12 +759,17 @@ export default function CrowdMonitor() {
                       <div className="space-y-2">
                         <div className="flex justify-between">
                           <span>Total Zones:</span>
-                          <span className="font-medium">{crowdZones.length}</span>
+                          <span className="font-medium">
+                            {crowdZones.length}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Safe Zones:</span>
                           <span className="font-medium text-green-600">
-                            {crowdZones.filter(zone => zone.density < 85).length}
+                            {
+                              crowdZones.filter((zone) => zone.density < 85)
+                                .length
+                            }
                           </span>
                         </div>
                       </div>
@@ -943,7 +981,8 @@ export default function CrowdMonitor() {
                     Crowd Density Timeline
                   </CardTitle>
                   <CardDescription>
-                    Historical crowd data and density trends over the last 24 hours
+                    Historical crowd data and density trends over the last 24
+                    hours
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -960,26 +999,41 @@ export default function CrowdMonitor() {
                           yAxisId="attendance"
                           orientation="left"
                           tick={{ fontSize: 12 }}
-                          label={{ value: 'Attendance', angle: -90, position: 'insideLeft' }}
+                          label={{
+                            value: "Attendance",
+                            angle: -90,
+                            position: "insideLeft",
+                          }}
                         />
                         <YAxis
                           yAxisId="density"
                           orientation="right"
                           tick={{ fontSize: 12 }}
-                          label={{ value: 'Density %', angle: 90, position: 'insideRight' }}
+                          label={{
+                            value: "Density %",
+                            angle: 90,
+                            position: "insideRight",
+                          }}
                         />
                         <Tooltip
                           contentStyle={{
-                            backgroundColor: 'white',
-                            border: '1px solid #ccc',
-                            borderRadius: '8px',
-                            fontSize: '12px'
+                            backgroundColor: "white",
+                            border: "1px solid #ccc",
+                            borderRadius: "8px",
+                            fontSize: "12px",
                           }}
                           formatter={(value, name) => {
-                            if (name === 'totalAttendance') return [value.toLocaleString(), 'Total Attendance'];
-                            if (name === 'averageDensity') return [`${value}%`, 'Average Density'];
-                            if (name === 'criticalZones') return [value, 'Critical Zones'];
-                            if (name === 'highDensityZones') return [value, 'High Density Zones'];
+                            if (name === "totalAttendance")
+                              return [
+                                value.toLocaleString(),
+                                "Total Attendance",
+                              ];
+                            if (name === "averageDensity")
+                              return [`${value}%`, "Average Density"];
+                            if (name === "criticalZones")
+                              return [value, "Critical Zones"];
+                            if (name === "highDensityZones")
+                              return [value, "High Density Zones"];
                             return [value, name];
                           }}
                         />
@@ -1041,8 +1095,13 @@ export default function CrowdMonitor() {
                         .sort((a, b) => b.totalAttendance - a.totalAttendance)
                         .slice(0, 3)
                         .map((entry, index) => (
-                          <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <span className="text-sm font-medium">{entry.time}</span>
+                          <div
+                            key={index}
+                            className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                          >
+                            <span className="text-sm font-medium">
+                              {entry.time}
+                            </span>
                             <div className="text-right">
                               <div className="text-sm font-bold">
                                 {entry.totalAttendance.toLocaleString()}
@@ -1066,25 +1125,40 @@ export default function CrowdMonitor() {
                       <div className="p-3 bg-blue-50 rounded">
                         <div className="text-lg font-bold text-blue-700">
                           {Math.round(
-                            timelineData.reduce((sum, entry) => sum + entry.averageDensity, 0) /
-                            timelineData.length
-                          )}%
+                            timelineData.reduce(
+                              (sum, entry) => sum + entry.averageDensity,
+                              0,
+                            ) / timelineData.length,
+                          )}
+                          %
                         </div>
-                        <div className="text-sm text-blue-600">24h Average Density</div>
+                        <div className="text-sm text-blue-600">
+                          24h Average Density
+                        </div>
                       </div>
 
                       <div className="p-3 bg-red-50 rounded">
                         <div className="text-lg font-bold text-red-700">
-                          {Math.max(...timelineData.map(entry => entry.criticalZones))}
+                          {Math.max(
+                            ...timelineData.map((entry) => entry.criticalZones),
+                          )}
                         </div>
-                        <div className="text-sm text-red-600">Max Critical Zones</div>
+                        <div className="text-sm text-red-600">
+                          Max Critical Zones
+                        </div>
                       </div>
 
                       <div className="p-3 bg-orange-50 rounded">
                         <div className="text-lg font-bold text-orange-700">
-                          {Math.max(...timelineData.map(entry => entry.highDensityZones))}
+                          {Math.max(
+                            ...timelineData.map(
+                              (entry) => entry.highDensityZones,
+                            ),
+                          )}
                         </div>
-                        <div className="text-sm text-orange-600">Max High Density Zones</div>
+                        <div className="text-sm text-orange-600">
+                          Max High Density Zones
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -1098,23 +1172,43 @@ export default function CrowdMonitor() {
                     <div className="space-y-3">
                       <div className="p-3 bg-green-50 rounded">
                         <div className="text-lg font-bold text-green-700">
-                          {((timelineData[timelineData.length - 1]?.totalAttendance || 0) / totalCapacity * 100).toFixed(1)}%
+                          {(
+                            ((timelineData[timelineData.length - 1]
+                              ?.totalAttendance || 0) /
+                              totalCapacity) *
+                            100
+                          ).toFixed(1)}
+                          %
                         </div>
-                        <div className="text-sm text-green-600">Current Stadium Fill</div>
+                        <div className="text-sm text-green-600">
+                          Current Stadium Fill
+                        </div>
                       </div>
 
                       <div className="p-3 bg-purple-50 rounded">
                         <div className="text-lg font-bold text-purple-700">
-                          {Math.max(...timelineData.map(entry => entry.totalAttendance)).toLocaleString()}
+                          {Math.max(
+                            ...timelineData.map(
+                              (entry) => entry.totalAttendance,
+                            ),
+                          ).toLocaleString()}
                         </div>
-                        <div className="text-sm text-purple-600">Peak Attendance</div>
+                        <div className="text-sm text-purple-600">
+                          Peak Attendance
+                        </div>
                       </div>
 
                       <div className="p-3 bg-gray-50 rounded">
                         <div className="text-lg font-bold text-gray-700">
-                          {(totalCapacity - (timelineData[timelineData.length - 1]?.totalAttendance || 0)).toLocaleString()}
+                          {(
+                            totalCapacity -
+                            (timelineData[timelineData.length - 1]
+                              ?.totalAttendance || 0)
+                          ).toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600">Available Capacity</div>
+                        <div className="text-sm text-gray-600">
+                          Available Capacity
+                        </div>
                       </div>
                     </div>
                   </CardContent>

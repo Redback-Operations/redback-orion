@@ -166,20 +166,71 @@ const matchEvents = [
 
 // Generate timeline data based on current stadium zones
 const generateTimelineFromStadiumData = (crowdZones) => {
-  const currentAttendance = crowdZones.reduce((sum, zone) => sum + zone.current, 0);
-  const currentDensity = Math.round(crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length);
-  const currentCritical = crowdZones.filter(zone => zone.density >= 95).length;
-  const currentHigh = crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length;
+  const currentAttendance = crowdZones.reduce(
+    (sum, zone) => sum + zone.current,
+    0,
+  );
+  const currentDensity = Math.round(
+    crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length,
+  );
+  const currentCritical = crowdZones.filter(
+    (zone) => zone.density >= 95,
+  ).length;
+  const currentHigh = crowdZones.filter(
+    (zone) => zone.density >= 85 && zone.density < 95,
+  ).length;
 
   // Generate historical timeline showing progression to current state
   return [
-    { time: "12:00", attendance: Math.round(currentAttendance * 0.6), density: Math.round(currentDensity * 0.7), critical: 0, high: Math.max(0, currentHigh - 2) },
-    { time: "13:00", attendance: Math.round(currentAttendance * 0.7), density: Math.round(currentDensity * 0.8), critical: Math.max(0, currentCritical - 1), high: Math.max(0, currentHigh - 1) },
-    { time: "14:00", attendance: Math.round(currentAttendance * 0.8), density: Math.round(currentDensity * 0.85), critical: Math.max(0, currentCritical - 1), high: currentHigh },
-    { time: "15:00", attendance: Math.round(currentAttendance * 0.9), density: Math.round(currentDensity * 0.9), critical: currentCritical, high: currentHigh },
-    { time: "16:00", attendance: currentAttendance, density: currentDensity, critical: currentCritical, high: currentHigh },
-    { time: "17:00", attendance: Math.round(currentAttendance * 0.95), density: Math.round(currentDensity * 0.95), critical: Math.max(0, currentCritical - 1), high: currentHigh },
-    { time: "18:00", attendance: Math.round(currentAttendance * 0.85), density: Math.round(currentDensity * 0.9), critical: Math.max(0, currentCritical - 1), high: Math.max(0, currentHigh - 1) }
+    {
+      time: "12:00",
+      attendance: Math.round(currentAttendance * 0.6),
+      density: Math.round(currentDensity * 0.7),
+      critical: 0,
+      high: Math.max(0, currentHigh - 2),
+    },
+    {
+      time: "13:00",
+      attendance: Math.round(currentAttendance * 0.7),
+      density: Math.round(currentDensity * 0.8),
+      critical: Math.max(0, currentCritical - 1),
+      high: Math.max(0, currentHigh - 1),
+    },
+    {
+      time: "14:00",
+      attendance: Math.round(currentAttendance * 0.8),
+      density: Math.round(currentDensity * 0.85),
+      critical: Math.max(0, currentCritical - 1),
+      high: currentHigh,
+    },
+    {
+      time: "15:00",
+      attendance: Math.round(currentAttendance * 0.9),
+      density: Math.round(currentDensity * 0.9),
+      critical: currentCritical,
+      high: currentHigh,
+    },
+    {
+      time: "16:00",
+      attendance: currentAttendance,
+      density: currentDensity,
+      critical: currentCritical,
+      high: currentHigh,
+    },
+    {
+      time: "17:00",
+      attendance: Math.round(currentAttendance * 0.95),
+      density: Math.round(currentDensity * 0.95),
+      critical: Math.max(0, currentCritical - 1),
+      high: currentHigh,
+    },
+    {
+      time: "18:00",
+      attendance: Math.round(currentAttendance * 0.85),
+      density: Math.round(currentDensity * 0.9),
+      critical: Math.max(0, currentCritical - 1),
+      high: Math.max(0, currentHigh - 1),
+    },
   ];
 };
 
@@ -2648,7 +2699,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           className="absolute inset-6 border-4 border-green-600 bg-green-200"
                           style={{
                             borderRadius: "50%",
-                            clipPath: "ellipse(45% 40% at 50% 50%)"
+                            clipPath: "ellipse(45% 40% at 50% 50%)",
                           }}
                         >
                           {/* Goal squares */}
@@ -2680,7 +2731,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           >
                             <div className="p-2 text-white text-center">
                               <div className="text-xs font-medium leading-tight">
-                                {zone.zone.split(' ')[0]}
+                                {zone.zone.split(" ")[0]}
                               </div>
                               <div className="text-xs font-bold">
                                 {zone.density}%
@@ -2694,7 +2745,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
 
                         {/* Stadium info */}
                         <div className="absolute top-2 right-2 flex items-center gap-2">
-                          <span className="text-xs font-medium text-gray-700 bg-white/80 px-2 py-1 rounded">MCG</span>
+                          <span className="text-xs font-medium text-gray-700 bg-white/80 px-2 py-1 rounded">
+                            MCG
+                          </span>
                         </div>
                       </div>
 
@@ -2721,9 +2774,35 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
 
                         {/* Summary stats */}
                         <div className="flex justify-between items-center text-xs bg-gray-50 p-2 rounded">
-                          <span>Total Attendance: <strong>{crowdZones.reduce((sum, zone) => sum + zone.current, 0).toLocaleString()}</strong></span>
-                          <span>Avg Density: <strong>{Math.round(crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length)}%</strong></span>
-                          <span>Critical Zones: <strong className="text-red-600">{crowdZones.filter(zone => zone.density >= 95).length}</strong></span>
+                          <span>
+                            Total Attendance:{" "}
+                            <strong>
+                              {crowdZones
+                                .reduce((sum, zone) => sum + zone.current, 0)
+                                .toLocaleString()}
+                            </strong>
+                          </span>
+                          <span>
+                            Avg Density:{" "}
+                            <strong>
+                              {Math.round(
+                                crowdZones.reduce(
+                                  (sum, zone) => sum + zone.density,
+                                  0,
+                                ) / crowdZones.length,
+                              )}
+                              %
+                            </strong>
+                          </span>
+                          <span>
+                            Critical Zones:{" "}
+                            <strong className="text-red-600">
+                              {
+                                crowdZones.filter((zone) => zone.density >= 95)
+                                  .length
+                              }
+                            </strong>
+                          </span>
                         </div>
                       </div>
                     </CardContent>
@@ -2744,7 +2823,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="text-center p-4 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">
-                          {crowdZones.reduce((sum, zone) => sum + zone.current, 0).toLocaleString()}
+                          {crowdZones
+                            .reduce((sum, zone) => sum + zone.current, 0)
+                            .toLocaleString()}
                         </div>
                         <div className="text-sm text-gray-600">
                           Current Attendance
@@ -2755,7 +2836,13 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </div>
                       <div className="text-center p-4 bg-green-50 rounded-lg">
                         <div className="text-2xl font-bold text-green-600">
-                          {Math.round(crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length)}%
+                          {Math.round(
+                            crowdZones.reduce(
+                              (sum, zone) => sum + zone.density,
+                              0,
+                            ) / crowdZones.length,
+                          )}
+                          %
                         </div>
                         <div className="text-sm text-gray-600">
                           Average Density
@@ -2766,9 +2853,13 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </div>
                       <div className="text-center p-4 bg-purple-50 rounded-lg">
                         <div className="text-2xl font-bold text-purple-600">
-                          {crowdZones.reduce((sum, zone) => sum + zone.capacity, 0).toLocaleString()}
+                          {crowdZones
+                            .reduce((sum, zone) => sum + zone.capacity, 0)
+                            .toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600">Total Capacity</div>
+                        <div className="text-sm text-gray-600">
+                          Total Capacity
+                        </div>
                         <div className="text-xs text-gray-600 mt-1">
                           Stadium Maximum
                         </div>
@@ -2796,11 +2887,37 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           <PieChart>
                             <Pie
                               data={[
-                                { name: "Low (0-49%)", value: crowdZones.filter(zone => zone.density < 50).length, color: "#22c55e" },
-                                { name: "Medium (50-84%)", value: crowdZones.filter(zone => zone.density >= 50 && zone.density < 85).length, color: "#f59e0b" },
-                                { name: "High (85-94%)", value: crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length, color: "#f97316" },
-                                { name: "Critical (95%+)", value: crowdZones.filter(zone => zone.density >= 95).length, color: "#dc2626" }
-                              ].filter(item => item.value > 0)}
+                                {
+                                  name: "Low (0-49%)",
+                                  value: crowdZones.filter(
+                                    (zone) => zone.density < 50,
+                                  ).length,
+                                  color: "#22c55e",
+                                },
+                                {
+                                  name: "Medium (50-84%)",
+                                  value: crowdZones.filter(
+                                    (zone) =>
+                                      zone.density >= 50 && zone.density < 85,
+                                  ).length,
+                                  color: "#f59e0b",
+                                },
+                                {
+                                  name: "High (85-94%)",
+                                  value: crowdZones.filter(
+                                    (zone) =>
+                                      zone.density >= 85 && zone.density < 95,
+                                  ).length,
+                                  color: "#f97316",
+                                },
+                                {
+                                  name: "Critical (95%+)",
+                                  value: crowdZones.filter(
+                                    (zone) => zone.density >= 95,
+                                  ).length,
+                                  color: "#dc2626",
+                                },
+                              ].filter((item) => item.value > 0)}
                               cx="50%"
                               cy="50%"
                               innerRadius={60}
@@ -2808,18 +2925,51 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                               paddingAngle={2}
                               dataKey="value"
                               label={({ value, percent }) =>
-                                value > 0 ? `${value} (${(percent * 100).toFixed(0)}%)` : ''
+                                value > 0
+                                  ? `${value} (${(percent * 100).toFixed(0)}%)`
+                                  : ""
                               }
                               labelLine={false}
                             >
                               {[
-                                { name: "Low (0-49%)", value: crowdZones.filter(zone => zone.density < 50).length, color: "#22c55e" },
-                                { name: "Medium (50-84%)", value: crowdZones.filter(zone => zone.density >= 50 && zone.density < 85).length, color: "#f59e0b" },
-                                { name: "High (85-94%)", value: crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length, color: "#f97316" },
-                                { name: "Critical (95%+)", value: crowdZones.filter(zone => zone.density >= 95).length, color: "#dc2626" }
-                              ].filter(item => item.value > 0).map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
-                              ))}
+                                {
+                                  name: "Low (0-49%)",
+                                  value: crowdZones.filter(
+                                    (zone) => zone.density < 50,
+                                  ).length,
+                                  color: "#22c55e",
+                                },
+                                {
+                                  name: "Medium (50-84%)",
+                                  value: crowdZones.filter(
+                                    (zone) =>
+                                      zone.density >= 50 && zone.density < 85,
+                                  ).length,
+                                  color: "#f59e0b",
+                                },
+                                {
+                                  name: "High (85-94%)",
+                                  value: crowdZones.filter(
+                                    (zone) =>
+                                      zone.density >= 85 && zone.density < 95,
+                                  ).length,
+                                  color: "#f97316",
+                                },
+                                {
+                                  name: "Critical (95%+)",
+                                  value: crowdZones.filter(
+                                    (zone) => zone.density >= 95,
+                                  ).length,
+                                  color: "#dc2626",
+                                },
+                              ]
+                                .filter((item) => item.value > 0)
+                                .map((entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={entry.color}
+                                  />
+                                ))}
                             </Pie>
                             <Tooltip
                               content={({ active, payload }) => {
@@ -2829,26 +2979,45 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                   let zones = [];
 
                                   if (densityRange.includes("Low (0-49%)")) {
-                                    zones = crowdZones.filter(zone => zone.density < 50);
-                                  } else if (densityRange.includes("Medium (50-84%)")) {
-                                    zones = crowdZones.filter(zone => zone.density >= 50 && zone.density < 85);
-                                  } else if (densityRange.includes("High (85-94%)")) {
-                                    zones = crowdZones.filter(zone => zone.density >= 85 && zone.density < 95);
-                                  } else if (densityRange.includes("Critical (95%+)")) {
-                                    zones = crowdZones.filter(zone => zone.density >= 95);
+                                    zones = crowdZones.filter(
+                                      (zone) => zone.density < 50,
+                                    );
+                                  } else if (
+                                    densityRange.includes("Medium (50-84%)")
+                                  ) {
+                                    zones = crowdZones.filter(
+                                      (zone) =>
+                                        zone.density >= 50 && zone.density < 85,
+                                    );
+                                  } else if (
+                                    densityRange.includes("High (85-94%)")
+                                  ) {
+                                    zones = crowdZones.filter(
+                                      (zone) =>
+                                        zone.density >= 85 && zone.density < 95,
+                                    );
+                                  } else if (
+                                    densityRange.includes("Critical (95%+)")
+                                  ) {
+                                    zones = crowdZones.filter(
+                                      (zone) => zone.density >= 95,
+                                    );
                                   }
 
                                   return (
                                     <div className="bg-white p-3 border rounded-lg shadow-lg">
                                       <p className="font-medium">{data.name}</p>
                                       <p className="text-sm text-gray-600">
-                                        {data.value} zone{data.value !== 1 ? 's' : ''}
+                                        {data.value} zone
+                                        {data.value !== 1 ? "s" : ""}
                                       </p>
                                       {zones.length > 0 && (
                                         <div className="mt-2 text-xs">
                                           <p className="font-medium">Zones:</p>
                                           {zones.map((zone) => (
-                                            <p key={zone.zone}>• {zone.zone} ({zone.density}%)</p>
+                                            <p key={zone.zone}>
+                                              • {zone.zone} ({zone.density}%)
+                                            </p>
                                           ))}
                                         </div>
                                       )}
@@ -2874,12 +3043,17 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="space-y-2">
                           <div className="flex justify-between">
                             <span>Total Zones:</span>
-                            <span className="font-medium">{crowdZones.length}</span>
+                            <span className="font-medium">
+                              {crowdZones.length}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Safe Zones:</span>
                             <span className="font-medium text-green-600">
-                              {crowdZones.filter(zone => zone.density < 85).length}
+                              {
+                                crowdZones.filter((zone) => zone.density < 85)
+                                  .length
+                              }
                             </span>
                           </div>
                         </div>
@@ -2887,13 +3061,21 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           <div className="flex justify-between">
                             <span>Alert Zones:</span>
                             <span className="font-medium text-orange-600">
-                              {crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length}
+                              {
+                                crowdZones.filter(
+                                  (zone) =>
+                                    zone.density >= 85 && zone.density < 95,
+                                ).length
+                              }
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Critical Zones:</span>
                             <span className="font-medium text-red-600">
-                              {crowdZones.filter(zone => zone.density >= 95).length}
+                              {
+                                crowdZones.filter((zone) => zone.density >= 95)
+                                  .length
+                              }
                             </span>
                           </div>
                         </div>
@@ -2911,25 +3093,41 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <CardContent>
                       <div className="space-y-4">
                         {crowdZones.map((zone, index) => {
-                          const densityLevel = zone.density >= 95 ? "Critical" :
-                                             zone.density >= 85 ? "High" :
-                                             zone.density >= 70 ? "Medium" : "Low";
-                          const colorClass = zone.density >= 95 ? "text-red-600" :
-                                           zone.density >= 85 ? "text-orange-600" :
-                                           zone.density >= 70 ? "text-yellow-600" : "text-green-600";
+                          const densityLevel =
+                            zone.density >= 95
+                              ? "Critical"
+                              : zone.density >= 85
+                                ? "High"
+                                : zone.density >= 70
+                                  ? "Medium"
+                                  : "Low";
+                          const colorClass =
+                            zone.density >= 95
+                              ? "text-red-600"
+                              : zone.density >= 85
+                                ? "text-orange-600"
+                                : zone.density >= 70
+                                  ? "text-yellow-600"
+                                  : "text-green-600";
 
                           return (
                             <div key={index} className="p-3 border rounded-lg">
                               <div className="flex justify-between items-center mb-2">
                                 <span className="font-medium">{zone.zone}</span>
-                                <span className={`text-sm font-medium ${colorClass}`}>
+                                <span
+                                  className={`text-sm font-medium ${colorClass}`}
+                                >
                                   {densityLevel}
                                 </span>
                               </div>
-                              <Progress value={zone.density} className="h-2 mb-1" />
+                              <Progress
+                                value={zone.density}
+                                className="h-2 mb-1"
+                              />
                               <div className="text-xs text-gray-600">
-                                {zone.current.toLocaleString()} / {zone.capacity.toLocaleString()}
-                                ({zone.density}%)
+                                {zone.current.toLocaleString()} /{" "}
+                                {zone.capacity.toLocaleString()}({zone.density}
+                                %)
                               </div>
                             </div>
                           );
@@ -2963,26 +3161,41 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                             yAxisId="attendance"
                             orientation="left"
                             tick={{ fontSize: 12 }}
-                            label={{ value: 'Attendance', angle: -90, position: 'insideLeft' }}
+                            label={{
+                              value: "Attendance",
+                              angle: -90,
+                              position: "insideLeft",
+                            }}
                           />
                           <YAxis
                             yAxisId="density"
                             orientation="right"
                             tick={{ fontSize: 12 }}
-                            label={{ value: 'Density %', angle: 90, position: 'insideRight' }}
+                            label={{
+                              value: "Density %",
+                              angle: 90,
+                              position: "insideRight",
+                            }}
                           />
                           <Tooltip
                             contentStyle={{
-                              backgroundColor: 'white',
-                              border: '1px solid #ccc',
-                              borderRadius: '8px',
-                              fontSize: '12px'
+                              backgroundColor: "white",
+                              border: "1px solid #ccc",
+                              borderRadius: "8px",
+                              fontSize: "12px",
                             }}
                             formatter={(value, name) => {
-                              if (name === 'attendance') return [value.toLocaleString(), 'Total Attendance'];
-                              if (name === 'density') return [`${value}%`, 'Average Density'];
-                              if (name === 'critical') return [value, 'Critical Zones'];
-                              if (name === 'high') return [value, 'High Density Zones'];
+                              if (name === "attendance")
+                                return [
+                                  value.toLocaleString(),
+                                  "Total Attendance",
+                                ];
+                              if (name === "density")
+                                return [`${value}%`, "Average Density"];
+                              if (name === "critical")
+                                return [value, "Critical Zones"];
+                              if (name === "high")
+                                return [value, "High Density Zones"];
                               return [value, name];
                             }}
                           />
@@ -3044,11 +3257,20 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           .sort((a, b) => b.attendance - a.attendance)
                           .slice(0, 3)
                           .map((entry, index) => (
-                            <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                              <span className="text-sm font-medium">{entry.time}</span>
+                            <div
+                              key={index}
+                              className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                            >
+                              <span className="text-sm font-medium">
+                                {entry.time}
+                              </span>
                               <div className="text-right">
-                                <div className="text-sm font-bold">{entry.attendance.toLocaleString()}</div>
-                                <div className="text-xs text-gray-600">{entry.density}% density</div>
+                                <div className="text-sm font-bold">
+                                  {entry.attendance.toLocaleString()}
+                                </div>
+                                <div className="text-xs text-gray-600">
+                                  {entry.density}% density
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -3064,21 +3286,41 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       <div className="space-y-3">
                         <div className="p-3 bg-blue-50 rounded">
                           <div className="text-lg font-bold text-blue-700">
-                            {Math.round(crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length)}%
+                            {Math.round(
+                              crowdZones.reduce(
+                                (sum, zone) => sum + zone.density,
+                                0,
+                              ) / crowdZones.length,
+                            )}
+                            %
                           </div>
-                          <div className="text-sm text-blue-600">Current Average Density</div>
+                          <div className="text-sm text-blue-600">
+                            Current Average Density
+                          </div>
                         </div>
                         <div className="p-3 bg-red-50 rounded">
                           <div className="text-lg font-bold text-red-700">
-                            {crowdZones.filter(zone => zone.density >= 95).length}
+                            {
+                              crowdZones.filter((zone) => zone.density >= 95)
+                                .length
+                            }
                           </div>
-                          <div className="text-sm text-red-600">Critical Zones</div>
+                          <div className="text-sm text-red-600">
+                            Critical Zones
+                          </div>
                         </div>
                         <div className="p-3 bg-orange-50 rounded">
                           <div className="text-lg font-bold text-orange-700">
-                            {crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length}
+                            {
+                              crowdZones.filter(
+                                (zone) =>
+                                  zone.density >= 85 && zone.density < 95,
+                              ).length
+                            }
                           </div>
-                          <div className="text-sm text-orange-600">High Density Zones</div>
+                          <div className="text-sm text-orange-600">
+                            High Density Zones
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -3086,27 +3328,57 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Capacity Insights</CardTitle>
+                      <CardTitle className="text-lg">
+                        Capacity Insights
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         <div className="p-3 bg-green-50 rounded">
                           <div className="text-lg font-bold text-green-700">
-                            {Math.round((crowdZones.reduce((sum, zone) => sum + zone.current, 0) / crowdZones.reduce((sum, zone) => sum + zone.capacity, 0)) * 100)}%
+                            {Math.round(
+                              (crowdZones.reduce(
+                                (sum, zone) => sum + zone.current,
+                                0,
+                              ) /
+                                crowdZones.reduce(
+                                  (sum, zone) => sum + zone.capacity,
+                                  0,
+                                )) *
+                                100,
+                            )}
+                            %
                           </div>
-                          <div className="text-sm text-green-600">Current Stadium Fill</div>
+                          <div className="text-sm text-green-600">
+                            Current Stadium Fill
+                          </div>
                         </div>
                         <div className="p-3 bg-purple-50 rounded">
                           <div className="text-lg font-bold text-purple-700">
-                            {crowdZones.reduce((sum, zone) => sum + zone.current, 0).toLocaleString()}
+                            {crowdZones
+                              .reduce((sum, zone) => sum + zone.current, 0)
+                              .toLocaleString()}
                           </div>
-                          <div className="text-sm text-purple-600">Current Attendance</div>
+                          <div className="text-sm text-purple-600">
+                            Current Attendance
+                          </div>
                         </div>
                         <div className="p-3 bg-gray-50 rounded">
                           <div className="text-lg font-bold text-gray-700">
-                            {(crowdZones.reduce((sum, zone) => sum + zone.capacity, 0) - crowdZones.reduce((sum, zone) => sum + zone.current, 0)).toLocaleString()}
+                            {(
+                              crowdZones.reduce(
+                                (sum, zone) => sum + zone.capacity,
+                                0,
+                              ) -
+                              crowdZones.reduce(
+                                (sum, zone) => sum + zone.current,
+                                0,
+                              )
+                            ).toLocaleString()}
                           </div>
-                          <div className="text-sm text-gray-600">Available Capacity</div>
+                          <div className="text-sm text-gray-600">
+                            Available Capacity
+                          </div>
                         </div>
                       </div>
                     </CardContent>
