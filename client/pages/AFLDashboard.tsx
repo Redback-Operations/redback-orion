@@ -2518,147 +2518,452 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
 
           {/* Crowd Monitoring Dashboard */}
           <TabsContent value="crowd" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="w-5 h-5" />
-                    Stadium Zone Density
-                  </CardTitle>
-                  <CardDescription>
-                    Real-time crowd distribution across stadium zones
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {crowdZones.map((zone, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium">{zone.zone}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600">
-                              {zone.current.toLocaleString()} /{" "}
-                              {zone.capacity.toLocaleString()}
-                            </span>
-                            {zone.trend === "up" && (
-                              <TrendingUp className="w-4 h-4 text-green-500" />
-                            )}
-                            {zone.trend === "down" && (
-                              <TrendingDown className="w-4 h-4 text-red-500" />
-                            )}
-                            {zone.trend === "stable" && (
-                              <div className="w-4 h-4 rounded-full bg-gray-400" />
-                            )}
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="timeline">Timeline</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview" className="space-y-6">
+                <div className="grid lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <MapPin className="w-5 h-5" />
+                        Stadium Zone Density
+                      </CardTitle>
+                      <CardDescription>
+                        Real-time crowd distribution across stadium zones
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {crowdZones.map((zone, index) => (
+                          <div key={index} className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">{zone.zone}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-600">
+                                  {zone.current.toLocaleString()} /{" "}
+                                  {zone.capacity.toLocaleString()}
+                                </span>
+                                {zone.trend === "up" && (
+                                  <TrendingUp className="w-4 h-4 text-green-500" />
+                                )}
+                                {zone.trend === "down" && (
+                                  <TrendingDown className="w-4 h-4 text-red-500" />
+                                )}
+                                {zone.trend === "stable" && (
+                                  <div className="w-4 h-4 rounded-full bg-gray-400" />
+                                )}
+                              </div>
+                            </div>
+                            <Progress value={zone.density} className="h-3" />
+                            <div className="text-xs text-gray-600 text-right">
+                              {zone.density}% capacity
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Eye className="w-5 h-5" />
+                        Visual Stadium Map
+                      </CardTitle>
+                      <CardDescription>
+                        Interactive crowd density visualization
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="relative bg-green-100 rounded-lg p-6 min-h-64">
+                        {/* Stadium representation */}
+                        <div className="absolute inset-4 border-2 border-green-600 rounded-lg">
+                          <div className="absolute inset-2 border border-green-400 rounded-lg bg-green-200">
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-medium text-green-800">
+                              FIELD
+                            </div>
                           </div>
                         </div>
-                        <Progress value={zone.density} className="h-3" />
-                        <div className="text-xs text-gray-600 text-right">
-                          {zone.density}% capacity
+
+                        {/* Zone overlays */}
+                        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-red-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
+                          Northern (95%)
+                        </div>
+                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
+                          Southern (95%)
+                        </div>
+                        <div className="absolute left-2 top-1/2 transform -translate-y-1/2 rotate-90 bg-green-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
+                          Eastern (85%)
+                        </div>
+                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 -rotate-90 bg-red-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
+                          Western (95%)
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Eye className="w-5 h-5" />
-                    Visual Stadium Map
-                  </CardTitle>
-                  <CardDescription>
-                    Interactive crowd density visualization
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="relative bg-green-100 rounded-lg p-6 min-h-64">
-                    {/* Stadium representation */}
-                    <div className="absolute inset-4 border-2 border-green-600 rounded-lg">
-                      <div className="absolute inset-2 border border-green-400 rounded-lg bg-green-200">
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-medium text-green-800">
-                          FIELD
+                      <div className="mt-4 flex justify-between items-center text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-green-500 rounded"></div>
+                          <span>Low Density</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+                          <span>Medium Density</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-red-500 rounded"></div>
+                          <span>High Density</span>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Zone overlays */}
-                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-red-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-                      Northern (95%)
-                    </div>
-                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-                      Southern (95%)
-                    </div>
-                    <div className="absolute left-2 top-1/2 transform -translate-y-1/2 rotate-90 bg-green-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-                      Eastern (85%)
-                    </div>
-                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 -rotate-90 bg-red-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded">
-                      Western (95%)
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex justify-between items-center text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded"></div>
-                      <span>Low Density</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                      <span>Medium Density</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-red-500 rounded"></div>
-                      <span>High Density</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  Historical Crowd Data
-                </CardTitle>
-                <CardDescription>
-                  Crowd patterns from previous matches
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      47,326
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Average Attendance
-                    </div>
-                    <div className="text-xs text-green-600 mt-1">
-                      +3.2% vs last season
-                    </div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">89%</div>
-                    <div className="text-sm text-gray-600">
-                      Average Capacity
-                    </div>
-                    <div className="text-xs text-green-600 mt-1">
-                      +5.1% vs last season
-                    </div>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
-                      2:45 PM
-                    </div>
-                    <div className="text-sm text-gray-600">Peak Entry Time</div>
-                    <div className="text-xs text-gray-600 mt-1">
-                      15 min before bounce
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="w-5 h-5" />
+                      Historical Crowd Data
+                    </CardTitle>
+                    <CardDescription>
+                      Crowd patterns from previous matches
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center p-4 bg-blue-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">
+                          47,326
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Average Attendance
+                        </div>
+                        <div className="text-xs text-green-600 mt-1">
+                          +3.2% vs last season
+                        </div>
+                      </div>
+                      <div className="text-center p-4 bg-green-50 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">89%</div>
+                        <div className="text-sm text-gray-600">
+                          Average Capacity
+                        </div>
+                        <div className="text-xs text-green-600 mt-1">
+                          +5.1% vs last season
+                        </div>
+                      </div>
+                      <div className="text-center p-4 bg-purple-50 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">
+                          2:45 PM
+                        </div>
+                        <div className="text-sm text-gray-600">Peak Entry Time</div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          15 min before bounce
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="analytics" className="space-y-6">
+                <div className="grid lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <PieChart className="w-5 h-5" />
+                        Density Distribution Pie Chart
+                      </CardTitle>
+                      <CardDescription>
+                        Visual breakdown of zones by density levels
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={[
+                                { name: "Low (0-49%)", value: 1, color: "#22c55e" },
+                                { name: "Medium (50-84%)", value: 2, color: "#f59e0b" },
+                                { name: "High (85-94%)", value: 2, color: "#f97316" },
+                                { name: "Critical (95%+)", value: 3, color: "#dc2626" }
+                              ]}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={120}
+                              paddingAngle={2}
+                              dataKey="value"
+                              label={({ value, percent }) =>
+                                value > 0 ? `${value} (${(percent * 100).toFixed(0)}%)` : ''
+                              }
+                              labelLine={false}
+                            >
+                              <Cell fill="#22c55e" />
+                              <Cell fill="#f59e0b" />
+                              <Cell fill="#f97316" />
+                              <Cell fill="#dc2626" />
+                            </Pie>
+                            <Tooltip />
+                            <Legend
+                              verticalAlign="bottom"
+                              height={36}
+                              formatter={(value) => (
+                                <span className="text-sm">{value}</span>
+                              )}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      {/* Summary below chart */}
+                      <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Total Zones:</span>
+                            <span className="font-medium">8</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Safe Zones:</span>
+                            <span className="font-medium text-green-600">3</span>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Alert Zones:</span>
+                            <span className="font-medium text-orange-600">2</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Critical Zones:</span>
+                            <span className="font-medium text-red-600">3</span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5" />
+                        Zone Analysis
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {crowdZones.map((zone, index) => {
+                          const densityLevel = zone.density >= 95 ? "Critical" :
+                                             zone.density >= 85 ? "High" :
+                                             zone.density >= 70 ? "Medium" : "Low";
+                          const colorClass = zone.density >= 95 ? "text-red-600" :
+                                           zone.density >= 85 ? "text-orange-600" :
+                                           zone.density >= 70 ? "text-yellow-600" : "text-green-600";
+
+                          return (
+                            <div key={index} className="p-3 border rounded-lg">
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="font-medium">{zone.zone}</span>
+                                <span className={`text-sm font-medium ${colorClass}`}>
+                                  {densityLevel}
+                                </span>
+                              </div>
+                              <Progress value={zone.density} className="h-2 mb-1" />
+                              <div className="text-xs text-gray-600">
+                                {zone.current.toLocaleString()} / {zone.capacity.toLocaleString()}
+                                ({zone.density}%)
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="timeline" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="w-5 h-5" />
+                      Crowd Density Timeline
+                    </CardTitle>
+                    <CardDescription>
+                      Historical crowd data and density trends over time
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={[
+                            { time: "12:00", attendance: 35000, density: 58, critical: 0, high: 1 },
+                            { time: "13:00", attendance: 42000, density: 70, critical: 1, high: 2 },
+                            { time: "14:00", attendance: 48000, density: 80, critical: 2, high: 3 },
+                            { time: "15:00", attendance: 53000, density: 88, critical: 3, high: 2 },
+                            { time: "16:00", attendance: 55000, density: 92, critical: 3, high: 3 },
+                            { time: "17:00", attendance: 52000, density: 87, critical: 2, high: 3 },
+                            { time: "18:00", attendance: 48000, density: 80, critical: 1, high: 2 }
+                          ]}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+                          <YAxis
+                            yAxisId="attendance"
+                            orientation="left"
+                            tick={{ fontSize: 12 }}
+                            label={{ value: 'Attendance', angle: -90, position: 'insideLeft' }}
+                          />
+                          <YAxis
+                            yAxisId="density"
+                            orientation="right"
+                            tick={{ fontSize: 12 }}
+                            label={{ value: 'Density %', angle: 90, position: 'insideRight' }}
+                          />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'white',
+                              border: '1px solid #ccc',
+                              borderRadius: '8px',
+                              fontSize: '12px'
+                            }}
+                            formatter={(value, name) => {
+                              if (name === 'attendance') return [value.toLocaleString(), 'Total Attendance'];
+                              if (name === 'density') return [`${value}%`, 'Average Density'];
+                              if (name === 'critical') return [value, 'Critical Zones'];
+                              if (name === 'high') return [value, 'High Density Zones'];
+                              return [value, name];
+                            }}
+                          />
+                          <Legend />
+                          <Area
+                            yAxisId="attendance"
+                            type="monotone"
+                            dataKey="attendance"
+                            stackId="1"
+                            stroke="#3b82f6"
+                            fill="#3b82f6"
+                            fillOpacity={0.6}
+                            name="Total Attendance"
+                          />
+                          <Area
+                            yAxisId="density"
+                            type="monotone"
+                            dataKey="density"
+                            stackId="2"
+                            stroke="#10b981"
+                            fill="#10b981"
+                            fillOpacity={0.6}
+                            name="Average Density %"
+                          />
+                          <Area
+                            yAxisId="density"
+                            type="monotone"
+                            dataKey="critical"
+                            stackId="3"
+                            stroke="#ef4444"
+                            fill="#ef4444"
+                            fillOpacity={0.8}
+                            name="Critical Zones"
+                          />
+                          <Area
+                            yAxisId="density"
+                            type="monotone"
+                            dataKey="high"
+                            stackId="4"
+                            stroke="#f97316"
+                            fill="#f97316"
+                            fillOpacity={0.8}
+                            name="High Density Zones"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid lg:grid-cols-3 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Peak Hours</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span className="text-sm font-medium">16:00</span>
+                          <div className="text-right">
+                            <div className="text-sm font-bold">55,000</div>
+                            <div className="text-xs text-gray-600">92% density</div>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span className="text-sm font-medium">15:00</span>
+                          <div className="text-right">
+                            <div className="text-sm font-bold">53,000</div>
+                            <div className="text-xs text-gray-600">88% density</div>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span className="text-sm font-medium">17:00</span>
+                          <div className="text-right">
+                            <div className="text-sm font-bold">52,000</div>
+                            <div className="text-xs text-gray-600">87% density</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Density Trends</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="p-3 bg-blue-50 rounded">
+                          <div className="text-lg font-bold text-blue-700">79%</div>
+                          <div className="text-sm text-blue-600">Average Density</div>
+                        </div>
+                        <div className="p-3 bg-red-50 rounded">
+                          <div className="text-lg font-bold text-red-700">3</div>
+                          <div className="text-sm text-red-600">Max Critical Zones</div>
+                        </div>
+                        <div className="p-3 bg-orange-50 rounded">
+                          <div className="text-lg font-bold text-orange-700">3</div>
+                          <div className="text-sm text-orange-600">Max High Density Zones</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Capacity Insights</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="p-3 bg-green-50 rounded">
+                          <div className="text-lg font-bold text-green-700">92%</div>
+                          <div className="text-sm text-green-600">Current Stadium Fill</div>
+                        </div>
+                        <div className="p-3 bg-purple-50 rounded">
+                          <div className="text-lg font-bold text-purple-700">55,000</div>
+                          <div className="text-sm text-purple-600">Peak Attendance</div>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <div className="text-lg font-bold text-gray-700">5,000</div>
+                          <div className="text-sm text-gray-600">Available Capacity</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           {/* Analytics Report Download */}
