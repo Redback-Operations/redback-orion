@@ -255,32 +255,7 @@ export default function AFLDashboard() {
   const [selectedAnalysisItem, setSelectedAnalysisItem] = useState<any>(null);
 
   // Processing Queue state - starts empty, only shows actual uploads
-  const [processingQueue, setProcessingQueue] = useState<
-    Array<{
-      id: string;
-      name: string;
-      analysisType: string;
-      status:
-        | "uploading"
-        | "queued"
-        | "processing"
-        | "analyzing"
-        | "completed"
-        | "failed";
-      progress: number;
-      duration: string;
-      size: string;
-      uploadTime: string;
-      completedTime: string | null;
-      estimatedCompletion: string | null;
-      priority: "low" | "medium" | "high";
-      userId: string;
-      processingStage: string;
-      errorCount: number;
-      retryCount: number;
-      isUIControlled?: boolean;
-    }>
-  >([]);
+  const [processingQueue, setProcessingQueue] = useState<QueueItem[]>([]);
 
   // Processing queue management functions
   const StatusIcon = ({ status }: { status: string }) => {
@@ -1446,7 +1421,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���═════════��════════════════════��═══════
+════════════════════���══════════════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
