@@ -1427,7 +1427,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════════════════════════════��══════��
+════════════════════���══════════════════════════════��═══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
@@ -2009,7 +2009,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="mb-4">
+                    <div className="mb-6">
                       <Select
                         value={comparisonPlayer.name}
                         onValueChange={(name) => {
@@ -2034,75 +2034,126 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </Select>
                     </div>
 
-                    <div className="space-y-4">
-                      {["kicks", "handballs", "marks", "tackles", "goals"].map(
-                        (stat) => (
-                          <div key={stat} className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span className="capitalize">{stat}</span>
-                              <span>
-                                {
-                                  selectedPlayer[
-                                    stat as keyof typeof selectedPlayer
-                                  ]
-                                }{" "}
-                                vs{" "}
-                                {
-                                  comparisonPlayer[
-                                    stat as keyof typeof comparisonPlayer
-                                  ]
-                                }
-                              </span>
-                            </div>
-                            <div className="flex gap-2">
-                              <div className="flex-1">
-                                <Progress
-                                  value={
-                                    ((selectedPlayer[
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Progress Bar Comparison */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-semibold text-gray-700">Statistical Comparison</h4>
+                        {["kicks", "handballs", "marks", "tackles", "goals"].map(
+                          (stat) => (
+                            <div key={stat} className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="capitalize">{stat}</span>
+                                <span>
+                                  {
+                                    selectedPlayer[
                                       stat as keyof typeof selectedPlayer
-                                    ] as number) /
-                                      Math.max(
-                                        selectedPlayer[
-                                          stat as keyof typeof selectedPlayer
-                                        ] as number,
-                                        comparisonPlayer[
-                                          stat as keyof typeof comparisonPlayer
-                                        ] as number,
-                                      )) *
-                                    100
-                                  }
-                                  className="h-2"
-                                />
-                                <div className="text-xs text-gray-600 mt-1">
-                                  {selectedPlayer.name}
-                                </div>
-                              </div>
-                              <div className="flex-1">
-                                <Progress
-                                  value={
-                                    ((comparisonPlayer[
+                                    ]
+                                  }{" "}
+                                  vs{" "}
+                                  {
+                                    comparisonPlayer[
                                       stat as keyof typeof comparisonPlayer
-                                    ] as number) /
-                                      Math.max(
-                                        selectedPlayer[
-                                          stat as keyof typeof selectedPlayer
-                                        ] as number,
-                                        comparisonPlayer[
-                                          stat as keyof typeof comparisonPlayer
-                                        ] as number,
-                                      )) *
-                                    100
+                                    ]
                                   }
-                                  className="h-2"
-                                />
-                                <div className="text-xs text-gray-600 mt-1">
-                                  {comparisonPlayer.name}
+                                </span>
+                              </div>
+                              <div className="flex gap-2">
+                                <div className="flex-1">
+                                  <Progress
+                                    value={
+                                      ((selectedPlayer[
+                                        stat as keyof typeof selectedPlayer
+                                      ] as number) /
+                                        Math.max(
+                                          selectedPlayer[
+                                            stat as keyof typeof selectedPlayer
+                                          ] as number,
+                                          comparisonPlayer[
+                                            stat as keyof typeof comparisonPlayer
+                                          ] as number,
+                                        )) *
+                                      100
+                                    }
+                                    className="h-2"
+                                  />
+                                  <div className="text-xs text-gray-600 mt-1">
+                                    {selectedPlayer.name}
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <Progress
+                                    value={
+                                      ((comparisonPlayer[
+                                        stat as keyof typeof comparisonPlayer
+                                      ] as number) /
+                                        Math.max(
+                                          selectedPlayer[
+                                            stat as keyof typeof selectedPlayer
+                                          ] as number,
+                                          comparisonPlayer[
+                                            stat as keyof typeof comparisonPlayer
+                                          ] as number,
+                                        )) *
+                                      100
+                                    }
+                                    className="h-2"
+                                  />
+                                  <div className="text-xs text-gray-600 mt-1">
+                                    {comparisonPlayer.name}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ),
-                      )}
+                          ),
+                        )}
+                      </div>
+
+                      {/* Line Chart Comparison */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-semibold text-gray-700">Performance Trend</h4>
+                        <div className="h-64 w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={playerComparisonData}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis
+                                dataKey="stat"
+                                tick={{ fontSize: 12 }}
+                                angle={-45}
+                                textAnchor="end"
+                                height={80}
+                              />
+                              <YAxis tick={{ fontSize: 12 }} />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: '#f8f9fa',
+                                  border: '1px solid #e9ecef',
+                                  borderRadius: '6px'
+                                }}
+                              />
+                              <Legend />
+                              <Line
+                                type="monotone"
+                                dataKey={selectedPlayer.name}
+                                stroke="#059669"
+                                strokeWidth={3}
+                                dot={{ fill: '#059669', strokeWidth: 2, r: 4 }}
+                                activeDot={{ r: 6, stroke: '#059669', strokeWidth: 2 }}
+                              />
+                              <Line
+                                type="monotone"
+                                dataKey={comparisonPlayer.name}
+                                stroke="#2563eb"
+                                strokeWidth={3}
+                                dot={{ fill: '#2563eb', strokeWidth: 2, r: 4 }}
+                                activeDot={{ r: 6, stroke: '#2563eb', strokeWidth: 2 }}
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">
+                          Performance metrics comparison between selected players
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
