@@ -1871,7 +1871,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                   src={card.image}
                                   alt={card.name}
                                   className={`w-full h-full object-cover transition-opacity duration-500 ${
-                                    isExpanded ? 'opacity-85' : 'opacity-60'
+                                    isExpanded ? 'opacity-95' : 'opacity-80'
                                   }`}
                                 />
                                 <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-500 ${
@@ -2083,7 +2083,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                     src={card.image}
                                     alt={card.name}
                                     className={`w-full h-full object-cover transition-opacity duration-500 ${
-                                      isExpanded ? 'opacity-90' : 'opacity-60'
+                                      isExpanded ? 'opacity-95' : 'opacity-80'
                                     }`}
                                   />
                                   <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-500 ${
