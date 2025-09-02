@@ -32,7 +32,22 @@ import {
   Clock,
   Shield,
   Navigation,
+  PieChart,
+  Timeline,
 } from "lucide-react";
+import {
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 
 // Crowd zone data with real-time simulation
 const generateCrowdData = () => {
