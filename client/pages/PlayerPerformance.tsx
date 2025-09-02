@@ -364,6 +364,265 @@ export default function PlayerPerformance() {
                     </CardContent>
                   </Card>
 
+                  {/* Player Trading Cards */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Player Trading Cards</CardTitle>
+                      <CardDescription>AFL player cards with photos and jersey numbers</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {/* Dayne Zorko Card */}
+                        <div className="relative w-full max-w-xs mx-auto">
+                          <div className="absolute top-3 left-3 z-20">
+                            <div className="bg-white rounded-full p-2 shadow-md">
+                              <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+                                <span className="text-white font-bold text-xs">AFL</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="absolute top-3 right-3 z-20">
+                            <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
+                              #7
+                            </div>
+                          </div>
+                          <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b from-red-800 to-red-900">
+                            <img
+                              src="https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800"
+                              alt="Dayne Zorko"
+                              className="w-full h-full object-cover opacity-30"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                            <div className="absolute top-12 left-3 right-3 z-10">
+                              <h3 className="text-white font-bold text-lg leading-tight">DAYNE ZORKO</h3>
+                              <p className="text-white/80 text-sm">Brisbane Lions</p>
+                            </div>
+                            <div className="absolute bottom-16 left-3 right-3 z-10">
+                              <div className="bg-black/80 backdrop-blur-sm rounded p-3">
+                                <div className="text-white text-xs space-y-1">
+                                  <div className="flex justify-between">
+                                    <span>GOAL ACCURACY:</span>
+                                    <span className="font-bold">67%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>HANDBALLS:</span>
+                                    <span className="font-bold">16</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>DISPOSALS:</span>
+                                    <span className="font-bold">34</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
+                              <div className="grid grid-cols-3 gap-2 text-white text-center">
+                                <div>
+                                  <div className="font-bold text-lg">18</div>
+                                  <div className="text-xs">KICKS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-lg">8</div>
+                                  <div className="text-xs">MARKS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-lg">6</div>
+                                  <div className="text-xs">TACKLES</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Marcus Bontempelli Card */}
+                        <div className="relative w-full max-w-xs mx-auto">
+                          <div className="absolute top-3 left-3 z-20">
+                            <div className="bg-white rounded-full p-2 shadow-md">
+                              <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+                                <span className="text-white font-bold text-xs">AFL</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="absolute top-3 right-3 z-20">
+                            <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
+                              #4
+                            </div>
+                          </div>
+                          <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b from-orange-600 to-orange-700">
+                            <img
+                              src="https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800"
+                              alt="Marcus Bontempelli"
+                              className="w-full h-full object-cover opacity-30"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                            <div className="absolute top-12 left-3 right-3 z-10">
+                              <h3 className="text-white font-bold text-lg leading-tight">MARCUS BONTEMPELLI</h3>
+                              <p className="text-white/80 text-sm">Western Bulldogs</p>
+                            </div>
+                            <div className="absolute bottom-16 left-3 right-3 z-10">
+                              <div className="bg-black/80 backdrop-blur-sm rounded p-3">
+                                <div className="text-white text-xs space-y-1">
+                                  <div className="flex justify-between">
+                                    <span>GOAL ACCURACY:</span>
+                                    <span className="font-bold">60%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>HANDBALLS:</span>
+                                    <span className="font-bold">18</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>DISPOSALS:</span>
+                                    <span className="font-bold">42</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
+                              <div className="grid grid-cols-3 gap-2 text-white text-center">
+                                <div>
+                                  <div className="font-bold text-lg">24</div>
+                                  <div className="text-xs">KICKS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-lg">10</div>
+                                  <div className="text-xs">MARKS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-lg">8</div>
+                                  <div className="text-xs">TACKLES</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Patrick Cripps Card */}
+                        <div className="relative w-full max-w-xs mx-auto">
+                          <div className="absolute top-3 left-3 z-20">
+                            <div className="bg-white rounded-full p-2 shadow-md">
+                              <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+                                <span className="text-white font-bold text-xs">AFL</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="absolute top-3 right-3 z-20">
+                            <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
+                              #9
+                            </div>
+                          </div>
+                          <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b from-blue-800 to-blue-900">
+                            <img
+                              src="https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800"
+                              alt="Patrick Cripps"
+                              className="w-full h-full object-cover opacity-30"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                            <div className="absolute top-12 left-3 right-3 z-10">
+                              <h3 className="text-white font-bold text-lg leading-tight">PATRICK CRIPPS</h3>
+                              <p className="text-white/80 text-sm">Carlton</p>
+                            </div>
+                            <div className="absolute bottom-16 left-3 right-3 z-10">
+                              <div className="bg-black/80 backdrop-blur-sm rounded p-3">
+                                <div className="text-white text-xs space-y-1">
+                                  <div className="flex justify-between">
+                                    <span>GOAL ACCURACY:</span>
+                                    <span className="font-bold">100%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>HANDBALLS:</span>
+                                    <span className="font-bold">12</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>DISPOSALS:</span>
+                                    <span className="font-bold">38</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
+                              <div className="grid grid-cols-3 gap-2 text-white text-center">
+                                <div>
+                                  <div className="font-bold text-lg">26</div>
+                                  <div className="text-xs">KICKS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-lg">7</div>
+                                  <div className="text-xs">MARKS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-lg">9</div>
+                                  <div className="text-xs">TACKLES</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Dustin Martin Card */}
+                        <div className="relative w-full max-w-xs mx-auto">
+                          <div className="absolute top-3 left-3 z-20">
+                            <div className="bg-white rounded-full p-2 shadow-md">
+                              <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+                                <span className="text-white font-bold text-xs">AFL</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="absolute top-3 right-3 z-20">
+                            <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
+                              #4
+                            </div>
+                          </div>
+                          <div className="relative h-80 rounded-lg overflow-hidden shadow-lg border-2 border-gray-200 bg-gradient-to-b from-yellow-500 to-yellow-600">
+                            <img
+                              src="https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800"
+                              alt="Dustin Martin"
+                              className="w-full h-full object-cover opacity-30"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                            <div className="absolute top-12 left-3 right-3 z-10">
+                              <h3 className="text-white font-bold text-lg leading-tight">DUSTIN MARTIN</h3>
+                              <p className="text-white/80 text-sm">Richmond</p>
+                            </div>
+                            <div className="absolute bottom-16 left-3 right-3 z-10">
+                              <div className="bg-black/80 backdrop-blur-sm rounded p-3">
+                                <div className="text-white text-xs space-y-1">
+                                  <div className="flex justify-between">
+                                    <span>GOAL ACCURACY:</span>
+                                    <span className="font-bold">80%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>HANDBALLS:</span>
+                                    <span className="font-bold">8</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>DISPOSALS:</span>
+                                    <span className="font-bold">28</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 p-3 z-10">
+                              <div className="grid grid-cols-3 gap-2 text-white text-center">
+                                <div>
+                                  <div className="font-bold text-lg">20</div>
+                                  <div className="text-xs">KICKS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-lg">6</div>
+                                  <div className="text-xs">MARKS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-lg">4</div>
+                                  <div className="text-xs">TACKLES</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {/* Player Comparison */}
                   <Card>
                     <CardHeader>
