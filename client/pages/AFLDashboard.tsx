@@ -164,6 +164,25 @@ const matchEvents = [
   },
 ];
 
+// Generate timeline data based on current stadium zones
+const generateTimelineFromStadiumData = (crowdZones) => {
+  const currentAttendance = crowdZones.reduce((sum, zone) => sum + zone.current, 0);
+  const currentDensity = Math.round(crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length);
+  const currentCritical = crowdZones.filter(zone => zone.density >= 95).length;
+  const currentHigh = crowdZones.filter(zone => zone.density >= 85 && zone.density < 95).length;
+
+  // Generate historical timeline showing progression to current state
+  return [
+    { time: "12:00", attendance: Math.round(currentAttendance * 0.6), density: Math.round(currentDensity * 0.7), critical: 0, high: Math.max(0, currentHigh - 2) },
+    { time: "13:00", attendance: Math.round(currentAttendance * 0.7), density: Math.round(currentDensity * 0.8), critical: Math.max(0, currentCritical - 1), high: Math.max(0, currentHigh - 1) },
+    { time: "14:00", attendance: Math.round(currentAttendance * 0.8), density: Math.round(currentDensity * 0.85), critical: Math.max(0, currentCritical - 1), high: currentHigh },
+    { time: "15:00", attendance: Math.round(currentAttendance * 0.9), density: Math.round(currentDensity * 0.9), critical: currentCritical, high: currentHigh },
+    { time: "16:00", attendance: currentAttendance, density: currentDensity, critical: currentCritical, high: currentHigh },
+    { time: "17:00", attendance: Math.round(currentAttendance * 0.95), density: Math.round(currentDensity * 0.95), critical: Math.max(0, currentCritical - 1), high: currentHigh },
+    { time: "18:00", attendance: Math.round(currentAttendance * 0.85), density: Math.round(currentDensity * 0.9), critical: Math.max(0, currentCritical - 1), high: Math.max(0, currentHigh - 1) }
+  ];
+};
+
 // Static crowd zones for AFL ground with realistic varying density
 const getStaticAFLCrowdZones = () => {
   return [
