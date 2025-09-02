@@ -34,284 +34,255 @@ import {
   LineChart,
   PieChart,
 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  LineChart as RechartsLineChart,
+  Line,
+  ResponsiveContainer,
+} from "recharts";
 
-// Detailed player data with realistic AFL statistics
-const generatePlayerData = () => {
-  const players = [
-    {
-      id: 1,
-      name: "Marcus Bontempelli",
-      team: "Western Bulldogs",
-      position: "Midfielder",
-      number: 4,
-      age: 28,
-      height: "1.93m",
-      weight: "92kg",
-      stats: {
-        kicks: 28,
-        handballs: 12,
-        disposals: 40,
-        marks: 8,
-        tackles: 6,
-        goals: 2,
-        behinds: 1,
-        efficiency: 87,
-        contested: 18,
-        uncontested: 22,
-        clangers: 3,
-        inside50s: 7,
-        rebounds: 4,
-        onePercenters: 2,
-        turnovers: 4,
-        intercepted: 2,
-        goalAccuracy: 67,
-      },
-      form: [85, 89, 91, 87, 93, 88, 87],
-      heatMap: [
-        { zone: "Forward 50", touches: 12, effectiveness: 85 },
-        { zone: "Center Bounce", touches: 18, effectiveness: 92 },
-        { zone: "Defensive 50", touches: 10, effectiveness: 78 },
-      ],
+// AFL Player data with realistic statistics
+const aflPlayers = [
+  {
+    id: 1,
+    name: "DAYNE ZORKO",
+    fullName: "Dayne Zorko",
+    number: "7",
+    team: "Brisbane Lions",
+    teamColor: "#8B0000", // Maroon
+    position: "Midfielder",
+    age: 34,
+    height: "178cm",
+    weight: "75kg",
+    image: "/api/placeholder/200/250", // Placeholder for player image
+    stats: {
+      goalsAccuracy: 56.7,
+      handballs: 23,
+      disposals: 34,
+      kicks: 18,
+      marks: 8,
+      tackles: 4,
+      freeKicksFor: 2,
+      freeKicksAgainst: 1,
+      efficiency: 78.5,
+      contestedPossessions: 12,
+      uncontestedPossessions: 22
     },
-    {
-      id: 2,
-      name: "Dustin Martin",
-      team: "Richmond",
-      position: "Forward",
-      number: 4,
-      age: 32,
-      height: "1.87m",
-      weight: "92kg",
-      stats: {
-        kicks: 22,
-        handballs: 8,
-        disposals: 30,
-        marks: 6,
-        tackles: 4,
-        goals: 3,
-        behinds: 2,
-        efficiency: 82,
-        contested: 14,
-        uncontested: 16,
-        clangers: 2,
-        inside50s: 5,
-        rebounds: 1,
-        onePercenters: 1,
-        turnovers: 3,
-        intercepted: 1,
-        goalAccuracy: 60,
-      },
-      form: [78, 82, 85, 80, 88, 84, 82],
-      heatMap: [
-        { zone: "Forward 50", touches: 20, effectiveness: 88 },
-        { zone: "Center Bounce", touches: 8, effectiveness: 75 },
-        { zone: "Defensive 50", touches: 2, effectiveness: 50 },
-      ],
+    performanceData: [
+      { round: 'R18', score: 85 },
+      { round: 'R19', score: 92 },
+      { round: 'R20', score: 78 },
+      { round: 'R21', score: 88 },
+      { round: 'R22', score: 95 },
+    ]
+  },
+  {
+    id: 2,
+    name: "MARCUS BONTEMPELLI",
+    fullName: "Marcus Bontempelli",
+    number: "4",
+    team: "Western Bulldogs",
+    teamColor: "#FF6B35", // Orange/Red
+    position: "Midfielder",
+    age: 28,
+    height: "193cm",
+    weight: "92kg",
+    image: "/api/placeholder/200/250",
+    stats: {
+      goalsAccuracy: 67.3,
+      handballs: 28,
+      disposals: 42,
+      kicks: 24,
+      marks: 10,
+      tackles: 6,
+      freeKicksFor: 3,
+      freeKicksAgainst: 2,
+      efficiency: 85.2,
+      contestedPossessions: 18,
+      uncontestedPossessions: 24
     },
-    {
-      id: 3,
-      name: "Patrick Dangerfield",
-      team: "Geelong",
-      position: "Midfielder",
-      number: 35,
-      age: 34,
-      height: "1.89m",
-      weight: "92kg",
-      stats: {
-        kicks: 25,
-        handballs: 15,
-        disposals: 40,
-        marks: 7,
-        tackles: 8,
-        goals: 1,
-        behinds: 0,
-        efficiency: 84,
-        contested: 22,
-        uncontested: 18,
-        clangers: 4,
-        inside50s: 6,
-        rebounds: 3,
-        onePercenters: 3,
-        turnovers: 5,
-        intercepted: 2,
-        goalAccuracy: 100,
-      },
-      form: [88, 84, 82, 86, 90, 85, 84],
-      heatMap: [
-        { zone: "Forward 50", touches: 8, effectiveness: 75 },
-        { zone: "Center Bounce", touches: 24, effectiveness: 87 },
-        { zone: "Defensive 50", touches: 8, effectiveness: 88 },
-      ],
+    performanceData: [
+      { round: 'R18', score: 88 },
+      { round: 'R19', score: 91 },
+      { round: 'R20', score: 85 },
+      { round: 'R21', score: 93 },
+      { round: 'R22', score: 89 },
+    ]
+  },
+  {
+    id: 3,
+    name: "PATRICK CRIPPS",
+    fullName: "Patrick Cripps",
+    number: "9",
+    team: "Carlton",
+    teamColor: "#1E3A8A", // Navy Blue
+    position: "Midfielder",
+    age: 29,
+    height: "195cm",
+    weight: "95kg",
+    image: "/api/placeholder/200/250",
+    stats: {
+      goalsAccuracy: 72.1,
+      handballs: 22,
+      disposals: 38,
+      kicks: 26,
+      marks: 7,
+      tackles: 8,
+      freeKicksFor: 4,
+      freeKicksAgainst: 1,
+      efficiency: 82.7,
+      contestedPossessions: 20,
+      uncontestedPossessions: 18
     },
-    {
-      id: 4,
-      name: "Max Gawn",
-      team: "Melbourne",
-      position: "Ruckman",
-      number: 11,
-      age: 32,
-      height: "2.08m",
-      weight: "108kg",
-      stats: {
-        kicks: 18,
-        handballs: 6,
-        disposals: 24,
-        marks: 10,
-        tackles: 3,
-        goals: 1,
-        behinds: 0,
-        efficiency: 78,
-        contested: 16,
-        uncontested: 8,
-        clangers: 2,
-        inside50s: 4,
-        rebounds: 6,
-        onePercenters: 8,
-        turnovers: 3,
-        intercepted: 1,
-        goalAccuracy: 100,
-      },
-      form: [82, 78, 85, 83, 80, 79, 78],
-      heatMap: [
-        { zone: "Forward 50", touches: 6, effectiveness: 83 },
-        { zone: "Center Bounce", touches: 14, effectiveness: 71 },
-        { zone: "Defensive 50", touches: 4, effectiveness: 100 },
-      ],
+    performanceData: [
+      { round: 'R18', score: 90 },
+      { round: 'R19', score: 87 },
+      { round: 'R20', score: 92 },
+      { round: 'R21', score: 85 },
+      { round: 'R22', score: 91 },
+    ]
+  },
+  {
+    id: 4,
+    name: "DUSTIN MARTIN",
+    fullName: "Dustin Martin",
+    number: "4",
+    team: "Richmond",
+    teamColor: "#FFFF00", // Yellow
+    position: "Forward",
+    age: 32,
+    height: "187cm",
+    weight: "92kg",
+    image: "/api/placeholder/200/250",
+    stats: {
+      goalsAccuracy: 65.8,
+      handballs: 15,
+      disposals: 28,
+      kicks: 20,
+      marks: 6,
+      tackles: 3,
+      freeKicksFor: 1,
+      freeKicksAgainst: 0,
+      efficiency: 89.4,
+      contestedPossessions: 10,
+      uncontestedPossessions: 18
     },
-  ];
-
-  return players;
-};
+    performanceData: [
+      { round: 'R18', score: 82 },
+      { round: 'R19', score: 89 },
+      { round: 'R20', score: 91 },
+      { round: 'R21', score: 87 },
+      { round: 'R22', score: 85 },
+    ]
+  }
+];
 
 export default function PlayerPerformance() {
   const [isLive, setIsLive] = useState(true);
-  const [players, setPlayers] = useState(generatePlayerData());
-  const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
-  const [comparisonPlayer, setComparisonPlayer] = useState(players[1]);
+  const [selectedPlayers, setSelectedPlayers] = useState([aflPlayers[0], aflPlayers[1]]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
   const [selectedPosition, setSelectedPosition] = useState("all");
 
-  // Simulate live data updates
-  useEffect(() => {
-    if (!isLive) return;
+  const teams = ["all", ...Array.from(new Set(aflPlayers.map(p => p.team)))];
+  const positions = ["all", ...Array.from(new Set(aflPlayers.map(p => p.position)))];
 
-    const interval = setInterval(() => {
-      setPlayers((prevPlayers) =>
-        prevPlayers.map((player) => ({
-          ...player,
-          stats: {
-            ...player.stats,
-            disposals: player.stats.disposals + Math.floor(Math.random() * 2),
-            efficiency: Math.max(
-              60,
-              Math.min(95, player.stats.efficiency + (Math.random() - 0.5) * 2),
-            ),
-          },
-        })),
-      );
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isLive]);
-
-  const filteredPlayers = players.filter(
+  const filteredPlayers = aflPlayers.filter(
     (player) =>
-      player.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      player.fullName.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedTeam === "all" || player.team === selectedTeam) &&
-      (selectedPosition === "all" || player.position === selectedPosition),
+      (selectedPosition === "all" || player.position === selectedPosition)
   );
 
-  const StatCard = ({
-    title,
-    value,
-    subtitle,
-    trend,
-    color = "blue",
-  }: {
-    title: string;
-    value: string | number;
-    subtitle?: string;
-    trend?: "up" | "down" | "stable";
-    color?: string;
-  }) => (
-    <div className={`p-4 rounded-lg bg-${color}-50 border border-${color}-100`}>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-sm font-medium text-gray-600">{title}</span>
-        {trend && (
-          <div className="flex items-center">
-            {trend === "up" && (
-              <TrendingUp className="w-3 h-3 text-green-500" />
-            )}
-            {trend === "down" && (
-              <TrendingDown className="w-3 h-3 text-red-500" />
-            )}
-            {trend === "stable" && (
-              <div className="w-3 h-3 rounded-full bg-gray-400" />
-            )}
+  const AFLPlayerCard = ({ player }: { player: typeof aflPlayers[0] }) => (
+    <div className="relative w-full max-w-sm mx-auto">
+      {/* AFL Logo */}
+      <div className="absolute top-4 left-4 z-10">
+        <div className="bg-white rounded-full p-2">
+          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-xs">AFL</span>
           </div>
-        )}
+        </div>
       </div>
-      <div className={`text-2xl font-bold text-${color}-600`}>{value}</div>
-      {subtitle && <div className="text-xs text-gray-500 mt-1">{subtitle}</div>}
+
+      {/* Main Card */}
+      <div 
+        className="relative h-80 rounded-lg overflow-hidden shadow-lg"
+        style={{ backgroundColor: player.teamColor }}
+      >
+        {/* Player Image Area */}
+        <div className="relative h-full w-full">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          
+          {/* Player Name */}
+          <div className="absolute top-16 left-4 right-4">
+            <h2 className="text-white font-bold text-xl tracking-wide">
+              {player.name}
+            </h2>
+          </div>
+
+          {/* Player Number */}
+          <div className="absolute top-4 right-4">
+            <div className="text-white/80 font-bold text-lg">
+              #{player.number}
+            </div>
+          </div>
+
+          {/* Stats Section */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-yellow-400 to-yellow-500 p-4">
+            <div className="grid grid-cols-3 gap-2 text-black">
+              <div className="text-center">
+                <div className="font-bold text-lg">{player.stats.disposals}</div>
+                <div className="text-xs font-medium">DISPOSALS</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-lg">{player.stats.kicks}</div>
+                <div className="text-xs font-medium">KICKS</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-lg">{player.stats.handballs}</div>
+                <div className="text-xs font-medium">HANDBALLS</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Performance Stats */}
+          <div className="absolute bottom-20 left-4 right-4">
+            <div className="bg-black/70 rounded p-2 text-white text-xs">
+              <div className="grid grid-cols-2 gap-2">
+                <div>EFFICIENCY: {player.stats.efficiency}%</div>
+                <div>MARKS: {player.stats.marks}</div>
+                <div>TACKLES: {player.stats.tackles}</div>
+                <div>GOALS ACC: {player.stats.goalsAccuracy}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Team Badge */}
+      <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+        <div className="bg-white rounded-full p-2 shadow-lg">
+          <div className="text-xs font-bold text-center px-2">
+            {player.team.split(' ').map(word => word[0]).join('')}
+          </div>
+        </div>
+      </div>
     </div>
   );
 
-  const ComparisonChart = ({
-    stat,
-    player1,
-    player2,
-  }: {
-    stat: string;
-    player1: any;
-    player2: any;
-  }) => {
-    const val1 = player1.stats[stat] || 0;
-    const val2 = player2.stats[stat] || 0;
-    const max = Math.max(val1, val2);
-
-    return (
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm font-medium capitalize">
-          <span>{stat.replace(/([A-Z])/g, " $1").trim()}</span>
-          <span>
-            {val1} vs {val2}
-          </span>
-        </div>
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs w-16 truncate">
-              {player1.name.split(" ")[0]}
-            </span>
-            <div className="flex-1">
-              <Progress value={(val1 / max) * 100} className="h-2" />
-            </div>
-            <span className="text-xs w-8">{val1}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs w-16 truncate">
-              {player2.name.split(" ")[0]}
-            </span>
-            <div className="flex-1">
-              <Progress
-                value={(val2 / max) * 100}
-                className="h-2 bg-orange-100"
-              />
-            </div>
-            <span className="text-xs w-8">{val2}</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <MobileNavigation />
 
-      {/* Main Content */}
       <div className="lg:ml-64 pb-16 lg:pb-0">
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-6">
           {/* Live Clock */}
           <LiveClock
             isLive={isLive}
@@ -319,325 +290,242 @@ export default function PlayerPerformance() {
             matchTime={{ quarter: 2, timeRemaining: "15:23" }}
           />
 
-          {/* Search and Filters */}
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Player Performance Analytics</h1>
+            <p className="text-gray-600">Compare AFL players with detailed statistics and performance metrics</p>
+          </div>
+
+          {/* Filters Section */}
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Search className="w-5 h-5" />
-                Player Search & Filters
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Filter className="w-5 h-5" />
+                Player Selection & Filters
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Input
-                placeholder="Search by name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Search Players</label>
+                  <Input
+                    placeholder="Search by name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Filter by Team</label>
+                  <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teams.map((team) => (
+                        <SelectItem key={team} value={team}>
+                          {team === "all" ? "All Teams" : team}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by team" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Teams</SelectItem>
-                    <SelectItem value="Western Bulldogs">
-                      Western Bulldogs
-                    </SelectItem>
-                    <SelectItem value="Richmond">Richmond</SelectItem>
-                    <SelectItem value="Geelong">Geelong</SelectItem>
-                    <SelectItem value="Melbourne">Melbourne</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Filter by Position</label>
+                  <Select value={selectedPosition} onValueChange={setSelectedPosition}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select position" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {positions.map((position) => (
+                        <SelectItem key={position} value={position}>
+                          {position === "all" ? "All Positions" : position}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-                <Select
-                  value={selectedPosition}
-                  onValueChange={setSelectedPosition}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by position" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Positions</SelectItem>
-                    <SelectItem value="Midfielder">Midfielder</SelectItem>
-                    <SelectItem value="Forward">Forward</SelectItem>
-                    <SelectItem value="Defender">Defender</SelectItem>
-                    <SelectItem value="Ruckman">Ruckman</SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* Player Selection Dropdowns */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Select Player 1</label>
+                  <Select 
+                    value={selectedPlayers[0]?.id.toString()} 
+                    onValueChange={(value) => {
+                      const player = filteredPlayers.find(p => p.id.toString() === value);
+                      if (player) setSelectedPlayers([player, selectedPlayers[1]]);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose first player" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredPlayers.map((player) => (
+                        <SelectItem key={player.id} value={player.id.toString()}>
+                          {player.fullName} ({player.team})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Select Player 2</label>
+                  <Select 
+                    value={selectedPlayers[1]?.id.toString()} 
+                    onValueChange={(value) => {
+                      const player = filteredPlayers.find(p => p.id.toString() === value);
+                      if (player) setSelectedPlayers([selectedPlayers[0], player]);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose second player" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredPlayers.map((player) => (
+                        <SelectItem key={player.id} value={player.id.toString()}>
+                          {player.fullName} ({player.team})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Player Selection */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {filteredPlayers.slice(0, 8).map((player) => (
-              <button
-                key={player.id}
-                onClick={() => setSelectedPlayer(player)}
-                className={`p-3 rounded-lg border text-left transition-colors ${
-                  selectedPlayer.id === player.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300 bg-white"
-                }`}
-              >
-                <div className="font-medium text-sm truncate">
-                  {player.name}
-                </div>
-                <div className="text-xs text-gray-600">{player.team}</div>
-                <div className="text-xs text-green-600">#{player.number}</div>
-              </button>
+          {/* Player Cards Display */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {selectedPlayers.map((player, index) => (
+              <div key={player.id} className="space-y-2">
+                <h3 className="text-center font-medium text-gray-700">
+                  Player {index + 1}
+                </h3>
+                <AFLPlayerCard player={player} />
+              </div>
             ))}
           </div>
 
-          {/* Player Details */}
+          {/* Performance Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Performance Over Time Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Over Time</CardTitle>
+                <CardDescription>Last 5 rounds performance comparison</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <RechartsLineChart>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="round" />
+                    <YAxis domain={[70, 100]} />
+                    <Tooltip />
+                    <Legend />
+                    <Line 
+                      dataKey="score" 
+                      data={selectedPlayers[0]?.performanceData || []}
+                      stroke="#8884d8" 
+                      strokeWidth={3}
+                      name={selectedPlayers[0]?.fullName || "Player 1"}
+                    />
+                    <Line 
+                      dataKey="score" 
+                      data={selectedPlayers[1]?.performanceData || []}
+                      stroke="#82ca9d" 
+                      strokeWidth={3}
+                      name={selectedPlayers[1]?.fullName || "Player 2"}
+                    />
+                  </RechartsLineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Player Metrics Comparison */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Player Metrics</CardTitle>
+                <CardDescription>Key statistics comparison</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={[
+                    {
+                      metric: 'Disposals',
+                      [selectedPlayers[0]?.fullName || 'Player 1']: selectedPlayers[0]?.stats.disposals || 0,
+                      [selectedPlayers[1]?.fullName || 'Player 2']: selectedPlayers[1]?.stats.disposals || 0,
+                    },
+                    {
+                      metric: 'Kicks',
+                      [selectedPlayers[0]?.fullName || 'Player 1']: selectedPlayers[0]?.stats.kicks || 0,
+                      [selectedPlayers[1]?.fullName || 'Player 2']: selectedPlayers[1]?.stats.kicks || 0,
+                    },
+                    {
+                      metric: 'Marks',
+                      [selectedPlayers[0]?.fullName || 'Player 1']: selectedPlayers[0]?.stats.marks || 0,
+                      [selectedPlayers[1]?.fullName || 'Player 2']: selectedPlayers[1]?.stats.marks || 0,
+                    },
+                    {
+                      metric: 'Tackles',
+                      [selectedPlayers[0]?.fullName || 'Player 1']: selectedPlayers[0]?.stats.tackles || 0,
+                      [selectedPlayers[1]?.fullName || 'Player 2']: selectedPlayers[1]?.stats.tackles || 0,
+                    },
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="metric" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey={selectedPlayers[0]?.fullName || 'Player 1'} fill="#ef4444" />
+                    <Bar dataKey={selectedPlayers[1]?.fullName || 'Player 2'} fill="#3b82f6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Detailed Stats Comparison Table */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl">
-                    {selectedPlayer.name}
-                  </CardTitle>
-                  <CardDescription className="flex items-center gap-4 text-sm">
-                    <span>{selectedPlayer.team}</span>
-                    <span>#{selectedPlayer.number}</span>
-                    <span>{selectedPlayer.position}</span>
-                    <Badge variant="outline">{selectedPlayer.age}y</Badge>
-                  </CardDescription>
-                </div>
-                <div className="text-right text-sm text-gray-600">
-                  <div>{selectedPlayer.height}</div>
-                  <div>{selectedPlayer.weight}</div>
-                </div>
-              </div>
+              <CardTitle>Detailed Statistics Comparison</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="stats" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="stats">Stats</TabsTrigger>
-                  <TabsTrigger value="form">Form</TabsTrigger>
-                  <TabsTrigger value="heatmap">Heat Map</TabsTrigger>
-                  <TabsTrigger value="compare">Compare</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="stats" className="space-y-4">
-                  {/* Core Stats */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <StatCard
-                      title="Disposals"
-                      value={selectedPlayer.stats.disposals}
-                      color="blue"
-                      trend="up"
-                    />
-                    <StatCard
-                      title="Kicks"
-                      value={selectedPlayer.stats.kicks}
-                      color="green"
-                    />
-                    <StatCard
-                      title="Handballs"
-                      value={selectedPlayer.stats.handballs}
-                      color="purple"
-                    />
-                    <StatCard
-                      title="Marks"
-                      value={selectedPlayer.stats.marks}
-                      color="orange"
-                    />
-                    <StatCard
-                      title="Tackles"
-                      value={selectedPlayer.stats.tackles}
-                      color="red"
-                    />
-                    <StatCard
-                      title="Goals"
-                      value={selectedPlayer.stats.goals}
-                      color="yellow"
-                    />
-                  </div>
-
-                  {/* Advanced Stats */}
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-gray-900">
-                      Advanced Metrics
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Efficiency</span>
-                          <span className="font-medium">
-                            {selectedPlayer.stats.efficiency}%
-                          </span>
-                        </div>
-                        <Progress
-                          value={selectedPlayer.stats.efficiency}
-                          className="h-2"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Goal Accuracy</span>
-                          <span className="font-medium">
-                            {selectedPlayer.stats.goalAccuracy}%
-                          </span>
-                        </div>
-                        <Progress
-                          value={selectedPlayer.stats.goalAccuracy}
-                          className="h-2"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                      <div className="p-2 bg-gray-50 rounded">
-                        <div className="text-lg font-semibold">
-                          {selectedPlayer.stats.contested}
-                        </div>
-                        <div className="text-xs text-gray-600">Contested</div>
-                      </div>
-                      <div className="p-2 bg-gray-50 rounded">
-                        <div className="text-lg font-semibold">
-                          {selectedPlayer.stats.uncontested}
-                        </div>
-                        <div className="text-xs text-gray-600">Uncontested</div>
-                      </div>
-                      <div className="p-2 bg-gray-50 rounded">
-                        <div className="text-lg font-semibold">
-                          {selectedPlayer.stats.inside50s}
-                        </div>
-                        <div className="text-xs text-gray-600">Inside 50s</div>
-                      </div>
-                      <div className="p-2 bg-gray-50 rounded">
-                        <div className="text-lg font-semibold">
-                          {selectedPlayer.stats.clangers}
-                        </div>
-                        <div className="text-xs text-gray-600">Clangers</div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="form" className="space-y-4">
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Recent Form (Last 7 Games)</h4>
-                    <div className="grid grid-cols-7 gap-1">
-                      {selectedPlayer.form.map((score, index) => (
-                        <div key={index} className="text-center">
-                          <div
-                            className={`p-2 rounded text-xs font-medium ${
-                              score >= 90
-                                ? "bg-green-100 text-green-700"
-                                : score >= 80
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {score}
-                          </div>
-                          <div className="text-xs text-gray-500 mt-1">
-                            R{7 - index}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Average:{" "}
-                      {(
-                        selectedPlayer.form.reduce((a, b) => a + b, 0) /
-                        selectedPlayer.form.length
-                      ).toFixed(1)}
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="heatmap" className="space-y-4">
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Field Position Heat Map</h4>
-                    {selectedPlayer.heatMap.map((zone, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>{zone.zone}</span>
-                          <span>
-                            {zone.touches} touches • {zone.effectiveness}%
-                            effective
-                          </span>
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <Progress
-                              value={(zone.touches / 30) * 100}
-                              className="h-3"
-                            />
-                            <div className="text-xs text-gray-500 mt-1">
-                              Touches
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <Progress
-                              value={zone.effectiveness}
-                              className="h-3"
-                            />
-                            <div className="text-xs text-gray-500 mt-1">
-                              Effectiveness
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-2">Statistic</th>
+                      <th className="text-center p-2">{selectedPlayers[0]?.fullName}</th>
+                      <th className="text-center p-2">{selectedPlayers[1]?.fullName}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { key: 'disposals', label: 'Disposals' },
+                      { key: 'kicks', label: 'Kicks' },
+                      { key: 'handballs', label: 'Handballs' },
+                      { key: 'marks', label: 'Marks' },
+                      { key: 'tackles', label: 'Tackles' },
+                      { key: 'efficiency', label: 'Efficiency %' },
+                      { key: 'goalsAccuracy', label: 'Goals Accuracy %' },
+                    ].map((stat) => (
+                      <tr key={stat.key} className="border-b hover:bg-gray-50">
+                        <td className="p-2 font-medium">{stat.label}</td>
+                        <td className="p-2 text-center">
+                          {selectedPlayers[0]?.stats[stat.key as keyof typeof selectedPlayers[0]['stats']] || 0}
+                        </td>
+                        <td className="p-2 text-center">
+                          {selectedPlayers[1]?.stats[stat.key as keyof typeof selectedPlayers[1]['stats']] || 0}
+                        </td>
+                      </tr>
                     ))}
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="compare" className="space-y-4">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-sm font-medium">
-                        Compare with:
-                      </label>
-                      <Select
-                        value={comparisonPlayer.name}
-                        onValueChange={(name) => {
-                          const player = players.find((p) => p.name === name);
-                          if (player) setComparisonPlayer(player);
-                        }}
-                      >
-                        <SelectTrigger className="w-full mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {players
-                            .filter((p) => p.id !== selectedPlayer.id)
-                            .map((player) => (
-                              <SelectItem key={player.id} value={player.name}>
-                                {player.name} ({player.team})
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-4">
-                      {[
-                        "disposals",
-                        "kicks",
-                        "handballs",
-                        "marks",
-                        "tackles",
-                        "goals",
-                        "efficiency",
-                      ].map((stat) => (
-                        <ComparisonChart
-                          key={stat}
-                          stat={stat}
-                          player1={selectedPlayer}
-                          player2={comparisonPlayer}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
         </div>
