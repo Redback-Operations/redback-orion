@@ -236,6 +236,11 @@ export default function AFLDashboard() {
   const [isLive, setIsLive] = useState(true);
   const [userEmail, setUserEmail] = useState("");
 
+  // Player card display state
+  const [showAllCards, setShowAllCards] = useState(false);
+  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
+  const [selectedCard, setSelectedCard] = useState(null);
+
   // Video upload states
   const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
   const [isVideoUploading, setIsVideoUploading] = useState(false);
@@ -1483,11 +1488,119 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
     downloadText(clipsData, `AFL_Video_Clips_${Date.now()}`);
   };
 
+  // Player cards data
+  const playerCards = [
+    {
+      id: 1,
+      name: "DAYNE ZORKO",
+      team: "Brisbane Lions",
+      number: 7,
+      background: "from-red-800 to-red-900",
+      image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      stats: {
+        goalAccuracy: 67,
+        handballs: 16,
+        disposals: 34,
+        kicks: 18,
+        marks: 8,
+        tackles: 6
+      }
+    },
+    {
+      id: 2,
+      name: "MARCUS BONTEMPELLI",
+      team: "Western Bulldogs",
+      number: 4,
+      background: "from-orange-600 to-orange-700",
+      image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      stats: {
+        goalAccuracy: 60,
+        handballs: 18,
+        disposals: 42,
+        kicks: 24,
+        marks: 10,
+        tackles: 8
+      }
+    },
+    {
+      id: 3,
+      name: "PATRICK CRIPPS",
+      team: "Carlton",
+      number: 9,
+      background: "from-blue-800 to-blue-900",
+      image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      stats: {
+        goalAccuracy: 100,
+        handballs: 12,
+        disposals: 38,
+        kicks: 26,
+        marks: 7,
+        tackles: 9
+      }
+    },
+    {
+      id: 4,
+      name: "DUSTIN MARTIN",
+      team: "Richmond",
+      number: 4,
+      background: "from-yellow-500 to-yellow-600",
+      image: "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      stats: {
+        goalAccuracy: 80,
+        handballs: 8,
+        disposals: 28,
+        kicks: 20,
+        marks: 6,
+        tackles: 4
+      }
+    }
+  ];
+
+  // Player comparison chart data
+  const playerComparisonData = [
+    {
+      stat: "Kicks",
+      [selectedPlayer.name]: selectedPlayer.kicks,
+      [comparisonPlayer.name]: comparisonPlayer.kicks
+    },
+    {
+      stat: "Handballs",
+      [selectedPlayer.name]: selectedPlayer.handballs,
+      [comparisonPlayer.name]: comparisonPlayer.handballs
+    },
+    {
+      stat: "Marks",
+      [selectedPlayer.name]: selectedPlayer.marks,
+      [comparisonPlayer.name]: comparisonPlayer.marks
+    },
+    {
+      stat: "Tackles",
+      [selectedPlayer.name]: selectedPlayer.tackles,
+      [comparisonPlayer.name]: comparisonPlayer.tackles
+    },
+    {
+      stat: "Goals",
+      [selectedPlayer.name]: selectedPlayer.goals,
+      [comparisonPlayer.name]: comparisonPlayer.goals
+    },
+    {
+      stat: "Efficiency",
+      [selectedPlayer.name]: selectedPlayer.efficiency,
+      [comparisonPlayer.name]: comparisonPlayer.efficiency
+    }
+  ];
+
   const filteredPlayers = mockPlayers.filter(
     (player) =>
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedTeam === "all" || player.team === selectedTeam),
   );
+
+  // Handle card click
+  const handleCardClick = (card, index) => {
+    setSelectedCard(card);
+    setSelectedCardIndex(index);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
