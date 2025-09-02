@@ -241,9 +241,8 @@ export default function AFLDashboard() {
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const [selectedCard, setSelectedCard] = useState(null);
 
-  // Player card modal state
-  const [showPlayerModal, setShowPlayerModal] = useState(false);
-  const [modalPlayerCard, setModalPlayerCard] = useState(null);
+  // Expanded card state
+  const [expandedCardId, setExpandedCardId] = useState(null);
 
   // Video upload states
   const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
@@ -1740,7 +1739,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       >
                         <div className="font-medium">{player.name}</div>
                         <div className="text-sm text-gray-600">
-                          {player.team} ����� {player.position}
+                          {player.team} ��� {player.position}
                         </div>
                         <div className="text-xs text-green-600 mt-1">
                           Efficiency: {player.efficiency}%
