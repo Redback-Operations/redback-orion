@@ -1499,8 +1499,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Brisbane Lions",
       number: 7,
       background: "from-red-800 to-red-900",
-      image:
-        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      image: "https://images.pexels.com/photos/29388609/pexels-photo-29388609.jpeg",
       stats: {
         goalAccuracy: 67,
         handballs: 16,
@@ -1516,8 +1515,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Western Bulldogs",
       number: 4,
       background: "from-orange-600 to-orange-700",
-      image:
-        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      image: "https://images.pexels.com/photos/34514/spot-runs-start-la.jpg",
       stats: {
         goalAccuracy: 60,
         handballs: 18,
@@ -1533,8 +1531,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Carlton",
       number: 9,
       background: "from-blue-800 to-blue-900",
-      image:
-        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      image: "https://images.pexels.com/photos/14262637/pexels-photo-14262637.jpeg",
       stats: {
         goalAccuracy: 100,
         handballs: 12,
@@ -1550,8 +1547,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       team: "Richmond",
       number: 4,
       background: "from-yellow-500 to-yellow-600",
-      image:
-        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F97158aa81af244ddb0f0180f747a397e?format=webp&width=800",
+      image: "https://images.pexels.com/photos/6078307/pexels-photo-6078307.jpeg",
       stats: {
         goalAccuracy: 80,
         handballs: 8,
