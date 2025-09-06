@@ -1,12 +1,10 @@
-# React + Vite
+# Redback Project 4 - Crowd Monitoring and Player Tracking
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Repository Guidelines
 
-Currently, two official plugins are available:
+Beginning in the second trimester of 2024, members should follow these guidelines while working with this repository:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **README.md Files**: All folders should contain a `README.md` (unless the folder is automatically generated, e.g., folders beginning with ".").
+- **Naming Conventions**: File and folder names must not contain spaces. Use either snake_case or kebab-case. For instance, instead of "Crowd Monitoring", use "crowd_monitoring" or "crowd-monitoring". Lower-case letters are preferred, but not strictly required.
+- **File Organization**: Do not store loose files at the top level of the repository unless explicitly approved.
+- **Folder Structure**: Teams should work within a designated subfolder under one of the following top-level directories: Crowd-Monitoring, Player-Tracking, Internet-of-Things, or Others.
