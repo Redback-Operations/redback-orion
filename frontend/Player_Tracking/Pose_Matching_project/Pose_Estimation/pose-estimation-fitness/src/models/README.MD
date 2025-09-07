@@ -1,2 +1,0 @@
-this code currently uses the Keypoint R-CNN mode, which is highly inaccurate for this usecase. ive customed trained a model to work a lot better, all the data ive used is in my model file FitnessTracking.v1.yolov5pytorch
-implementing it into the main function would improve the accuracy a lot.

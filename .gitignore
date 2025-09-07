@@ -1,0 +1,3 @@
+
+frontend/Player_Tracking/*
+!frontend/Player_Tracking/afl_player_tracking_and_crowd_monitoring/
