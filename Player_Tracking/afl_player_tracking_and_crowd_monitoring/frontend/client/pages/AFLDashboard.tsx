@@ -1776,33 +1776,32 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="video" className="space-y-6">
-          <div className="flex items-center justify-between gap-4">
-            <TabsList className="grid grid-cols-4">
-              <TabsTrigger
-                value="performance"
-                className="flex items-center gap-2"
-              >
-                <BarChart3 className="w-4 h-4" />
-                Player Performance
-              </TabsTrigger>
-              <TabsTrigger value="crowd" className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Crowd Monitor
-              </TabsTrigger>
-              <TabsTrigger value="reports" className="flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                Reports
-              </TabsTrigger>
-              <TabsTrigger value="video" className="flex items-center gap-2">
-                <Video className="w-4 h-4" />
-                Video Analysis
-              </TabsTrigger>
-            </TabsList>
-            <Button variant="outline" onClick={() => navigate("/team-match-performance")}>
-              Match Team Performance
-            </Button>
-          </div>
+        <Tabs defaultValue="video" onValueChange={(v) => { if (v === "team") navigate("/team-match-performance"); }} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger
+              value="performance"
+              className="flex items-center gap-2"
+            >
+              <BarChart3 className="w-4 h-4" />
+              Player Performance
+            </TabsTrigger>
+            <TabsTrigger value="crowd" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Crowd Monitor
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              Reports
+            </TabsTrigger>
+            <TabsTrigger value="team" className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              Team Match
+            </TabsTrigger>
+            <TabsTrigger value="video" className="flex items-center gap-2">
+              <Video className="w-4 h-4" />
+              Video Analysis
+            </TabsTrigger>
+          </TabsList>
 
           {/* Player Performance Tracker */}
           <TabsContent value="performance" className="space-y-6">
