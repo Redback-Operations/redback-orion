@@ -350,6 +350,125 @@ export default function AFLDashboard() {
   // Static crowd zones data
   const crowdZones = getStaticAFLCrowdZones();
 
+  // Team Match Performance data for Team tab
+  const teamMatches = [
+    {
+      id: 1,
+      round: "Round 12",
+      venue: "MCG",
+      date: "2025-07-02",
+      teams: { home: "Western Bulldogs", away: "Richmond" },
+      stats: {
+        home: { goals: 12, behinds: 8, disposals: 368, marks: 86, tackles: 57, clearances: 34, inside50: 55, efficiency: 76 },
+        away: { goals: 10, behinds: 11, disposals: 341, marks: 73, tackles: 62, clearances: 31, inside50: 49, efficiency: 72 },
+      },
+    },
+    {
+      id: 2,
+      round: "Round 12",
+      venue: "Marvel Stadium",
+      date: "2025-07-03",
+      teams: { home: "Geelong", away: "Collingwood" },
+      stats: {
+        home: { goals: 14, behinds: 7, disposals: 402, marks: 90, tackles: 51, clearances: 39, inside50: 61, efficiency: 79 },
+        away: { goals: 9, behinds: 12, disposals: 359, marks: 77, tackles: 66, clearances: 30, inside50: 47, efficiency: 71 },
+      },
+    },
+    {
+      id: 3,
+      round: "Round 13",
+      venue: "Adelaide Oval",
+      date: "2025-07-10",
+      teams: { home: "Adelaide", away: "Port Adelaide" },
+      stats: {
+        home: { goals: 11, behinds: 13, disposals: 372, marks: 81, tackles: 64, clearances: 37, inside50: 58, efficiency: 73 },
+        away: { goals: 12, behinds: 10, disposals: 365, marks: 75, tackles: 59, clearances: 35, inside50: 54, efficiency: 75 },
+      },
+    },
+  ];
+
+  const [teamSearch, setTeamSearch] = useState("");
+  const [teamFilter, setTeamFilter] = useState("all");
+  const [teamRound, setTeamRound] = useState("all");
+  const teamRounds = useMemo(() => ["all", ...Array.from(new Set(teamMatches.map((m) => m.round)))], []);
+  const teamTeams = useMemo(() => {
+    const s = new Set<string>();
+    teamMatches.forEach((m) => { s.add(m.teams.home); s.add(m.teams.away); });
+    return ["all", ...Array.from(s).sort()];
+  }, []);
+  const teamFiltered = useMemo(() => {
+    const q = teamSearch.trim().toLowerCase();
+    return teamMatches.filter((m) => {
+      const matchesRound = teamRound === "all" || m.round === teamRound;
+      const matchesTeam = teamFilter === "all" || m.teams.home === teamFilter || m.teams.away === teamFilter;
+      const hay = `${m.teams.home} ${m.teams.away} ${m.venue}`.toLowerCase();
+      return matchesRound && matchesTeam && (q === "" || hay.includes(q));
+    });
+  }, [teamMatches, teamRound, teamFilter, teamSearch]);
+  const teamSummary = useMemo(() => {
+    return teamFiltered.reduce(
+      (acc, m) => {
+        acc.games += 1;
+        acc.goals += m.stats.home.goals + m.stats.away.goals;
+        acc.disposals += m.stats.home.disposals + m.stats.away.disposals;
+        acc.inside50 += m.stats.home.inside50 + m.stats.away.inside50;
+        return acc;
+      },
+      { games: 0, goals: 0, disposals: 0, inside50: 0 },
+    );
+  }, [teamFiltered]);
+
+  // Compare Teams helpers
+  const [teamA, setTeamA] = useState<string>("all");
+  const [teamB, setTeamB] = useState<string>("all");
+  const calcTotals = (name: string) => {
+    const base = { goals: 0, disposals: 0, marks: 0, tackles: 0, clearances: 0, inside50: 0, effSum: 0, effCount: 0 };
+    if (!name || name === "all") return base;
+    for (const m of teamMatches) {
+      if (m.teams.home === name) {
+        base.goals += m.stats.home.goals; base.disposals += m.stats.home.disposals; base.marks += m.stats.home.marks; base.tackles += m.stats.home.tackles; base.clearances += m.stats.home.clearances; base.inside50 += m.stats.home.inside50; base.effSum += m.stats.home.efficiency; base.effCount += 1;
+      }
+      if (m.teams.away === name) {
+        base.goals += m.stats.away.goals; base.disposals += m.stats.away.disposals; base.marks += m.stats.away.marks; base.tackles += m.stats.away.tackles; base.clearances += m.stats.away.clearances; base.inside50 += m.stats.away.inside50; base.effSum += m.stats.away.efficiency; base.effCount += 1;
+      }
+    }
+    return base;
+  };
+  const teamCompare = useMemo(() => {
+    const a = calcTotals(teamA); const b = calcTotals(teamB);
+    const aEff = a.effCount ? Math.round(a.effSum / a.effCount) : 0;
+    const bEff = b.effCount ? Math.round(b.effSum / b.effCount) : 0;
+    return { a, b, aEff, bEff };
+  }, [teamA, teamB]);
+
+  const TeamCompareBar = ({ label, aLabel, aValue, bLabel, bValue }: { label: string; aLabel: string; aValue: number; bLabel: string; bValue: number }) => {
+    const max = Math.max(aValue, bValue) || 1;
+    const aPct = Math.round((aValue / max) * 100);
+    const bPct = Math.round((bValue / max) * 100);
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-medium">{label}</span>
+          <span className="text-gray-600">{aValue} vs {bValue}</span>
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="w-28 text-xs text-blue-700 truncate">{aLabel}</span>
+            <div className="flex-1 bg-gray-200 rounded-full h-3">
+              <div className="bg-blue-500 h-3 rounded-full" style={{ width: `${aPct}%` }} />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-28 text-xs text-green-700 truncate">{bLabel}</span>
+            <div className="flex-1 bg-gray-200 rounded-full h-3">
+              <div className="bg-green-600 h-3 rounded-full" style={{ width: `${bPct}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Player card display state
   const [showAllCards, setShowAllCards] = useState(false);
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
