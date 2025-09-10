@@ -105,7 +105,7 @@ export default function NotFound() {
                       to={page.href}
                       className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-orange-100 rounded-lg flex items-center justify-center">
                         <Icon className="w-4 h-4 text-green-600" />
                       </div>
                       <span className="font-medium text-gray-700">
