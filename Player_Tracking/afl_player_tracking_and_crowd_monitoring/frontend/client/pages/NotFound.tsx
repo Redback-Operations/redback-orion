@@ -65,7 +65,7 @@ export default function NotFound() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   asChild
-                  className="bg-gradient-to-r from-green-600 to-blue-600 flex-1"
+                  className="bg-gradient-to-r from-purple-600 to-orange-600 flex-1"
                 >
                   <Link to="/afl-dashboard">
                     <Home className="w-4 h-4 mr-2" />
