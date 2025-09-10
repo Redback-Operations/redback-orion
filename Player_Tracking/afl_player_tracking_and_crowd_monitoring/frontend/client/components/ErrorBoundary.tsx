@@ -158,15 +158,15 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
 
       // Default error UI
       return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex flex-col">
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50 flex flex-col">
           {/* Header */}
           <header className="border-b bg-white/80 backdrop-blur-sm">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
               <a href="/afl-dashboard" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-orange-600 rounded-lg flex items-center justify-center">
                   <Activity className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
                   AFL Analytics
                 </span>
               </a>
@@ -202,7 +202,7 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
                   <div className="flex flex-col sm:flex-row gap-3">
                     <Button
                       onClick={this.handleRetry}
-                      className="bg-gradient-to-r from-green-600 to-blue-600 flex-1"
+                      className="bg-gradient-to-r from-purple-600 to-orange-600 flex-1"
                     >
                       <RefreshCw className="w-4 h-4 mr-2" />
                       Try Again
@@ -259,11 +259,11 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
                   </div>
 
                   {/* Help Section */}
-                  <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h4 className="font-medium text-blue-900 mb-2">
+                  <div className="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <h4 className="font-medium text-purple-900 mb-2">
                       Need Help?
                     </h4>
-                    <ul className="text-sm text-blue-700 space-y-1 text-left">
+                    <ul className="text-sm text-purple-700 space-y-1 text-left">
                       <li>
                         • Try refreshing the page or going back to the dashboard
                       </li>
