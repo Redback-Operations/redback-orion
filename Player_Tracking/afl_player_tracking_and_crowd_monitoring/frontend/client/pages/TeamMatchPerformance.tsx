@@ -237,10 +237,6 @@ export default function TeamMatchPerformance() {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="hidden sm:flex">Updated now</Badge>
-            <Button onClick={() => navigate("/player-performance")} className="bg-gradient-to-r from-green-600 to-blue-600">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Player Performance
-            </Button>
           </div>
         </div>
       </header>
