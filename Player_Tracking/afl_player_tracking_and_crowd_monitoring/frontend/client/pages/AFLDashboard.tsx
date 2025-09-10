@@ -345,6 +345,7 @@ export default function AFLDashboard() {
   const [selectedTeam, setSelectedTeam] = useState("all");
   const [isLive, setIsLive] = useState(true);
   const [userEmail, setUserEmail] = useState("");
+  const [activeTab, setActiveTab] = useState("video");
 
   // Static crowd zones data
   const crowdZones = getStaticAFLCrowdZones();
@@ -1776,7 +1777,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="video" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(v) => { if (v === "team") { navigate("/team-match-performance"); return; } setActiveTab(v as any); }} className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger
               value="performance"
