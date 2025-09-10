@@ -358,17 +358,17 @@ export default function Login() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-orange-600 rounded-lg flex items-center justify-center">
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
                   AFL Analytics
                 </h1>
                 <p className="text-sm text-gray-600">
@@ -402,7 +402,7 @@ export default function Login() {
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
                   Professional AFL
-                  <span className="block bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
                     Analytics Platform
                   </span>
                 </h2>
@@ -422,8 +422,8 @@ export default function Login() {
                       className="p-4 bg-white rounded-lg border shadow-sm"
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Icon className="w-4 h-4 text-green-600" />
+                        <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-4 h-4 text-purple-600" />
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-900">
@@ -439,19 +439,19 @@ export default function Login() {
                 })}
               </div>
 
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
                 <div className="flex items-center space-x-2 mb-2">
-                  <User className="w-4 h-4 text-blue-600" />
-                  <span className="font-medium text-blue-900">Demo Access</span>
+                  <User className="w-4 h-4 text-orange-600" />
+                  <span className="font-medium text-orange-900">Demo Access</span>
                 </div>
-                <p className="text-sm text-blue-700 mb-3">
+                <p className="text-sm text-orange-700 mb-3">
                   Try the platform with demo credentials to explore all features
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={demoLogin}
-                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                  className="text-orange-600 border-orange-300 hover:bg-orange-100"
                 >
                   Load Demo Credentials
                 </Button>
@@ -611,7 +611,7 @@ export default function Login() {
                           <button
                             type="button"
                             onClick={() => setIsResetModalOpen(true)}
-                            className="text-sm text-blue-600 hover:underline"
+                            className="text-sm text-orange-600 hover:underline"
                           >
                             Forgot password?
                           </button>
@@ -619,7 +619,7 @@ export default function Login() {
 
                         <Button
                           type="submit"
-                          className="w-full bg-gradient-to-r from-green-600 to-blue-600"
+                          className="w-full bg-gradient-to-r from-purple-600 to-orange-600"
                           disabled={isLoading}
                         >
                           {isLoading ? (
@@ -833,14 +833,14 @@ export default function Login() {
                             I agree to the{" "}
                             <button
                               type="button"
-                              className="text-blue-600 hover:underline"
+                              className="text-orange-600 hover:underline"
                             >
                               Terms of Service
                             </button>{" "}
                             and{" "}
                             <button
                               type="button"
-                              className="text-blue-600 hover:underline"
+                              className="text-orange-600 hover:underline"
                             >
                               Privacy Policy
                             </button>
@@ -849,7 +849,7 @@ export default function Login() {
 
                         <Button
                           type="submit"
-                          className="w-full bg-gradient-to-r from-green-600 to-blue-600"
+                          className="w-full bg-gradient-to-r from-purple-600 to-orange-600"
                           disabled={isLoading}
                         >
                           {isLoading ? (
