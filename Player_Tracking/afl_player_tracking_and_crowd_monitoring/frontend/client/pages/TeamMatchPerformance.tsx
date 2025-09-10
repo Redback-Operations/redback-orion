@@ -294,6 +294,63 @@ export default function TeamMatchPerformance() {
         <Metric label="Inside 50s" value={totalSummary.inside50} />
       </div>
 
+      {/* Compare Teams */}
+      <div className="p-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Compare Teams
+            </CardTitle>
+            <CardDescription>Select two teams to compare totals across listed matches</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <Select value={teamA} onValueChange={setTeamA}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Team A" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.filter(t=>t!=="all").map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Select value={teamB} onValueChange={setTeamB}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Team B" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.filter(t=>t!=="all").map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center">
+                <Badge variant="outline" className="w-full justify-center">
+                  {teamA !== "all" && teamB !== "all" && teamA !== teamB ? "Ready" : "Select two different teams"}
+                </Badge>
+              </div>
+            </div>
+
+            {teamA !== "all" && teamB !== "all" && teamA !== teamB && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CompareBar label="Goals" aLabel={teamA} aValue={compare.a.goals} bLabel={teamB} bValue={compare.b.goals} />
+                <CompareBar label="Disposals" aLabel={teamA} aValue={compare.a.disposals} bLabel={teamB} bValue={compare.b.disposals} />
+                <CompareBar label="Marks" aLabel={teamA} aValue={compare.a.marks} bLabel={teamB} bValue={compare.b.marks} />
+                <CompareBar label="Tackles" aLabel={teamA} aValue={compare.a.tackles} bLabel={teamB} bValue={compare.b.tackles} />
+                <CompareBar label="Inside 50" aLabel={teamA} aValue={compare.a.inside50} bLabel={teamB} bValue={compare.b.inside50} />
+                <CompareBar label="Avg Efficiency %" aLabel={teamA} aValue={compare.aEff} bLabel={teamB} bValue={compare.bEff} colorA="bg-indigo-500" colorB="bg-emerald-600" />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Matches list */}
       <div className="p-4 grid grid-cols-1 gap-4">
         {filtered.map((m) => {
