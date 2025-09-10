@@ -437,14 +437,6 @@ export default function TeamMatchPerformance() {
                   />
                 </div>
 
-                {/* Quick action */}
-                <div className="flex items-center justify-end">
-                  <Button variant="outline" onClick={() => navigate("/player-performance")}> 
-                    <Users className="w-4 h-4 mr-2" />
-                    View Player Performance
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           );
