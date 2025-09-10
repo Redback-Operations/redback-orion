@@ -453,15 +453,15 @@ export default function AFLDashboard() {
         </div>
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="w-28 text-xs text-blue-700 truncate">{aLabel}</span>
+            <span className="w-28 text-xs text-purple-700 truncate">{aLabel}</span>
             <div className="flex-1 bg-gray-200 rounded-full h-3">
-              <div className="bg-blue-500 h-3 rounded-full" style={{ width: `${aPct}%` }} />
+              <div className="bg-purple-500 h-3 rounded-full" style={{ width: `${aPct}%` }} />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-28 text-xs text-green-700 truncate">{bLabel}</span>
+            <span className="w-28 text-xs text-orange-700 truncate">{bLabel}</span>
             <div className="flex-1 bg-gray-200 rounded-full h-3">
-              <div className="bg-green-600 h-3 rounded-full" style={{ width: `${bPct}%` }} />
+              <div className="bg-orange-600 h-3 rounded-full" style={{ width: `${bPct}%` }} />
             </div>
           </div>
         </div>
@@ -506,7 +506,7 @@ export default function AFLDashboard() {
       case "analyzing":
       case "processing":
         return (
-          <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />
+          <div className="w-3 h-3 rounded-full bg-purple-500 animate-pulse" />
         );
       case "uploading":
         return (
@@ -1851,17 +1851,17 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
   }, [playerCards, selectedCard]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-orange-600 rounded-lg flex items-center justify-center">
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
                   AFL Analytics
                 </h1>
                 <p className="text-sm text-gray-600">
@@ -2060,7 +2060,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <Flag className="w-4 h-4 text-blue-600" />
+                          <Flag className="w-4 h-4 text-purple-600" />
                           <CardTitle className="text-base">
                             {m.teams.home} vs {m.teams.away}
                           </CardTitle>
@@ -2155,7 +2155,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         key={player.id}
                         className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                           selectedPlayer.id === player.id
-                            ? "border-blue-500 bg-blue-50"
+                            ? "border-blue-500 bg-purple-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                         onClick={() => setSelectedPlayer(player)}
@@ -2164,7 +2164,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="text-sm text-gray-600">
                           {player.team} ��� {player.position}
                         </div>
-                        <div className="text-xs text-green-600 mt-1">
+                        <div className="text-xs text-orange-600 mt-1">
                           Efficiency: {player.efficiency}%
                         </div>
                       </div>
@@ -2185,14 +2185,14 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <div className="text-center p-4 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-center p-4 bg-purple-50 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">
                           {selectedPlayer.kicks}
                         </div>
                         <div className="text-sm text-gray-600">Kicks</div>
                       </div>
-                      <div className="text-center p-4 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">
+                      <div className="text-center p-4 bg-orange-50 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">
                           {selectedPlayer.handballs}
                         </div>
                         <div className="text-sm text-gray-600">Handballs</div>
@@ -2276,7 +2276,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                               </div>
                               {isExpanded && (
                                 <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
-                                  <div className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                                  <div className="bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
                                     EXPANDED VIEW
                                   </div>
                                 </div>
@@ -2284,7 +2284,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                               <div
                                 className={`relative rounded-lg overflow-hidden shadow-lg border-2 bg-gradient-to-b ${card.background} transition-all duration-500 ${
                                   isExpanded
-                                    ? "h-[500px] border-green-400"
+                                    ? "h-[500px] border-orange-400"
                                     : "h-80 border-gray-200"
                                 }`}
                               >
@@ -2532,7 +2532,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 </div>
                                 {isExpanded && (
                                   <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
-                                    <div className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                                    <div className="bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
                                       EXPANDED VIEW
                                     </div>
                                   </div>
@@ -2540,7 +2540,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 <div
                                   className={`relative rounded-lg overflow-hidden shadow-lg border-2 bg-gradient-to-b ${card.background} transition-all duration-500 ${
                                     isExpanded
-                                      ? "h-[600px] border-green-400"
+                                      ? "h-[600px] border-orange-400"
                                       : "h-96 border-gray-200"
                                   }`}
                                 >
@@ -2729,7 +2729,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                     </div>
                                     {isExpanded && (
                                       <div className="text-center text-white/80 text-sm opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.5s_forwards]">
-                                        Click again to collapse • Background
+                                        Click again to collapse �� Background
                                         image more visible • Full player details
                                         shown
                                       </div>
@@ -2997,24 +2997,24 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="relative bg-green-50 rounded-lg p-4 min-h-80">
+                      <div className="relative bg-orange-50 rounded-lg p-4 min-h-80">
                         {/* AFL Ground - Oval Shape */}
                         <div
-                          className="absolute inset-6 border-4 border-green-600 bg-green-200"
+                          className="absolute inset-6 border-4 border-orange-600 bg-orange-200"
                           style={{
                             borderRadius: "50%",
                             clipPath: "ellipse(45% 40% at 50% 50%)",
                           }}
                         >
                           {/* Goal squares */}
-                          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-green-700 bg-green-300"></div>
-                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-green-700 bg-green-300"></div>
+                          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-orange-700 bg-orange-300"></div>
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-orange-700 bg-orange-300"></div>
 
                           {/* Center circle */}
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 border-2 border-green-700 rounded-full"></div>
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 border-2 border-orange-700 rounded-full"></div>
 
                           {/* AFL text */}
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-green-800 mt-6">
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-orange-800 mt-6">
                             AFL GROUND
                           </div>
                         </div>
@@ -3125,8 +3125,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center p-4 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-center p-4 bg-purple-50 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">
                           {crowdZones
                             .reduce((sum, zone) => sum + zone.current, 0)
                             .toLocaleString()}
@@ -3134,12 +3134,12 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="text-sm text-gray-600">
                           Current Attendance
                         </div>
-                        <div className="text-xs text-green-600 mt-1">
+                        <div className="text-xs text-orange-600 mt-1">
                           Live Stadium Data
                         </div>
                       </div>
-                      <div className="text-center p-4 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">
+                      <div className="text-center p-4 bg-orange-50 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">
                           {Math.round(
                             crowdZones.reduce(
                               (sum, zone) => sum + zone.density,
@@ -3151,7 +3151,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="text-sm text-gray-600">
                           Average Density
                         </div>
-                        <div className="text-xs text-green-600 mt-1">
+                        <div className="text-xs text-orange-600 mt-1">
                           Across {crowdZones.length} zones
                         </div>
                       </div>
@@ -3353,7 +3353,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           </div>
                           <div className="flex justify-between">
                             <span>Safe Zones:</span>
-                            <span className="font-medium text-green-600">
+                            <span className="font-medium text-orange-600">
                               {
                                 crowdZones.filter((zone) => zone.density < 85)
                                   .length
@@ -3412,7 +3412,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 ? "text-orange-600"
                                 : zone.density >= 70
                                   ? "text-yellow-600"
-                                  : "text-green-600";
+                                  : "text-orange-600";
 
                           return (
                             <div key={index} className="p-3 border rounded-lg">
@@ -3588,8 +3588,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="p-3 bg-blue-50 rounded">
-                          <div className="text-lg font-bold text-blue-700">
+                        <div className="p-3 bg-purple-50 rounded">
+                          <div className="text-lg font-bold text-purple-700">
                             {Math.round(
                               crowdZones.reduce(
                                 (sum, zone) => sum + zone.density,
@@ -3598,7 +3598,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                             )}
                             %
                           </div>
-                          <div className="text-sm text-blue-600">
+                          <div className="text-sm text-purple-600">
                             Current Average Density
                           </div>
                         </div>
@@ -3638,8 +3638,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="p-3 bg-green-50 rounded">
-                          <div className="text-lg font-bold text-green-700">
+                        <div className="p-3 bg-orange-50 rounded">
+                          <div className="text-lg font-bold text-orange-700">
                             {Math.round(
                               (crowdZones.reduce(
                                 (sum, zone) => sum + zone.current,
@@ -3653,7 +3653,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                             )}
                             %
                           </div>
-                          <div className="text-sm text-green-600">
+                          <div className="text-sm text-orange-600">
                             Current Stadium Fill
                           </div>
                         </div>
@@ -3790,7 +3790,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </div>
                   </div>
 
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600">
+                  <Button className="w-full bg-gradient-to-r from-purple-600 to-orange-600">
                     <Download className="w-4 h-4 mr-2" />
                     Generate Report
                   </Button>
@@ -3900,7 +3900,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </div>
                   </div>
 
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600">
+                  <Button className="w-full bg-gradient-to-r from-purple-600 to-orange-600">
                     <Download className="w-4 h-4 mr-2" />
                     Generate Crowd Report
                   </Button>
@@ -4026,9 +4026,9 @@ Generated on: ${new Date().toLocaleString()}
                   </div>
 
                   {selectedVideoFile && (
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
                       <div className="flex items-center gap-2">
-                        <Video className="w-4 h-4 text-blue-600" />
+                        <Video className="w-4 h-4 text-purple-600" />
                         <span className="font-medium">
                           {selectedVideoFile.name}
                         </span>
@@ -4069,10 +4069,10 @@ Generated on: ${new Date().toLocaleString()}
                   )}
 
                   {videoAnalysisComplete && (
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="p-3 bg-orange-50 border border-green-200 rounded-lg">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-orange-500 rounded-full" />
-                        <span className="text-sm text-green-700 font-medium">
+                        <span className="text-sm text-orange-700 font-medium">
                           Analysis completed successfully!
                         </span>
                       </div>
@@ -4140,7 +4140,7 @@ Generated on: ${new Date().toLocaleString()}
                   </div>
 
                   <Button
-                    className="w-full bg-gradient-to-r from-green-600 to-blue-600"
+                    className="w-full bg-gradient-to-r from-purple-600 to-orange-600"
                     onClick={uploadAndAnalyzeVideo}
                     disabled={
                       !selectedVideoFile || isVideoUploading || isVideoAnalyzing
@@ -4179,7 +4179,7 @@ Generated on: ${new Date().toLocaleString()}
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <div className="p-4 bg-blue-50 rounded-lg">
+                      <div className="p-4 bg-purple-50 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">
                             Analysis Type:{" "}
@@ -4201,7 +4201,7 @@ Generated on: ${new Date().toLocaleString()}
                       </div>
 
                       {selectedFocusAreas.length > 0 && (
-                        <div className="p-4 bg-green-50 rounded-lg">
+                        <div className="p-4 bg-orange-50 rounded-lg">
                           <div className="flex items-center justify-between mb-2">
                             <span className="font-medium">
                               Focus Areas Analyzed
@@ -4445,7 +4445,7 @@ Generated on: ${new Date().toLocaleString()}
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleViewAnalysis(item)}
-                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                                className="text-purple-600 border-blue-600 hover:bg-purple-50"
                               >
                                 <Eye className="w-4 h-4 mr-1" />
                                 View
@@ -4455,7 +4455,7 @@ Generated on: ${new Date().toLocaleString()}
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="text-green-600 border-green-600 hover:bg-green-50"
+                                    className="text-orange-600 border-orange-600 hover:bg-orange-50"
                                   >
                                     <Download className="w-4 h-4 mr-1" />
                                     Download
@@ -4497,7 +4497,7 @@ Generated on: ${new Date().toLocaleString()}
                                 variant="outline"
                                 size="sm"
                                 onClick={() => retryProcessing(item.id)}
-                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                                className="text-purple-600 border-blue-600 hover:bg-purple-50"
                               >
                                 <Zap className="w-4 h-4 mr-1" />
                                 Retry
@@ -4635,7 +4635,7 @@ Generated on: ${new Date().toLocaleString()}
                   <h3 className="text-lg font-semibold">Analysis Results</h3>
                   <Badge
                     variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    className="bg-orange-50 text-orange-700 border-green-200"
                   >
                     <div className="w-2 h-2 rounded-full bg-orange-500 mr-2" />
                     Analysis Complete
@@ -4658,7 +4658,7 @@ Generated on: ${new Date().toLocaleString()}
                           <div className="space-y-4">
                             {/* Player Stats Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <div className="p-3 bg-blue-50 rounded-lg">
+                              <div className="p-3 bg-purple-50 rounded-lg">
                                 <div className="font-medium">
                                   Marcus Bontempelli
                                 </div>
@@ -4669,7 +4669,7 @@ Generated on: ${new Date().toLocaleString()}
                                   Max Speed: 32.4 km/h | Distance: 12.8 km
                                 </div>
                               </div>
-                              <div className="p-3 bg-green-50 rounded-lg">
+                              <div className="p-3 bg-orange-50 rounded-lg">
                                 <div className="font-medium">
                                   Patrick Cripps
                                 </div>
@@ -4732,7 +4732,7 @@ Generated on: ${new Date().toLocaleString()}
                         <CardContent>
                           <div className="space-y-4">
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                              <div className="p-3 bg-green-50 rounded-lg">
+                              <div className="p-3 bg-orange-50 rounded-lg">
                                 <div className="font-medium">
                                   Northern Stand
                                 </div>
@@ -4743,7 +4743,7 @@ Generated on: ${new Date().toLocaleString()}
                                   Noise: 95.2 dB peak
                                 </div>
                               </div>
-                              <div className="p-3 bg-blue-50 rounded-lg">
+                              <div className="p-3 bg-purple-50 rounded-lg">
                                 <div className="font-medium">
                                   Southern Stand
                                 </div>
@@ -4766,13 +4766,13 @@ Generated on: ${new Date().toLocaleString()}
                             </div>
 
                             {/* Crowd Chart Placeholder */}
-                            <div className="h-48 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
+                            <div className="h-48 bg-gradient-to-br from-purple-50 to-orange-50 rounded-lg border-2 border-dashed border-purple-300 flex items-center justify-center">
                               <div className="text-center">
                                 <Users className="w-10 h-10 mx-auto text-blue-400 mb-2" />
-                                <div className="text-lg font-medium text-blue-600">
+                                <div className="text-lg font-medium text-purple-600">
                                   Crowd Density Charts
                                 </div>
-                                <div className="text-sm text-blue-500">
+                                <div className="text-sm text-purple-500">
                                   Stadium utilization and movement patterns
                                 </div>
                               </div>
@@ -4800,7 +4800,7 @@ Generated on: ${new Date().toLocaleString()}
                                 (94% confidence)
                               </div>
                             </div>
-                            <div className="p-3 bg-green-50 border-l-4 border-green-400">
+                            <div className="p-3 bg-orange-50 border-l-4 border-orange-400">
                               <div className="font-medium">
                                 00:18:23 - Spectacular Mark
                               </div>
@@ -4809,7 +4809,7 @@ Generated on: ${new Date().toLocaleString()}
                                 confidence)
                               </div>
                             </div>
-                            <div className="p-3 bg-blue-50 border-l-4 border-blue-400">
+                            <div className="p-3 bg-purple-50 border-l-4 border-purple-400">
                               <div className="font-medium">
                                 00:34:56 - Crucial Tackle
                               </div>
@@ -4831,26 +4831,26 @@ Generated on: ${new Date().toLocaleString()}
                         </CardHeader>
                         <CardContent>
                           <div className="grid md:grid-cols-3 gap-4">
-                            <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                            <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-purple-200">
                               <div className="flex items-center gap-2 mb-2">
-                                <TrendingUp className="w-4 h-4 text-blue-600" />
+                                <TrendingUp className="w-4 h-4 text-purple-600" />
                                 <span className="font-medium text-blue-800">
                                   Top Performer
                                 </span>
                               </div>
-                              <div className="text-sm text-blue-700">
+                              <div className="text-sm text-purple-700">
                                 Patrick Cripps leads with 88.6% efficiency and
                                 strong defensive stats
                               </div>
                             </div>
                             <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
                               <div className="flex items-center gap-2 mb-2">
-                                <Users className="w-4 h-4 text-green-600" />
-                                <span className="font-medium text-green-800">
+                                <Users className="w-4 h-4 text-orange-600" />
+                                <span className="font-medium text-orange-800">
                                   Crowd Impact
                                 </span>
                               </div>
-                              <div className="text-sm text-green-700">
+                              <div className="text-sm text-orange-700">
                                 Southern Stand achieved 97.3% density with peak
                                 engagement
                               </div>
@@ -4870,7 +4870,7 @@ Generated on: ${new Date().toLocaleString()}
                           </div>
                           <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
                             <div className="flex items-start gap-3">
-                              <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <div className="w-2 h-2 rounded-full bg-white" />
                               </div>
                               <div>
