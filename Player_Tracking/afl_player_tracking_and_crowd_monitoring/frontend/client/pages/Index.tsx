@@ -148,7 +148,7 @@ export default function Index() {
       <section className="container mx-auto px-4 py-16 text-center">
         <Badge
           variant="secondary"
-          className="mb-4 bg-blue-100 text-blue-700 border-blue-200"
+          className="mb-4 bg-purple-100 text-purple-700 border-purple-200"
         >
           <Sparkles className="w-3 h-3 mr-1" />
           AI-Powered UI Design
