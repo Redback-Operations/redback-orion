@@ -102,7 +102,7 @@ export default function Index() {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <Wand2 className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
               Stitch
             </span>
           </div>
@@ -136,7 +136,7 @@ export default function Index() {
             </Button>
             <Button
               size="sm"
-              className="bg-gradient-to-r from-blue-600 to-purple-600"
+              className="bg-gradient-to-r from-purple-600 to-orange-600"
             >
               Get Started
             </Button>
@@ -155,7 +155,7 @@ export default function Index() {
         </Badge>
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
           Design UIs with
-          <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
             {" "}
             Natural Language
           </span>
@@ -205,7 +205,7 @@ export default function Index() {
                   onClick={handleGenerate}
                   disabled={!prompt.trim() || isGenerating}
                   size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600"
+                  className="bg-gradient-to-r from-purple-600 to-orange-600"
                 >
                   {isGenerating ? (
                     <>
@@ -330,7 +330,7 @@ export default function Index() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-lg px-8"
+              className="bg-gradient-to-r from-purple-600 to-orange-600 text-lg px-8"
             >
               Start Creating Free
             </Button>
