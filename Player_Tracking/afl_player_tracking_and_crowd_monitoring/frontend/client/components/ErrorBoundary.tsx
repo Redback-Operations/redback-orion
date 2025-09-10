@@ -162,14 +162,14 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
           {/* Header */}
           <header className="border-b bg-white/80 backdrop-blur-sm">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-              <Link to="/afl-dashboard" className="flex items-center space-x-2">
+              <a href="/afl-dashboard" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
                   <Activity className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                   AFL Analytics
                 </span>
-              </Link>
+              </a>
               <Badge variant="destructive">Application Error</Badge>
             </div>
           </header>
@@ -215,11 +215,11 @@ Component Stack: ${errorInfo?.componentStack || "No component stack"}
                       <RefreshCw className="w-4 h-4 mr-2" />
                       Reload Page
                     </Button>
-                    <Button asChild variant="outline" className="flex-1">
-                      <Link to="/afl-dashboard">
+                    <Button variant="outline" className="flex-1" asChild>
+                      <a href="/afl-dashboard">
                         <Home className="w-4 h-4 mr-2" />
                         Go Home
-                      </Link>
+                      </a>
                     </Button>
                   </div>
 
