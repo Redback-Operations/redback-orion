@@ -263,7 +263,7 @@ export default function Index() {
               >
                 <CardHeader>
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-orange-100 rounded-lg flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-blue-600" />
+                    <Icon className="w-6 h-6 text-purple-600" />
                   </div>
                   <CardTitle className="text-xl">{feature.title}</CardTitle>
                   <CardDescription className="text-gray-600">
