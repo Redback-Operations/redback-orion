@@ -2933,66 +2933,6 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
             </div>
           </TabsContent>
 
-          {/* Team Match Performance */}
-          <TabsContent value="team" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    Team Match Performance
-                  </CardTitle>
-                  <CardDescription>
-                    Quick overview of recent team match metrics and navigation
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 bg-blue-50 rounded">
-                      <div className="text-lg font-bold text-blue-700">Goals</div>
-                      <div className="text-sm text-gray-700">Team scoring trends</div>
-                    </div>
-                    <div className="p-3 bg-green-50 rounded">
-                      <div className="text-lg font-bold text-green-700">Disposals</div>
-                      <div className="text-sm text-gray-700">Ball movement & control</div>
-                    </div>
-                    <div className="p-3 bg-orange-50 rounded">
-                      <div className="text-lg font-bold text-orange-700">Inside 50s</div>
-                      <div className="text-sm text-gray-700">Forward entries</div>
-                    </div>
-                    <div className="p-3 bg-purple-50 rounded">
-                      <div className="text-lg font-bold text-purple-700">Tackles</div>
-                      <div className="text-sm text-gray-700">Pressure acts</div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <Button onClick={() => navigate("/team-match-performance")} className="bg-gradient-to-r from-green-600 to-blue-600">
-                      Open Full Team View
-                    </Button>
-                    <Button variant="outline" onClick={() => navigate("/player-performance")}>
-                      Go to Player Performance
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">How to use</CardTitle>
-                  <CardDescription>
-                    Explore team-level insights and jump to player details
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                    <li>Review team metrics and compare trends</li>
-                    <li>Click "Open Full Team View" for detailed comparisons</li>
-                    <li>Use "Go to Player Performance" for individual breakdowns</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
           {/* Crowd Monitoring Dashboard */}
           <TabsContent value="crowd" className="space-y-6">
             <Tabs defaultValue="overview" className="w-full">
