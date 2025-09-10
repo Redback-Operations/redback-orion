@@ -1804,6 +1804,186 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
             </TabsTrigger>
           </TabsList>
 
+          {/* Team Match Performance */}
+          <TabsContent value="team" className="space-y-6">
+            {/* Filters */}
+            <div className="bg-white border rounded-lg p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
+                <div className="sm:col-span-1">
+                  <Input
+                    placeholder="Search team, venue..."
+                    value={teamSearch}
+                    onChange={(e) => setTeamSearch(e.target.value)}
+                  />
+                </div>
+                <div className="sm:col-span-1">
+                  <Select value={teamFilter} onValueChange={setTeamFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teamTeams.map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t === "all" ? "All Teams" : t}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="sm:col-span-1">
+                  <Select value={teamRound} onValueChange={setTeamRound}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Round" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teamRounds.map((r) => (
+                        <SelectItem key={r} value={r}>
+                          {r === "all" ? "All Rounds" : r}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-sm text-gray-600">Matches</div>
+                  <div className="text-2xl font-semibold">{teamSummary.games}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-sm text-gray-600">Total Goals</div>
+                  <div className="text-2xl font-semibold">{teamSummary.goals}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-sm text-gray-600">Total Disposals</div>
+                  <div className="text-2xl font-semibold">{teamSummary.disposals.toLocaleString()}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-sm text-gray-600">Inside 50s</div>
+                  <div className="text-2xl font-semibold">{teamSummary.inside50}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Compare Teams */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="w-5 h-5" />
+                  Compare Teams
+                </CardTitle>
+                <CardDescription>Select two teams to compare totals across listed matches</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <Select value={teamA} onValueChange={setTeamA}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Team A" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teamTeams.filter(t=>t!=="all").map((t) => (
+                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Select value={teamB} onValueChange={setTeamB}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Team B" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teamTeams.filter(t=>t!=="all").map((t) => (
+                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center">
+                    <Badge variant="outline" className="w-full justify-center">
+                      {teamA !== "all" && teamB !== "all" && teamA !== teamB ? "Ready" : "Select two different teams"}
+                    </Badge>
+                  </div>
+                </div>
+
+                {teamA !== "all" && teamB !== "all" && teamA !== teamB && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <TeamCompareBar label="Goals" aLabel={teamA} aValue={teamCompare.a.goals} bLabel={teamB} bValue={teamCompare.b.goals} />
+                    <TeamCompareBar label="Disposals" aLabel={teamA} aValue={teamCompare.a.disposals} bLabel={teamB} bValue={teamCompare.b.disposals} />
+                    <TeamCompareBar label="Marks" aLabel={teamA} aValue={teamCompare.a.marks} bLabel={teamB} bValue={teamCompare.b.marks} />
+                    <TeamCompareBar label="Tackles" aLabel={teamA} aValue={teamCompare.a.tackles} bLabel={teamB} bValue={teamCompare.b.tackles} />
+                    <TeamCompareBar label="Inside 50" aLabel={teamA} aValue={teamCompare.a.inside50} bLabel={teamB} bValue={teamCompare.b.inside50} />
+                    <TeamCompareBar label="Avg Efficiency %" aLabel={teamA} aValue={teamCompare.aEff} bLabel={teamB} bValue={teamCompare.bEff} />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Matches list */}
+            <div className="grid grid-cols-1 gap-4">
+              {teamFiltered.map((m) => {
+                const homePoints = m.stats.home.goals * 6 + m.stats.home.behinds;
+                const awayPoints = m.stats.away.goals * 6 + m.stats.away.behinds;
+                const winPct = Math.min(100, Math.max(0, Math.round((homePoints / (homePoints + awayPoints || 1)) * 100)));
+                return (
+                  <Card key={m.id}>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Flag className="w-4 h-4 text-blue-600" />
+                          <CardTitle className="text-base">
+                            {m.teams.home} vs {m.teams.away}
+                          </CardTitle>
+                        </div>
+                        <Badge variant="outline">{m.round}</Badge>
+                      </div>
+                      <CardDescription>
+                        {m.venue} • {new Date(m.date).toLocaleDateString()}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-600">Score</div>
+                          <div className="text-2xl font-semibold">
+                            {homePoints} - {awayPoints}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {m.stats.home.goals}.{m.stats.home.behinds} vs {m.stats.away.goals}.{m.stats.away.behinds}
+                          </div>
+                        </div>
+                        <div className="md:col-span-2">
+                          <div className="text-sm text-gray-600 mb-1">Win Probability ({m.teams.home})</div>
+                          <Progress value={winPct} />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <TeamCompareBar label="Disposals" aLabel={m.teams.home} aValue={m.stats.home.disposals} bLabel={m.teams.away} bValue={m.stats.away.disposals} />
+                        <TeamCompareBar label="Marks" aLabel={m.teams.home} aValue={m.stats.home.marks} bLabel={m.teams.away} bValue={m.stats.away.marks} />
+                        <TeamCompareBar label="Tackles" aLabel={m.teams.home} aValue={m.stats.home.tackles} bLabel={m.teams.away} bValue={m.stats.away.tackles} />
+                        <TeamCompareBar label="Clearances" aLabel={m.teams.home} aValue={m.stats.home.clearances} bLabel={m.teams.away} bValue={m.stats.away.clearances} />
+                        <TeamCompareBar label="Inside 50" aLabel={m.teams.home} aValue={m.stats.home.inside50} bLabel={m.teams.away} bValue={m.stats.away.inside50} />
+                        <TeamCompareBar label="Efficiency %" aLabel={m.teams.home} aValue={m.stats.home.efficiency} bLabel={m.teams.away} bValue={m.stats.away.efficiency} />
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </TabsContent>
+
           {/* Player Performance Tracker */}
           <TabsContent value="performance" className="space-y-6">
             <div className="flex flex-col lg:flex-row gap-6">
