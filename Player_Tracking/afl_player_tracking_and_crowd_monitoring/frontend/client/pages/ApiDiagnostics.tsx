@@ -257,7 +257,7 @@ export default function ApiDiagnostics() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "healthy":
-        return "text-green-600 bg-green-100";
+        return "text-orange-600 bg-orange-100";
       case "warning":
         return "text-yellow-600 bg-yellow-100";
       case "error":
@@ -281,8 +281,8 @@ export default function ApiDiagnostics() {
   };
 
   const getHttpStatusColor = (status: number) => {
-    if (status >= 200 && status < 300) return "text-green-600";
-    if (status >= 300 && status < 400) return "text-blue-600";
+    if (status >= 200 && status < 300) return "text-orange-600";
+    if (status >= 300 && status < 400) return "text-purple-600";
     if (status >= 400 && status < 500) return "text-yellow-600";
     return "text-red-600";
   };
@@ -294,7 +294,7 @@ export default function ApiDiagnostics() {
   const overallHealth = (healthyApis / totalApis) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
       <MobileNavigation />
 
       <div className="lg:ml-64 pb-16 lg:pb-0">
@@ -320,10 +320,10 @@ export default function ApiDiagnostics() {
                     </p>
                   </div>
                   <div
-                    className={`p-2 rounded-full ${overallHealth > 80 ? "bg-green-100" : "bg-red-100"}`}
+                    className={`p-2 rounded-full ${overallHealth > 80 ? "bg-orange-100" : "bg-red-100"}`}
                   >
                     {overallHealth > 80 ? (
-                      <CheckCircle className="w-6 h-6 text-green-500" />
+                      <CheckCircle className="w-6 h-6 text-orange-500" />
                     ) : (
                       <XCircle className="w-6 h-6 text-red-500" />
                     )}
@@ -342,7 +342,7 @@ export default function ApiDiagnostics() {
                     </p>
                     <p className="text-xs text-gray-500">Last minute</p>
                   </div>
-                  <Zap className="w-6 h-6 text-blue-500" />
+                  <Zap className="w-6 h-6 text-purple-500" />
                 </div>
               </CardContent>
             </Card>
@@ -458,7 +458,7 @@ export default function ApiDiagnostics() {
                         </div>
                         <div className="text-center p-2 bg-gray-50 rounded">
                           <div
-                            className={`font-medium ${api.status === "healthy" ? "text-green-600" : api.status === "warning" ? "text-yellow-600" : "text-red-600"}`}
+                            className={`font-medium ${api.status === "healthy" ? "text-orange-600" : api.status === "warning" ? "text-yellow-600" : "text-red-600"}`}
                           >
                             {api.status.toUpperCase()}
                           </div>
@@ -544,16 +544,16 @@ export default function ApiDiagnostics() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-3 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-center p-3 bg-purple-50 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">
                           {systemMetrics.activeConnections}
                         </div>
                         <div className="text-sm text-gray-600">
                           Active Connections
                         </div>
                       </div>
-                      <div className="text-center p-3 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">
+                      <div className="text-center p-3 bg-orange-50 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">
                           {systemMetrics.requestsPerMinute}
                         </div>
                         <div className="text-sm text-gray-600">
@@ -589,7 +589,7 @@ export default function ApiDiagnostics() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="p-4 border rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <CheckCircle className="w-4 h-4 text-orange-500" />
                           <span className="font-medium">Primary Database</span>
                         </div>
                         <div className="space-y-1 text-sm text-gray-600">
@@ -600,7 +600,7 @@ export default function ApiDiagnostics() {
                       </div>
                       <div className="p-4 border rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <CheckCircle className="w-4 h-4 text-orange-500" />
                           <span className="font-medium">Read Replica</span>
                         </div>
                         <div className="space-y-1 text-sm text-gray-600">

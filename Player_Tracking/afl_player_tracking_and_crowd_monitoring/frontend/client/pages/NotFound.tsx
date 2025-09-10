@@ -22,15 +22,15 @@ export default function NotFound() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50 flex flex-col">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/afl-dashboard" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-orange-600 rounded-lg flex items-center justify-center">
               <Activity className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
               AFL Analytics
             </span>
           </Link>
@@ -65,7 +65,7 @@ export default function NotFound() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   asChild
-                  className="bg-gradient-to-r from-green-600 to-blue-600 flex-1"
+                  className="bg-gradient-to-r from-purple-600 to-orange-600 flex-1"
                 >
                   <Link to="/afl-dashboard">
                     <Home className="w-4 h-4 mr-2" />
@@ -105,7 +105,7 @@ export default function NotFound() {
                       to={page.href}
                       className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-orange-100 rounded-lg flex items-center justify-center">
                         <Icon className="w-4 h-4 text-green-600" />
                       </div>
                       <span className="font-medium text-gray-700">

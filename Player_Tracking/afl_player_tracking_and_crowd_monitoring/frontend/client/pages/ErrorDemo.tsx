@@ -106,7 +106,7 @@ export default function ErrorDemo() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
       <MobileNavigation />
 
       <div className="lg:ml-64 pb-16 lg:pb-0">
@@ -114,7 +114,7 @@ export default function ErrorDemo() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
                 Error Demo Page
               </h1>
               <p className="text-gray-600 mt-2">
@@ -147,7 +147,7 @@ export default function ErrorDemo() {
                   variant="outline"
                   className="flex items-center gap-2 h-auto p-4 flex-col"
                 >
-                  <Wifi className="w-6 h-6 text-blue-600" />
+                  <Wifi className="w-6 h-6 text-purple-600" />
                   <span className="text-center">
                     Network Error
                     <br />
@@ -265,7 +265,7 @@ export default function ErrorDemo() {
                     variant="inline"
                     loadingText="Fetching data..."
                   >
-                    <div className="p-3 bg-green-50 border border-green-200 rounded">
+                    <div className="p-3 bg-orange-50 border border-orange-200 rounded">
                       ✅ Data loaded successfully!
                     </div>
                   </LoadingState>
@@ -319,7 +319,7 @@ export default function ErrorDemo() {
                     emptyMessage="No AFL data available"
                     onRetry={resetDataState}
                   >
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded">
+                    <div className="p-3 bg-purple-50 border border-purple-200 rounded">
                       📊 AFL data: {dataState.data.length} items
                     </div>
                   </DataWrapper>

@@ -102,7 +102,7 @@ export default function Index() {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <Wand2 className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
               Stitch
             </span>
           </div>
@@ -136,7 +136,7 @@ export default function Index() {
             </Button>
             <Button
               size="sm"
-              className="bg-gradient-to-r from-blue-600 to-purple-600"
+              className="bg-gradient-to-r from-purple-600 to-orange-600"
             >
               Get Started
             </Button>
@@ -148,14 +148,14 @@ export default function Index() {
       <section className="container mx-auto px-4 py-16 text-center">
         <Badge
           variant="secondary"
-          className="mb-4 bg-blue-100 text-blue-700 border-blue-200"
+          className="mb-4 bg-purple-100 text-purple-700 border-purple-200"
         >
           <Sparkles className="w-3 h-3 mr-1" />
           AI-Powered UI Design
         </Badge>
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
           Design UIs with
-          <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
             {" "}
             Natural Language
           </span>
@@ -180,7 +180,7 @@ export default function Index() {
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <span>Try:</span>
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-purple-600 hover:underline"
                     onClick={() =>
                       setPrompt(
                         "Create a meditation app with calming blue colors and minimalist design",
@@ -191,7 +191,7 @@ export default function Index() {
                   </button>
                   <span>•</span>
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-purple-600 hover:underline"
                     onClick={() =>
                       setPrompt(
                         "Design an e-commerce product page with modern layout and clean typography",
@@ -205,7 +205,7 @@ export default function Index() {
                   onClick={handleGenerate}
                   disabled={!prompt.trim() || isGenerating}
                   size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600"
+                  className="bg-gradient-to-r from-purple-600 to-orange-600"
                 >
                   {isGenerating ? (
                     <>
@@ -262,8 +262,8 @@ export default function Index() {
                 className="border-0 shadow-md hover:shadow-lg transition-shadow duration-300"
               >
                 <CardHeader>
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-orange-100 rounded-lg flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-purple-600" />
                   </div>
                   <CardTitle className="text-xl">{feature.title}</CardTitle>
                   <CardDescription className="text-gray-600">
@@ -295,7 +295,7 @@ export default function Index() {
             >
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-lg group-hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-lg group-hover:text-purple-600 transition-colors">
                     {example.title}
                   </CardTitle>
                   <Badge variant="secondary" className="text-xs">
@@ -307,7 +307,7 @@ export default function Index() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center text-blue-600 text-sm font-medium group-hover:gap-2 transition-all">
+                <div className="flex items-center text-purple-600 text-sm font-medium group-hover:gap-2 transition-all">
                   Try this prompt
                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -330,7 +330,7 @@ export default function Index() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-lg px-8"
+              className="bg-gradient-to-r from-purple-600 to-orange-600 text-lg px-8"
             >
               Start Creating Free
             </Button>
