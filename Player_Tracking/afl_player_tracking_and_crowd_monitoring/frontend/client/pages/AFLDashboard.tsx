@@ -1762,6 +1762,10 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                   Welcome, {userEmail}
                 </span>
               )}
+              <Button variant="outline" size="sm" onClick={() => navigate("/team-match-performance")}>
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Team Match Performance
+              </Button>
               <Button variant="outline" size="sm">
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
