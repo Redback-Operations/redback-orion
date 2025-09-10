@@ -203,36 +203,6 @@ export default function PlayerPerformance() {
       <div className="bg-white border-b">
         <div className="px-4">
           <Tabs defaultValue="player-performance" className="w-full">
-            <TabsList className="h-12 bg-transparent border-0 gap-8">
-              <TabsTrigger
-                value="player-performance"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
-              >
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Player Performance
-              </TabsTrigger>
-              <TabsTrigger
-                value="crowd-monitor"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
-              >
-                <Users className="w-4 h-4 mr-2" />
-                Crowd Monitor
-              </TabsTrigger>
-              <TabsTrigger
-                value="reports"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Reports
-              </TabsTrigger>
-              <TabsTrigger
-                value="video-analysis"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none pb-3"
-              >
-                <Video className="w-4 h-4 mr-2" />
-                Video Analysis
-              </TabsTrigger>
-            </TabsList>
 
             <TabsContent value="player-performance" className="mt-0">
               <div className="grid grid-cols-12 gap-6 p-6">
