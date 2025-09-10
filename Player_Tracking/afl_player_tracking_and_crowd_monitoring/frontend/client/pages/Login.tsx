@@ -1049,7 +1049,7 @@ export default function Login() {
                     Your password has been reset successfully.
                   </p>
                 </div>
-                <Button onClick={closeResetModal} className="w-full">
+                <Button onClick={closeResetModal} className="w-full bg-gradient-to-r from-purple-600 to-orange-600">
                   Continue to Sign In
                 </Button>
               </div>
