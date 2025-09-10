@@ -502,7 +502,7 @@ export default function AFLDashboard() {
   const StatusIcon = ({ status }: { status: string }) => {
     switch (status) {
       case "completed":
-        return <div className="w-3 h-3 rounded-full bg-green-500" />;
+        return <div className="w-3 h-3 rounded-full bg-orange-500" />;
       case "analyzing":
       case "processing":
         return (
@@ -3059,7 +3059,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       <div className="mt-4 space-y-2">
                         <div className="flex justify-between items-center text-xs">
                           <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-green-500 rounded"></div>
+                            <div className="w-3 h-3 bg-orange-500 rounded"></div>
                             <span>Low (0-49%)</span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -4071,7 +4071,7 @@ Generated on: ${new Date().toLocaleString()}
                   {videoAnalysisComplete && (
                     <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <div className="w-2 h-2 bg-orange-500 rounded-full" />
                         <span className="text-sm text-green-700 font-medium">
                           Analysis completed successfully!
                         </span>
@@ -4637,7 +4637,7 @@ Generated on: ${new Date().toLocaleString()}
                     variant="outline"
                     className="bg-green-50 text-green-700 border-green-200"
                   >
-                    <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                    <div className="w-2 h-2 rounded-full bg-orange-500 mr-2" />
                     Analysis Complete
                   </Badge>
                 </div>
