@@ -180,7 +180,7 @@ export default function Index() {
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <span>Try:</span>
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-purple-600 hover:underline"
                     onClick={() =>
                       setPrompt(
                         "Create a meditation app with calming blue colors and minimalist design",
@@ -191,7 +191,7 @@ export default function Index() {
                   </button>
                   <span>•</span>
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-purple-600 hover:underline"
                     onClick={() =>
                       setPrompt(
                         "Design an e-commerce product page with modern layout and clean typography",
