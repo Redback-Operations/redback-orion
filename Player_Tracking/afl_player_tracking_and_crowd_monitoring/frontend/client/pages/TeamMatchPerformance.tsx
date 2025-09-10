@@ -78,20 +78,31 @@ export default function TeamMatchPerformance() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [round, setRound] = useState("all");
+  const [team, setTeam] = useState("all");
 
   const rounds = useMemo(() => [
     "all",
     ...Array.from(new Set(demoMatches.map((m) => m.round))),
   ], []);
 
+  const teams = useMemo(() => {
+    const set = new Set<string>();
+    demoMatches.forEach((m) => {
+      set.add(m.teams.home);
+      set.add(m.teams.away);
+    });
+    return ["all", ...Array.from(set).sort()];
+  }, []);
+
   const filtered = useMemo(() => {
     return demoMatches.filter((m) => {
       const matchesRound = round === "all" || m.round === round;
+      const matchesTeam = team === "all" || m.teams.home === team || m.teams.away === team;
       const hay = `${m.teams.home} ${m.teams.away} ${m.venue}`.toLowerCase();
       const q = search.trim().toLowerCase();
-      return matchesRound && (q === "" || hay.includes(q));
+      return matchesRound && matchesTeam && (q === "" || hay.includes(q));
     });
-  }, [round, search]);
+  }, [round, team, search]);
 
   const totalSummary = useMemo(() => {
     const base = {
@@ -194,15 +205,29 @@ export default function TeamMatchPerformance() {
 
       {/* Filters */}
       <div className="bg-white border-b">
-        <div className="px-4 py-3 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-          <div className="flex-1">
+        <div className="px-4 py-3 grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
+          <div className="sm:col-span-1">
             <Input
               placeholder="Search team, venue..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="w-full sm:w-60">
+          <div className="sm:col-span-1">
+            <Select value={team} onValueChange={setTeam}>
+              <SelectTrigger>
+                <SelectValue placeholder="Team" />
+              </SelectTrigger>
+              <SelectContent>
+                {teams.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t === "all" ? "All Teams" : t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="sm:col-span-1">
             <Select value={round} onValueChange={setRound}>
               <SelectTrigger>
                 <SelectValue placeholder="Round" />
