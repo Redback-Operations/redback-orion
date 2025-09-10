@@ -79,6 +79,7 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  Flag,
 } from "lucide-react";
 
 // Mock data for the dashboard
