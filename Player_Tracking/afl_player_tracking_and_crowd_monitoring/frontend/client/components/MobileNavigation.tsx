@@ -70,10 +70,10 @@ export default function MobileNavigation() {
       <header className="lg:hidden border-b bg-white/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-orange-600 rounded-lg flex items-center justify-center">
               <Activity className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
               AFL Analytics
             </span>
           </Link>
@@ -87,7 +87,7 @@ export default function MobileNavigation() {
             <SheetContent side="right" className="w-80">
               <div className="flex flex-col h-full">
                 <div className="flex items-center space-x-2 pb-4 border-b">
-                  <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-orange-600 rounded-lg flex items-center justify-center">
                     <Activity className="w-5 h-5 text-white" />
                   </div>
                   <span className="text-lg font-bold">AFL Analytics</span>
@@ -106,16 +106,16 @@ export default function MobileNavigation() {
                           onClick={() => setIsOpen(false)}
                           className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors ${
                             active
-                              ? "bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 text-green-700"
+                              ? "bg-gradient-to-r from-purple-50 to-orange-50 border border-orange-200 text-orange-700"
                               : "hover:bg-gray-50"
                           }`}
                         >
                           <Icon
-                            className={`w-5 h-5 ${active ? "text-green-600" : "text-gray-500"}`}
+                            className={`w-5 h-5 ${active ? "text-orange-600" : "text-gray-500"}`}
                           />
                           <div className="flex-1">
                             <div
-                              className={`font-medium ${active ? "text-green-700" : "text-gray-700"}`}
+                              className={`font-medium ${active ? "text-orange-700" : "text-gray-700"}`}
                             >
                               {item.name}
                             </div>
@@ -124,7 +124,7 @@ export default function MobileNavigation() {
                             </div>
                           </div>
                           {active && (
-                            <div className="w-2 h-2 bg-green-500 rounded-full" />
+                            <div className="w-2 h-2 bg-orange-500 rounded-full" />
                           )}
                         </Link>
                       );
@@ -141,10 +141,10 @@ export default function MobileNavigation() {
       <nav className="hidden lg:block fixed left-0 top-0 h-full w-64 bg-white border-r z-40">
         <div className="flex flex-col h-full">
           <div className="flex items-center space-x-2 p-6 border-b">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-orange-600 rounded-lg flex items-center justify-center">
               <Activity className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
               AFL Analytics
             </span>
           </div>
@@ -161,16 +161,16 @@ export default function MobileNavigation() {
                     to={item.href}
                     className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors ${
                       active
-                        ? "bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 text-green-700"
+                        ? "bg-gradient-to-r from-purple-50 to-orange-50 border border-orange-200 text-orange-700"
                         : "hover:bg-gray-50"
                     }`}
                   >
                     <Icon
-                      className={`w-5 h-5 ${active ? "text-green-600" : "text-gray-500"}`}
+                      className={`w-5 h-5 ${active ? "text-orange-600" : "text-gray-500"}`}
                     />
                     <div className="flex-1">
                       <div
-                        className={`font-medium ${active ? "text-green-700" : "text-gray-700"}`}
+                        className={`font-medium ${active ? "text-orange-700" : "text-gray-700"}`}
                       >
                         {item.name}
                       </div>
@@ -179,7 +179,7 @@ export default function MobileNavigation() {
                       </div>
                     </div>
                     {active && (
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
+                      <div className="w-2 h-2 bg-orange-500 rounded-full" />
                     )}
                   </Link>
                 );
@@ -201,7 +201,7 @@ export default function MobileNavigation() {
                 key={item.name}
                 to={item.href}
                 className={`flex flex-col items-center py-2 px-1 transition-colors ${
-                  active ? "text-green-600" : "text-gray-500"
+                  active ? "text-orange-600" : "text-gray-500"
                 }`}
               >
                 <Icon className="w-5 h-5 mb-1" />
