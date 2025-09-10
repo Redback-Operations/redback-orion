@@ -14,6 +14,7 @@ import Reports from "./pages/Reports";
 import ApiDiagnostics from "./pages/ApiDiagnostics";
 import ErrorDemo from "./pages/ErrorDemo";
 import NotFound from "./pages/NotFound";
+import TeamMatchPerformance from "./pages/TeamMatchPerformance";
 
 const queryClient = new QueryClient({
   defaultOptions: {
