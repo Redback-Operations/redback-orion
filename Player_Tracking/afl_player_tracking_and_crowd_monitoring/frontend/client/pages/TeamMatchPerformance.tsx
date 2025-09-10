@@ -128,6 +128,48 @@ export default function TeamMatchPerformance() {
     }, base);
   }, [filtered]);
 
+  // Team comparison state
+  const [teamA, setTeamA] = useState<string>("all");
+  const [teamB, setTeamB] = useState<string>("all");
+
+  const calcTeamTotals = (teamName: string) => {
+    const base = { goals: 0, behinds: 0, disposals: 0, marks: 0, tackles: 0, clearances: 0, inside50: 0, efficiencySum: 0, efficiencyCount: 0 };
+    if (!teamName || teamName === "all") return base;
+    for (const m of demoMatches) {
+      if (m.teams.home === teamName) {
+        base.goals += m.stats.home.goals;
+        base.behinds += m.stats.home.behinds;
+        base.disposals += m.stats.home.disposals;
+        base.marks += m.stats.home.marks;
+        base.tackles += m.stats.home.tackles;
+        base.clearances += m.stats.home.clearances;
+        base.inside50 += m.stats.home.inside50;
+        base.efficiencySum += m.stats.home.efficiency;
+        base.efficiencyCount += 1;
+      }
+      if (m.teams.away === teamName) {
+        base.goals += m.stats.away.goals;
+        base.behinds += m.stats.away.behinds;
+        base.disposals += m.stats.away.disposals;
+        base.marks += m.stats.away.marks;
+        base.tackles += m.stats.away.tackles;
+        base.clearances += m.stats.away.clearances;
+        base.inside50 += m.stats.away.inside50;
+        base.efficiencySum += m.stats.away.efficiency;
+        base.efficiencyCount += 1;
+      }
+    }
+    return base;
+  };
+
+  const compare = useMemo(() => {
+    const a = calcTeamTotals(teamA);
+    const b = calcTeamTotals(teamB);
+    const aEff = a.efficiencyCount ? Math.round(a.efficiencySum / a.efficiencyCount) : 0;
+    const bEff = b.efficiencyCount ? Math.round(b.efficiencySum / b.efficiencyCount) : 0;
+    return { a, b, aEff, bEff };
+  }, [teamA, teamB]);
+
   const Metric = ({ label, value, suffix = "" }: { label: string; value: number; suffix?: string }) => (
     <div className="p-4 rounded-lg bg-white border">
       <div className="text-sm text-gray-600">{label}</div>
