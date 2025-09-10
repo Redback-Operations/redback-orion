@@ -295,7 +295,7 @@ export default function Index() {
             >
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-lg group-hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-lg group-hover:text-purple-600 transition-colors">
                     {example.title}
                   </CardTitle>
                   <Badge variant="secondary" className="text-xs">
