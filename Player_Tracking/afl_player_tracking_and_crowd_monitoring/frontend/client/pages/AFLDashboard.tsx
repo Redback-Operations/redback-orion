@@ -1777,7 +1777,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="video" onValueChange={(v) => { if (v === "team") navigate("/team-match-performance"); }} className="space-y-6">
+        <Tabs defaultValue="video" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger
               value="performance"
