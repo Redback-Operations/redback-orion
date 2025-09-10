@@ -307,7 +307,7 @@ export default function Index() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center text-blue-600 text-sm font-medium group-hover:gap-2 transition-all">
+                <div className="flex items-center text-purple-600 text-sm font-medium group-hover:gap-2 transition-all">
                   Try this prompt
                   <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
