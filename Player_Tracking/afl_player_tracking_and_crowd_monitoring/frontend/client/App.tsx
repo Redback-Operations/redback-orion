@@ -14,6 +14,7 @@ import Reports from "./pages/Reports";
 import ApiDiagnostics from "./pages/ApiDiagnostics";
 import ErrorDemo from "./pages/ErrorDemo";
 import NotFound from "./pages/NotFound";
+import TeamMatchPerformance from "./pages/TeamMatchPerformance";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,6 +83,7 @@ export default function App() {
               <Route path="/crowd-monitor" element={<CrowdMonitor />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/team-match-performance" element={<TeamMatchPerformance />} />
               <Route path="/api-diagnostics" element={<ApiDiagnostics />} />
               <Route path="/error-demo" element={<ErrorDemo />} />
               <Route path="/stitch" element={<Index />} />

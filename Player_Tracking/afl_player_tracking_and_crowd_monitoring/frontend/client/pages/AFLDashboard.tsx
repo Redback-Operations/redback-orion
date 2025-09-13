@@ -1,6 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import QueueStatusIcon from "@/components/dashboard/QueueStatusIcon";
+import TeamCompareBar from "@/components/dashboard/TeamCompareBar";
+import ProcessingQueueList from "@/components/dashboard/ProcessingQueueList";
+import VideoUploadPanel from "@/components/dashboard/VideoUploadPanel";
+import AnalysisResultsPanel from "@/components/dashboard/AnalysisResultsPanel";
+import ReportsPanel from "@/components/dashboard/ReportsPanel";
+import TeamMatchFilters from "@/components/dashboard/TeamMatchFilters";
+import TeamMatchCompare from "@/components/dashboard/TeamMatchCompare";
+import PlayerComparison from "@/components/dashboard/PlayerComparison";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import TeamSummaryCards from "@/components/dashboard/TeamSummaryCards";
+import MatchesList from "@/components/dashboard/MatchesList";
+import PlayerSearchFilters from "@/components/dashboard/PlayerSearchFilters";
+import PlayerStatsGrid from "@/components/dashboard/PlayerStatsGrid";
+import PlayerTradingCards from "@/components/dashboard/PlayerTradingCards";
+import type { QueueItem } from "@/types/dashboard";
+import { mockPlayers, matchEvents } from "@/lib/mock-data";
+import { generateTimelineFromStadiumData, getStaticAFLCrowdZones } from "@/lib/crowd";
+import { generateDashboardPDF, convertBackendDataToHTML, convertBackendDataToText, fetchBackendAnalysisData } from "@/lib/reports";
+import { useProcessingQueueSimulator } from "@/hooks/use-processing-queue";
 import { useNavigate } from "react-router-dom";
 import { downloadText, downloadFile } from "@/lib/download";
+import { formatTimeAgo, formatETA } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -79,263 +100,10 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  Flag,
 } from "lucide-react";
 
-// Mock data for the dashboard
-const mockPlayers = [
-  {
-    id: 1,
-    name: "Marcus Bontempelli",
-    team: "Western Bulldogs",
-    position: "Midfielder",
-    kicks: 28,
-    handballs: 12,
-    marks: 8,
-    tackles: 6,
-    goals: 2,
-    efficiency: 87,
-  },
-  {
-    id: 2,
-    name: "Dustin Martin",
-    team: "Richmond",
-    position: "Forward",
-    kicks: 22,
-    handballs: 8,
-    marks: 6,
-    tackles: 4,
-    goals: 3,
-    efficiency: 82,
-  },
-  {
-    id: 3,
-    name: "Patrick Dangerfield",
-    team: "Geelong",
-    position: "Midfielder",
-    kicks: 25,
-    handballs: 15,
-    marks: 7,
-    tackles: 8,
-    goals: 1,
-    efficiency: 84,
-  },
-  {
-    id: 4,
-    name: "Max Gawn",
-    team: "Melbourne",
-    position: "Ruckman",
-    kicks: 18,
-    handballs: 6,
-    marks: 10,
-    tackles: 3,
-    goals: 1,
-    efficiency: 78,
-  },
-];
 
-const matchEvents = [
-  {
-    time: "1:32",
-    event: "GOAL",
-    player: "Charlie Curnow",
-    team: "Carlton",
-    description: "Beautiful mark and goal from 30m out",
-  },
-  {
-    time: "3:45",
-    event: "BEHIND",
-    player: "Taylor Walker",
-    team: "Adelaide",
-    description: "Shot from the boundary line",
-  },
-  {
-    time: "5:12",
-    event: "MARK",
-    player: "Jeremy McGovern",
-    team: "West Coast",
-    description: "Spectacular defensive mark",
-  },
-  {
-    time: "7:22",
-    event: "TACKLE",
-    player: "Clayton Oliver",
-    team: "Melbourne",
-    description: "Crucial tackle in defensive 50",
-  },
-];
-
-// Generate timeline data based on current stadium zones
-const generateTimelineFromStadiumData = (crowdZones) => {
-  const currentAttendance = crowdZones.reduce(
-    (sum, zone) => sum + zone.current,
-    0,
-  );
-  const currentDensity = Math.round(
-    crowdZones.reduce((sum, zone) => sum + zone.density, 0) / crowdZones.length,
-  );
-  const currentCritical = crowdZones.filter(
-    (zone) => zone.density >= 95,
-  ).length;
-  const currentHigh = crowdZones.filter(
-    (zone) => zone.density >= 85 && zone.density < 95,
-  ).length;
-
-  // Generate historical timeline showing progression to current state
-  return [
-    {
-      time: "12:00",
-      attendance: Math.round(currentAttendance * 0.6),
-      density: Math.round(currentDensity * 0.7),
-      critical: 0,
-      high: Math.max(0, currentHigh - 2),
-    },
-    {
-      time: "13:00",
-      attendance: Math.round(currentAttendance * 0.7),
-      density: Math.round(currentDensity * 0.8),
-      critical: Math.max(0, currentCritical - 1),
-      high: Math.max(0, currentHigh - 1),
-    },
-    {
-      time: "14:00",
-      attendance: Math.round(currentAttendance * 0.8),
-      density: Math.round(currentDensity * 0.85),
-      critical: Math.max(0, currentCritical - 1),
-      high: currentHigh,
-    },
-    {
-      time: "15:00",
-      attendance: Math.round(currentAttendance * 0.9),
-      density: Math.round(currentDensity * 0.9),
-      critical: currentCritical,
-      high: currentHigh,
-    },
-    {
-      time: "16:00",
-      attendance: currentAttendance,
-      density: currentDensity,
-      critical: currentCritical,
-      high: currentHigh,
-    },
-    {
-      time: "17:00",
-      attendance: Math.round(currentAttendance * 0.95),
-      density: Math.round(currentDensity * 0.95),
-      critical: Math.max(0, currentCritical - 1),
-      high: currentHigh,
-    },
-    {
-      time: "18:00",
-      attendance: Math.round(currentAttendance * 0.85),
-      density: Math.round(currentDensity * 0.9),
-      critical: Math.max(0, currentCritical - 1),
-      high: Math.max(0, currentHigh - 1),
-    },
-  ];
-};
-
-// Static crowd zones for AFL ground with realistic varying density
-const getStaticAFLCrowdZones = () => {
-  return [
-    {
-      zone: "Northern Stand",
-      capacity: 15000,
-      current: 14250,
-      density: 95,
-      trend: "stable",
-      color: "#dc2626", // red - critical
-      position: { top: "5%", left: "25%", width: "50%", height: "15%" },
-    },
-    {
-      zone: "Southern Stand",
-      capacity: 12000,
-      current: 10800,
-      density: 90,
-      trend: "up",
-      color: "#f97316", // orange - high
-      position: { bottom: "5%", left: "25%", width: "50%", height: "15%" },
-    },
-    {
-      zone: "Eastern Wing",
-      capacity: 8000,
-      current: 3200,
-      density: 40,
-      trend: "down",
-      color: "#22c55e", // green - low
-      position: { top: "25%", right: "5%", width: "15%", height: "50%" },
-    },
-    {
-      zone: "Western Wing",
-      capacity: 8000,
-      current: 7200,
-      density: 90,
-      trend: "stable",
-      color: "#f97316", // orange - high
-      position: { top: "25%", left: "5%", width: "15%", height: "50%" },
-    },
-    {
-      zone: "Northeast Corner",
-      capacity: 5000,
-      current: 2750,
-      density: 55,
-      trend: "up",
-      color: "#eab308", // yellow - low-medium
-      position: { top: "15%", right: "15%", width: "20%", height: "20%" },
-    },
-    {
-      zone: "Northwest Corner",
-      capacity: 5000,
-      current: 4750,
-      density: 95,
-      trend: "stable",
-      color: "#dc2626", // red - critical
-      position: { top: "15%", left: "15%", width: "20%", height: "20%" },
-    },
-    {
-      zone: "Southeast Corner",
-      capacity: 5000,
-      current: 3750,
-      density: 75,
-      trend: "down",
-      color: "#f59e0b", // amber - medium
-      position: { bottom: "15%", right: "15%", width: "20%", height: "20%" },
-    },
-    {
-      zone: "Southwest Corner",
-      capacity: 5000,
-      current: 1500,
-      density: 30,
-      trend: "stable",
-      color: "#22c55e", // green - low
-      position: { bottom: "15%", left: "15%", width: "20%", height: "20%" },
-    },
-  ];
-};
-
-type QueueItem = {
-  id: string;
-  name: string;
-  analysisType: string;
-  status:
-    | "uploading"
-    | "queued"
-    | "processing"
-    | "analyzing"
-    | "completed"
-    | "failed";
-  progress: number;
-  duration: string;
-  size: string;
-  uploadTime: string;
-  completedTime: string | null;
-  estimatedCompletion: string | null;
-  priority: "low" | "medium" | "high";
-  userId: string;
-  processingStage: string;
-  errorCount: number;
-  retryCount: number;
-  isUIControlled?: boolean;
-};
 
 export default function AFLDashboard() {
   const navigate = useNavigate();
@@ -348,6 +116,98 @@ export default function AFLDashboard() {
 
   // Static crowd zones data
   const crowdZones = getStaticAFLCrowdZones();
+
+  // Team Match Performance data for Team tab
+  const teamMatches = [
+    {
+      id: 1,
+      round: "Round 12",
+      venue: "MCG",
+      date: "2025-07-02",
+      teams: { home: "Western Bulldogs", away: "Richmond" },
+      stats: {
+        home: { goals: 12, behinds: 8, disposals: 368, marks: 86, tackles: 57, clearances: 34, inside50: 55, efficiency: 76 },
+        away: { goals: 10, behinds: 11, disposals: 341, marks: 73, tackles: 62, clearances: 31, inside50: 49, efficiency: 72 },
+      },
+    },
+    {
+      id: 2,
+      round: "Round 12",
+      venue: "Marvel Stadium",
+      date: "2025-07-03",
+      teams: { home: "Geelong", away: "Collingwood" },
+      stats: {
+        home: { goals: 14, behinds: 7, disposals: 402, marks: 90, tackles: 51, clearances: 39, inside50: 61, efficiency: 79 },
+        away: { goals: 9, behinds: 12, disposals: 359, marks: 77, tackles: 66, clearances: 30, inside50: 47, efficiency: 71 },
+      },
+    },
+    {
+      id: 3,
+      round: "Round 13",
+      venue: "Adelaide Oval",
+      date: "2025-07-10",
+      teams: { home: "Adelaide", away: "Port Adelaide" },
+      stats: {
+        home: { goals: 11, behinds: 13, disposals: 372, marks: 81, tackles: 64, clearances: 37, inside50: 58, efficiency: 73 },
+        away: { goals: 12, behinds: 10, disposals: 365, marks: 75, tackles: 59, clearances: 35, inside50: 54, efficiency: 75 },
+      },
+    },
+  ];
+
+  const [teamSearch, setTeamSearch] = useState("");
+  const [teamFilter, setTeamFilter] = useState("all");
+  const [teamRound, setTeamRound] = useState("all");
+  const teamRounds = useMemo(() => ["all", ...Array.from(new Set(teamMatches.map((m) => m.round)))], []);
+  const teamTeams = useMemo(() => {
+    const s = new Set<string>();
+    teamMatches.forEach((m) => { s.add(m.teams.home); s.add(m.teams.away); });
+    return ["all", ...Array.from(s).sort()];
+  }, []);
+  const teamFiltered = useMemo(() => {
+    const q = teamSearch.trim().toLowerCase();
+    return teamMatches.filter((m) => {
+      const matchesRound = teamRound === "all" || m.round === teamRound;
+      const matchesTeam = teamFilter === "all" || m.teams.home === teamFilter || m.teams.away === teamFilter;
+      const hay = `${m.teams.home} ${m.teams.away} ${m.venue}`.toLowerCase();
+      return matchesRound && matchesTeam && (q === "" || hay.includes(q));
+    });
+  }, [teamMatches, teamRound, teamFilter, teamSearch]);
+  const teamSummary = useMemo(() => {
+    return teamFiltered.reduce(
+      (acc, m) => {
+        acc.games += 1;
+        acc.goals += m.stats.home.goals + m.stats.away.goals;
+        acc.disposals += m.stats.home.disposals + m.stats.away.disposals;
+        acc.inside50 += m.stats.home.inside50 + m.stats.away.inside50;
+        return acc;
+      },
+      { games: 0, goals: 0, disposals: 0, inside50: 0 },
+    );
+  }, [teamFiltered]);
+
+  // Compare Teams helpers
+  const [teamA, setTeamA] = useState<string>("all");
+  const [teamB, setTeamB] = useState<string>("all");
+  const calcTotals = (name: string) => {
+    const base = { goals: 0, disposals: 0, marks: 0, tackles: 0, clearances: 0, inside50: 0, effSum: 0, effCount: 0 };
+    if (!name || name === "all") return base;
+    for (const m of teamMatches) {
+      if (m.teams.home === name) {
+        base.goals += m.stats.home.goals; base.disposals += m.stats.home.disposals; base.marks += m.stats.home.marks; base.tackles += m.stats.home.tackles; base.clearances += m.stats.home.clearances; base.inside50 += m.stats.home.inside50; base.effSum += m.stats.home.efficiency; base.effCount += 1;
+      }
+      if (m.teams.away === name) {
+        base.goals += m.stats.away.goals; base.disposals += m.stats.away.disposals; base.marks += m.stats.away.marks; base.tackles += m.stats.away.tackles; base.clearances += m.stats.away.clearances; base.inside50 += m.stats.away.inside50; base.effSum += m.stats.away.efficiency; base.effCount += 1;
+      }
+    }
+    return base;
+  };
+  const teamCompare = useMemo(() => {
+    const a = calcTotals(teamA); const b = calcTotals(teamB);
+    const aEff = a.effCount ? Math.round(a.effSum / a.effCount) : 0;
+    const bEff = b.effCount ? Math.round(b.effSum / b.effCount) : 0;
+    return { a, b, aEff, bEff };
+  }, [teamA, teamB]);
+
 
   // Player card display state
   const [showAllCards, setShowAllCards] = useState(false);
@@ -379,27 +239,6 @@ export default function AFLDashboard() {
   const [processingQueue, setProcessingQueue] = useState<QueueItem[]>([]);
 
   // Processing queue management functions
-  const StatusIcon = ({ status }: { status: string }) => {
-    switch (status) {
-      case "completed":
-        return <div className="w-3 h-3 rounded-full bg-green-500" />;
-      case "analyzing":
-      case "processing":
-        return (
-          <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />
-        );
-      case "uploading":
-        return (
-          <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />
-        );
-      case "queued":
-        return <div className="w-3 h-3 rounded-full bg-gray-400" />;
-      case "failed":
-        return <div className="w-3 h-3 rounded-full bg-red-500" />;
-      default:
-        return <div className="w-3 h-3 rounded-full bg-gray-300" />;
-    }
-  };
 
   const retryProcessing = (itemId: string) => {
     setProcessingQueue((prev) =>
@@ -426,32 +265,7 @@ export default function AFLDashboard() {
     setProcessingQueue((prev) => prev.filter((item) => item.id !== itemId));
   };
 
-  const formatTimeAgo = (timestamp: string) => {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffMs = now.getTime() - time.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
 
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins} min ago`;
-    if (diffHours < 24)
-      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
-    return time.toLocaleDateString();
-  };
-
-  const formatETA = (timestamp: string | null) => {
-    if (!timestamp) return "Unknown";
-    const now = new Date();
-    const eta = new Date(timestamp);
-    const diffMs = eta.getTime() - now.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 0) return "Overdue";
-    if (diffMins < 60) return `${diffMins} min remaining`;
-    const diffHours = Math.floor(diffMins / 60);
-    return `${diffHours}h ${diffMins % 60}m remaining`;
-  };
 
   // Generate dynamic chart data for analysis results
   const generateAnalysisChartData = (item: any) => {
@@ -723,127 +537,7 @@ export default function AFLDashboard() {
     }
   };
 
-  // Simulate realistic processing queue progress
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProcessingQueue((prev) =>
-        prev.map((item) => {
-          // Only update items that are actively processing AND not controlled by UI
-          if (
-            (item.status === "analyzing" ||
-              item.status === "processing" ||
-              item.status === "uploading" ||
-              item.status === "queued") &&
-            !item.isUIControlled
-          ) {
-            // Variable progress based on file size and complexity
-            const sizeMultiplier = parseFloat(item.size) > 1000 ? 0.5 : 1; // Slower for large files
-            const complexityMultiplier =
-              item.analysisType === "Full Match Analysis"
-                ? 0.3
-                : item.analysisType === "Tactical Analysis"
-                  ? 0.6
-                  : 1;
-            const progressIncrement =
-              Math.random() * 3 * sizeMultiplier * complexityMultiplier + 0.5;
-            const newProgress = Math.min(
-              100,
-              item.progress + progressIncrement,
-            );
-
-            // Simulate stage transitions
-            let newStage = item.processingStage;
-            let newStatus: QueueItem["status"] = item.status;
-
-            if (item.status === "uploading" && newProgress >= 100) {
-              newStatus = "queued";
-              newStage = "queue_waiting";
-              return {
-                ...item,
-                status: newStatus,
-                progress: 0,
-                processingStage: newStage,
-              };
-            }
-
-            if (item.status === "queued" && Math.random() > 0.7) {
-              newStatus = "processing";
-              newStage = "preprocessing";
-              return {
-                ...item,
-                status: newStatus,
-                progress: 5,
-                processingStage: newStage,
-              };
-            }
-
-            if (
-              item.status === "processing" &&
-              item.progress > 30 &&
-              Math.random() > 0.8
-            ) {
-              newStatus = "analyzing";
-              newStage = "video_analysis";
-            }
-
-            if (newProgress >= 100) {
-              newStatus = "completed";
-              newStage = "analysis_complete";
-              return {
-                ...item,
-                status: newStatus,
-                progress: 100,
-                processingStage: newStage,
-                completedTime: new Date().toISOString(),
-                estimatedCompletion: null,
-              };
-            }
-
-            // Realistic failure scenarios based on file characteristics
-            const failureChance =
-              parseFloat(item.size) > 2000
-                ? 0.005 // Higher chance for very large files
-                : item.analysisType === "Tactical Analysis"
-                  ? 0.003 // Complex analysis more prone to failure
-                  : item.retryCount > 0
-                    ? 0.001 // Lower chance if already retried
-                    : 0.002; // Base failure chance
-
-            if (
-              Math.random() < failureChance &&
-              item.errorCount < 2 &&
-              item.progress > 10
-            ) {
-              const errorReasons = [
-                "insufficient_memory",
-                "corrupted_segment",
-                "processing_timeout",
-                "unsupported_codec",
-                "server_overload",
-              ];
-              return {
-                ...item,
-                status: "failed",
-                processingStage:
-                  errorReasons[Math.floor(Math.random() * errorReasons.length)],
-                errorCount: item.errorCount + 1,
-              };
-            }
-
-            return {
-              ...item,
-              progress: newProgress,
-              status: newStatus,
-              processingStage: newStage,
-            };
-          }
-          return item;
-        }),
-      );
-    }, 2000); // Update every 2 seconds
-
-    return () => clearInterval(interval);
-  }, []);
+  useProcessingQueueSimulator(processingQueue, setProcessingQueue);
 
   // Check authentication on component mount
   useEffect(() => {
@@ -1111,53 +805,6 @@ export default function AFLDashboard() {
     };
   };
 
-  // PDF generation for dashboard reports
-  const generateDashboardPDF = (content: string, fileName: string) => {
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) {
-      alert("Please allow popups to generate PDF reports");
-      return;
-    }
-
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <title>AFL Analytics Dashboard Report</title>
-          <style>
-            body { font-family: 'Segoe UI', sans-serif; margin: 40px; line-height: 1.6; color: #333; }
-            .header { text-align: center; border-bottom: 3px solid #059669; padding-bottom: 20px; margin-bottom: 30px; }
-            .logo { color: #059669; font-size: 28px; font-weight: bold; margin-bottom: 5px; }
-            .subtitle { color: #666; font-size: 14px; }
-            h1 { color: #059669; font-size: 24px; margin: 30px 0 15px 0; }
-            h2 { color: #2563eb; font-size: 18px; margin: 25px 0 10px 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
-            .metric { background: #f0fdf4; padding: 10px; margin: 8px 0; border-left: 4px solid #059669; }
-            .section { margin-bottom: 25px; }
-            .player-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0; }
-            .player-card { background: #f9fafb; padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb; }
-            .crowd-item { background: #ecfdf5; padding: 8px; margin: 4px 0; border-radius: 4px; }
-            @media print { body { margin: 20px; } .no-print { display: none; } }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <div class="logo">AFL Analytics Dashboard</div>
-            <div class="subtitle">Professional Sports Analytics Platform</div>
-          </div>
-          <div class="no-print" style="text-align: center; margin-bottom: 20px;">
-            <button onclick="window.print()" style="background: #059669; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Generate PDF</button>
-            <button onclick="window.close()" style="background: #6b7280; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">Close</button>
-          </div>
-          ${content}
-        </body>
-      </html>
-    `;
-
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    setTimeout(() => printWindow.print(), 500);
-  };
 
   // Generate detailed AFL video analysis insights
   const generateDashboardInsights = () => {
@@ -1212,227 +859,8 @@ export default function AFLDashboard() {
     return { playerStats, crowdDensity };
   };
 
-  // Simulate getting JSON data from backend
-  const fetchBackendAnalysisData = async (analysisId: string) => {
-    // Simulate backend JSON response
-    return {
-      analysisId,
-      timestamp: new Date().toISOString(),
-      videoFile: {
-        name: selectedVideoFile?.name || "sample_video.mp4",
-        duration: "02:15:30",
-        size: "1.8 GB",
-        resolution: "1920x1080",
-        framerate: "30fps",
-      },
-      analysisType: selectedAnalysisType,
-      focusAreas: selectedFocusAreas,
-      processingTime: Math.floor(Math.random() * 300 + 120),
-      results: {
-        playerPerformance: [
-          {
-            playerId: "p001",
-            name: "Marcus Bontempelli",
-            team: "Western Bulldogs",
-            position: "Midfielder",
-            statistics: {
-              speed: { max: 32.4, average: 24.8, unit: "km/h" },
-              distance: { total: 12.8, sprints: 2.3, unit: "km" },
-              touches: { total: 28, effective: 24, efficiency: 85.7 },
-              goals: 2,
-              assists: 3,
-              tackles: 6,
-              marks: 8,
-              disposals: 31,
-              timeOnGround: 87.5,
-            },
-          },
-          {
-            playerId: "p002",
-            name: "Patrick Cripps",
-            team: "Carlton",
-            position: "Midfielder",
-            statistics: {
-              speed: { max: 29.8, average: 22.1, unit: "km/h" },
-              distance: { total: 13.2, sprints: 1.8, unit: "km" },
-              touches: { total: 35, effective: 31, efficiency: 88.6 },
-              goals: 1,
-              assists: 5,
-              tackles: 9,
-              marks: 6,
-              disposals: 34,
-              timeOnGround: 92.3,
-            },
-          },
-        ],
-        crowdAnalysis: {
-          totalAttendance: 47832,
-          capacity: 50000,
-          utilizationRate: 95.7,
-          sections: [
-            {
-              sectionId: "north_stand",
-              name: "Northern Stand",
-              attendance: 14250,
-              capacity: 15000,
-              density: 95.0,
-              noiseLevel: { peak: 95.2, average: 78.4, unit: "dB" },
-            },
-            {
-              sectionId: "south_stand",
-              name: "Southern Stand",
-              attendance: 11680,
-              capacity: 12000,
-              density: 97.3,
-              noiseLevel: { peak: 92.8, average: 76.9, unit: "dB" },
-            },
-          ],
-        },
-        highlights: [
-          {
-            timestamp: "00:03:45",
-            duration: 15,
-            type: "goal",
-            description: "Opening goal with crowd eruption",
-            players: ["Marcus Bontempelli"],
-            confidence: 0.94,
-          },
-        ],
-        metadata: {
-          confidence: 0.923,
-          processingVersion: "2.1.3",
-          qualityScore: 8.7,
-        },
-      },
-    };
-  };
 
-  // Convert backend JSON to formatted text
-  const convertBackendDataToText = (data: any) => {
-    return `AFL VIDEO ANALYSIS REPORT
-Generated: ${new Date(data.timestamp).toLocaleString()}
-Analysis ID: ${data.analysisId}
 
-VIDEO INFORMATION
-================
-File: ${data.videoFile.name}
-Duration: ${data.videoFile.duration}
-Size: ${data.videoFile.size}
-Resolution: ${data.videoFile.resolution}
-Processing Time: ${data.processingTime} seconds
-
-PLAYER PERFORMANCE
-==================
-${data.results.playerPerformance
-  .map(
-    (player: any) => `
-${player.name} (${player.team} - ${player.position})
-- Max Speed: ${player.statistics.speed.max} ${player.statistics.speed.unit}
-- Average Speed: ${player.statistics.speed.average} ${player.statistics.speed.unit}
-- Total Distance: ${player.statistics.distance.total} ${player.statistics.distance.unit}
-- Goals: ${player.statistics.goals} | Assists: ${player.statistics.assists}
-- Tackles: ${player.statistics.tackles} | Marks: ${player.statistics.marks}
-- Disposals: ${player.statistics.disposals} | Efficiency: ${player.statistics.touches.efficiency}%
-- Time on Ground: ${player.statistics.timeOnGround}%
-`,
-  )
-  .join("\n")}
-
-CROWD ANALYSIS
-==============
-Total Attendance: ${data.results.crowdAnalysis.totalAttendance.toLocaleString()}
-Stadium Utilization: ${data.results.crowdAnalysis.utilizationRate}%
-
-${data.results.crowdAnalysis.sections
-  .map(
-    (section: any) => `
-${section.name}: ${section.attendance.toLocaleString()} / ${section.capacity.toLocaleString()} (${section.density}%)
-Peak Noise: ${section.noiseLevel.peak} ${section.noiseLevel.unit}
-`,
-  )
-  .join("")}
-
-HIGHLIGHTS
-==========
-${data.results.highlights
-  .map(
-    (highlight: any) =>
-      `${highlight.timestamp} - ${highlight.type.toUpperCase()}: ${highlight.description} (${Math.round(highlight.confidence * 100)}% confidence)`,
-  )
-  .join("\n")}
-
-TECHNICAL METADATA
-==================
-Overall Confidence: ${Math.round(data.results.metadata.confidence * 100)}%
-Quality Score: ${data.results.metadata.qualityScore}/10
-Processing Version: ${data.results.metadata.processingVersion}
-
-Report generated by AFL Analytics Platform
-`;
-  };
-
-  // Convert backend JSON to HTML for PDF
-  const convertBackendDataToHTML = (data: any) => {
-    return `
-      <div class="section">
-        <h1>AFL Video Analysis Report</h1>
-        <div class="metric">
-          <strong>Generated:</strong> ${new Date(data.timestamp).toLocaleString()}<br>
-          <strong>Analysis ID:</strong> ${data.analysisId}<br>
-          <strong>Video File:</strong> ${data.videoFile.name}<br>
-          <strong>Duration:</strong> ${data.videoFile.duration}<br>
-          <strong>Processing Time:</strong> ${data.processingTime} seconds
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Player Performance Analysis</h2>
-        <div class="player-grid">
-          ${data.results.playerPerformance
-            .map(
-              (player: any) => `
-            <div class="player-card">
-              <h3 style="margin: 0 0 8px 0; color: #059669;">${player.name}</h3>
-              <div class="player-team">${player.team} - ${player.position}</div>
-              <div><strong>Max Speed:</strong> ${player.statistics.speed.max} ${player.statistics.speed.unit}</div>
-              <div><strong>Distance:</strong> ${player.statistics.distance.total} ${player.statistics.distance.unit}</div>
-              <div><strong>Goals:</strong> ${player.statistics.goals} | <strong>Assists:</strong> ${player.statistics.assists}</div>
-              <div><strong>Efficiency:</strong> ${player.statistics.touches.efficiency}%</div>
-            </div>
-          `,
-            )
-            .join("")}
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Crowd Analysis</h2>
-        <div class="metric">
-          <strong>Total Attendance:</strong> ${data.results.crowdAnalysis.totalAttendance.toLocaleString()}<br>
-          <strong>Utilization Rate:</strong> ${data.results.crowdAnalysis.utilizationRate}%
-        </div>
-        ${data.results.crowdAnalysis.sections
-          .map(
-            (section: any) => `
-          <div class="crowd-item">
-            <strong>${section.name}:</strong> ${section.attendance.toLocaleString()} / ${section.capacity.toLocaleString()} (${section.density}%)<br>
-            Peak Noise: ${section.noiseLevel.peak} ${section.noiseLevel.unit}
-          </div>
-        `,
-          )
-          .join("")}
-      </div>
-
-      <div class="section">
-        <h2>Technical Information</h2>
-        <div class="metric">
-          <strong>Analysis Confidence:</strong> ${Math.round(data.results.metadata.confidence * 100)}%<br>
-          <strong>Quality Score:</strong> ${data.results.metadata.qualityScore}/10<br>
-          <strong>Processing Version:</strong> ${data.results.metadata.processingVersion}
-        </div>
-      </div>
-    `;
-  };
 
   // Download handlers for reports with backend JSON processing
   const handleDownloadReport = async (
@@ -1446,7 +874,12 @@ Report generated by AFL Analytics Platform
     try {
       // Fetch JSON data from backend
       const analysisId = `analysis_${Date.now()}`;
-      const backendData = await fetchBackendAnalysisData(analysisId);
+      const backendData = await fetchBackendAnalysisData({
+        analysisId,
+        videoName: selectedVideoFile?.name || "sample_video.mp4",
+        analysisType: selectedAnalysisType,
+        focusAreas: selectedFocusAreas,
+      });
 
       if (format === "json") {
         // Download raw JSON data
@@ -1543,7 +976,7 @@ Analysis Type: ${
               : "Crowd Reactions"
     }
 
-════════════════════���══════════════════════════════����══════
+════════════════════�����═════════════��════════��═══════����══════
 
 EXTRACTED VIDEO CLIPS WITH INSIGHTS
 ===================================
@@ -1572,7 +1005,7 @@ CLIP ANALYSIS SUMMARY
         parseFloat(section.density) > parseFloat(max.density) ? section : max,
       ).section
     }
-• Player tracking accuracy: 97.2%
+��� Player tracking accuracy: 97.2%
 
 CROWD RESPONSE CORRELATION
 ==========================
@@ -1731,49 +1164,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
   }, [playerCards, selectedCard]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                  AFL Analytics
-                </h1>
-                <p className="text-sm text-gray-600">
-                  Real-time match insights & player analytics
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Badge
-                variant={isLive ? "destructive" : "secondary"}
-                className="animate-pulse"
-              >
-                <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-                {isLive ? "LIVE" : "OFFLINE"}
-              </Badge>
-              {userEmail && (
-                <span className="text-sm text-gray-600 hidden sm:block">
-                  Welcome, {userEmail}
-                </span>
-              )}
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
+      <DashboardHeader isLive={isLive} userEmail={userEmail} onLogout={handleLogout} />
 
       <div className="container mx-auto px-4 py-6">
         <Tabs defaultValue="video" className="space-y-6">
@@ -1793,838 +1185,82 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
               <Download className="w-4 h-4" />
               Reports
             </TabsTrigger>
+            <TabsTrigger value="team" className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              Team Match
+            </TabsTrigger>
             <TabsTrigger value="video" className="flex items-center gap-2">
               <Video className="w-4 h-4" />
               Video Analysis
             </TabsTrigger>
           </TabsList>
 
+          {/* Team Match Performance */}
+          <TabsContent value="team" className="space-y-6">
+            {/* Filters */}
+            <TeamMatchFilters
+              teamSearch={teamSearch}
+              setTeamSearch={setTeamSearch}
+              teamFilter={teamFilter}
+              setTeamFilter={setTeamFilter}
+              teamRound={teamRound}
+              setTeamRound={setTeamRound}
+              teamRounds={teamRounds}
+              teamTeams={teamTeams}
+            />
+
+            <TeamSummaryCards teamSummary={teamSummary} />
+
+            {/* Compare Teams */}
+            <TeamMatchCompare
+              teamA={teamA}
+              setTeamA={setTeamA}
+              teamB={teamB}
+              setTeamB={setTeamB}
+              teamTeams={teamTeams}
+              teamCompare={teamCompare}
+            />
+
+            <MatchesList matches={teamFiltered} />
+          </TabsContent>
+
           {/* Player Performance Tracker */}
           <TabsContent value="performance" className="space-y-6">
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Search and Filters */}
-              <Card className="lg:w-1/3">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Search className="w-5 h-5" />
-                    Player Search & Filters
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      Search Players
-                    </label>
-                    <Input
-                      placeholder="Search by name..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      Filter by Team
-                    </label>
-                    <Select
-                      value={selectedTeam}
-                      onValueChange={setSelectedTeam}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select team" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Teams</SelectItem>
-                        <SelectItem value="Western Bulldogs">
-                          Western Bulldogs
-                        </SelectItem>
-                        <SelectItem value="Richmond">Richmond</SelectItem>
-                        <SelectItem value="Geelong">Geelong</SelectItem>
-                        <SelectItem value="Melbourne">Melbourne</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {filteredPlayers.map((player) => (
-                      <div
-                        key={player.id}
-                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                          selectedPlayer.id === player.id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
-                        onClick={() => setSelectedPlayer(player)}
-                      >
-                        <div className="font-medium">{player.name}</div>
-                        <div className="text-sm text-gray-600">
-                          {player.team} ��� {player.position}
-                        </div>
-                        <div className="text-xs text-green-600 mt-1">
-                          Efficiency: {player.efficiency}%
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <PlayerSearchFilters
+                searchTerm={searchTerm}
+                setSearchTerm={(v: string) => setSearchTerm(v)}
+                selectedTeam={selectedTeam}
+                setSelectedTeam={(v: string) => setSelectedTeam(v)}
+                filteredPlayers={filteredPlayers}
+                selectedPlayer={selectedPlayer}
+                onSelectPlayer={(p) => setSelectedPlayer(p)}
+              />
 
               {/* Player Statistics */}
               <div className="lg:w-2/3 space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>Player Statistics - {selectedPlayer.name}</span>
-                      <Badge variant="outline">{selectedPlayer.team}</Badge>
-                    </CardTitle>
-                    <CardDescription>{selectedPlayer.position}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <div className="text-center p-4 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {selectedPlayer.kicks}
-                        </div>
-                        <div className="text-sm text-gray-600">Kicks</div>
-                      </div>
-                      <div className="text-center p-4 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">
-                          {selectedPlayer.handballs}
-                        </div>
-                        <div className="text-sm text-gray-600">Handballs</div>
-                      </div>
-                      <div className="text-center p-4 bg-purple-50 rounded-lg">
-                        <div className="text-2xl font-bold text-purple-600">
-                          {selectedPlayer.marks}
-                        </div>
-                        <div className="text-sm text-gray-600">Marks</div>
-                      </div>
-                      <div className="text-center p-4 bg-orange-50 rounded-lg">
-                        <div className="text-2xl font-bold text-orange-600">
-                          {selectedPlayer.tackles}
-                        </div>
-                        <div className="text-sm text-gray-600">Tackles</div>
-                      </div>
-                      <div className="text-center p-4 bg-red-50 rounded-lg">
-                        <div className="text-2xl font-bold text-red-600">
-                          {selectedPlayer.goals}
-                        </div>
-                        <div className="text-sm text-gray-600">Goals</div>
-                      </div>
-                      <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                        <div className="text-2xl font-bold text-yellow-600">
-                          {selectedPlayer.efficiency}%
-                        </div>
-                        <div className="text-sm text-gray-600">Efficiency</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <PlayerStatsGrid selectedPlayer={selectedPlayer} />
 
-                {/* AFL Trading Cards */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5" />
-                        Player Profiles
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowAllCards(!showAllCards)}
-                      >
-                        {showAllCards ? "Show One" : "View All"}
-                      </Button>
-                    </CardTitle>
-                    <CardDescription>
-                      View AFL player profiles with stats and performance data
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {showAllCards ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {playerCards.map((card, index) => {
-                          const isExpanded = expandedCardId === card.id;
-                          return (
-                            <div
-                              key={card.id}
-                              className={`relative w-full mx-auto cursor-pointer transform transition-all duration-500 hover:shadow-xl ${
-                                isExpanded
-                                  ? "col-span-full max-w-2xl scale-105 z-10"
-                                  : "max-w-xs hover:scale-105"
-                              }`}
-                              onClick={() => handleCardClick(card, index)}
-                            >
-                              <div className="absolute top-3 left-3 z-20">
-                                <div className="bg-white rounded-full p-2 shadow-md">
-                                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                                    <span className="text-white font-bold text-xs">
-                                      AFL
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="absolute top-3 right-3 z-20">
-                                <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
-                                  #{card.number}
-                                </div>
-                              </div>
-                              {isExpanded && (
-                                <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
-                                  <div className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                                    EXPANDED VIEW
-                                  </div>
-                                </div>
-                              )}
-                              <div
-                                className={`relative rounded-lg overflow-hidden shadow-lg border-2 bg-gradient-to-b ${card.background} transition-all duration-500 ${
-                                  isExpanded
-                                    ? "h-[500px] border-green-400"
-                                    : "h-80 border-gray-200"
-                                }`}
-                              >
-                                <img
-                                  src={card.image}
-                                  alt={card.name}
-                                  className={`w-full h-full object-cover transition-opacity duration-500 ${
-                                    isExpanded ? "opacity-95" : "opacity-80"
-                                  }`}
-                                />
-                                <div
-                                  className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-500 ${
-                                    isExpanded
-                                      ? "from-transparent via-black/20 to-black/90"
-                                      : "from-transparent via-transparent to-black/80"
-                                  }`}
-                                />
-                                <div
-                                  className={`absolute left-3 right-3 z-10 transition-all duration-500 ${
-                                    isExpanded ? "top-16" : "top-12"
-                                  }`}
-                                >
-                                  <h3
-                                    className={`text-white font-bold leading-tight transition-all duration-500 ${
-                                      isExpanded ? "text-2xl" : "text-lg"
-                                    }`}
-                                  >
-                                    {card.name}
-                                  </h3>
-                                  <p
-                                    className={`text-white/80 transition-all duration-500 ${
-                                      isExpanded ? "text-lg" : "text-sm"
-                                    }`}
-                                  >
-                                    {card.team}
-                                  </p>
-                                  {isExpanded && (
-                                    <div className="mt-3 flex gap-2 opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.3s_forwards]">
-                                      <div className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-xs">
-                                        🏆 Season MVP
-                                      </div>
-                                      <div className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-xs">
-                                        ��� Top Performer
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                                <div
-                                  className={`absolute left-3 right-3 z-10 transition-all duration-500 ${
-                                    isExpanded ? "bottom-32" : "bottom-16"
-                                  }`}
-                                >
-                                  <div
-                                    className={`bg-black/80 backdrop-blur-sm rounded transition-all duration-500 ${
-                                      isExpanded ? "p-4" : "p-3"
-                                    }`}
-                                  >
-                                    <div
-                                      className={`text-white space-y-1 transition-all duration-500 ${
-                                        isExpanded ? "text-sm" : "text-xs"
-                                      }`}
-                                    >
-                                      <div className="flex justify-between">
-                                        <span>GOAL ACCURACY:</span>
-                                        <span className="font-bold">
-                                          {card.stats.goalAccuracy}%
-                                        </span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span>HANDBALLS:</span>
-                                        <span className="font-bold">
-                                          {card.stats.handballs}
-                                        </span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span>DISPOSALS:</span>
-                                        <span className="font-bold">
-                                          {card.stats.disposals}
-                                        </span>
-                                      </div>
-                                      {isExpanded && (
-                                        <div className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.4s_forwards]">
-                                          <div className="border-t border-white/20 my-2"></div>
-                                          <div className="flex justify-between">
-                                            <span>EFFICIENCY:</span>
-                                            <span className="font-bold">
-                                              87%
-                                            </span>
-                                          </div>
-                                          <div className="flex justify-between">
-                                            <span>CONTESTED MARKS:</span>
-                                            <span className="font-bold">4</span>
-                                          </div>
-                                          <div className="flex justify-between">
-                                            <span>INTERCEPTS:</span>
-                                            <span className="font-bold">3</span>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                                <div
-                                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 z-10 transition-all duration-500 ${
-                                    isExpanded ? "p-4" : "p-3"
-                                  }`}
-                                >
-                                  <div
-                                    className={`grid grid-cols-3 gap-2 text-white text-center transition-all duration-500 ${
-                                      isExpanded ? "mb-2" : ""
-                                    }`}
-                                  >
-                                    <div>
-                                      <div
-                                        className={`font-bold transition-all duration-500 ${
-                                          isExpanded ? "text-xl" : "text-lg"
-                                        }`}
-                                      >
-                                        {card.stats.kicks}
-                                      </div>
-                                      <div
-                                        className={`transition-all duration-500 ${
-                                          isExpanded ? "text-sm" : "text-xs"
-                                        }`}
-                                      >
-                                        KICKS
-                                      </div>
-                                    </div>
-                                    <div>
-                                      <div
-                                        className={`font-bold transition-all duration-500 ${
-                                          isExpanded ? "text-xl" : "text-lg"
-                                        }`}
-                                      >
-                                        {card.stats.marks}
-                                      </div>
-                                      <div
-                                        className={`transition-all duration-500 ${
-                                          isExpanded ? "text-sm" : "text-xs"
-                                        }`}
-                                      >
-                                        MARKS
-                                      </div>
-                                    </div>
-                                    <div>
-                                      <div
-                                        className={`font-bold transition-all duration-500 ${
-                                          isExpanded ? "text-xl" : "text-lg"
-                                        }`}
-                                      >
-                                        {card.stats.tackles}
-                                      </div>
-                                      <div
-                                        className={`transition-all duration-500 ${
-                                          isExpanded ? "text-sm" : "text-xs"
-                                        }`}
-                                      >
-                                        TACKLES
-                                      </div>
-                                    </div>
-                                  </div>
-                                  {isExpanded && (
-                                    <div className="text-center text-white/80 text-xs opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.5s_forwards]">
-                                      Click again to collapse • Background image
-                                      now more visible
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center space-y-4">
-                        <div className="flex items-center space-x-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const newIndex = Math.max(
-                                0,
-                                selectedCardIndex - 1,
-                              );
-                              setSelectedCardIndex(newIndex);
-                              setSelectedCard(playerCards[newIndex]);
-                            }}
-                            disabled={selectedCardIndex === 0}
-                          >
-                            ← Previous
-                          </Button>
-                          <span className="text-sm text-gray-600">
-                            {selectedCardIndex + 1} of {playerCards.length}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const newIndex = Math.min(
-                                playerCards.length - 1,
-                                selectedCardIndex + 1,
-                              );
-                              setSelectedCardIndex(newIndex);
-                              setSelectedCard(playerCards[newIndex]);
-                            }}
-                            disabled={
-                              selectedCardIndex === playerCards.length - 1
-                            }
-                          >
-                            Next →
-                          </Button>
-                        </div>
-
-                        <div
-                          className={`relative w-full mx-auto cursor-pointer transform transition-all duration-500 hover:shadow-xl ${
-                            expandedCardId === playerCards[selectedCardIndex].id
-                              ? "max-w-2xl scale-105"
-                              : "max-w-sm hover:scale-105"
-                          }`}
-                          onClick={() =>
-                            handleCardClick(
-                              playerCards[selectedCardIndex],
-                              selectedCardIndex,
-                            )
-                          }
-                        >
-                          {(() => {
-                            const card = playerCards[selectedCardIndex];
-                            const isExpanded = expandedCardId === card.id;
-                            return (
-                              <>
-                                <div className="absolute top-3 left-3 z-20">
-                                  <div className="bg-white rounded-full p-2 shadow-md">
-                                    <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                                      <span className="text-white font-bold text-xs">
-                                        AFL
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="absolute top-3 right-3 z-20">
-                                  <div className="bg-black/70 text-white px-2 py-1 rounded text-sm font-bold">
-                                    #{card.number}
-                                  </div>
-                                </div>
-                                {isExpanded && (
-                                  <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-20">
-                                    <div className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                                      EXPANDED VIEW
-                                    </div>
-                                  </div>
-                                )}
-                                <div
-                                  className={`relative rounded-lg overflow-hidden shadow-lg border-2 bg-gradient-to-b ${card.background} transition-all duration-500 ${
-                                    isExpanded
-                                      ? "h-[600px] border-green-400"
-                                      : "h-96 border-gray-200"
-                                  }`}
-                                >
-                                  <img
-                                    src={card.image}
-                                    alt={card.name}
-                                    className={`w-full h-full object-cover transition-opacity duration-500 ${
-                                      isExpanded ? "opacity-95" : "opacity-80"
-                                    }`}
-                                  />
-                                  <div
-                                    className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-500 ${
-                                      isExpanded
-                                        ? "from-transparent via-black/20 to-black/90"
-                                        : "from-transparent via-transparent to-black/80"
-                                    }`}
-                                  />
-                                  <div
-                                    className={`absolute left-3 right-3 z-10 transition-all duration-500 ${
-                                      isExpanded ? "top-16" : "top-12"
-                                    }`}
-                                  >
-                                    <h3
-                                      className={`text-white font-bold leading-tight transition-all duration-500 ${
-                                        isExpanded ? "text-3xl" : "text-xl"
-                                      }`}
-                                    >
-                                      {card.name}
-                                    </h3>
-                                    <p
-                                      className={`text-white/80 transition-all duration-500 ${
-                                        isExpanded ? "text-xl" : "text-base"
-                                      }`}
-                                    >
-                                      {card.team}
-                                    </p>
-                                    {isExpanded && (
-                                      <div className="mt-4 flex gap-3 opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.3s_forwards]">
-                                        <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-sm">
-                                          🏆 Season MVP
-                                        </div>
-                                        <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-sm">
-                                          ⭐ Top Performer
-                                        </div>
-                                        <div className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded text-white text-sm">
-                                          💪 Best Midfielder
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div
-                                    className={`absolute left-3 right-3 z-10 transition-all duration-500 ${
-                                      isExpanded ? "bottom-40" : "bottom-20"
-                                    }`}
-                                  >
-                                    <div
-                                      className={`bg-black/80 backdrop-blur-sm rounded transition-all duration-500 ${
-                                        isExpanded ? "p-6" : "p-4"
-                                      }`}
-                                    >
-                                      <div
-                                        className={`text-white space-y-2 transition-all duration-500 ${
-                                          isExpanded ? "text-base" : "text-sm"
-                                        }`}
-                                      >
-                                        <div className="flex justify-between">
-                                          <span>GOAL ACCURACY:</span>
-                                          <span className="font-bold">
-                                            {card.stats.goalAccuracy}%
-                                          </span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                          <span>HANDBALLS:</span>
-                                          <span className="font-bold">
-                                            {card.stats.handballs}
-                                          </span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                          <span>DISPOSALS:</span>
-                                          <span className="font-bold">
-                                            {card.stats.disposals}
-                                          </span>
-                                        </div>
-                                        {isExpanded && (
-                                          <div className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.4s_forwards]">
-                                            <div className="border-t border-white/20 my-3"></div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                              <div className="flex justify-between">
-                                                <span>EFFICIENCY:</span>
-                                                <span className="font-bold">
-                                                  87%
-                                                </span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span>INTERCEPTS:</span>
-                                                <span className="font-bold">
-                                                  3
-                                                </span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span>CONTESTED MARKS:</span>
-                                                <span className="font-bold">
-                                                  4
-                                                </span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span>ONE PERCENTERS:</span>
-                                                <span className="font-bold">
-                                                  7
-                                                </span>
-                                              </div>
-                                            </div>
-                                            <div className="border-t border-white/20 mt-3 pt-3">
-                                              <div className="text-center">
-                                                <span className="text-white/70 text-sm">
-                                                  MATCH RATING
-                                                </span>
-                                                <div className="text-yellow-400 text-2xl font-bold">
-                                                  ★ 9.2/10
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-red-700 z-10 transition-all duration-500 ${
-                                      isExpanded ? "p-6" : "p-4"
-                                    }`}
-                                  >
-                                    <div
-                                      className={`grid grid-cols-3 gap-2 text-white text-center transition-all duration-500 ${
-                                        isExpanded ? "mb-3" : ""
-                                      }`}
-                                    >
-                                      <div>
-                                        <div
-                                          className={`font-bold transition-all duration-500 ${
-                                            isExpanded ? "text-2xl" : "text-xl"
-                                          }`}
-                                        >
-                                          {card.stats.kicks}
-                                        </div>
-                                        <div
-                                          className={`transition-all duration-500 ${
-                                            isExpanded ? "text-base" : "text-sm"
-                                          }`}
-                                        >
-                                          KICKS
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <div
-                                          className={`font-bold transition-all duration-500 ${
-                                            isExpanded ? "text-2xl" : "text-xl"
-                                          }`}
-                                        >
-                                          {card.stats.marks}
-                                        </div>
-                                        <div
-                                          className={`transition-all duration-500 ${
-                                            isExpanded ? "text-base" : "text-sm"
-                                          }`}
-                                        >
-                                          MARKS
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <div
-                                          className={`font-bold transition-all duration-500 ${
-                                            isExpanded ? "text-2xl" : "text-xl"
-                                          }`}
-                                        >
-                                          {card.stats.tackles}
-                                        </div>
-                                        <div
-                                          className={`transition-all duration-500 ${
-                                            isExpanded ? "text-base" : "text-sm"
-                                          }`}
-                                        >
-                                          TACKLES
-                                        </div>
-                                      </div>
-                                    </div>
-                                    {isExpanded && (
-                                      <div className="text-center text-white/80 text-sm opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.5s_forwards]">
-                                        Click again to collapse • Background
-                                        image more visible • Full player details
-                                        shown
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </>
-                            );
-                          })()}
-                        </div>
-
-                        <div className="text-center text-sm text-gray-600 max-w-md">
-                          <p className="font-medium">
-                            Current: {playerCards[selectedCardIndex].name} from{" "}
-                            {playerCards[selectedCardIndex].team}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <PlayerTradingCards
+                  playerCards={playerCards}
+                  showAllCards={showAllCards}
+                  setShowAllCards={setShowAllCards}
+                  selectedCardIndex={selectedCardIndex}
+                  setSelectedCardIndex={setSelectedCardIndex}
+                  expandedCardId={expandedCardId}
+                  setExpandedCardId={setExpandedCardId}
+                  onSelectCard={(c) => setSelectedCard(c)}
+                />
 
                 {/* Player Comparison */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="w-5 h-5" />
-                      Player Comparison
-                    </CardTitle>
-                    <CardDescription>
-                      Compare {selectedPlayer.name} with another player
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-6">
-                      <Select
-                        value={comparisonPlayer.name}
-                        onValueChange={(name) => {
-                          const player = mockPlayers.find(
-                            (p) => p.name === name,
-                          );
-                          if (player) setComparisonPlayer(player);
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select player to compare" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockPlayers
-                            .filter((p) => p.id !== selectedPlayer.id)
-                            .map((player) => (
-                              <SelectItem key={player.id} value={player.name}>
-                                {player.name} ({player.team})
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Progress Bar Comparison */}
-                      <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-700">
-                          Statistical Comparison
-                        </h4>
-                        {[
-                          "kicks",
-                          "handballs",
-                          "marks",
-                          "tackles",
-                          "goals",
-                        ].map((stat) => (
-                          <div key={stat} className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span className="capitalize">{stat}</span>
-                              <span>
-                                {
-                                  selectedPlayer[
-                                    stat as keyof typeof selectedPlayer
-                                  ]
-                                }{" "}
-                                vs{" "}
-                                {
-                                  comparisonPlayer[
-                                    stat as keyof typeof comparisonPlayer
-                                  ]
-                                }
-                              </span>
-                            </div>
-                            <div className="flex gap-2">
-                              <div className="flex-1">
-                                <Progress
-                                  value={
-                                    ((selectedPlayer[
-                                      stat as keyof typeof selectedPlayer
-                                    ] as number) /
-                                      Math.max(
-                                        selectedPlayer[
-                                          stat as keyof typeof selectedPlayer
-                                        ] as number,
-                                        comparisonPlayer[
-                                          stat as keyof typeof comparisonPlayer
-                                        ] as number,
-                                      )) *
-                                    100
-                                  }
-                                  className="h-2"
-                                />
-                                <div className="text-xs text-gray-600 mt-1">
-                                  {selectedPlayer.name}
-                                </div>
-                              </div>
-                              <div className="flex-1">
-                                <Progress
-                                  value={
-                                    ((comparisonPlayer[
-                                      stat as keyof typeof comparisonPlayer
-                                    ] as number) /
-                                      Math.max(
-                                        selectedPlayer[
-                                          stat as keyof typeof selectedPlayer
-                                        ] as number,
-                                        comparisonPlayer[
-                                          stat as keyof typeof comparisonPlayer
-                                        ] as number,
-                                      )) *
-                                    100
-                                  }
-                                  className="h-2"
-                                />
-                                <div className="text-xs text-gray-600 mt-1">
-                                  {comparisonPlayer.name}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Line Chart Comparison */}
-                      <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-700">
-                          Performance Trend
-                        </h4>
-                        <div className="h-64 w-full">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={playerComparisonData}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis
-                                dataKey="stat"
-                                tick={{ fontSize: 12 }}
-                                angle={-45}
-                                textAnchor="end"
-                                height={80}
-                              />
-                              <YAxis tick={{ fontSize: 12 }} />
-                              <Tooltip
-                                contentStyle={{
-                                  backgroundColor: "#f8f9fa",
-                                  border: "1px solid #e9ecef",
-                                  borderRadius: "6px",
-                                }}
-                              />
-                              <Legend />
-                              <Line
-                                type="monotone"
-                                dataKey={selectedPlayer.name}
-                                stroke="#059669"
-                                strokeWidth={3}
-                                dot={{ fill: "#059669", strokeWidth: 2, r: 4 }}
-                                activeDot={{
-                                  r: 6,
-                                  stroke: "#059669",
-                                  strokeWidth: 2,
-                                }}
-                              />
-                              <Line
-                                type="monotone"
-                                dataKey={comparisonPlayer.name}
-                                stroke="#2563eb"
-                                strokeWidth={3}
-                                dot={{ fill: "#2563eb", strokeWidth: 2, r: 4 }}
-                                activeDot={{
-                                  r: 6,
-                                  stroke: "#2563eb",
-                                  strokeWidth: 2,
-                                }}
-                              />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </div>
-                        <div className="text-xs text-gray-600 text-center">
-                          Performance metrics comparison between selected
-                          players
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <PlayerComparison
+                  selectedPlayer={selectedPlayer}
+                  comparisonPlayer={comparisonPlayer}
+                  setComparisonPlayer={setComparisonPlayer}
+                  mockPlayers={mockPlayers}
+                  playerComparisonData={playerComparisonData}
+                />
               </div>
             </div>
           </TabsContent>
@@ -2693,24 +1329,24 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="relative bg-green-50 rounded-lg p-4 min-h-80">
+                      <div className="relative bg-orange-50 rounded-lg p-4 min-h-80">
                         {/* AFL Ground - Oval Shape */}
                         <div
-                          className="absolute inset-6 border-4 border-green-600 bg-green-200"
+                          className="absolute inset-6 border-4 border-orange-600 bg-orange-200"
                           style={{
                             borderRadius: "50%",
                             clipPath: "ellipse(45% 40% at 50% 50%)",
                           }}
                         >
                           {/* Goal squares */}
-                          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-green-700 bg-green-300"></div>
-                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-green-700 bg-green-300"></div>
+                          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-orange-700 bg-orange-300"></div>
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border-2 border-orange-700 bg-orange-300"></div>
 
                           {/* Center circle */}
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 border-2 border-green-700 rounded-full"></div>
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 border-2 border-orange-700 rounded-full"></div>
 
                           {/* AFL text */}
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-green-800 mt-6">
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-orange-800 mt-6">
                             AFL GROUND
                           </div>
                         </div>
@@ -2755,7 +1391,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       <div className="mt-4 space-y-2">
                         <div className="flex justify-between items-center text-xs">
                           <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-green-500 rounded"></div>
+                            <div className="w-3 h-3 bg-orange-500 rounded"></div>
                             <span>Low (0-49%)</span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -2821,8 +1457,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center p-4 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-center p-4 bg-purple-50 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">
                           {crowdZones
                             .reduce((sum, zone) => sum + zone.current, 0)
                             .toLocaleString()}
@@ -2830,12 +1466,12 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="text-sm text-gray-600">
                           Current Attendance
                         </div>
-                        <div className="text-xs text-green-600 mt-1">
+                        <div className="text-xs text-orange-600 mt-1">
                           Live Stadium Data
                         </div>
                       </div>
-                      <div className="text-center p-4 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">
+                      <div className="text-center p-4 bg-orange-50 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">
                           {Math.round(
                             crowdZones.reduce(
                               (sum, zone) => sum + zone.density,
@@ -2847,7 +1483,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         <div className="text-sm text-gray-600">
                           Average Density
                         </div>
-                        <div className="text-xs text-green-600 mt-1">
+                        <div className="text-xs text-orange-600 mt-1">
                           Across {crowdZones.length} zones
                         </div>
                       </div>
@@ -3049,7 +1685,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           </div>
                           <div className="flex justify-between">
                             <span>Safe Zones:</span>
-                            <span className="font-medium text-green-600">
+                            <span className="font-medium text-orange-600">
                               {
                                 crowdZones.filter((zone) => zone.density < 85)
                                   .length
@@ -3108,7 +1744,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 ? "text-orange-600"
                                 : zone.density >= 70
                                   ? "text-yellow-600"
-                                  : "text-green-600";
+                                  : "text-orange-600";
 
                           return (
                             <div key={index} className="p-3 border rounded-lg">
@@ -3284,8 +1920,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="p-3 bg-blue-50 rounded">
-                          <div className="text-lg font-bold text-blue-700">
+                        <div className="p-3 bg-purple-50 rounded">
+                          <div className="text-lg font-bold text-purple-700">
                             {Math.round(
                               crowdZones.reduce(
                                 (sum, zone) => sum + zone.density,
@@ -3294,7 +1930,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                             )}
                             %
                           </div>
-                          <div className="text-sm text-blue-600">
+                          <div className="text-sm text-purple-600">
                             Current Average Density
                           </div>
                         </div>
@@ -3334,8 +1970,8 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="p-3 bg-green-50 rounded">
-                          <div className="text-lg font-bold text-green-700">
+                        <div className="p-3 bg-orange-50 rounded">
+                          <div className="text-lg font-bold text-orange-700">
                             {Math.round(
                               (crowdZones.reduce(
                                 (sum, zone) => sum + zone.current,
@@ -3349,7 +1985,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                             )}
                             %
                           </div>
-                          <div className="text-sm text-green-600">
+                          <div className="text-sm text-orange-600">
                             Current Stadium Fill
                           </div>
                         </div>
@@ -3390,614 +2026,36 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
 
           {/* Analytics Report Download */}
           <TabsContent value="reports" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    Player Performance Reports
-                  </CardTitle>
-                  <CardDescription>
-                    Generate detailed analytics reports for players and teams
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-sm font-medium">Report Type</label>
-                      <Select defaultValue="individual">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="individual">
-                            Individual Player Report
-                          </SelectItem>
-                          <SelectItem value="team">
-                            Team Performance Report
-                          </SelectItem>
-                          <SelectItem value="comparison">
-                            Player Comparison Report
-                          </SelectItem>
-                          <SelectItem value="season">
-                            Season Summary Report
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium">Date Range</label>
-                      <Select defaultValue="last7">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="last7">Last 7 days</SelectItem>
-                          <SelectItem value="last30">Last 30 days</SelectItem>
-                          <SelectItem value="season">Current Season</SelectItem>
-                          <SelectItem value="custom">Custom Range</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium">Format</label>
-                      <Select defaultValue="pdf">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pdf">PDF Report</SelectItem>
-                          <SelectItem value="excel">
-                            Excel Spreadsheet
-                          </SelectItem>
-                          <SelectItem value="csv">CSV Data</SelectItem>
-                          <SelectItem value="json">JSON Data</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Include Sections</h4>
-                    <div className="space-y-2">
-                      {[
-                        "Performance Statistics",
-                        "Match Highlights",
-                        "Trend Analysis",
-                        "Comparison Charts",
-                        "Heat Maps",
-                      ].map((section) => (
-                        <label
-                          key={section}
-                          className="flex items-center space-x-2"
-                        >
-                          <input
-                            type="checkbox"
-                            defaultChecked
-                            className="rounded"
-                          />
-                          <span className="text-sm">{section}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600">
-                    <Download className="w-4 h-4 mr-2" />
-                    Generate Report
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    Crowd Analytics Reports
-                  </CardTitle>
-                  <CardDescription>
-                    Generate crowd movement and density reports
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-sm font-medium">Report Type</label>
-                      <Select defaultValue="density">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="density">
-                            Crowd Density Report
-                          </SelectItem>
-                          <SelectItem value="movement">
-                            Movement Pattern Report
-                          </SelectItem>
-                          <SelectItem value="capacity">
-                            Capacity Utilization Report
-                          </SelectItem>
-                          <SelectItem value="safety">
-                            Safety Analytics Report
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium">Time Period</label>
-                      <Select defaultValue="match">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="match">Current Match</SelectItem>
-                          <SelectItem value="gameday">Full Game Day</SelectItem>
-                          <SelectItem value="season">
-                            Season Analysis
-                          </SelectItem>
-                          <SelectItem value="custom">Custom Period</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium">Zone Focus</label>
-                      <Select defaultValue="all">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Zones</SelectItem>
-                          <SelectItem value="northern">
-                            Northern Stand
-                          </SelectItem>
-                          <SelectItem value="southern">
-                            Southern Stand
-                          </SelectItem>
-                          <SelectItem value="eastern">Eastern Wing</SelectItem>
-                          <SelectItem value="western">Western Wing</SelectItem>
-                          <SelectItem value="premium">
-                            Premium Seating
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Analytics Features</h4>
-                    <div className="space-y-2">
-                      {[
-                        "Heat Map Visualization",
-                        "Peak Hour Analysis",
-                        "Entry/Exit Patterns",
-                        "Safety Compliance",
-                        "Revenue Optimization",
-                      ].map((feature) => (
-                        <label
-                          key={feature}
-                          className="flex items-center space-x-2"
-                        >
-                          <input
-                            type="checkbox"
-                            defaultChecked
-                            className="rounded"
-                          />
-                          <span className="text-sm">{feature}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600">
-                    <Download className="w-4 h-4 mr-2" />
-                    Generate Crowd Report
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Reports */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Reports</CardTitle>
-                <CardDescription>
-                  Download previously generated reports
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {[
-                    {
-                      name: "Weekly Player Performance - Round 15",
-                      date: "2024-01-15",
-                      size: "2.4 MB",
-                      format: "PDF",
-                    },
-                    {
-                      name: "Crowd Density Analysis - MCG",
-                      date: "2024-01-14",
-                      size: "1.8 MB",
-                      format: "Excel",
-                    },
-                    {
-                      name: "Season Summary Report",
-                      date: "2024-01-12",
-                      size: "5.2 MB",
-                      format: "PDF",
-                    },
-                    {
-                      name: "Player Comparison - Top 50",
-                      date: "2024-01-10",
-                      size: "3.1 MB",
-                      format: "Excel",
-                    },
-                  ].map((report, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
-                    >
-                      <div className="flex-1">
-                        <div className="font-medium">{report.name}</div>
-                        <div className="text-sm text-gray-600">
-                          {report.date} • {report.size} • {report.format}
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const reportContent = `AFL Analytics Report: ${report.name}
-
-Generated: ${report.date}
-Format: ${report.format}
-Size: ${report.size}
-
-This is a sample report from AFL Analytics Platform.
-Report details and analysis data would be included here in a real implementation.
-
-Generated on: ${new Date().toLocaleString()}
-`;
-                          downloadText(
-                            reportContent,
-                            `${report.name.replace(/[^a-z0-9]/gi, "_")}_${Date.now()}`,
-                          );
-                        }}
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <ReportsPanel />
           </TabsContent>
 
           {/* Video Analytics Input */}
           <TabsContent value="video" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Upload className="w-5 h-5" />
-                    Video Upload & Analysis
-                  </CardTitle>
-                  <CardDescription>
-                    Upload match videos for AI-powered analysis
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={handleVideoFileSelect}
-                      className="hidden"
-                      id="video-upload-dashboard"
-                    />
-                    <label
-                      htmlFor="video-upload-dashboard"
-                      className="cursor-pointer"
-                    >
-                      <Video className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                      <div className="text-lg font-medium text-gray-700">
-                        {selectedVideoFile
-                          ? selectedVideoFile.name
-                          : "Drop video files here"}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        or click to browse
-                      </div>
-                      <div className="text-xs text-gray-400 mt-2">
-                        Supports MP4, MOV, AVI • Max 500MB
-                      </div>
-                    </label>
-                  </div>
+              <VideoUploadPanel
+                selectedVideoFile={selectedVideoFile}
+                videoAnalysisError={videoAnalysisError}
+                isVideoUploading={isVideoUploading}
+                videoUploadProgress={videoUploadProgress}
+                isVideoAnalyzing={isVideoAnalyzing}
+                videoAnalysisProgress={videoAnalysisProgress}
+                selectedAnalysisType={selectedAnalysisType}
+                setSelectedAnalysisType={setSelectedAnalysisType}
+                selectedFocusAreas={selectedFocusAreas}
+                onFocusAreaChange={handleFocusAreaChange}
+                onFileSelect={handleVideoFileSelect}
+                onStart={uploadAndAnalyzeVideo}
+                disabledStart={!selectedVideoFile || isVideoUploading || isVideoAnalyzing}
+              />
 
-                  {selectedVideoFile && (
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <Video className="w-4 h-4 text-blue-600" />
-                        <span className="font-medium">
-                          {selectedVideoFile.name}
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        Size:{" "}
-                        {(selectedVideoFile.size / 1024 / 1024).toFixed(1)} MB
-                      </div>
-                    </div>
-                  )}
-
-                  {videoAnalysisError && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <div className="text-sm text-red-700">
-                        {videoAnalysisError}
-                      </div>
-                    </div>
-                  )}
-
-                  {isVideoUploading && (
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Uploading video...</span>
-                        <span>{videoUploadProgress}%</span>
-                      </div>
-                      <Progress value={videoUploadProgress} className="h-2" />
-                    </div>
-                  )}
-
-                  {isVideoAnalyzing && (
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Analyzing video...</span>
-                        <span>{videoAnalysisProgress}%</span>
-                      </div>
-                      <Progress value={videoAnalysisProgress} className="h-2" />
-                    </div>
-                  )}
-
-                  {videoAnalysisComplete && (
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full" />
-                        <span className="text-sm text-green-700 font-medium">
-                          Analysis completed successfully!
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-sm font-medium">
-                        Analysis Type
-                      </label>
-                      <Select
-                        value={selectedAnalysisType}
-                        onValueChange={setSelectedAnalysisType}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="highlights">
-                            Match Highlights
-                          </SelectItem>
-                          <SelectItem value="player">
-                            Player Tracking
-                          </SelectItem>
-                          <SelectItem value="tactics">
-                            Tactical Analysis
-                          </SelectItem>
-                          <SelectItem value="performance">
-                            Performance Metrics
-                          </SelectItem>
-                          <SelectItem value="crowd">Crowd Reactions</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium">Focus Areas</label>
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        {[
-                          "Goals & Scoring",
-                          "Defensive Actions",
-                          "Player Movement",
-                          "Ball Possession",
-                          "Set Pieces",
-                          "Injuries",
-                        ].map((area) => (
-                          <label
-                            key={area}
-                            className="flex items-center space-x-2"
-                          >
-                            <input
-                              type="checkbox"
-                              className="rounded"
-                              checked={selectedFocusAreas.includes(area)}
-                              onChange={(e) =>
-                                handleFocusAreaChange(area, e.target.checked)
-                              }
-                            />
-                            <span className="text-sm">{area}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button
-                    className="w-full bg-gradient-to-r from-green-600 to-blue-600"
-                    onClick={uploadAndAnalyzeVideo}
-                    disabled={
-                      !selectedVideoFile || isVideoUploading || isVideoAnalyzing
-                    }
-                  >
-                    <Zap className="w-4 h-4 mr-2" />
-                    {isVideoUploading
-                      ? "Uploading..."
-                      : isVideoAnalyzing
-                        ? "Analyzing..."
-                        : "Start Analysis"}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Eye className="w-5 h-5" />
-                    Analysis Results
-                  </CardTitle>
-                  <CardDescription>
-                    AI-generated insights from uploaded videos
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {!videoAnalysisComplete ? (
-                    <div className="text-center py-8">
-                      <Video className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        No Analysis Results Yet
-                      </h3>
-                      <p className="text-gray-600">
-                        Upload and analyze a video to see detailed insights here
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">
-                            Analysis Type:{" "}
-                            {selectedAnalysisType === "highlights"
-                              ? "Match Highlights"
-                              : selectedAnalysisType === "player"
-                                ? "Player Tracking"
-                                : selectedAnalysisType === "tactics"
-                                  ? "Tactical Analysis"
-                                  : selectedAnalysisType === "performance"
-                                    ? "Performance Metrics"
-                                    : "Crowd Reactions"}
-                          </span>
-                          <Badge variant="secondary">Complete</Badge>
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          Video: {selectedVideoFile?.name}
-                        </div>
-                      </div>
-
-                      {selectedFocusAreas.length > 0 && (
-                        <div className="p-4 bg-green-50 rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium">
-                              Focus Areas Analyzed
-                            </span>
-                            <Badge variant="secondary">
-                              {selectedFocusAreas.length} areas
-                            </Badge>
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {selectedFocusAreas.join(", ")}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="p-4 bg-purple-50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">
-                            AI Insights Generated
-                          </span>
-                          <Badge variant="secondary">Ready</Badge>
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {selectedAnalysisType === "highlights" &&
-                            "Key moments and highlights identified"}
-                          {selectedAnalysisType === "player" &&
-                            "Player movements and performance tracked"}
-                          {selectedAnalysisType === "tactics" &&
-                            "Tactical patterns and strategies analyzed"}
-                          {selectedAnalysisType === "performance" &&
-                            "Performance metrics calculated"}
-                          {selectedAnalysisType === "crowd" &&
-                            "Crowd reactions and engagement measured"}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    <h4 className="font-medium">Export Analysis</h4>
-                    <p className="text-sm text-gray-600">
-                      Download analysis data from backend in different formats
-                    </p>
-                    <div className="space-y-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleDownloadVideoClips}
-                        disabled={!videoAnalysisComplete}
-                        className="w-full"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Video Clips
-                      </Button>
-                      <div className="grid grid-cols-3 gap-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownloadReport("pdf")}
-                          disabled={!videoAnalysisComplete}
-                        >
-                          <FileText className="w-4 h-4 mr-1" />
-                          PDF
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownloadReport("json")}
-                          disabled={!videoAnalysisComplete}
-                        >
-                          <Download className="w-4 h-4 mr-1" />
-                          JSON
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownloadReport("txt")}
-                          disabled={!videoAnalysisComplete}
-                        >
-                          <FileText className="w-4 h-4 mr-1" />
-                          TXT
-                        </Button>
-                      </div>
-                      <div className="text-xs text-gray-500 mt-2 space-y-1">
-                        <div>
-                          <strong>PDF:</strong> Formatted report for
-                          printing/sharing
-                        </div>
-                        <div>
-                          <strong>JSON:</strong> Raw backend data for developers
-                        </div>
-                        <div>
-                          <strong>TXT:</strong> Plain text summary for analysis
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <AnalysisResultsPanel
+                videoAnalysisComplete={videoAnalysisComplete}
+                selectedAnalysisType={selectedAnalysisType}
+                selectedVideoFileName={selectedVideoFile?.name}
+                selectedFocusAreas={selectedFocusAreas}
+                onDownloadVideoClips={handleDownloadVideoClips}
+                onDownloadReport={handleDownloadReport}
+              />
             </div>
 
             {/* Processing Queue */}
@@ -4016,223 +2074,15 @@ Generated on: ${new Date().toLocaleString()}
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {processingQueue.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-4 border rounded-lg bg-gradient-to-r from-white via-gray-50 to-white"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <StatusIcon status={item.status} />
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900">
-                              {item.name}
-                            </div>
-                            <div className="text-sm text-gray-600 flex items-center gap-2">
-                              <span>{item.analysisType}</span>
-                              <span>•</span>
-                              <span>{item.duration}</span>
-                              <span>•</span>
-                              <span>{item.size}</span>
-                              {item.priority === "high" && (
-                                <>
-                                  <span>•</span>
-                                  <Badge
-                                    variant="destructive"
-                                    className="text-xs py-0 px-1"
-                                  >
-                                    HIGH PRIORITY
-                                  </Badge>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant={
-                              item.status === "completed"
-                                ? "default"
-                                : item.status === "analyzing" ||
-                                    item.status === "processing"
-                                  ? "secondary"
-                                  : item.status === "uploading"
-                                    ? "outline"
-                                    : item.status === "failed"
-                                      ? "destructive"
-                                      : "outline"
-                            }
-                            className="capitalize"
-                          >
-                            {item.status}
-                          </Badge>
-                          {item.retryCount > 0 && (
-                            <Badge variant="outline" className="text-xs">
-                              Retry #{item.retryCount}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-
-                      {item.progress > 0 && item.progress < 100 && (
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">
-                              {item.status === "uploading"
-                                ? "Uploading file..."
-                                : item.status === "processing"
-                                  ? "Pre-processing video..."
-                                  : item.status === "analyzing"
-                                    ? "Analyzing video content..."
-                                    : "Processing..."}
-                            </span>
-                            <span className="font-medium">
-                              {Math.round(item.progress)}%
-                            </span>
-                          </div>
-                          <Progress value={item.progress} className="h-2" />
-                          <div className="text-xs text-gray-500">
-                            Stage:{" "}
-                            {item.processingStage
-                              .replace(/_/g, " ")
-                              .replace(/\b\w/g, (l) => l.toUpperCase())}
-                          </div>
-                        </div>
-                      )}
-
-                      {item.status === "failed" && (
-                        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-center gap-2 text-red-800 text-sm">
-                            <div className="w-4 h-4 rounded-full bg-red-500 flex-shrink-0" />
-                            <span>
-                              Processing failed after {item.errorCount} attempt
-                              {item.errorCount > 1 ? "s" : ""}
-                            </span>
-                          </div>
-                          <div className="text-xs text-red-600 mt-1">
-                            Common causes: Unsupported format, corrupted file,
-                            or insufficient server resources
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex justify-between items-center mt-3">
-                        <div className="flex flex-col text-sm text-gray-500">
-                          <span>
-                            Uploaded: {formatTimeAgo(item.uploadTime)}
-                          </span>
-                          {item.status === "completed" &&
-                            item.completedTime && (
-                              <span>
-                                Completed: {formatTimeAgo(item.completedTime)}
-                              </span>
-                            )}
-                          {item.estimatedCompletion &&
-                            item.status !== "completed" && (
-                              <span>
-                                ETA: {formatETA(item.estimatedCompletion)}
-                              </span>
-                            )}
-                        </div>
-                        <div className="flex gap-2">
-                          {item.status === "completed" && (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleViewAnalysis(item)}
-                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                              >
-                                <Eye className="w-4 h-4 mr-1" />
-                                View
-                              </Button>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="text-green-600 border-green-600 hover:bg-green-50"
-                                  >
-                                    <Download className="w-4 h-4 mr-1" />
-                                    Download
-                                    <ChevronDown className="w-3 h-3 ml-1" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      handleDownloadFromQueue(item, "pdf")
-                                    }
-                                  >
-                                    <FileText className="w-4 h-4 mr-2" />
-                                    PDF Report
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      handleDownloadFromQueue(item, "json")
-                                    }
-                                  >
-                                    <Download className="w-4 h-4 mr-2" />
-                                    JSON Data
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      handleDownloadFromQueue(item, "txt")
-                                    }
-                                  >
-                                    <FileText className="w-4 h-4 mr-2" />
-                                    Text Summary
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </>
-                          )}
-                          {item.status === "failed" && (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => retryProcessing(item.id)}
-                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                              >
-                                <Zap className="w-4 h-4 mr-1" />
-                                Retry
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => removeFromQueue(item.id)}
-                                className="text-red-600 border-red-600 hover:bg-red-50"
-                              >
-                                Remove
-                              </Button>
-                            </>
-                          )}
-                          {(item.status === "queued" ||
-                            item.status === "uploading") && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeFromQueue(item.id)}
-                              className="text-gray-600"
-                            >
-                              Cancel
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {processingQueue.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                      <p>No items in processing queue</p>
-                      <p className="text-sm">
-                        Upload a video to start analysis
-                      </p>
-                    </div>
-                  )}
+                  <ProcessingQueueList
+                    items={processingQueue}
+                    onRetry={retryProcessing}
+                    onRemove={removeFromQueue}
+                    onView={handleViewAnalysis}
+                    onDownload={handleDownloadFromQueue}
+                    formatTimeAgo={formatTimeAgo}
+                    formatETA={formatETA}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -4331,9 +2181,9 @@ Generated on: ${new Date().toLocaleString()}
                   <h3 className="text-lg font-semibold">Analysis Results</h3>
                   <Badge
                     variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    className="bg-orange-50 text-orange-700 border-green-200"
                   >
-                    <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                    <div className="w-2 h-2 rounded-full bg-orange-500 mr-2" />
                     Analysis Complete
                   </Badge>
                 </div>
@@ -4354,7 +2204,7 @@ Generated on: ${new Date().toLocaleString()}
                           <div className="space-y-4">
                             {/* Player Stats Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <div className="p-3 bg-blue-50 rounded-lg">
+                              <div className="p-3 bg-purple-50 rounded-lg">
                                 <div className="font-medium">
                                   Marcus Bontempelli
                                 </div>
@@ -4365,7 +2215,7 @@ Generated on: ${new Date().toLocaleString()}
                                   Max Speed: 32.4 km/h | Distance: 12.8 km
                                 </div>
                               </div>
-                              <div className="p-3 bg-green-50 rounded-lg">
+                              <div className="p-3 bg-orange-50 rounded-lg">
                                 <div className="font-medium">
                                   Patrick Cripps
                                 </div>
@@ -4428,7 +2278,7 @@ Generated on: ${new Date().toLocaleString()}
                         <CardContent>
                           <div className="space-y-4">
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                              <div className="p-3 bg-green-50 rounded-lg">
+                              <div className="p-3 bg-orange-50 rounded-lg">
                                 <div className="font-medium">
                                   Northern Stand
                                 </div>
@@ -4439,7 +2289,7 @@ Generated on: ${new Date().toLocaleString()}
                                   Noise: 95.2 dB peak
                                 </div>
                               </div>
-                              <div className="p-3 bg-blue-50 rounded-lg">
+                              <div className="p-3 bg-purple-50 rounded-lg">
                                 <div className="font-medium">
                                   Southern Stand
                                 </div>
@@ -4462,13 +2312,13 @@ Generated on: ${new Date().toLocaleString()}
                             </div>
 
                             {/* Crowd Chart Placeholder */}
-                            <div className="h-48 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
+                            <div className="h-48 bg-gradient-to-br from-purple-50 to-orange-50 rounded-lg border-2 border-dashed border-purple-300 flex items-center justify-center">
                               <div className="text-center">
                                 <Users className="w-10 h-10 mx-auto text-blue-400 mb-2" />
-                                <div className="text-lg font-medium text-blue-600">
+                                <div className="text-lg font-medium text-purple-600">
                                   Crowd Density Charts
                                 </div>
-                                <div className="text-sm text-blue-500">
+                                <div className="text-sm text-purple-500">
                                   Stadium utilization and movement patterns
                                 </div>
                               </div>
@@ -4496,7 +2346,7 @@ Generated on: ${new Date().toLocaleString()}
                                 (94% confidence)
                               </div>
                             </div>
-                            <div className="p-3 bg-green-50 border-l-4 border-green-400">
+                            <div className="p-3 bg-orange-50 border-l-4 border-orange-400">
                               <div className="font-medium">
                                 00:18:23 - Spectacular Mark
                               </div>
@@ -4505,7 +2355,7 @@ Generated on: ${new Date().toLocaleString()}
                                 confidence)
                               </div>
                             </div>
-                            <div className="p-3 bg-blue-50 border-l-4 border-blue-400">
+                            <div className="p-3 bg-purple-50 border-l-4 border-purple-400">
                               <div className="font-medium">
                                 00:34:56 - Crucial Tackle
                               </div>
@@ -4527,26 +2377,26 @@ Generated on: ${new Date().toLocaleString()}
                         </CardHeader>
                         <CardContent>
                           <div className="grid md:grid-cols-3 gap-4">
-                            <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                            <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-purple-200">
                               <div className="flex items-center gap-2 mb-2">
-                                <TrendingUp className="w-4 h-4 text-blue-600" />
+                                <TrendingUp className="w-4 h-4 text-purple-600" />
                                 <span className="font-medium text-blue-800">
                                   Top Performer
                                 </span>
                               </div>
-                              <div className="text-sm text-blue-700">
+                              <div className="text-sm text-purple-700">
                                 Patrick Cripps leads with 88.6% efficiency and
                                 strong defensive stats
                               </div>
                             </div>
                             <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
                               <div className="flex items-center gap-2 mb-2">
-                                <Users className="w-4 h-4 text-green-600" />
-                                <span className="font-medium text-green-800">
+                                <Users className="w-4 h-4 text-orange-600" />
+                                <span className="font-medium text-orange-800">
                                   Crowd Impact
                                 </span>
                               </div>
-                              <div className="text-sm text-green-700">
+                              <div className="text-sm text-orange-700">
                                 Southern Stand achieved 97.3% density with peak
                                 engagement
                               </div>
@@ -4566,7 +2416,7 @@ Generated on: ${new Date().toLocaleString()}
                           </div>
                           <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
                             <div className="flex items-start gap-3">
-                              <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <div className="w-2 h-2 rounded-full bg-white" />
                               </div>
                               <div>
