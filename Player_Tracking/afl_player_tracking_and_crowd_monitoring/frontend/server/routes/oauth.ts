@@ -7,7 +7,10 @@ import { OAuthUser, OAuthResponse } from "@shared/oauth";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const APPLE_CLIENT_ID = process.env.APPLE_CLIENT_ID;
-const JWT_SECRET = process.env.JWT_SECRET || "your-jwt-secret-key";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required");
+}
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:8080";
 
 // Initialize Google OAuth client
