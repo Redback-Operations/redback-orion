@@ -7,9 +7,11 @@ import { OAuthUser, OAuthResponse } from "@shared/oauth";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const APPLE_CLIENT_ID = process.env.APPLE_CLIENT_ID;
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is required");
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key-change-in-production";
+
+// Warn if using default JWT secret
+if (!process.env.JWT_SECRET) {
+  console.warn("⚠️  WARNING: Using default JWT_SECRET. Set JWT_SECRET environment variable for production!");
 }
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:8080";
 

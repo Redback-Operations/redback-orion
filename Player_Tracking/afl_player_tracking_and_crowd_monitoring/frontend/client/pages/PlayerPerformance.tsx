@@ -332,32 +332,32 @@ export default function PlayerPerformance() {
                       <div className="grid grid-cols-6 gap-4">
                         <StatBox
                           label="Kicks"
-                          value={selectedPlayer.stats.kicks}
+                          value={selectedPlayer.kicks}
                           color="bg-blue-500"
                         />
                         <StatBox
                           label="Handballs"
-                          value={selectedPlayer.stats.handballs}
+                          value={selectedPlayer.handballs}
                           color="bg-green-500"
                         />
                         <StatBox
                           label="Marks"
-                          value={selectedPlayer.stats.marks}
+                          value={selectedPlayer.marks}
                           color="bg-purple-500"
                         />
                         <StatBox
                           label="Tackles"
-                          value={selectedPlayer.stats.tackles}
+                          value={selectedPlayer.tackles}
                           color="bg-red-500"
                         />
                         <StatBox
                           label="Goals"
-                          value={selectedPlayer.stats.goals}
+                          value={selectedPlayer.goals}
                           color="bg-orange-500"
                         />
                         <StatBox
                           label="Efficiency"
-                          value={`${selectedPlayer.stats.efficiency}%`}
+                          value={`${selectedPlayer.efficiency}%`}
                           color="bg-teal-500"
                         />
                       </div>
