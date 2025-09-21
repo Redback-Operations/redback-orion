@@ -28,7 +28,7 @@ export default function DashboardHeader({
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Badge variant={isLive ? "destructive" : "secondary"} className="animate-pulse">
+            <Badge variant={isLive ? "destructive" : "secondary"} className="hidden">
               <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
               {isLive ? "LIVE" : "OFFLINE"}
             </Badge>
