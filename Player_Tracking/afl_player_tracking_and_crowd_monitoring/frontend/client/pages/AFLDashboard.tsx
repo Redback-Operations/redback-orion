@@ -83,7 +83,7 @@ export default function AFLDashboard() {
               <Download className="w-4 h-4" />
               Reports
             </TabsTrigger>
-            <TabsTrigger value="team" className="flex items-center gap-2">
+            <TabsTrigger value="team" className="flex items-center gap-2 hidden">
               <Target className="w-4 h-4" />
               Team Match
             </TabsTrigger>
@@ -105,7 +105,7 @@ export default function AFLDashboard() {
             <ReportsTab />
           </TabsContent>
 
-          <TabsContent value="team">
+          <TabsContent value="team" className="hidden">
             <TeamMatchTab
               teamA={dashboardState.teamA}
               setTeamA={dashboardState.setTeamA}
