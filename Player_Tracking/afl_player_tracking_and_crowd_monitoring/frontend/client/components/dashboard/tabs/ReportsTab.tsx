@@ -1,4 +1,6 @@
 import React from "react";
+import { getPlayerDashboard, getCrowdAnalysis } from "@/lib/video";
+import { downloadJSON, downloadText } from "@/lib/download";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import { Download, FileText, Calendar, Filter, Search, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import ReportsPanel from "../ReportsPanel";
 
-export default function ReportsTab() {
+interface UploadMeta { id: string; original_filename: string; created_at: string; status: string }
+export default function ReportsTab({ upload }: { upload: UploadMeta | null }) {
   // Mock data for reports
   const reports = [
     {
@@ -95,6 +98,79 @@ export default function ReportsTab() {
           Generate New Report
         </Button>
       </div>
+
+      {/* Quick Exports from Current Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="w-5 h-5" />
+            Export Current Analysis
+          </CardTitle>
+          <CardDescription>
+            Download the latest selected upload’s Player/Crowd analysis
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              disabled={!upload?.id}
+              onClick={async () => {
+                if (!upload?.id) return;
+                const [player, crowd] = await Promise.all([
+                  getPlayerDashboard(upload.id).catch(() => null),
+                  getCrowdAnalysis(upload.id).catch(() => null),
+                ]);
+                const payload = { upload, player, crowd };
+                downloadJSON(payload, `${upload.original_filename || "analysis"}`);
+              }}
+            >
+              JSON
+            </Button>
+            <Button
+              variant="outline"
+              disabled={!upload?.id}
+              onClick={async () => {
+                if (!upload?.id) return;
+                const [player, crowd] = await Promise.all([
+                  getPlayerDashboard(upload.id).catch(() => null),
+                  getCrowdAnalysis(upload.id).catch(() => null),
+                ]);
+                const text = `Upload: ${upload.original_filename}\nCreated: ${new Date(upload.created_at).toLocaleString()}\n\nPlayer: ${player ? "available" : "not available"}\nCrowd: ${crowd ? "available" : "not available"}`;
+                downloadText(text, `${upload.original_filename || "analysis"}`);
+              }}
+            >
+              TXT
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-purple-600 to-orange-600"
+              disabled={!upload?.id}
+              onClick={async () => {
+                if (!upload?.id) return;
+                const [player, crowd] = await Promise.all([
+                  getPlayerDashboard(upload.id).catch(() => null),
+                  getCrowdAnalysis(upload.id).catch(() => null),
+                ]);
+                const win = window.open("", "_blank", "noopener,noreferrer");
+                if (!win) return;
+                const html = `<!doctype html><html><head><meta charset=\"utf-8\"><title>Analysis Report</title>
+                  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,\"Helvetica Neue\",sans-serif;padding:24px} h1{background:linear-gradient(90deg,#7c3aed,#fb923c);-webkit-background-clip:text;background-clip:text;color:transparent} .sec{margin-top:16px;padding:12px;border:1px solid #eee;border-radius:8px}</style>
+                </head><body>
+                  <h1>Analysis Report</h1>
+                  <div class=sec><strong>Upload:</strong> ${upload.original_filename}<br/>
+                  <strong>Created:</strong> ${new Date(upload.created_at).toLocaleString()}</div>
+                  <div class=sec><strong>Player Analysis</strong><pre>${player ? JSON.stringify(player, null, 2) : "Not available"}</pre></div>
+                  <div class=sec><strong>Crowd Analysis</strong><pre>${crowd ? JSON.stringify(crowd, null, 2) : "Not available"}</pre></div>
+                  <script>window.print()</script>
+                </body></html>`;
+                win.document.write(html);
+                win.document.close();
+              }}
+            >
+              PDF
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Report Generation Panel */}
       <Card>
