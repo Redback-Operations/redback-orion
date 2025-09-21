@@ -6,6 +6,7 @@ from typing import Optional, Dict
 from sqlalchemy import create_engine, func, String, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.orm import relationship
 
 # --- DB setup ---
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -29,20 +30,32 @@ class Upload(Base):
     media_type: Mapped[str] = mapped_column(String(32), nullable=False, default="video")
     size_bytes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-
-    # 🔹 New column: store original filename
     original_filename: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
+    # 🔹 Cascade delete relationship to inferences
+    inferences = relationship(
+        "Inference",
+        back_populates="upload",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
 
 class Inference(Base):
     __tablename__ = "inferences"
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    upload_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("uploads.id"), nullable=False, index=True)
+    upload_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("uploads.id", ondelete="CASCADE"),   # 🔹 important
+        nullable=False,
+        index=True
+    )
     task: Mapped[str] = mapped_column(String(16), nullable=False)  # "player" | "crowd"
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="ok")
     payload: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    upload = relationship("Upload", back_populates="inferences")
 
 
 class PlayerAnalysis(Base):
