@@ -8,12 +8,18 @@ import os
 import uuid
 import math
 import json
+from pathlib import Path
+
 
 app = FastAPI(title="AFL Player Tracking Microservice")
 
-# Initialize model once
-MODEL_PATH = "C:\\Users\\TOMIN JOSE\\Downloads\\tracking_code\\tracking_code\\best.pt"
-tracking_model = Tracking(model_path=MODEL_PATH, confidence_threshold=0.3)
+# Base directory of this file (tracking_code/)
+BASE_DIR = Path(__file__).resolve().parent
+
+# Either use environment variable or fallback to local best.pt
+MODEL_PATH = os.getenv("MODEL_PATH", BASE_DIR / "best.pt")
+
+tracking_model = Tracking(model_path=str(MODEL_PATH), confidence_threshold=0.3)
 
 # Directories
 UPLOAD_DIR = "uploads"
