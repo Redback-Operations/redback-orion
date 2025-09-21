@@ -27,3 +27,6 @@ backend/heatmaps/
 *.log
 *.DS_Store
 Thumbs.db
+
+# Generated analytics
+tracking_code/analytics/
