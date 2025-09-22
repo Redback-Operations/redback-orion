@@ -3,6 +3,8 @@ import { getPlayerDashboard, getCrowdAnalysis, listUploads } from "@/lib/video";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
+import { buildAnalysisPdf } from "@/lib/pdf";
+import { downloadFile } from "@/lib/download";
 
 interface UploadMeta {
   id: string;
@@ -11,43 +13,20 @@ interface UploadMeta {
   status?: string;
 }
 
-function renderHTML(title: string, upload: UploadMeta, section: string, data: unknown) {
-  const createdAt = upload.created_at ? new Date(upload.created_at).toLocaleString() : "";
-  return `<!doctype html><html><head><meta charset=\"utf-8\"><title>${title}</title>
-    <style>
-      :root { --grad1: #7c3aed; --grad2: #fb923c; }
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, \"Helvetica Neue\", sans-serif; margin: 0; padding: 24px; color: #111827; }
-      .title { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, var(--grad1), var(--grad2)); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 0 0 4px; }
-      .meta { font-size: 12px; color: #6b7280; }
-      .card { margin-top: 16px; padding: 16px; border: 1px solid #e5e7eb; border-radius: 10px; }
-      .card h2 { margin: 0 0 8px; font-size: 16px; font-weight: 700; }
-      pre { white-space: pre-wrap; word-break: break-word; background: #f9fafb; padding: 12px; border-radius: 8px; border: 1px solid #eef2f7; font-size: 12px; line-height: 1.5; }
-      .footer { margin-top: 24px; font-size: 12px; color: #6b7280; }
-    </style>
-  </head><body>
-    <h1 class=\"title\">${title}</h1>
-    <div class=\"meta\">Upload: ${upload.original_filename} • Created: ${createdAt}</div>
-    <div class=\"card\"><h2>${section}</h2><pre>${data ? JSON.stringify(data, null, 2) : "Not available"}</pre></div>
-    <div class=\"footer\">Generated on ${new Date().toLocaleString()}</div>
-    <script>window.print()</script>
-  </body></html>`;
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
 }
 
 async function generatePDFWithFetcher(title: string, upload: UploadMeta, section: string, fetcher: () => Promise<any>) {
-  const win = window.open("", "_blank", "noopener,noreferrer");
-  if (!win) return;
-  // Immediate loading content to avoid popup blockers/blank pages
-  win.document.write(`<!doctype html><html><head><meta charset=\"utf-8\"><title>${title}</title></head><body style=\"font-family:system-ui;padding:24px\">Preparing ${section}...</body></html>`);
-  win.document.close();
   try {
     const data = await fetcher();
-    win.document.open();
-    win.document.write(renderHTML(title, upload, section, data));
-    win.document.close();
+    const blob = await buildAnalysisPdf({ title, upload, section, data });
+    const name = `${slugify(title)}_${slugify(upload.original_filename)}_${Date.now()}.pdf`;
+    downloadFile(blob, name, "application/pdf");
   } catch (e) {
-    win.document.open();
-    win.document.write(renderHTML(title, upload, section, { error: "Failed to load analysis" }));
-    win.document.close();
+    const blob = await buildAnalysisPdf({ title, upload, section, data: { error: "Failed to load analysis" } });
+    const name = `${slugify(title)}_${slugify(upload.original_filename)}_${Date.now()}.pdf`;
+    downloadFile(blob, name, "application/pdf");
   }
 }
 
