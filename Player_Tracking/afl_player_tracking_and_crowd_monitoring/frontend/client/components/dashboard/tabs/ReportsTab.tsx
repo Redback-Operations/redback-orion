@@ -11,25 +11,9 @@ interface UploadMeta {
   status?: string;
 }
 
-function openPDF({
-  title,
-  upload,
-  section,
-  data,
-}: {
-  title: string;
-  upload: UploadMeta;
-  section: string;
-  data: unknown;
-}) {
-  const win = window.open("", "_blank", "noopener,noreferrer");
-  if (!win) return;
-
-  const createdAt = upload.created_at
-    ? new Date(upload.created_at).toLocaleString()
-    : "";
-
-  const html = `<!doctype html><html><head><meta charset=\"utf-8\"><title>${title}</title>
+function renderHTML(title: string, upload: UploadMeta, section: string, data: unknown) {
+  const createdAt = upload.created_at ? new Date(upload.created_at).toLocaleString() : "";
+  return `<!doctype html><html><head><meta charset=\"utf-8\"><title>${title}</title>
     <style>
       :root { --grad1: #7c3aed; --grad2: #fb923c; }
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, \"Helvetica Neue\", sans-serif; margin: 0; padding: 24px; color: #111827; }
@@ -41,20 +25,30 @@ function openPDF({
       .footer { margin-top: 24px; font-size: 12px; color: #6b7280; }
     </style>
   </head><body>
-    <h1 class="title">${title}</h1>
-    <div class="meta">Upload: ${upload.original_filename} • Created: ${createdAt}</div>
-
-    <div class="card">
-      <h2>${section}</h2>
-      <pre>${data ? JSON.stringify(data, null, 2) : "Not available"}</pre>
-    </div>
-
-    <div class="footer">Generated on ${new Date().toLocaleString()}</div>
+    <h1 class=\"title\">${title}</h1>
+    <div class=\"meta\">Upload: ${upload.original_filename} • Created: ${createdAt}</div>
+    <div class=\"card\"><h2>${section}</h2><pre>${data ? JSON.stringify(data, null, 2) : "Not available"}</pre></div>
+    <div class=\"footer\">Generated on ${new Date().toLocaleString()}</div>
     <script>window.print()</script>
   </body></html>`;
+}
 
-  win.document.write(html);
+async function generatePDFWithFetcher(title: string, upload: UploadMeta, section: string, fetcher: () => Promise<any>) {
+  const win = window.open("", "_blank", "noopener,noreferrer");
+  if (!win) return;
+  // Immediate loading content to avoid popup blockers/blank pages
+  win.document.write(`<!doctype html><html><head><meta charset=\"utf-8\"><title>${title}</title></head><body style=\"font-family:system-ui;padding:24px\">Preparing ${section}...</body></html>`);
   win.document.close();
+  try {
+    const data = await fetcher();
+    win.document.open();
+    win.document.write(renderHTML(title, upload, section, data));
+    win.document.close();
+  } catch (e) {
+    win.document.open();
+    win.document.write(renderHTML(title, upload, section, { error: "Failed to load analysis" }));
+    win.document.close();
+  }
 }
 
 export default function ReportsTab({ upload }: { upload: UploadMeta | null }) {
@@ -92,14 +86,22 @@ export default function ReportsTab({ upload }: { upload: UploadMeta | null }) {
 
   const handleCurrentPlayerPDF = async () => {
     if (!upload?.id) return;
-    const player = await getPlayerDashboard(upload.id).catch(() => null);
-    openPDF({ title: "Player Analysis Report", upload, section: "Player Analysis", data: player });
+    await generatePDFWithFetcher(
+      "Player Analysis Report",
+      upload,
+      "Player Analysis",
+      () => getPlayerDashboard(upload.id).catch(() => null),
+    );
   };
 
   const handleCurrentCrowdPDF = async () => {
     if (!upload?.id) return;
-    const crowd = await getCrowdAnalysis(upload.id).catch(() => null);
-    openPDF({ title: "Crowd Analysis Report", upload, section: "Crowd Analysis", data: crowd });
+    await generatePDFWithFetcher(
+      "Crowd Analysis Report",
+      upload,
+      "Crowd Analysis",
+      () => getCrowdAnalysis(upload.id).catch(() => null),
+    );
   };
 
   return (
@@ -166,8 +168,12 @@ export default function ReportsTab({ upload }: { upload: UploadMeta | null }) {
                   <Button
                     variant="outline"
                     onClick={async () => {
-                      const player = await getPlayerDashboard(u.id).catch(() => null);
-                      openPDF({ title: "Player Analysis Report", upload: u, section: "Player Analysis", data: player });
+                      await generatePDFWithFetcher(
+                        "Player Analysis Report",
+                        u,
+                        "Player Analysis",
+                        () => getPlayerDashboard(u.id).catch(() => null),
+                      );
                     }}
                   >
                     Player PDF
@@ -175,8 +181,12 @@ export default function ReportsTab({ upload }: { upload: UploadMeta | null }) {
                   <Button
                     variant="outline"
                     onClick={async () => {
-                      const crowd = await getCrowdAnalysis(u.id).catch(() => null);
-                      openPDF({ title: "Crowd Analysis Report", upload: u, section: "Crowd Analysis", data: crowd });
+                      await generatePDFWithFetcher(
+                        "Crowd Analysis Report",
+                        u,
+                        "Crowd Analysis",
+                        () => getCrowdAnalysis(u.id).catch(() => null),
+                      );
                     }}
                   >
                     Crowd PDF
