@@ -7,7 +7,7 @@ from storage import get_upload, save_crowd_analysis, get_crowd_analysis,save_inf
 
 router = APIRouter(tags=["Crowd Inference"])
 
-CROWD_API_URL = "https://78013ce0a6a0.ngrok-free.app/analyze_frame/"
+CROWD_API_URL = "https://5c18a59a4255.ngrok-free.app"
 
 # -------------------------------
 # Helpers & directories
