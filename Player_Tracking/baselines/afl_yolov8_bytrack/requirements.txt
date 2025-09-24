@@ -1,0 +1,4 @@
+ultralytics==8.3.0
+opencv-python>=4.8.0
+PyYAML>=6.0
+
