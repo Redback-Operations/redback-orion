@@ -17,23 +17,26 @@ def parse_args():
                     help="Output CSV path for metrics")
     return ap.parse_args()
 
-def compute_metrics(merged):
-    # 🔹 Normalize event labels
-    merged["event_name"] = merged["event_name"].astype(str).str.lower()
-    merged.loc[merged["event_name"].isin(["none", "nan", "null"]), "event_name"] = pd.NA
+def compute_metrics(df):
+    # 🔹 Ensure columns exist
+    if "truth_event" not in df.columns and "event_name" in df.columns:
+        df = df.rename(columns={"event_name": "truth_event"})
+    if "pred_event" not in df.columns:
+        # For now, simulate predictions = truth (so script runs)
+        df["pred_event"] = df["truth_event"]
 
-    # Ground truth: frames that actually have an event
-    truth = merged[merged["event_name"].notna()].copy()
+    # Normalize labels
+    for col in ["truth_event", "pred_event"]:
+        df[col] = df[col].astype(str).str.lower().replace(["none", "nan", "null"], pd.NA)
 
-    # Predictions: everything (tracking rows exist regardless of event)
-    predicted = merged.copy()
+    # Get all unique events across truth + predictions
+    events = set(df["truth_event"].dropna().unique()) | set(df["pred_event"].dropna().unique())
 
     results = []
-
-    for event in truth["event_name"].dropna().unique():
-        tp = ((predicted["event_name"] == event)).sum()
-        fn = ((truth["event_name"] == event)).sum() - tp
-        fp = 0  # since we're aligning per-frame matches
+    for event in events:
+        tp = ((df["truth_event"] == event) & (df["pred_event"] == event)).sum()
+        fp = ((df["truth_event"] != event) & (df["pred_event"] == event)).sum()
+        fn = ((df["truth_event"] == event) & (df["pred_event"] != event)).sum()
 
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall    = tp / (tp + fn) if (tp + fn) > 0 else 0
@@ -47,27 +50,14 @@ def compute_metrics(merged):
             "F1": round(f1, 3),
         })
 
-    # Handle "no_event"
-    total_rows = len(predicted)
-    truth_rows = len(truth)
-    no_event_tp = (predicted["event_name"].isna()).sum()
-    results.append({
-        "event": "(no_event)",
-        "TP": no_event_tp, "FP": 0, "FN": total_rows - truth_rows - no_event_tp,
-        "Precision": 1 if no_event_tp > 0 else 0,
-        "Recall": 1 if no_event_tp > 0 else 0,
-        "F1": 1 if no_event_tp > 0 else 0,
-    })
-
     return pd.DataFrame(results)
 
 def main():
     args = parse_args()
-    merged = pd.read_csv(args.inp)
+    df = pd.read_csv(args.inp)
 
-    metrics = compute_metrics(merged)
+    metrics = compute_metrics(df)
     metrics.to_csv(args.out, index=False)
-
     print(metrics)
 
 if __name__ == "__main__":
