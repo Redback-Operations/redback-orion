@@ -1,0 +1,13 @@
+# Example defaults (override with CLI if needed)
+model: yolov8n.pt
+source: samples/input.mp4
+tracker: bytetrack.yaml
+imgsz: 960
+conf: 0.35
+device: "0"
+out_dir: outputs
+save_vid: true
+save_csv: true
+save_json: true
+class_person_only: true
+
