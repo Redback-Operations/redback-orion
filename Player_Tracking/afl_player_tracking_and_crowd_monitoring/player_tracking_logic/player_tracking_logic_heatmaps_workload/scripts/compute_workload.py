@@ -148,7 +148,7 @@ def main():     # Script input and output paths
     df["is_sprint"] = kmh >= sprint_kmh                                             # Boolean checks if player performed a sprint
 
     # Run-length encode per player to get sprint segments
-    def _sprint_segments(g: pd.DataFrame):
+    def _sprint_segments(pid, g: pd.DataFrame):
         # g is sorted by frame_id already
         mask = g["is_sprint"].to_numpy()
         if mask.size == 0:
@@ -169,22 +169,21 @@ def main():     # Script input and output paths
                                         "dist_m","mean_speed_mps"])
 
         agg = (sprint_rows.groupby("seg_id")
-                .agg(player_id=("player_id","first"),
-                    t_start=("timestamp_s","min"),
+                .agg(t_start=("timestamp_s","min"),
                     t_end=("timestamp_s","max"),
                     dur_s=("dt_s","sum"),
                     dist_m=("step_dist_m","sum"),
                     mean_speed_mps=("speed_mps","mean"))
                 .reset_index(drop=True))
+        agg["player_id"] = pid
         # keep segments that last long enough
         agg = agg[agg["dur_s"] >= min_sprint_dur_s].reset_index(drop=True)
         return agg
 
-    sprint_segments = (
-        df.groupby("player_id", group_keys=False)
-        .apply(_sprint_segments)
-        .reset_index(drop=True)
-    )
+    sprint_segments = pd.concat(
+    [_sprint_segments(pid, g) for pid, g in df.groupby("player_id", sort=False)],
+    ignore_index=True
+)
 
     # - Repeated Sprint Bouts (clusters of sprints within rs_window_s)
     def _count_repeated_bouts(agg: pd.DataFrame) -> pd.DataFrame:

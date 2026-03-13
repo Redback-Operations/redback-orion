@@ -23,28 +23,29 @@ afl-workload-pipeline/
 
 ## Setup
 
-Clone and set up environment:
+Clone Repo and set up virtual environment:
 
-```bash
-git clone https://github.com/<USERNAME>/afl-workload-pipeline.git
-cd afl-workload-pipeline
+1. git clone https://github.com/<USERNAME>/afl-workload-pipeline.git
+2. cd afl-workload-pipeline
 
-python3 -m venv .venv
-source .venv/bin/activate
+3. python3 -m venv .venv 
+4. source .venv/bin/activate
 
-pip install -r requirements.txt   # or: pip install pandas numpy pyyaml scipy matplotlib imageio
+# Install dependencies
+5. pip install pandas numpy pyyaml scipy matplotlib imageio
 
-python scripts/compute_workload.py \
+# Run workload  metrics
+6. python scripts/compute_workload.py \
   --tracking examples/tracking2.0.csv \
   --config config.yaml \
   --out-json examples/out_workload.json \
   --out-csv  examples/out_workload.csv
 
 Outputs:
-	•	JSON: per-player workload indicators (distance, speed, HSR, work/rest, workload score, fatigue risk).
-	•	CSV: tidy table for spreadsheets / BI tools.
+	•	JSON: examples/out_workload.json - per-player workload indicators (distance, speed, HSR, work/rest, workload score, fatigue risk).
+	•	CSV: examples/out_workload.csv - tidy table for spreadsheets / BI tools.
 
-python scripts/generate_heatmaps.py \
+7. python scripts/generate_heatmaps.py \
   --tracking examples/tracking2.0.csv \
   --config config.yaml \
   --out-dir examples/heatmaps \
