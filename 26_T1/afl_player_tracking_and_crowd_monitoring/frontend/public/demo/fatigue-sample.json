@@ -1,0 +1,55 @@
+{
+    "frames": [
+      {
+        "t": "2025-01-10T08:30:00Z",
+        "quarter": 1,
+        "players": [
+          { "jersey": 19, "name": "Rowan Marshall", "team": "St Kilda Football Club", "pos": "Ruck", "age": 29, "height_cm": 201, "weight_kg": 105, "img": "", "fatigue": 0.18, "speed_mps": 7.8, "distance_m": 22, "hr": 138 },
+          { "jersey": 4,  "name": "Marcus Bontempelli", "team": "Western Bulldogs", "pos": "Midfielder", "age": 28, "height_cm": 192, "weight_kg": 87,  "img": "", "fatigue": 0.12, "speed_mps": 8.1, "distance_m": 25, "hr": 136 }
+        ]
+      },
+      { "t": "2025-01-10T08:31:00Z", "quarter": 1,
+        "players": [
+          { "jersey": 19, "fatigue": 0.22, "speed_mps": 7.6, "distance_m": 26, "hr": 141 },
+          { "jersey": 4,  "fatigue": 0.15, "speed_mps": 8.0, "distance_m": 28, "hr": 139 }
+        ]
+      },
+      { "t": "2025-01-10T08:32:00Z", "quarter": 1,
+        "players": [
+          { "jersey": 19, "fatigue": 0.28, "speed_mps": 7.2, "distance_m": 24, "hr": 147 },
+          { "jersey": 4,  "fatigue": 0.21, "speed_mps": 7.6, "distance_m": 30, "hr": 142 }
+        ]
+      },
+      { "t": "2025-01-10T08:33:00Z", "quarter": 2,
+        "players": [
+          { "jersey": 19, "fatigue": 0.35, "speed_mps": 6.9, "distance_m": 27, "hr": 151 },
+          { "jersey": 4,  "fatigue": 0.27, "speed_mps": 7.3, "distance_m": 29, "hr": 146 }
+        ]
+      },
+      { "t": "2025-01-10T08:34:00Z", "quarter": 2,
+        "players": [
+          { "jersey": 19, "fatigue": 0.44, "speed_mps": 6.6, "distance_m": 25, "hr": 156 },
+          { "jersey": 4,  "fatigue": 0.33, "speed_mps": 7.0, "distance_m": 26, "hr": 150 }
+        ]
+      },
+      { "t": "2025-01-10T08:35:00Z", "quarter": 3,
+        "players": [
+          { "jersey": 19, "fatigue": 0.57, "speed_mps": 6.1, "distance_m": 24, "hr": 161 },
+          { "jersey": 4,  "fatigue": 0.47, "speed_mps": 6.5, "distance_m": 25, "hr": 158 }
+        ]
+      },
+      { "t": "2025-01-10T08:36:00Z", "quarter": 3,
+        "players": [
+          { "jersey": 19, "fatigue": 0.68, "speed_mps": 5.8, "distance_m": 22, "hr": 166 },
+          { "jersey": 4,  "fatigue": 0.54, "speed_mps": 6.2, "distance_m": 24, "hr": 162 }
+        ]
+      },
+      { "t": "2025-01-10T08:37:00Z", "quarter": 4,
+        "players": [
+          { "jersey": 19, "fatigue": 0.79, "speed_mps": 5.3, "distance_m": 20, "hr": 171 },
+          { "jersey": 4,  "fatigue": 0.63, "speed_mps": 5.9, "distance_m": 22, "hr": 168 }
+        ]
+      }
+    ]
+  }
+  
