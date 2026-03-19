@@ -114,7 +114,7 @@ export default function Login() {
       localStorage.setItem("userEmail", loginForm.email);
 
       // Successful login - redirect to dashboard
-      navigate("/afl-dashboard");
+      navigate("/player-performance");
     } else {
       setError(
         "Invalid email or password. Try demo@aflanalytics.com / demo123 or use your signup credentials",
@@ -209,7 +209,7 @@ export default function Login() {
     });
 
     // Successful signup - redirect to dashboard
-    navigate("/afl-dashboard");
+    navigate("/player-performance");
   };
 
   const demoLogin = () => {
@@ -256,7 +256,7 @@ export default function Login() {
         );
 
         // Redirect to dashboard
-        navigate("/afl-dashboard");
+        navigate("/player-performance");
       } catch (error) {
         console.error("Error parsing OAuth user data:", error);
         setError("Authentication failed. Please try again.");
