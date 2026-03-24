@@ -6,7 +6,7 @@
 OUR BRANCH
 ----------
 Branch name : backend-api-gateway
-Our folder  : Player_Tracking/afl_player_tracking_and_crowd_monitoring/backend/
+Our folder  : 26_T1/afl_player_tracking_and_crowd_monitoring/backend/
 Repo        : https://github.com/lucastargett/redback-orion
 
 RULE: Only touch files inside the backend/ folder.
