@@ -1,0 +1,110 @@
+========================================================
+  PROJECT ORION — BACKEND TEAM GIT GUIDE
+  SIT782 – Team Project (B) – Execution and Delivery
+========================================================
+
+OUR BRANCH
+----------
+Branch name : backend-api-gateway
+Our folder  : Player_Tracking/afl_player_tracking_and_crowd_monitoring/backend/
+Repo        : https://github.com/lucastargett/redback-orion
+
+RULE: Only touch files inside the backend/ folder.
+RULE: Never commit directly to main.
+
+
+FIRST TIME SETUP (new team member)
+------------------------------------
+1. Clone the repo:
+   git clone https://github.com/lucastargett/redback-orion.git
+
+2. Switch to our branch:
+   git checkout backend-api-gateway
+
+3. Confirm you are on the right branch:
+   git branch
+   (should show * backend-api-gateway)
+
+
+DAILY WORKFLOW
+--------------
+Before starting work every day:
+   git pull origin backend-api-gateway
+
+Do your work...
+
+When done:
+   git add backend/        (only add backend folder)
+   git commit -m "your message"
+   git push
+
+
+WEEKLY SYNC (every Monday)
+---------------------------
+Get latest changes from other teams:
+   git checkout main
+   git pull origin main
+   git checkout backend-api-gateway
+   git merge main
+
+This brings other teams' merged work into your branch.
+Resolve any conflicts if they arise (unlikely since we own backend/).
+
+
+COMMIT MESSAGE GUIDE
+---------------------
+Keep messages short and clear. Examples:
+   "Add auth register and login endpoints"
+   "Implement JWT token validation"
+   "Add PostgreSQL database connection"
+   "Fix job status not updating after processing"
+
+
+BRANCH STRUCTURE (whole team)
+------------------------------
+Branch                 | Owner         | Folder
+-----------------------|---------------|---------------------------
+main                   | Everyone      | — (merge target only)
+backend-api-gateway    | Backend team  | backend/
+crowd-monitoring       | Crowd team    | crowd_model/
+player-tracking        | Player team   | player_model/
+frontend               | Frontend team | frontend/
+
+
+MERGING TO MAIN (end of each week)
+------------------------------------
+When a phase is complete and ready to share:
+   1. Go to GitHub
+   2. Open a Pull Request: backend-api-gateway → main
+   3. Get team lead to review and approve
+   4. Merge
+
+
+THINGS TO NEVER DO
+-------------------
+- Never commit .env file (contains secrets)
+- Never commit uploads/ folder (contains video files)
+- Never force push to main
+- Never commit directly to main
+- Never edit other teams' folders
+
+
+IF YOU GET A CONFLICT
+----------------------
+1. Open the conflicting file
+2. Look for these markers:
+   <<<<<<< your branch
+   your changes
+   =======
+   their changes
+   >>>>>>> main
+
+3. Keep the correct version, remove the markers
+4. git add the file
+5. git commit
+
+
+========================================================
+  Backend Team — Project Orion
+  Created: 2026-03-24
+========================================================
