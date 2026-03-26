@@ -1,7 +1,26 @@
 from fastapi import FastAPI
+from app.routes import test, players, crowd
 
-app = FastAPI()
+app = FastAPI(
+    title="Project Orion Backend API",
+    description="API for player tracking and crowd monitoring",
+    version="1.0.0"
+)
 
 @app.get("/")
 def read_root():
-    return {"message": "Backend is running!"}
+    return {
+        "status": "success",
+        "message": "Backend is running!"
+    }
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "success",
+        "message": "Backend is healthy!"
+    }
+
+app.include_router(test.router)
+app.include_router(players.router)
+app.include_router(crowd.router)
