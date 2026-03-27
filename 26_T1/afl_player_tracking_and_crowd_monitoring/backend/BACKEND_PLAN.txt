@@ -143,6 +143,11 @@ CROWD_SERVICE_URL=http://localhost:8002
 BACKEND_PORT=8000
 UPLOAD_DIR=uploads
 
+# Mock Service Toggle
+# Set to true during development or when player/crowd services are not ready
+# Set to false to use real player and crowd services
+USE_MOCK_SERVICES=true
+
 # PostgreSQL
 DATABASE_URL=postgresql://user:password@localhost:5432/orion_db
 
@@ -284,7 +289,7 @@ IMPLEMENTATION PHASES
 
 PHASE 1 — Foundation (Week 1-2)
   - Set up folder structure (including schemas/ and tests/)
-  - Implement config.py (env var loading)
+  - Implement config.py (env var loading including USE_MOCK_SERVICES flag)
   - Configure CORS (allow frontend on localhost:3000)
   - Set up PostgreSQL locally and create users + jobs tables
   - Implement database.py and models.py (SQLAlchemy)
@@ -297,16 +302,22 @@ PHASE 1 — Foundation (Week 1-2)
   - Write tests for auth endpoints (tests/test_auth.py)
   - Run gateway locally: uvicorn app.main:app --port 8000
   - Test gateway starts correctly and connects to PostgreSQL
+  - Share API contract (BACKEND_PLAN.txt + /docs) with frontend team
+  - Send contract template to player and crowd teams and request confirmation
 
 PHASE 2 — Core Gateway Logic (Week 3-4)
   - Define Pydantic schemas for jobs (schemas/jobs.py)
   - Implement httpx async clients (player_client.py, crowd_client.py)
+  - Both clients must respect USE_MOCK_SERVICES flag:
+      → USE_MOCK_SERVICES=true  → return hardcoded mock JSON (default)
+      → USE_MOCK_SERVICES=false → call real player/crowd service endpoints
   - Implement POST /upload:
       → validate video format (.mp4, .avi, .mov) and MIME type
       → save video to uploads/ folder
       → create job in PostgreSQL (status: processing)
       → add background task (process_video) and return job_id immediately
       Background task (process_video):
+        → check USE_MOCK_SERVICES flag to decide which client to use
         → call player + crowd services in parallel (asyncio.gather)
         → handle partial results if one service fails
         → update job in PostgreSQL with results (status: done/partial/failed)
@@ -318,22 +329,31 @@ PHASE 2 — Core Gateway Logic (Week 3-4)
   - Implement DELETE /jobs/{job_id} → delete job (RBAC enforced)
   - Write tests with mocked player + crowd service responses
   - Test all endpoints with mocked services
+  - Frontend integration checkpoint: verify /health and /auth/login reachable from frontend
 
 PHASE 3 — Integration (Week 5-6)
-  - Integrate with actual player service once player team confirms their API
-  - Integrate with actual crowd service once crowd team confirms their API
+  - Finalise confirmed contracts with player and crowd teams
+  - Make integration decision: proceed with real services or stay on mocks
+  - If contracts confirmed: update player_client.py and crowd_client.py for real services
+  - Keep USE_MOCK_SERVICES flag — do NOT delete mock logic
   - Each team runs their service locally on their agreed port
   - End-to-end test: frontend → gateway → both services → results back
   - Handle errors (service down, timeout, bad video format)
+  - Prepare two demo modes:
+      Mode A (preferred): USE_MOCK_SERVICES=false — real player + crowd services
+      Mode B (fallback):  USE_MOCK_SERVICES=true  — mock responses, full flow still works
 
-PHASE 4 — Dockerize & Polish (Week 7-8)
-  - Write Dockerfile for the gateway
-  - Write docker-compose.yml wiring all 4 services + PostgreSQL container
-  - Add shared Docker volume for uploads/ folder
-  - Swap .env URLs from localhost to Docker service names
+PHASE 4 — Buffer + Dockerize & Polish (Week 7-8)
+  - Week 7 is a buffer week — use it to resolve any outstanding integration issues
+  - If integration is on track, proceed with Docker setup:
+      → Write Dockerfile for the gateway
+      → Write docker-compose.yml wiring all 4 services + PostgreSQL container
+      → Add shared Docker volume for uploads/ folder
+      → Swap .env URLs from localhost to Docker service names
   - Logging (request/response logs for debugging)
   - API documentation (FastAPI auto-generates Swagger UI at /docs)
   - README with setup and run instructions (both local and Docker)
+  - Final demo: attempt Mode A first, fall back to Mode B if real services not stable
 
 
 ROLE-BASED ACCESS CONTROL (RBAC)
@@ -501,14 +521,16 @@ NOTE: All contracts marked "TBC" will be updated once other teams confirm.
 
 ========================================================
   PROGRESS TRACKER
-  Last Updated: 2026-03-24
+  Last Updated: 2026-03-27
 ========================================================
 
-OVERALL STATUS: Planning Complete — Ready to start Phase 1
+OVERALL STATUS: Phase 1 In Progress — Week 1 Complete for Tomin and Lucas
 
 PHASE 1 — Foundation
-  [ ] Set up folder structure (including schemas/ and tests/)
-  [ ] Implement config.py (env var loading)
+  [x] Set up folder structure (including schemas/ and tests/)
+  [x] Implement basic routes (/, /health, /api/players, /api/crowd, /api/test)
+  [x] Share API contract (BACKEND_PLAN.txt) with team
+  [ ] Implement config.py (env var loading including USE_MOCK_SERVICES flag)
   [ ] Configure CORS (allow frontend on localhost:3000)
   [ ] Set up PostgreSQL locally and create users + jobs tables
   [ ] Implement database.py and models.py (SQLAlchemy)
@@ -516,14 +538,15 @@ PHASE 1 — Foundation
   [ ] Implement auth module (hashing.py + jwt.py)
   [ ] Implement RBAC dependencies (get_current_user, require_admin)
   [ ] Implement POST /auth/register and POST /auth/login
-  [ ] Implement GET /health endpoint
   [ ] Create uploads/ folder for temporary video storage
   [ ] Write tests for auth endpoints (tests/test_auth.py)
   [ ] Run gateway locally: uvicorn app.main:app --port 8000
+  [ ] Share /docs URL with frontend team
+  [ ] Send contract template to player and crowd teams
 
 PHASE 2 — Core Gateway Logic
   [ ] Define Pydantic schemas for jobs (schemas/jobs.py)
-  [ ] Implement player_client.py and crowd_client.py
+  [ ] Implement player_client.py and crowd_client.py with USE_MOCK_SERVICES toggle
   [ ] Implement POST /upload with background task
   [ ] Implement GET /status/{job_id}
   [ ] Implement GET /jobs (paginated)
@@ -531,16 +554,20 @@ PHASE 2 — Core Gateway Logic
   [ ] Implement POST /jobs/{job_id}/retry
   [ ] Implement DELETE /jobs/{job_id}
   [ ] Write tests with mocked services
+  [ ] Frontend checkpoint: verify /health and /auth/login reachable from frontend
 
 PHASE 3 — Integration
-  [ ] Confirm contracts with player team
-  [ ] Confirm contracts with crowd team
-  [ ] Integrate with actual player service
-  [ ] Integrate with actual crowd service
+  [ ] Finalise contracts with player team
+  [ ] Finalise contracts with crowd team
+  [ ] Integration decision: real services or stay on mocks
+  [ ] Update player_client.py for real service (keep mock flag)
+  [ ] Update crowd_client.py for real service (keep mock flag)
   [ ] End-to-end testing with all services
   [ ] Error handling for service failures
+  [ ] Verify demo Mode A (real) and Mode B (mock fallback) both work
 
-PHASE 4 — Dockerize & Polish
+PHASE 4 — Buffer + Dockerize & Polish
+  [ ] Buffer week: resolve any outstanding integration issues
   [ ] Write Dockerfile for gateway
   [ ] Write docker-compose.yml
   [ ] Add shared Docker volume for uploads/
@@ -548,6 +575,7 @@ PHASE 4 — Dockerize & Polish
   [ ] Add logging
   [ ] Verify Swagger docs at /docs
   [ ] Write README
+  [ ] Final demo run with frontend team
 
 DECISIONS LOG
 -------------
@@ -559,3 +587,7 @@ DECISIONS LOG
 2026-03-24 — Docker: local dev first, Dockerize in Phase 4 only
 2026-03-24 — Video formats accepted: .mp4, .avi, .mov
 2026-03-24 — Contracts from player/crowd teams: TBC
+2026-03-27 — Mock fallback strategy added: USE_MOCK_SERVICES flag in .env to toggle between mock and real services without code changes
+2026-03-27 — Demo strategy: Mode A (real services) preferred, Mode B (mock fallback) as safety net
+2026-03-27 — Contract push moved to Week 2 (earlier than originally planned) to reduce integration risk
+2026-03-27 — Week 7 designated as buffer week — Docker only if integration is on track
