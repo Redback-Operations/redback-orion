@@ -1,0 +1,66 @@
+Bi-WEEKLY SPRINT 1: 23rd March - 3rd April,,,,
+Backend,,,,
+,WEEK 1: 23 - 28 March,,,
+MEMBER,TASK,DESCRIPTION,OUTPUT
+Tomin,Backend Architecture & Project Setup,"Define the backend architecture, create the project folder structure, set up the FastAPI application, establish main API routes and share the API contract with all teams.","Working FastAPI base project with organised folder structure, main.py, basic routes (/ and /health), and BACKEND_PLAN.txt shared with team"
+Lucas,API Routes Implementation,"Create the backend route files for player, crowd, and test functionality and implement the initial API endpoints required for frontend and integration testing.","Route files created (players, crowd, test) with working endpoints /api/test, /api/players, and /api/crowd"
+William,Mock Service Layer — Setup,"Create player_client.py and crowd_client.py returning mock JSON responses for player and crowd data.","player_client.py and crowd_client.py created with structured mock JSON responses"
+Prabhnoor,Configuration Setup,"Implement config.py to load all environment variables from .env using python-dotenv. Fill in .env with local dev values.",".env and config.py completed with all required environment variables loaded correctly"
+,,,,
+,WEEK 2: 29 March - 3 April,,,
+MEMBER,TASK,DESCRIPTION,OUTPUT
+Tomin,CORS + Route Wiring + Frontend Checkpoint 1,"Configure CORS in main.py to allow frontend on localhost:3000. Wire all completed routes into main.py. Share BACKEND_PLAN.txt and Swagger URL (http://localhost:8000/docs) with frontend team. Review and merge all week 1 PRs.","CORS configured, all routes wired, API contract shared with frontend team, PRs merged"
+Lucas,Auth Schemas,"Implement schemas/auth.py (RegisterRequest, LoginRequest, AuthResponse, UserResponse) and schemas/health.py (HealthResponse).","Pydantic schemas ready for use in auth routes"
+William,Mock Services Connected to Routes,"Connect player_client.py and crowd_client.py to the API routes. Verify mock responses return correctly through the gateway.","Mock services integrated and returning structured data through the routes"
+Prabhnoor,Database Setup,"Implement database.py (PostgreSQL async connection via SQLAlchemy) and models.py (users and jobs table definitions). Set up local PostgreSQL and confirm connection works.","Working database connection with users and jobs tables created"
+,,,,
+,,,,
+Bi-WEEKLY SPRINT 2: 4th - 17th April,,,,
+Backend,,,,
+,WEEK 3: 4 - 10 April,,,
+MEMBER,TASK,DESCRIPTION,OUTPUT
+Tomin,Auth Core Implementation,"Implement auth/hashing.py (bcrypt password hashing) and auth/jwt.py (JWT token creation and validation). Implement RBAC dependencies get_current_user and require_admin. Review all PRs.","Working auth system with password hashing, JWT tokens, and role-based access control"
+Lucas,Auth Routes,"Implement routes/auth.py with POST /auth/register, POST /auth/login, and GET /auth/me endpoints.","Auth endpoints working and returning correct responses"
+William,Job Schemas,"Implement schemas/jobs.py with JobSummary, JobDetail, JobListResponse, and UploadResponse Pydantic models.","Job schemas ready for use in upload and job routes"
+Prabhnoor,Global Error Handler & Logging Middleware,"Add global exception handler to main.py to catch all unhandled errors and return clean JSON. Add request logging middleware to log all incoming requests.","All unhandled errors return clean JSON responses, all requests logged"
+,,,,
+,WEEK 4: 11 - 17 April,,,
+MEMBER,TASK,DESCRIPTION,OUTPUT
+Tomin,Video Upload Route + Frontend Checkpoint 2,"Implement routes/upload.py to validate video format, save to uploads/, create a job in the database, and return job_id immediately. Wire route into main.py. Verify frontend can connect to /health and /auth/login — confirm CORS and connection working.","POST /upload working, job created in DB, frontend connection verified"
+Lucas,Job Routes,"Implement routes/jobs.py with GET /status/{job_id}, GET /jobs, GET /jobs/{job_id}, POST /jobs/{job_id}/retry, and DELETE /jobs/{job_id} with RBAC enforced.","All job endpoints working with correct role-based access control"
+William,Background Task — process_video(),"Implement process_video() background task using asyncio.gather to call player and crowd services in parallel. Handle partial results if one service fails. Update job status in DB to done, partial, or failed.","Background processing working, job status updated correctly after processing"
+Prabhnoor,Auth & Health Tests,"Write tests/test_auth.py (register, login, token validation) and tests/test_health.py.","Auth and health tests passing"
+,,,,
+,,,,
+Bi-WEEKLY SPRINT 3: 17th April - 1st May,,,,
+Backend,,,,
+,WEEK 5: 17 - 24 April,,,
+MEMBER,TASK,DESCRIPTION,OUTPUT
+Tomin,Confirm API Contracts,"Confirm request and response format with player team (port, endpoint, JSON structure) and crowd team. Update BACKEND_PLAN.txt and .env with confirmed service URLs. Review all PRs.","Confirmed contracts documented in BACKEND_PLAN.txt, service URLs updated in .env"
+Lucas,Upload & Job Tests,"Write tests/test_upload.py (file format validation, job creation) and tests/test_jobs.py (job status, pagination, retry) using mocked service responses.","Upload and job tests passing with mocked services"
+William,Real Player Service Integration,"Update player_client.py to call the real player service endpoint once the contract is confirmed. Remove mock responses.","Live async calls to player service working"
+Prabhnoor,Real Crowd Service Integration,"Update crowd_client.py to call the real crowd service endpoint once the contract is confirmed. Remove mock responses.","Live async calls to crowd service working"
+,,,,
+,WEEK 6: 25 April - 1 May,,,
+MEMBER,TASK,DESCRIPTION,OUTPUT
+Tomin,Core Frontend Integration Checkpoint 3,"Run full pipeline locally. Verify frontend can hit /upload and /status/{job_id} and receive correct responses end-to-end. Review and merge all integration PRs.","Full frontend to gateway to services flow confirmed working"
+Lucas,Route Error Handling,"Handle timeout errors from player and crowd services, return 400 for bad video formats, and return partial or failed status when a service is down.","All error cases handled with correct HTTP status codes and clean responses"
+William,Retry Endpoint Testing,"Test POST /jobs/{job_id}/retry with a real partial failure scenario. Verify asyncio.gather handles one service failing correctly and only the failed service is retried.","Retry working correctly in real partial failure scenarios"
+Prabhnoor,Integration Test Suite,"Run all tests against real services. Fix any test failures caused by real integration. Document any issues found.","All tests passing with real player and crowd services"
+,,,,
+,,,,
+Bi-WEEKLY SPRINT 4: 1st - 15th May,,,,
+Backend,,,,
+,WEEK 7: 1 - 8 May,,,
+MEMBER,TASK,DESCRIPTION,OUTPUT
+Tomin,Docker Setup,"Write Dockerfile for the gateway. Write docker-compose.yml wiring gateway, PostgreSQL, player service, and crowd service containers together. Add shared Docker volume for uploads/ folder. Review all PRs.","Full Docker setup running locally with all services containerised"
+Lucas,Docker Config & Endpoint Testing,"Swap .env URLs from localhost to Docker service names. Test all endpoints work correctly inside Docker.","All endpoints verified working inside Docker environment"
+William,Service Clients in Docker,"Test player_client.py and crowd_client.py work correctly with Docker service names.","Service clients confirmed working inside Docker"
+Prabhnoor,Test Suite in Docker,"Run the full test suite inside Docker. Identify and fix any Docker-specific issues.","All tests passing inside Docker"
+,,,,
+,WEEK 8: 8 - 15 May,,,
+MEMBER,TASK,DESCRIPTION,OUTPUT
+Tomin,README + Final Demo Checkpoint 4,"Write README.md with local and Docker setup instructions. Do final review of all code. Run full end-to-end demo with frontend team — frontend to gateway to services to results. Coordinate final demo run with all teams.","Complete README, all code reviewed and clean, full demo flow confirmed with frontend team"
+Lucas,Swagger Docs Polish,"Verify /docs looks clean and accurate. Add any missing response descriptions to all endpoints.","Clean and accurate Swagger UI at /docs"
+William,Logging & Cleanup,"Add request and response logging to all service clients. Clean up any leftover debug code.","All service client calls logged, codebase clean"
+Prabhnoor,Final Test Run & Cleanup,"Run the complete test suite one final time. Ensure all tests pass. Remove any leftover debug code.","All tests green, codebase clean and demo-ready"
