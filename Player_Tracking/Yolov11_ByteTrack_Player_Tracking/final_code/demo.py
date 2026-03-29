@@ -4,8 +4,8 @@ import time
 def main():
     # Configuration
     start = time.time()
-    model_path = 'best.pt'  #use your path
-    video_path = 'afl video.mp4' #use your path
+    model_path = '/Users/lucastargett/Desktop/SIT378_Team_Project_B/redback-orion/Player_Tracking/football_detect/Models/yolov11/weights/best.pt'
+    video_path = 'GoldCoast_Carlton_VFL.mp4' #use your path
     output_path = video_path.rsplit('.', 1)[0] + "_separated_tracking_ocr.mp4" #use your path
     
     try:
