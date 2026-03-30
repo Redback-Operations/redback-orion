@@ -27,6 +27,58 @@ This task receives analytics output and determines overall crowd behaviour trend
 }
 ```
 
+```
+{
+  "video_id": "match_02",
+  "zones": [
+    {
+      "zone_id": "A1",
+      "person_count": 16,
+      "density": 0.88
+    },
+    {
+      "zone_id": "A2",
+      "person_count": 14,
+      "density": 0.79
+    },
+    {
+      "zone_id": "B1",
+      "person_count": 11,
+      "density": 0.68
+    }
+  ],
+  "heatmap": {
+    "image_path": "output/heatmap_match_02.png"
+  }
+}
+```
+
+```
+{
+  "video_id": "match_03",
+  "zones": [
+    {
+      "zone_id": "A1",
+      "person_count": 2,
+      "density": 0.12
+    },
+    {
+      "zone_id": "A2",
+      "person_count": 3,
+      "density": 0.18
+    },
+    {
+      "zone_id": "B1",
+      "person_count": 1,
+      "density": 0.10
+    }
+  ],
+  "heatmap": {
+    "image_path": "output/heatmap_match_03.png"
+  }
+}
+```
+
 ## Output JSON
 
 ```json
@@ -40,3 +92,5 @@ This task receives analytics output and determines overall crowd behaviour trend
 
 - output of this task is used by `crowd_allocation_risk_zone`
 - keep `crowd_state` aligned with the intelligence service schema
+- behaviour analysis can use zone density patterns and heatmap availability as input features
+- this task can evolve from rule-based scoring to a trained ML model later without changing the output schema
