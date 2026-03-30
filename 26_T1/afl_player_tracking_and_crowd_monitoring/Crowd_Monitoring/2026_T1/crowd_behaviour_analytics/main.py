@@ -62,6 +62,7 @@ def analyze_behaviour(input_data):
     return {
         "video_id": video_id,
         "crowd_state": crowd_state,
+        "zones": zones,
     }
 
 

@@ -84,7 +84,14 @@ This task receives analytics output and determines overall crowd behaviour trend
 ```json
 {
   "video_id": "match_01",
-  "crowd_state": "increasing_density"
+  "crowd_state": "increasing_density",
+  "zones": [
+    {
+      "zone_id": "A1",
+      "person_count": 8,
+      "density": 0.72
+    }
+  ]
 }
 ```
 
