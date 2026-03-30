@@ -59,6 +59,9 @@ tmp/
 .DS_Store
 Thumbs.db
 
+# Allow our specific configuration files even if they are .json
+!shared/config/*.json
+
 # Ignore the actual heavy files
 data/raw/*.mp4
 video_processing/data/extracted_frames/*.jpg
