@@ -45,9 +45,10 @@ def detect_crowd(processed_video: dict) -> dict:
         detections = detect_faces(model, frame, DEFAULT_CONF, DEFAULT_IOU)
 
         all_results.append({
-            "frame":     frame_data["frame_id"],
+            "frame_id":     frame_data["frame_id"],
             "timestamp":    frame_data["timestamp"],
             "person_count": len(detections),
+            "detections": detections
         })
 
     return {
@@ -55,25 +56,5 @@ def detect_crowd(processed_video: dict) -> dict:
         "frames":   all_results
     }
 
-
-
-def main(processed_video: dict) -> dict:
-   
-    model       = load_model()
-    all_results = []
-
-    for frame_data in processed_video["frames"]:
-        result = detect_crowd(frame_data, model)
-
-        if result is None:
-            continue
-
-        all_results.append(result)
-        print(f"  frame {frame_data['frame_id']:>4}  |  {frame_data['timestamp']}s  |  faces: {len(result['detections']):>4}")
-
-    return {
-        "video_id": processed_video["video_id"],
-        "frames":   all_results,
-    }
     
     
