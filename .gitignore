@@ -1,5 +1,10 @@
 # macOS system files
 .DS_Store
+*.pyc
+*.mp4
+*.json
+*.csv
+*.pt
 
 # Python venv
 .venv/

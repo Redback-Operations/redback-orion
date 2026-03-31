@@ -16,13 +16,6 @@ def read_root():
         "message": "Backend is running!"
     }
 
-@app.get("/health")
-def health_check():
-    return {
-        "status": "success",
-        "message": "Backend is healthy!"
-    }
-
 app.include_router(test.router)
 app.include_router(players.router)
 app.include_router(crowd.router)
