@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app.routes import health, test, players, crowd
+from fastapi.middleware.cors import CORSMiddleware
+from app.routes import health, test, players, crowd, auth
 
 app = FastAPI(
     title="Project Orion Backend API",
@@ -7,7 +8,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(health.router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
@@ -16,6 +23,8 @@ def read_root():
         "message": "Backend is running!"
     }
 
+app.include_router(health.router)
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(test.router)
 app.include_router(players.router)
 app.include_router(crowd.router)
