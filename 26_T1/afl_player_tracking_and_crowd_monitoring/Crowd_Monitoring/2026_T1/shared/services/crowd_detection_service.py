@@ -9,7 +9,7 @@ def process_detection(data: dict):
     video_id = data.get("video_id")
     video_path = data.get("video_path")
 
-    processed_video = process_video(video_path)
+    processed_video = process_video(video_id, video_path)
     detection_result = detect_crowd(processed_video)
 
     if isinstance(detection_result, dict) and "video_id" not in detection_result:
