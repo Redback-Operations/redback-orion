@@ -119,6 +119,19 @@ const availableReports = [
     downloads: 8,
     created: "2024-01-07T20:30:00Z",
   },
+  {
+    id: 7,
+    name: "Crowd Movement & Density Report",
+    type: "Crowd Report",
+    category: "Crowd Monitoring",
+    date: "2024-01-20",
+    size: "2.1 MB",
+    format: "PDF",
+    teams: "MCG Stadium Analysis",
+    status: "ready",
+    downloads: 5,
+    created: "2024-01-20T12:00:00Z",
+  },
 ];
 
 export default function Reports() {
