@@ -14,7 +14,7 @@ def load_config():
     with open(CONFIG_PATH, 'r') as f:
         return json.load(f)
 
-def process_video(video_path: str):
+def process_video(video_id: str, video_path: str):
     """
     video_path: Expected as 'data/raw/filename.mp4' (relative to Root (2026_T1))
     """
@@ -79,6 +79,7 @@ def process_video(video_path: str):
 
     #Return the dictionary for the Service Layer to use
     return {
+        "video_id": video_id,
         "video_path": video_path,
         "frames": frames_metadata
     }
@@ -86,7 +87,7 @@ def process_video(video_path: str):
 if __name__ == "__main__":
     #Run this from the Project Root (2026_T1)
     #python -m video_processing.main
-    test_res = process_video("data/raw/match_01.mp4")
+    test_res = process_video("match_01", "data/raw/match_01.mp4")
     print(f"Successfully processed {len(test_res['frames'])} frames.")
 
 
