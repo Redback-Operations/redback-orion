@@ -201,6 +201,7 @@ export default function ApiDiagnostics() {
   const [testResult, setTestResult] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState("1h");
+  const [highlightedCards, setHighlightedCards] = useState<string[]>([]);
 
   // Simulate real-time updates
   useEffect(() => {
@@ -222,6 +223,24 @@ export default function ApiDiagnostics() {
 
     return () => clearInterval(interval);
   }, [isLive]);
+
+  const toggleHighlightedCard = (cardName: string) => {
+    setHighlightedCards((prev) =>
+      prev.includes(cardName)
+        ? prev.filter((item) => item !== cardName)
+        : [...prev, cardName],
+    );
+  };
+
+  const getOverviewCardClassName = (cardName: string) => {
+    const isHighlighted = highlightedCards.includes(cardName);
+
+    return `cursor-pointer transition-all duration-200 ${
+      isHighlighted
+        ? "ring-2 ring-green-500 bg-green-50 shadow-lg scale-[1.02]"
+        : "hover:shadow-md hover:scale-[1.01]"
+    }`;
+  };
 
   const runApiTest = async () => {
     setIsTesting(true);
@@ -307,7 +326,10 @@ export default function ApiDiagnostics() {
 
           {/* Overview Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
+            <Card
+              className={getOverviewCardClassName("API Health")}
+              onClick={() => toggleHighlightedCard("API Health")}
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -332,7 +354,10 @@ export default function ApiDiagnostics() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card
+              className={getOverviewCardClassName("Avg Response")}
+              onClick={() => toggleHighlightedCard("Avg Response")}
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -347,7 +372,10 @@ export default function ApiDiagnostics() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card
+              className={getOverviewCardClassName("Requests/min")}
+              onClick={() => toggleHighlightedCard("Requests/min")}
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -362,7 +390,10 @@ export default function ApiDiagnostics() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card
+              className={getOverviewCardClassName("Error Rate")}
+              onClick={() => toggleHighlightedCard("Error Rate")}
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
