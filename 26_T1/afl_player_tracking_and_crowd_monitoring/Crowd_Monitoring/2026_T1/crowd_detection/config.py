@@ -1,7 +1,9 @@
+import os
 from pathlib import Path
 
-
-MODEL_NAME   = "model.pt" # Model downloaded from https://huggingface.co/arnabdhar/YOLOv8-Face-Detection
+CURRENT_DIR=os.path.dirname(os.path.abspath(__file__))
+MODEL_NAME = os.path.join(CURRENT_DIR, "model.pt") # Model downloaded from https://huggingface.co/arnabdhar/YOLOv8-Face-Detection
+ 
 PERSON_CLASS = None
 
 
