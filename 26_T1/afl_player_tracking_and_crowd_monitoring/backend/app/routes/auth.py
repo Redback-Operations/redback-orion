@@ -23,8 +23,8 @@ def login(user: LoginRequest):
         "token_type": "bearer",
         "user": {
             "id": "1",
-            "username": user.username,
-            "email": f"{user.username}@example.com"
+            "username": user.email.split("@")[0],
+            "email": user.email
         },
         "expires_in": 3600
     }
