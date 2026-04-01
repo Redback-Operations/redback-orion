@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional
 from datetime import datetime
+from uuid import UUID
 
 
 class RegisterRequest(BaseModel):
@@ -17,7 +18,7 @@ class LoginRequest(BaseModel):
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    user_id: str
+    user_id: UUID
     username: str
     email: EmailStr
     role: str
