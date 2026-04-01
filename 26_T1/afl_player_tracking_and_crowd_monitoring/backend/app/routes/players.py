@@ -6,9 +6,14 @@ router = APIRouter(prefix="/api", tags=["Players"])
 USE_MOCK_SERVICES = True
 
 @router.get("/players")
-def get_players():
+async def get_players():
     if USE_MOCK_SERVICES:
-        return get_player_data()
+        data = await get_player_data()
+        return {
+            "status": "success",
+            "message": "Players data retrieved successfully",
+            "data": data
+        }
 
     return {
         "status": "error",
