@@ -1,27 +1,16 @@
 from fastapi import APIRouter
+from app.services.player_client import get_player_data
 
 router = APIRouter(prefix="/api", tags=["Players"])
 
+USE_MOCK_SERVICES = True
+
 @router.get("/players")
 def get_players():
-    return {
-        "status": "success",
-        "message": "Players data retrieved successfully",
-        "data": [
-            {
-                "player_id": 1,
-                "team": "Team A",
-                "x": 120,
-                "y": 340,
-                "speed": 6.4
-            },
-            {
-                "player_id": 2,
-                "team": "Team B",
-                "x": 210,
-                "y": 280,
-                "speed": 5.8
-            }
-        ]
-    }
+    if USE_MOCK_SERVICES:
+        return get_player_data()
 
+    return {
+        "status": "error",
+        "message": "Mock player service is disabled"
+    }
