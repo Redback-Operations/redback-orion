@@ -13,12 +13,12 @@ class LoginRequest(BaseModel):
 class UserResponse(BaseModel):
     id: str
     username: str
-    password: str
-    
-class AuthResponse(BaseModel): 
+    email: EmailStr
+
+class AuthResponse(BaseModel):
     access_token: str
     token_type: str
-    user: Optional[int] = None
+    user: Optional[UserResponse] = None
     expires_in: int
 
 
