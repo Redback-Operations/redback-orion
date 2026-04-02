@@ -3,6 +3,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.routes import health, test, players, crowd, auth, upload, jobs
+from app.database import engine
+from app.models import Base
 from app import config
 
 logging.basicConfig(
@@ -10,6 +12,8 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Project Orion Backend API",
