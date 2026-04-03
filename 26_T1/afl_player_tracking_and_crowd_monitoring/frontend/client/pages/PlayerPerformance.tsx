@@ -255,6 +255,7 @@ const generatePlayerData = () => {
 };
 
 export default function PlayerPerformance() {
+  const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const ENABLE_LIVE_FEATURES = true;
@@ -376,6 +377,8 @@ export default function PlayerPerformance() {
     trend,
     color = "blue",
     icon: Icon,
+    active = false,
+    onClick,
   }: {
     title: string;
     value: string | number;
@@ -383,8 +386,15 @@ export default function PlayerPerformance() {
     trend?: "up" | "down" | "stable";
     color?: string;
     icon?: any;
+    active?: boolean;
+    onClick?: () => void;
   }) => (
-    <Card className="relative overflow-hidden">
+    <Card
+      className={`relative overflow-hidden transition-all duration-200 ${onClick ? "cursor-pointer" : ""} ${
+        active ? "ring-2 ring-blue-500 ring-offset-2 shadow-lg" : ""
+      }`}
+      onClick={onClick}
+    >
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -533,37 +543,52 @@ export default function PlayerPerformance() {
 
           {/* Quick Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard
-              title="Players Active"
-              value={filteredPlayers.length}
-              icon={Users}
-              color="blue"
-              trend="up"
-            />
-            <StatCard
-              title="Total Goals"
-              value={filteredPlayers.reduce((sum, p) => sum + p.stats.goals, 0)}
-              icon={Target}
-              color="green"
-              trend="up"
-            />
-            <StatCard
-              title="Avg Efficiency"
-              value={`${Math.round(filteredPlayers.reduce((sum, p) => sum + p.stats.efficiency, 0) / filteredPlayers.length)}%`}
-              icon={Activity}
-              color="purple"
-              trend="stable"
-            />
-            <StatCard
-              title="Total Disposals"
-              value={filteredPlayers.reduce(
-                (sum, p) => sum + p.stats.disposals,
-                0,
-              )}
-              icon={BarChart3}
-              color="orange"
-              trend="up"
-            />
+                              <StatCard
+                      title="Players Active"
+                      value={filteredPlayers.length}
+                      icon={Users}
+                      color="blue"
+                      trend="up"
+                      active={selectedStat === "Players Active"}
+                      onClick={() => setSelectedStat("Players Active")}
+                    />
+
+                    <StatCard
+                      title="Total Goals"
+                      value={filteredPlayers.reduce((sum, p) => sum + p.stats.goals, 0)}
+                      icon={Target}
+                      color="green"
+                      trend="up"
+                      active={selectedStat === "Total Goals"}
+                      onClick={() => setSelectedStat("Total Goals")}
+                    />
+
+                    <StatCard
+                      title="Avg Efficiency"
+                      value={`${
+                        filteredPlayers.length > 0
+                          ? Math.round(
+                              filteredPlayers.reduce((sum, p) => sum + p.stats.efficiency, 0) /
+                                filteredPlayers.length
+                            )
+                          : 0
+                      }%`}
+                      icon={Activity}
+                      color="purple"
+                      trend="stable"
+                      active={selectedStat === "Avg Efficiency"}
+                      onClick={() => setSelectedStat("Avg Efficiency")}
+                    />
+
+                    <StatCard
+                      title="Total Disposals"
+                      value={filteredPlayers.reduce((sum, p) => sum + p.stats.disposals, 0)}
+                      icon={BarChart3}
+                      color="orange"
+                      trend="up"
+                      active={selectedStat === "Total Disposals"}
+                      onClick={() => setSelectedStat("Total Disposals")}
+                    />    
           </div>
 
           {/* Search and Filters */}
