@@ -9,7 +9,11 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     fs: {
-      allow: ["./client", "./shared"],
+      allow: [
+        path.resolve(__dirname, "."),
+        path.resolve(__dirname, "./client"),
+        path.resolve(__dirname, "./shared"),
+      ],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
   },
@@ -28,11 +32,9 @@ export default defineConfig(({ mode }) => ({
 function expressPlugin(): Plugin {
   return {
     name: "express-plugin",
-    apply: "serve", // Only apply during development (serve mode)
+    apply: "serve",
     configureServer(server) {
       const app = createServer();
-
-      // Add Express app as middleware to Vite dev server
       server.middlewares.use(app);
     },
   };

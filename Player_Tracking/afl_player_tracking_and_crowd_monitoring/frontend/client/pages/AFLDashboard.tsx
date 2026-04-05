@@ -88,12 +88,17 @@ const mockPlayers = [
     name: "Marcus Bontempelli",
     team: "Western Bulldogs",
     position: "Midfielder",
-    kicks: 28,
+    kicks: 18,
     handballs: 12,
-    marks: 8,
-    tackles: 6,
+    marks: 6,
+    tackles: 5,
     goals: 2,
-    efficiency: 87,
+    efficiency: 84,
+    dob: "1995-11-24",
+    age: 30,
+    height: "193 cm",
+    weight: "93 kg",
+    photo: "",
   },
   {
     id: 2,
@@ -106,6 +111,11 @@ const mockPlayers = [
     tackles: 4,
     goals: 3,
     efficiency: 82,
+    dob: "1991-06-26",
+    age: 34,
+    height: "187 cm",
+    weight: "87 kg",
+    photo: "/image.png",
   },
   {
     id: 3,
@@ -118,6 +128,11 @@ const mockPlayers = [
     tackles: 8,
     goals: 1,
     efficiency: 84,
+    dob: "1990-04-05",
+    age: 35,
+    height: "189 cm",
+    weight: "92 kg",
+    photo: "https://via.placeholder.com/150",
   },
   {
     id: 4,
@@ -130,6 +145,198 @@ const mockPlayers = [
     tackles: 3,
     goals: 1,
     efficiency: 78,
+    dob: "1991-12-30",
+    age: 33,
+    height: "208 cm",
+    weight: "108 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 5,
+    name: "Nick Daicos",
+    team: "Collingwood",
+    position: "Midfielder",
+    kicks: 24,
+    handballs: 16,
+    marks: 9,
+    tackles: 4,
+    goals: 1,
+    efficiency: 89,
+    dob: "2003-01-03",
+    age: 23,
+    height: "183 cm",
+    weight: "72 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 6,
+    name: "Christian Petracca",
+    team: "Melbourne",
+    position: "Midfielder",
+    kicks: 20,
+    handballs: 14,
+    marks: 6,
+    tackles: 5,
+    goals: 2,
+    efficiency: 87,
+    dob: "1996-01-04",
+    age: 30,
+    height: "186 cm",
+    weight: "89 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 7,
+    name: "Lachie Neale",
+    team: "Brisbane Lions",
+    position: "Midfielder",
+    kicks: 22,
+    handballs: 18,
+    marks: 5,
+    tackles: 7,
+    goals: 1,
+    efficiency: 88,
+    dob: "1993-05-24",
+    age: 32,
+    height: "177 cm",
+    weight: "82 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 8,
+    name: "Charlie Curnow",
+    team: "Carlton",
+    position: "Forward",
+    kicks: 14,
+    handballs: 5,
+    marks: 8,
+    tackles: 2,
+    goals: 4,
+    efficiency: 81,
+    dob: "1997-02-03",
+    age: 29,
+    height: "194 cm",
+    weight: "92 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 9,
+    name: "Jeremy Cameron",
+    team: "Geelong",
+    position: "Forward",
+    kicks: 16,
+    handballs: 6,
+    marks: 7,
+    tackles: 3,
+    goals: 3,
+    efficiency: 83,
+    dob: "1993-04-01",
+    age: 32,
+    height: "196 cm",
+    weight: "94 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 10,
+    name: "Clayton Oliver",
+    team: "Melbourne",
+    position: "Midfielder",
+    kicks: 21,
+    handballs: 19,
+    marks: 6,
+    tackles: 8,
+    goals: 1,
+    efficiency: 86,
+    dob: "1997-07-22",
+    age: 28,
+    height: "187 cm",
+    weight: "87 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 11,
+    name: "Tom Hawkins",
+    team: "Geelong",
+    position: "Forward",
+    kicks: 13,
+    handballs: 4,
+    marks: 9,
+    tackles: 2,
+    goals: 3,
+    efficiency: 79,
+    dob: "1988-07-21",
+    age: 37,
+    height: "198 cm",
+    weight: "105 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 12,
+    name: "Andrew Brayshaw",
+    team: "Fremantle",
+    position: "Midfielder",
+    kicks: 23,
+    handballs: 17,
+    marks: 7,
+    tackles: 6,
+    goals: 1,
+    efficiency: 87,
+    dob: "1999-11-08",
+    age: 26,
+    height: "184 cm",
+    weight: "78 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 13,
+    name: "Jack Steele",
+    team: "St Kilda",
+    position: "Midfielder",
+    kicks: 19,
+    handballs: 15,
+    marks: 5,
+    tackles: 9,
+    goals: 1,
+    efficiency: 85,
+    dob: "1995-10-13",
+    age: 30,
+    height: "186 cm",
+    weight: "88 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 14,
+    name: "Marcus Windhager",
+    team: "St Kilda",
+    position: "Midfielder",
+    kicks: 17,
+    handballs: 13,
+    marks: 4,
+    tackles: 6,
+    goals: 1,
+    efficiency: 82,
+    dob: "2003-05-20",
+    age: 23,
+    height: "185 cm",
+    weight: "80 kg",
+    photo: "https://via.placeholder.com/150",
+  },
+  {
+    id: 15,
+    name: "Tim Taranto",
+    team: "Richmond",
+    position: "Midfielder",
+    kicks: 20,
+    handballs: 18,
+    marks: 6,
+    tackles: 7,
+    goals: 1,
+    efficiency: 84,
+    dob: "1998-03-02",
+    age: 28,
+    height: "186 cm",
+    weight: "85 kg",
+    photo: "https://via.placeholder.com/150",
   },
 ];
 
@@ -1496,13 +1703,41 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       (selectedTeam === "all" || player.team === selectedTeam),
   );
 
+  const navigates = useNavigate();
+
+  const goToHome = () => {
+    navigates("/");
+  };
+
+  const calculateAge = (dob: string) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <button
+              type="button"
+              onClick={goToHome}
+              className="flex items-center space-x-4 text-left hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-lg"
+              aria-label="Go to home page"
+              title="Go to home page"
+            >
               <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
                 <Activity className="w-6 h-6 text-white" />
               </div>
@@ -1514,7 +1749,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                   Real-time match insights & player analytics
                 </p>
               </div>
-            </div>
+            </button>
             <div className="flex items-center space-x-4">
               <Badge
                 variant={isLive ? "destructive" : "secondary"}
@@ -1617,7 +1852,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </Select>
                   </div>
 
-                  <div className="space-y-3 max-h-60 overflow-y-auto">
+                  <div className="space-y-3  overflow-y-auto">
                     {filteredPlayers.map((player) => (
                       <div
                         key={player.id}
@@ -1651,7 +1886,50 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                     </CardTitle>
                     <CardDescription>{selectedPlayer.position}</CardDescription>
                   </CardHeader>
-                  <CardContent>
+
+                  <CardContent className="space-y-6">
+                    {/* Player Profile */}
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                      <img
+                        src={selectedPlayer.photo}
+                        alt={selectedPlayer.name}
+                        className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md"
+                      />
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <div className="text-sm text-gray-500">
+                            Date of Birth
+                          </div>
+                          <div className="text-base font-semibold">
+                            {selectedPlayer.dob}
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <div className="text-sm text-gray-500">Age</div>
+                          <div className="text-base font-semibold">
+                            {calculateAge(selectedPlayer.dob)}
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <div className="text-sm text-gray-500">Height</div>
+                          <div className="text-base font-semibold">
+                            {selectedPlayer.height}
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <div className="text-sm text-gray-500">Weight</div>
+                          <div className="text-base font-semibold">
+                            {selectedPlayer.weight}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Performance Stats */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div className="text-center p-4 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">
@@ -1659,30 +1937,35 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         </div>
                         <div className="text-sm text-gray-600">Kicks</div>
                       </div>
+
                       <div className="text-center p-4 bg-green-50 rounded-lg">
                         <div className="text-2xl font-bold text-green-600">
                           {selectedPlayer.handballs}
                         </div>
                         <div className="text-sm text-gray-600">Handballs</div>
                       </div>
+
                       <div className="text-center p-4 bg-purple-50 rounded-lg">
                         <div className="text-2xl font-bold text-purple-600">
                           {selectedPlayer.marks}
                         </div>
                         <div className="text-sm text-gray-600">Marks</div>
                       </div>
+
                       <div className="text-center p-4 bg-orange-50 rounded-lg">
                         <div className="text-2xl font-bold text-orange-600">
                           {selectedPlayer.tackles}
                         </div>
                         <div className="text-sm text-gray-600">Tackles</div>
                       </div>
+
                       <div className="text-center p-4 bg-red-50 rounded-lg">
                         <div className="text-2xl font-bold text-red-600">
                           {selectedPlayer.goals}
                         </div>
                         <div className="text-sm text-gray-600">Goals</div>
                       </div>
+
                       <div className="text-center p-4 bg-yellow-50 rounded-lg">
                         <div className="text-2xl font-bold text-yellow-600">
                           {selectedPlayer.efficiency}%
@@ -1750,6 +2033,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                 }
                               </span>
                             </div>
+
                             <div className="flex gap-2">
                               <div className="flex-1">
                                 <Progress
@@ -1773,6 +2057,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                   {selectedPlayer.name}
                                 </div>
                               </div>
+
                               <div className="flex-1">
                                 <Progress
                                   value={

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -64,6 +65,49 @@ import {
   Eye,
   Star,
 } from "lucide-react";
+
+const getTeamLogo = (team: string) => {
+  const logos: Record<string, string> = {
+    "Western Bulldogs":
+      "https://upload.wikimedia.org/wikipedia/en/6/6b/Western_Bulldogs_logo.svg",
+    Richmond:
+      "https://upload.wikimedia.org/wikipedia/en/f/f3/Richmond_Tigers_logo.svg",
+    Geelong:
+      "https://upload.wikimedia.org/wikipedia/en/9/9c/Geelong_Football_Club_logo.svg",
+    Melbourne:
+      "https://upload.wikimedia.org/wikipedia/en/f/f4/Melbourne_Demons_logo.svg",
+    Carlton:
+      "https://upload.wikimedia.org/wikipedia/en/7/7a/Carlton_Football_Club_logo.svg",
+    Adelaide:
+      "https://upload.wikimedia.org/wikipedia/en/f/fc/Adelaide_Crows_logo.svg",
+    "West Coast":
+      "https://upload.wikimedia.org/wikipedia/en/2/2e/West_Coast_Eagles_logo.svg",
+    Collingwood:
+      "https://upload.wikimedia.org/wikipedia/en/7/7a/Collingwood_Football_Club_logo.svg",
+    Essendon:
+      "https://upload.wikimedia.org/wikipedia/en/6/6b/Essendon_Football_Club_logo.svg",
+    Fremantle:
+      "https://upload.wikimedia.org/wikipedia/en/7/7f/Fremantle_Football_Club_logo.svg",
+    Brisbane:
+      "https://upload.wikimedia.org/wikipedia/en/2/2f/Brisbane_Lions_logo.svg",
+    Sydney:
+      "https://upload.wikimedia.org/wikipedia/en/1/17/Sydney_Swans_Logo.svg",
+    "St Kilda":
+      "https://upload.wikimedia.org/wikipedia/en/7/78/St_Kilda_Football_Club_logo.svg",
+    "Port Adelaide":
+      "https://upload.wikimedia.org/wikipedia/en/7/70/Port_Adelaide_Football_Club_logo.svg",
+    "North Melbourne":
+      "https://upload.wikimedia.org/wikipedia/en/5/52/North_Melbourne_Football_Club_logo.svg",
+    "Gold Coast":
+      "https://upload.wikimedia.org/wikipedia/en/e/e7/Gold_Coast_Suns_logo.svg",
+    "GWS Giants":
+      "https://upload.wikimedia.org/wikipedia/en/1/17/GWS_Giants_logo.svg",
+    Hawthorn:
+      "https://upload.wikimedia.org/wikipedia/en/9/9f/Hawthorn_Football_Club_logo.svg",
+  };
+
+  return logos[team] || "";
+};
 
 // Comprehensive player data with enhanced AFL statistics
 const generatePlayerData = () => {
@@ -189,7 +233,6 @@ const generatePlayerData = () => {
         { time: 30, possession: 30 },
       ],
     },
-    // Add more players with similar detailed data structure
     ...Array.from({ length: 16 }, (_, i) => ({
       id: i + 3,
       name: `Player ${i + 3}`,
@@ -255,6 +298,8 @@ const generatePlayerData = () => {
 };
 
 export default function PlayerPerformance() {
+  const navigate = useNavigate();
+
   const [isLive, setIsLive] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const ENABLE_LIVE_FEATURES = true;
@@ -269,7 +314,10 @@ export default function PlayerPerformance() {
     "possession" | "performance" | "comparison"
   >("possession");
 
-  // Simulate live data updates
+  const goToHome = () => {
+    navigate("/");
+  };
+
   useEffect(() => {
     if (!isLive || !isPlaying) return;
 
@@ -301,7 +349,6 @@ export default function PlayerPerformance() {
 
   const uniqueTeams = [...new Set(players.map((p) => p.team))];
 
-  // Performance metrics data for charts
   const performanceMetrics = [
     {
       name: "Goals",
@@ -435,6 +482,14 @@ export default function PlayerPerformance() {
           <div className="text-xl font-bold">{player.stats.disposals}</div>
           <div className="text-xs">DISPOSALS</div>
         </div>
+
+        {getTeamLogo(player.team) && (
+          <img
+            src={getTeamLogo(player.team)}
+            alt={player.team}
+            className="absolute bottom-[-14px] right-4 w-10 h-10 bg-white rounded-full p-1 shadow object-contain"
+          />
+        )}
       </div>
 
       <CardContent className="p-4">
@@ -485,19 +540,30 @@ export default function PlayerPerformance() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <MobileNavigation />
 
-      {/* Main Content */}
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Player Performance
-              </h1>
-              <p className="text-gray-600">
-                Real-time AFL player analytics and statistics
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={goToHome}
+              className="flex items-center gap-3 text-left hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1"
+              aria-label="Go to index page"
+              title="Go to index page"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center shadow-sm">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Player Performance
+                </h1>
+                <p className="text-gray-600">
+                  Real-time AFL player analytics and statistics
+                </p>
+              </div>
+            </button>
+
             <div className="flex items-center gap-2">
               <Button
                 variant={isPlaying ? "default" : "outline"}
@@ -522,7 +588,6 @@ export default function PlayerPerformance() {
             </div>
           </div>
 
-          {/* Live Clock */}
           {ENABLE_LIVE_FEATURES && (
             <LiveClock
               isLive={isLive}
@@ -531,7 +596,6 @@ export default function PlayerPerformance() {
             />
           )}
 
-          {/* Quick Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
               title="Players Active"
@@ -549,7 +613,12 @@ export default function PlayerPerformance() {
             />
             <StatCard
               title="Avg Efficiency"
-              value={`${Math.round(filteredPlayers.reduce((sum, p) => sum + p.stats.efficiency, 0) / filteredPlayers.length)}%`}
+              value={`${Math.round(
+                filteredPlayers.reduce(
+                  (sum, p) => sum + p.stats.efficiency,
+                  0,
+                ) / filteredPlayers.length,
+              )}%`}
               icon={Activity}
               color="purple"
               trend="stable"
@@ -566,7 +635,6 @@ export default function PlayerPerformance() {
             />
           </div>
 
-          {/* Search and Filters */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -614,7 +682,6 @@ export default function PlayerPerformance() {
             </CardContent>
           </Card>
 
-          {/* Player Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredPlayers.slice(0, 12).map((player) => (
               <EnhancedPlayerCard
@@ -626,7 +693,6 @@ export default function PlayerPerformance() {
             ))}
           </div>
 
-          {/* Selected Player Dashboard */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Large Player Card */}
             <Card className="lg:col-span-1">
@@ -634,7 +700,15 @@ export default function PlayerPerformance() {
                 className="h-32 rounded-t-lg relative flex items-center justify-center"
                 style={{ backgroundColor: getTeamColor(selectedPlayer.team) }}
               >
-                <div className="text-center text-white">
+                <div className="text-center text-white relative">
+                  {getTeamLogo(selectedPlayer.team) && (
+                    <img
+                      src={getTeamLogo(selectedPlayer.team)}
+                      alt={selectedPlayer.team}
+                      className="w-12 h-12 object-contain mx-auto mb-2 bg-white rounded-full p-1 shadow"
+                    />
+                  )}
+
                   <div className="text-4xl font-bold mb-2">
                     #{selectedPlayer.number}
                   </div>
@@ -646,7 +720,27 @@ export default function PlayerPerformance() {
                   </div>
                 </div>
               </div>
-              <CardContent className="p-6">
+
+              <CardContent className="p-6 pt-10">
+                <div className="flex flex-col items-center -mt-10 mb-4">
+                  {selectedPlayer.photo ? (
+                    <img
+                      src={selectedPlayer.photo}
+                      alt={selectedPlayer.name}
+                      className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg bg-white"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gray-300 border-4 border-white shadow-lg flex items-center justify-center">
+                      <span className="text-2xl font-bold text-gray-600">
+                        {selectedPlayer.name
+                          .split(" ")
+                          .map((n: string) => n[0])
+                          .join("")}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-4">
                   <div className="text-center">
                     <Badge variant="outline" className="mb-2">
@@ -702,9 +796,7 @@ export default function PlayerPerformance() {
               </CardContent>
             </Card>
 
-            {/* Charts Section */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Chart Controls */}
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -800,7 +892,6 @@ export default function PlayerPerformance() {
             </div>
           </div>
 
-          {/* Additional Stats and Comparison */}
           <Tabs defaultValue="detailed-stats" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="detailed-stats">Detailed Stats</TabsTrigger>
