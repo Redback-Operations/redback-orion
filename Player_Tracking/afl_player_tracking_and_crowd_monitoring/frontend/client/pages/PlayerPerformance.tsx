@@ -582,8 +582,8 @@ export default function PlayerPerformance() {
                 <Download className="w-4 h-4 mr-2" />
                 Export
               </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4" />
+              <Button variant="outline" size="sm" onClick={() => window.open("https://redback-operations.github.io/redback-documentation/", "_blank")}>
+  Redback Operations
               </Button>
             </div>
           </div>
