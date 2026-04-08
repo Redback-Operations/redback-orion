@@ -132,6 +132,20 @@ const availableReports = [
     downloads: 5,
     created: "2024-01-20T12:00:00Z",
   },
+
+  {
+  id: 8,
+  name: "Video Analysis Match Insights",
+  type: "Video Report",
+  category: "Video Analysis",
+  date: "2024-01-22",
+  size: "4.6 MB",
+  format: "MP4",
+  teams: "Match Footage Breakdown",
+  status: "ready",
+  downloads: 3,
+  created: "2024-01-22T14:00:00Z",
+}
 ];
 
 export default function Reports() {
