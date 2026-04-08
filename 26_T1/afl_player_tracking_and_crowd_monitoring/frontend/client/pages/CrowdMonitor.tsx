@@ -314,10 +314,16 @@ export default function CrowdMonitor() {
 
           <Tabs value={viewMode} onValueChange={setViewMode} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="heatmap">Heat Map</TabsTrigger>
-              <TabsTrigger value="list">Zone Details</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            </TabsList>
+  <TabsTrigger value="heatmap" className="data-[state=active]:bg-green-600 data-[state=active]:text-white">
+    Heat Map
+  </TabsTrigger>
+  <TabsTrigger value="list" className="data-[state=active]:bg-green-600 data-[state=active]:text-white">
+    Zone Details
+  </TabsTrigger>
+  <TabsTrigger value="analytics" className="data-[state=active]:bg-green-600 data-[state=active]:text-white">
+    Analytics
+  </TabsTrigger>
+</TabsList>
 
             <TabsContent value="heatmap" className="space-y-4">
               <Card>

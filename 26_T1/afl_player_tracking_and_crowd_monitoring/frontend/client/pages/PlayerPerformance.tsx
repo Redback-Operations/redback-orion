@@ -828,11 +828,19 @@ export default function PlayerPerformance() {
           {/* Additional Stats and Comparison */}
           <Tabs defaultValue="detailed-stats" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="detailed-stats">Detailed Stats</TabsTrigger>
-              <TabsTrigger value="form">Form</TabsTrigger>
-              <TabsTrigger value="heatmap">Heat Map</TabsTrigger>
-              <TabsTrigger value="compare">Compare Players</TabsTrigger>
-            </TabsList>
+  <TabsTrigger value="detailed-stats" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+    Detailed Stats
+  </TabsTrigger>
+  <TabsTrigger value="form" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+    Form
+  </TabsTrigger>
+  <TabsTrigger value="heatmap" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+    Heat Map
+  </TabsTrigger>
+  <TabsTrigger value="compare" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+    Compare Players
+  </TabsTrigger>
+</TabsList>
 
             <TabsContent value="detailed-stats" className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
