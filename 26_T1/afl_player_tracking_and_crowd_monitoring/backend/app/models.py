@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.orm import relationship   # ✅ ADDED
 from app.database import Base
 
 
@@ -14,6 +15,8 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, default="user", nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    jobs = relationship("Job", back_populates="user")
 
 
 class Job(Base):
@@ -28,3 +31,5 @@ class Job(Base):
     error = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", back_populates="jobs")
