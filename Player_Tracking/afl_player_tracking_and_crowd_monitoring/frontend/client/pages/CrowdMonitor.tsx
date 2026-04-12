@@ -284,6 +284,31 @@ export default function CrowdMonitor() {
                 </div>
               </CardContent>
             </Card>
+          <Card>
+  <CardContent className="p-4">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-600">Highest Attendance</p>
+        <p className="text-2xl font-bold text-green-600">62,500</p>
+        <p className="text-xs text-gray-500">MCG - Round 10</p>
+      </div>
+      <TrendingUp className="w-8 h-8 text-green-500" />
+    </div>
+  </CardContent>
+</Card>
+
+<Card>
+  <CardContent className="p-4">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-600">Lowest Attendance</p>
+        <p className="text-2xl font-bold text-red-600">18,200</p>
+        <p className="text-xs text-gray-500">Marvel Stadium - Round 3</p>
+      </div>
+      <TrendingDown className="w-8 h-8 text-red-500" />
+    </div>
+  </CardContent>
+</Card>
           </div>
 
           {/* Controls */}

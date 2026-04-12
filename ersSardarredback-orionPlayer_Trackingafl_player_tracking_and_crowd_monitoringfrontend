@@ -1,0 +1,526 @@
+[33m9ef4b03[m[33m ([m[1;32mfront-end[m[33m)[m Add Highest/Lowest Attendance boxes and Redback Operations button
+[33me7d7a62[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;31morigin/BackEnd[m[33m, [m[1;32mmain[m[33m)[m Crowd monitoring structure
+[33md54266e[m Merge branch 'main' of https://github.com/lucastargett/redback-orion
+[33m213924b[m Add player tracking notebook
+[33ma0a4001[m Merge branch 'main' of https://github.com/lucastargett/redback-orion
+[33m16c1183[m Move boundingboxes into player_tracking_logic
+[33mfd15a27[m Delete 26_T1/afl_player_tracking_and_crowd_monitoring/team_log.md
+[33m29ce7de[m Delete 26_T1/afl_player_tracking_and_crowd_monitoring/Notebooks directory
+[33mb7bf3cc[m testing
+[33m7a105f6[m Add T1 2026 Orion project structure
+[33m20a27e1[m Merge branch 'Redback-Operations:main' into main
+[33m4a78c74[m Resolve frontend package.json merge conflict and update dependencies
+[33mee12e03[m Fix pandas compatibility in compute_workload and update README
+[33m94c1b6a[m Merge pull request #110 from Apaar-sc/main
+[33m8dcfa94[m adding files
+[33md2d5f71[m Merge pull request #108 from lucastargett/add-lucas-tracking-logic
+[33m28d7a99[m Merge pull request #107 from audiriri/feat/yolov8-bytrack-baseline
+[33m597048d[m Merge pull request #106 from JarrodG98/add-jarrod-tracking-logic
+[33m0ac5fa6[m Add notebooks folder with heatmap_temporal_outputs.ipynb and README
+[33m415ebae[m feat(tracking): add YOLOv8+ByteTrack baseline pipeline with MOT CSV/JSON outputs
+[33m5d85667[m Fix prediction_vs_truth.py metrics logic (proper TP/FP/FN calculation)
+[33m5c44d91[m Add README for player tracking logic scripts
+[33mf34567b[m Add player tracking logic scripts and update .gitignore
+[33m8bbe89c[m Merge pull request #105 from p324747/patch-1
+[33m4addfa2[m Created BoundingBoxes
+[33mabcbf46[m Merge pull request #103 from JarrodG98:add-jarrod-tracking-logic
+[33m3fd169b[m Merge pull request #102 from lucastargett:add-lucas-tracking-logic
+[33m249dbec[m Merge pull request #101 from huylx222:main
+[33m7690f20[m Merge pull request #100 from sontung2310:lisa_branch
+[33m711c5c9[m Annotation sync and analysis files by Jarrod
+[33m686c2fd[m Fix: add player_tracking_logic_heatmaps_workload as normal files and ignore .DS_Store
+[33maf9a9fc[m Addling Player tracking
+[33mca56c6d[m update tracking code after modification for running speed
+[33m1ce524a[m Add lisa and CSRNet
+[33md9c251a[m Merge pull request #92 from jd-deakin/patch-1
+[33mb19b414[m Merge pull request #96 from ishita230702/main
+[33me15e6ae[m Resolve PR #96 conflicts
+[33m7a088b1[m Update security-scan.yml
+[33me228e1b[m Merge pull request #86 from SanduniDissanayake25/feat/fatigue-ui
+[33med55ee9[m Updated removing unnecessary files
+[33m132b740[m Fix: remove accidental nested git repo from frontend
+[33m078ff8e[m Merge branch 'main' into feat/fatigue-ui
+[33mf9cb6d2[m Merge pull request #87 from Basilbe/feature/manual-auto-fusion-pipeline
+[33mc12d10c[m Add manual+auto fusion pipeline (pipeline.py) and example config
+[33m3630652[m Merge pull request #85 from BinilTomJose1278/main
+[33mb8393b4[m new tracking code
+[33m2616dca[m merge: resolve with upstream (keep local App.jsx; take upstream package-lock.json)
+[33m7aad744[m  Upload Video Functionality Added
+[33m8c91aba[m  Crowd Heatmap Added
+[33md55c804[m Authentication Fixed
+[33m3a317ec[m Merge pull request #84 from BinilTomJose1278/main
+[33m7e6e376[m feat(fatigue): add live fatigue panel to dashboard + global loader/error gates; polish styles & mock metrics
+[33m5286c2e[m Player_Tracking/afl_player_tracking_and_crowd_monitoring/frontend/public/demo/fatigue-sample.json Player_Tracking/afl_player_tracking_and_crowd_monitoring/frontend/src/components/FatigueLivePanel.jsx Player_Tracking/afl_player_tracking_and_crowd_monitoring/frontend/src/components/ScreenError.jsx Player_Tracking/afl_player_tracking_and_crowd_monitoring/frontend/src/components/ScreenLoader.jsx Player_Tracking/afl_player_tracking_and_crowd_monitoring/frontend/src/components/fatigue.css
+[33m51b45e5[m  Download report added
+[33m43c459b[m  Players Stats Added
+[33mb5d2543[m Merge pull request #83 from BinilTomJose1278/main
+[33m7665bf6[m  Dashboard ui added
+[33md6878ce[m Authentication added
+[33m9442cc9[m Merge pull request #82 from BinilTomJose1278/main
+[33m58b72e6[m  Added folder structure for player tracking and crowd monitoring
+[33m8f7f9d8[m base pipeline for Yolov8+DeepSort
+[33mb87b007[m Merge pull request #71 from plasma141/main
+[33m5b00471[m removing sonarqube
+[33mc765dc7[m Merge pull request #63 from Khanhvinh1999/main
+[33m39102c8[m Merge branch 'main' into main
+[33m351a118[m removing debug flag on flask apps
+[33mb4e1f9c[m removing irrelevant astronomy paper
+[33m3152a37[m cleaning osx junk
+[33m802a634[m Merge pull request #81 from Redback-Operations/security-scanner
+[33md58923d[m updates to security scanner
+[33m4a0a35a[m Merge pull request #79 from HarshBhanot7/patch-1
+[33m37fbbab[m Update new security check
+[33mf3573cd[m Congestion Detection and Dwelling Time Calculation (#73)
+[33m8f2abdd[m Full code of Tennis Ball tracking  (#80)
+[33md5b629b[m Add files via upload (#72)
+[33mdb336ef[m All my work from trimester 1 2025 (#69)
+[33m27ee527[m add final dags and triggers for airflow (#67)
+[33m7aadd82[m Update README.md
+[33m3e0714b[m Merge pull request #76 from HarshBhanot7/main
+[33ma461f19[m Merge pull request #78 from rspoerl1/main
+[33mdddb799[m Fixed security issues with Flask and os.system() for commands
+[33m081daed[m update new multithreading
+[33maa6eea2[m Update README.md
+[33ma0b3e11[m Create README.md
+[33m8e89c30[m annotate-train-deploy script and generated annotations
+[33m8df2e30[m Update README.md
+[33m796f4e3[m Merge pull request #66 from Purvasha13/main
+[33mc12c824[m Security scan file with PR
+[33m8c76550[m Update README.md
+[33maa8ec35[m Update README.md
+[33mda3df4e[m Update README.md
+[33m173d36a[m changed the angle estimation code which is now printing the angles between the body parts on the console as well for the better understanding
+[33m6cd229f[m Update README.md
+[33mbb111f0[m Update README.md
+[33m2c90d33[m added output images to the directory
+[33md003ef1[m commiting the final changes in the code file using coco model and cleaned up the directories
+[33md520389[m cleaned up the workspace directory
+[33m7befbd1[m Update README.md
+[33meef6444[m Update README.md
+[33m6dff9bd[m Update README.md
+[33m0d9c0fe[m Merge pull request #65 from sumituiet/main
+[33m6fa2425[m add backend for data streaming and ETL
+[33m0a62214[m Update README.md
+[33m85948d8[m Update README.md
+[33me07171f[m Update README.md
+[33m6874a16[m Update README.md
+[33m608a425[m Update README.md
+[33m4c12ff2[m Update README.md
+[33m6341ae2[m Update README.md
+[33m759d409[m Update README.md
+[33m9f5348e[m Update README.md
+[33m4c560fe[m Delete sonar-project.properties
+[33mdcc8ce0[m Delete .github/workflows directory
+[33m09a9a6a[m Update sonarqube.yml
+[33mefd73c0[m Update sonarqube.yml
+[33md4a9328[m Update sonarqube.yml
+[33m80bab49[m final speed estimation code using yolo and bytetrack (in pixels/s)
+[33m8e0c3eb[m Added the new feature to estimate the approx. angle which pose data Analysis
+[33mf28d32f[m changes the in code file
+[33mc474242[m cleaned and renamed the input images for better understanding of the new comers
+[33m3d463d5[m refined some data and my code notebook
+[33mcb55aeb[m Delete Player_Tracking/tennis_tracking/tennis-pose-detection/kyrgios tennis output directory
+[33m46c339a[m Delete Player_Tracking/tennis_tracking/tennis-pose-detection/adib tennis output directory
+[33ma31e128[m Create README.md
+[33m1a96419[m Created the notebook to detect the pose of the tennis players
+[33m406f314[m multi threading
+[33m4761d96[m new update
+[33m309d0fc[m Initial speed estimation implementation
+[33md7c3272[m update new UI coordinate
+[33m3322508[m module to update
+[33mf1f409a[m fixing Sahil's commit
+[33mfac5915[m Merge pull request #60 from Redback-Operations/revert-57-main
+[33mf2ea147[m Revert "add face_detection_yolov9 (#57)"
+[33m81a2fbf[m Merge pull request #59 from Redback-Operations/sonar
+[33me2991b0[m Create sonarqube.yml
+[33m9811088[m Create sonar-project.properties
+[33mef9f03d[m add face_detection_yolov9 (#57)
+[33m70b52a3[m Integrate Player Tracking and Football Match Outcome Prediction Systems (#55)
+[33m96cd426[m Tinkle's football detect work (#56)
+[33m1f789cb[m Added face_detection folder (#52)
+[33mfc21894[m Added Final Artefacts For Heatmap (#54)
+[33m410d99d[m Small object detection work by Tajish (#50)
+[33m6ec07eb[m all iterations from week 1-6 (#53)
+[33m9daf117[m Merge pull request #49 from MigsMarabut/main
+[33ma80724d[m Merge branch 'Redback-Operations:main' into main
+[33md1cd222[m Edited to remove credentials
+[33m545cf4d[m Merge pull request #45 from hishobank/hisho
+[33mf7d1025[m Merge pull request #44 from Brian08p/main
+[33m61cd96f[m Merge pull request #43 from BinIsChilling/main
+[33mb8e8d2f[m Merge pull request #42 from senduz/boxingdetection
+[33m59732d4[m Merge pull request #40 from Skyithamster/Timothy_Lau_Pose_tracking
+[33m85f6b7b[m Merge pull request #39 from sumituiet/main
+[33m565504d[m Merge pull request #37 from abdulahad1487/main
+[33m8abce9d[m Merge pull request #36 from rissicay/main
+[33m8f83e26[m Merge pull request #33 from D940465942/main
+[33m5c13b01[m removed credentials
+[33m70287a8[m Merge pull request #32 from Khanhvinh1999/main
+[33m4ea26b6[m cleaning up
+[33ma6c0e30[m Added notebooks for training
+[33m30a2e46[m Update Readme.md
+[33mc52d9b2[m Update Readme.md
+[33m20dcc25[m Merge branch 'Redback-Operations:main' into main
+[33m4113507[m Update docker-compose.yml
+[33m57186c9[m Rename .server_env to .env
+[33m686a4b8[m Update server.js for .env username and password
+[33m9ee3ca0[m Create .server_env
+[33mb8e6224[m Added automated setup scripts and updated README with new suggestions
+[33m0fb3b0b[m Made corrections to the code
+[33m8cce12c[m Made corrections to the code
+[33m19fdbb6[m Delete Player_Tracking/MMA_tracking/MMA_tracking directory
+[33mbffc965[m Add files via upload
+[33mbc450d0[m Delete Player_Tracking/MMA_tracking/MMA_tracking/Pereira headkick.jpg
+[33mbf0ca79[m Delete Player_Tracking/MMA_tracking/MMA_tracking/Pereira celebration.jpg
+[33m152a6f5[m Delete Player_Tracking/MMA_tracking/MMA_tracking/AlexPereira.jpg
+[33m32d5149[m Add files via upload
+[33m75e0d70[m update
+[33m5121691[m Delete Player_Tracking/MMA_tracking/MMA_tracking/README.md
+[33ma8952fb[m Delete Player_Tracking/MMA_tracking/MMA_tracking/LICENSE
+[33m8869e5d[m Delete Player_Tracking/MMA_tracking/MMA_tracking/Pereira headkick.jpg
+[33m1f3395c[m Delete Player_Tracking/MMA_tracking/MMA_tracking/Pereira celebration.jpg
+[33ma1f5073[m Delete Player_Tracking/MMA_tracking/MMA_tracking/AlexPereira.jpg
+[33m8aee451[m Delete Player_Tracking/MMA_tracking/MMA_tracking/Full Fight_ Alex Pereira vs Sean Strickland at #UFC 276.mp4
+[33m06382fb[m readme file
+[33m0651a26[m Add files via upload
+[33m4900975[m Merge branch 'Redback-Operations:main' into main
+[33mdad405b[m Merge pull request #47 from Aryan9001/pose_estimation
+[33m8fc052e[m Merge branch 'Redback-Operations:main' into main
+[33m95176bb[m update add hf_token requirements for unsloth
+[33m311e3c8[m Merge pull request #30 from milieureka/main
+[33me81e52d[m Added boxing action detection folder
+[33m66da1cc[m Updated README, deleted ipynb_checkpoints and __pycache__ folders
+[33m5534fc4[m Deleted .ipynb_checkpoints directory
+[33m5cb5b56[m Final Changes to the repository
+[33mcb062d9[m Refactored Repository structure based on feedback
+[33m4ab9e5f[m fix comments
+[33mdedae28[m add environment.yml, test, implementt notebooks
+[33m8c80671[m Updated README, added new demo folder, data folder, and training script
+[33m4c01ffb[m remove error code in model.ipynb
+[33m5762a59[m Update Readme.md
+[33m547f6d1[m Update Readme.md
+[33m45e6bbc[m Create Readme.md
+[33mbdfbf49[m Add files via upload
+[33m97f7516[m Corrected issues based on PR comments
+[33ma9fd0df[m Updated changes as asked in the review
+[33m92c6259[m results and model files
+[33macc034f[m Delete Crowd_Monitoring/Kafka_connectors/connector example.py
+[33mde24833[m Delete Crowd_Monitoring/Kafka_connectors/kafka_connector.py
+[33m28985a0[m fix required changes and add api for the interfacing LLM models
+[33m245f635[m Added changes
+[33m22f70b7[m Delete Player_Tracking/movenet.ipynb
+[33m722cf33[m Update README.md
+[33m30d9545[m Update README.md
+[33m0d95bd3[m aryan-pranav changes
+[33m03fa4d8[m added requirements.txt to local training and verbose command in colab training
+[33mb92a41d[m Update feature_km_per_hour.ipynb
+[33m1357732[m Finished all the TBD items in the 'feature_km_per_hour' notebook and added descriptions there.
+[33mf78f1f6[m Add data collection section in readme
+[33me1b3ccf[m Moving greyhound_tracking into Player_Tracking
+[33m17e3cc2[m Update README.md
+[33m1eb4043[m Made corrections to the code
+[33m9850229[m Update on video link for video inference
+[33m01643f7[m Update sahi_prediction.ipynb
+[33m87b75dc[m Update sahi_prediction.ipynb
+[33m2c04d63[m Update the video used in inference on video
+[33mc8dae9a[m Add files via upload
+[33m05768fc[m Added Latest_update_Hisho folder
+[33m2d437cb[m Created using Colab
+[33mb85a42c[m Update README.md
+[33m8be216a[m Delete Crowd_Monitoring/small_object_detection/batch_training_eval.ipynb
+[33mc7dc97c[m Add files via upload
+[33m62042c7[m Delete Crowd_Monitoring/small_object_detection/resources/yolov8_prediction.gif
+[33m81029ce[m Add files via upload
+[33m9448bad[m Delete Crowd_Monitoring/small_object_detection/resources/yolov8 prediction vs groudtruth-2.gif
+[33m60006d7[m Add files via upload
+[33ma4f1371[m Delete Crowd_Monitoring/Small object detection/resources directory
+[33mf07b063[m Add files via upload
+[33mc58990e[m change name file
+[33md7f7c0a[m Delete Crowd_Monitoring/Small_detection_YOLO_and_SAHI-2.ipynb
+[33m7c6d86a[m Merge pull request #10 from MigsMarabut/main
+[33mef4c9ea[m documentation (Mustafa & Abdul Ahad)
+[33m7a36e1a[m Add cfg files
+[33m430a48d[m Create graph_opt.pb
+[33m7fb1cbf[m update
+[33m22ac261[m Create AlexPereira.jpg
+[33mc0ecee9[m add harcascade implementation for face detection with frame id and location
+[33m281c153[m added files for boxingbagdetection, boxingdetection and documentation
+[33m1f82c5d[m Add README.md
+[33m7d47125[m Movenet_player_tracking
+[33mead43db[m Add files via upload
+[33m20c4edf[m add work for llm development and interfacing with database
+[33mc8c746f[m Add files via upload
+[33mf83f3ed[m add harcascade implementation for face detection with frame id and location
+[33m9082e6e[m Re-added Fencing folder and files
+[33mcb2060c[m Removing bullet points
+[33m944d4fc[m Merge branch 'main' of github.com:rissicay/redback-orion
+[33ma8ae2e3[m Updating README for new links
+[33m72da4c5[m Merge pull request #2 from rissicay/feature/changing-pixel-per-second
+[33m5ab7a6a[m Adding collab installs
+[33mab9a5d3[m Doing cleaning up of feature notebooks
+[33m02babbc[m Update README.md
+[33mf974dae[m Code review for both colab and local training notebooks . Deleted initial.ipynb , merged code to two main code files. Provided links to datasets in comments for colab notebook
+[33m96cdd5d[m Update README.md
+[33md06c689[m Update Readme File
+[33m9160827[m Update & Organize files
+[33mceb920f[m Update file name
+[33m9e4cc12[m Update folder
+[33md2c6594[m Merge pull request #8 from shricenguyen/main
+[33med07972[m preserving important info
+[33m6c4c42f[m adding ReadME.md and fixing data recording notification
+[33me44dc7a[m Code for YOLOV3 Model
+[33mf07a8c0[m Codes for Pipeline for Real-time Data Logistics Handling and Storage
+[33m1e3d828[m Merge pull request #7 from MigsMarabut/main
+[33m47e1625[m Adding requirements.txt
+[33m3466f80[m Removing unnecessary items
+[33m4227d76[m Updating dependencies
+[33mb0e7ebd[m Update README.md
+[33mf38a081[m Update README.md
+[33ma007394[m Update README.md
+[33mb8fd3b7[m Update README.md
+[33m31fa246[m Update README.md
+[33ma5a3230[m Update README.md
+[33m5b0b136[m Update README.md
+[33m7a756e3[m Created a new feature to track the relative speed of greyhounds, needs more tuning and need to fix alot of stuff in this python file
+[33md31b8db[m Removing dataset and adjusting training notebook
+[33m6e956a1[m added some markdowns
+[33mf1d2e87[m updated the trained IPYNB file, made proper headings and documentation
+[33m7bb57cc[m Add proper points and explanation to the notebook1
+[33mbd88b5e[m Weights and some metrics (graphs) of first training completion
+[33mc30eb3c[m simplied script ffor training on google colab
+[33mcade7f9[m Training data with images and labels
+[33mcd45f5d[m Weights and some metrics (graphs) of first training completion
+[33m88f7eaf[m Early build for training greyhound data
+[33mb8af4f9[m Initial commit for greyhound tracking
+[33m3119b7d[m Preserving important information
+[33mfae5c72[m Merge branch 'main' of https://github.com/shricenguyen/redback-orion
+[33m0bf0366[m adding README.md files and comments for the code
+[33m717924e[m Merge pull request #1 from MigsMarabut/MiguelMarabut-patch
+[33m3a05cb3[m Added notebook on using pre-trained model to generate 2d image on a shot taken.
+[33m7c8ffe6[m Merge pull request #6 from shricenguyen/main
+[33m088d158[m Delete Crowd_Monitoring/Live_Tracking_T2/Backend directory
+[33mda222b6[m Delete Crowd_Monitoring/Live_Tracking_T2/BackendUpdate/__pycache__ directory
+[33m04946ea[m Delete Crowd_Monitoring/Live_Tracking_T2/Backend/__pycache__ directory
+[33m235edec[m Delete Crowd_Monitoring/Live_Tracking_T2/Backend/yolov8n.pt
+[33mbcccdf0[m Update New Backend Folder
+[33mf937636[m Update backend system
+[33m7a79bef[m Update new demo code
+[33m10a4ab0[m Update new backend process code
+[33mc3df69d[m Adding extra important detail on RTSP
+[33m98dcdf9[m Adding documentation RTSP retrieving method
+[33m0fb12fd[m Update README.md
+[33m57ae7e2[m Add files via upload
+[33m942e46d[m Update README.md
+[33mb2c48bc[m Created using Colab
+[33mdd928a7[m Assemble code for continuous camera
+[33mc68fe39[m remove DS_Store
+[33m53fd912[m Remove .DS_Store files
+[33me718467[m Merge pull request #5 from shricenguyen/main
+[33m397efad[m Correcting a minor issue
+[33meea88f9[m Update data recording mechanism
+[33m17c24be[m Add backend system
+[33m7a013f7[m Update README.md
+[33ma315609[m Created using Colab
+[33mc42e68c[m Add files via upload
+[33m39fb1b8[m Add files via upload
+[33mb25e869[m Delete Crowd_Monitoring/Small object detection/resources/sahi_framework.jpg
+[33m0d85335[m Add files via upload
+[33m2d7cc4c[m Update ata  recoding echanism
+[33m2af69d6[m Add files via upload
+[33m45476f2[m Add files via upload
+[33m21cb81a[m Delete Crowd_Monitoring/Small object detection/resources/s
+[33mdd8fdc4[m change the name
+[33m99b58ea[m Add files via upload
+[33mbf42259[m Create s
+[33ma692ec2[m Delete Crowd_Monitoring/Small object detection/resource/supervision_detect_small_objects_example.mp4
+[33m7006e36[m Delete Crowd_Monitoring/Small object detection/resource/comparison
+[33m7c4eda4[m Add files via upload
+[33m0313de6[m Create comparison
+[33m6be3d16[m Create README.md
+[33meb200c9[m Merge pull request #3 from shricenguyen/main
+[33mdf8510b[m assembling Live Tracking and 2D model program
+[33m713e8b6[m .DS_Store file
+[33m332fd6c[m Merge pull request #2 from shricenguyen/main
+[33m95bb99a[m Adding MongoDB Documentation and Changing Data Storing Method
+[33mc9bef89[m Merge pull request #1 from shricenguyen/main
+[33mda38dd2[m Merge branch 'Redback-Operations:main' into main
+[33md6da864[m Backend and Real-time Monitoring code
+[33mf20e326[m Creating Backend file for Web Interface and Removing Data Daily Reseting
+[33m67d43d2[m Delete Small_detection_YOLO_and_SAHI.ipynb
+[33m34e1702[m batch prediction, missing evaluation
+[33m671a6cc[m Delete Crowd_Monitoring/Small_detection_YOLO_and_SAHI-2.ipynb
+[33m3794cec[m Initial batch prediction, missing evaluation
+[33m44323ea[m Initial code for batch prediction, missing the evaluation
+[33mfc28782[m Delete Small_detection_YOLO_and_SAHI.ipynb
+[33m6c8d34e[m Merge branch 'Redback-Operations:main' into main
+[33m704c9d6[m Merge pull request #28 from kcf-jackson/main
+[33mdf934ac[m Move original `.gitignore` to `Internet_of_Things`
+[33m2d9595c[m Reorganize folder structure; add repository guidelines
+[33m60be3e0[m Update daily daata reset
+[33m155278f[m Adding MongoDB for cloud storage
+[33md71e07c[m README File 31/07
+[33m7ac8009[m Created using Colab
+[33m8c4056f[m Live Tracking with IP camera
+[33m2dc263f[m Apply YOLOv8 with crowd video
+[33m9462cc9[m Merge pull request #26 from Redback-Operations/DSM_PT
+[33mc142cf9[m Merge pull request #25 from MarsImmortal/main
+[33mcbe6ee5[m Merge pull request #22 from Bhumika-Chauhan09/main
+[33m8d39a4c[m Merge pull request #23 from sohilnagpal04/main
+[33mcf93482[m add the lucid spark brainstorming documnent for the team.
+[33m8a70cb3[m Merge pull request #24 from groot676/main
+[33m8f6a062[m Merge pull request #19 from Buzz-coding-217/main
+[33mcffba40[m Merge pull request #18 from MarsImmortal/main
+[33m5fe139a[m Merge pull request #20 from Mayank52455/main
+[33m1daac6d[m delete the wrongly named file
+[33mf096751[m rename existing file to make it easy to understand.
+[33m0697374[m Merge branch 'Redback-Operations:main' into main
+[33m8e7b459[m add final code for visulising data provided by iot team
+[33mcb9831c[m suggestions for data visualisations and meta data that can be extracted
+[33m683ca73[m add iot data csv file and rename their to navigate easily
+[33mee0cf6f[m change git repo which has redback logo for visualisation
+[33mc6b5a63[m Add files via upload
+[33mabdd309[m Delete tennis_tracking/player_tracker.py
+[33m3336469[m Delete tennis_tracking/video_utils.py
+[33m55fb77b[m Delete tennis_tracking/main.py
+[33m9f22c26[m Delete tennis_tracking/court_line_detector.py
+[33m18b1fff[m Delete tennis_tracking/ball_tracker.py
+[33m0803452[m Add files via upload
+[33med3de47[m Create temp
+[33m3a97926[m Add files via upload
+[33mfba3ab1[m Create temp
+[33m03ccb63[m Add files via upload
+[33mff23c92[m Create temp
+[33m62e5366[m Add files via upload
+[33m00e35bb[m Create temp
+[33m06d4293[m Add files via upload
+[33mc269db4[m Create temp
+[33m351e82f[m Merge branch 'Redback-Operations:main' into main
+[33ma57242e[m Add files via upload
+[33m57a9ab2[m Create temp
+[33md06f35c[m Merge branch 'Redback-Operations:main' into main
+[33mf8ce207[m Adding up the sensor data
+[33m0892d6c[m Merge pull request #15 from ishaan2307/main
+[33m9657789[m Merge pull request #3 from Ayush-Som/main
+[33m7426c97[m Merge branch 'main' of https://github.com/ishaan2307/redback-orion
+[33mbb3b4ee[m Files for mongodb and mqtt combined, Filtered csv file and its code.
+[33mfc804c9[m Merge branch 'Redback-Operations:main' into main
+[33m94bd742[m Merge branch 'main' of https://github.com/ishaan2307/redback-orion
+[33ma9400f7[m Create Final_code.ino
+[33m1cded30[m Rename IOT33.pdf to Accessing_data_of_accelrometer_on_Nano.pdf
+[33mcc5c66d[m Add files via upload
+[33me502ca7[m Direction in vector form.
+[33m3630c1e[m  CSV logs Arduino accelerometer data with alerts.
+[33ma5ce4ce[m Update Accelerometer_KalmanFilter_code.ino
+[33mf4ef44b[m Update Entering_and_Exiting_Humans.ipynb
+[33m0d9e01f[m Update Entering_and_Exiting_Humans.ipynb
+[33m61e7ddd[m Add Entering & Exiting Code
+[33mc422fec[m Merge branch 'Redback-Operations:main' into main
+[33mcb8befb[m All documentations I created until now are in this commit
+[33m2e81105[m Commits to upload the tested and working code for PI cam streaming.
+[33m6317347[m Merge pull request #16 from sohilnagpal04/main
+[33meb28504[m Merge branch 'Redback-Operations:main' into main
+[33m1fd73e8[m Create Combined_3 sensors.cpp
+[33m901102c[m Merge branch 'Redback-Operations:main' into main
+[33mc7adeb3[m Create GPS_HEART_RATE.ino
+[33mb8ac31a[m Add Object Counting from different Views
+[33m9bace83[m add requirements file for installation of libs
+[33m6fbf215[m add the initial (code used in notebook)
+[33mc8449fd[m Merge branch 'Redback-Operations:main' into main
+[33m86a294f[m testing and making changes on the run python code for speeding the processing time
+[33mbc88642[m add command to track possesion and edit markdown to show relevant info
+[33m5aac75d[m remove kaggle code (cuz it aint working) minor improvement with folder navigation
+[33m1506b1f[m add jupyter notebook to track player and display passing stats
+[33m778bb3e[m Update pi_cam_testing_final.py
+[33m159994a[m Update publish_pi_cam.py
+[33meedfafa[m Update subscribe_pi_cam.py
+[33m5132833[m Update pyhton_pi_cam.py
+[33md847df4[m Update pyhton_pi_cam.py
+[33m4476d25[m Update subscribe_pi_cam.py
+[33mbbff359[m Create MongoDB_test.js
+[33mb4a7ae0[m Create Working_gps_code.ino
+[33m7a8ede2[m Create testing_mqtt.js
+[33mfa8ba37[m Merge pull request #13 from Mayank52455/main
+[33mb574cfc[m changing the px mapping and testing on football video
+[33m27b132a[m add code for deployment of model on RF
+[33ma496107[m Merge pull request #12 from Buzz-coding-217/main
+[33maa0cf0c[m Add Speed Estimation Code in player Tracking
+[33m70c96be[m Merge branch 'Redback-Operations:main' into main
+[33m5a7350c[m Merge pull request #1 from Bhumika-Chauhan09/main
+[33mb554659[m Add files via upload
+[33m630c515[m Data Cleansing with Jupyter Notebook: Eliminating Zero Values and Irrelevant Information
+[33m1bc2914[m Merge branch 'Redback-Operations:main' into main
+[33m0bfd42c[m updating the sensor code
+[33m33340a3[m Resolved conflicts and synchronized with remote main branch
+[33m3fddd4d[m Editing the Sensor Code
+[33mdceb491[m Merge pull request #14 from therock297/main
+[33ma6e699b[m Revert "Added a test file"
+[33mb3d0df4[m Added a test file
+[33m20423de[m Added Initial GPS testing code
+[33m9527534[m clean data of heart rate sensor
+[33m6301693[m Update kalman_filter2.ino
+[33md8a9105[m Update kalman_filter2.ino
+[33m4db318b[m Update kalman_filter2.ino
+[33m8d02854[m Update kalman_filter2.ino
+[33m7f9f2ec[m Update and rename cyber_timedog.ino to Acclerometer_secure_code.ino
+[33m4b603bd[m Add files via upload
+[33mca435d3[m Merge branch 'Redback-Operations:main' into main
+[33m94261c1[m Delete Madhav web_dev directory
+[33ma4f99de[m Update main.html
+[33m3b39c09[m Merge branch 'main' of https://github.com/therock297/redback-orion
+[33m593eafc[m figma page first commit
+[33md257e57[m Merge pull request #9 from MarsImmortal/main
+[33md91e43c[m Merge branch 'main' of https://github.com/MarsImmortal/redback-orion into main
+[33ma6c4ec6[m rename DCA file to data cost analysis for readability
+[33m8bea8c2[m Merge branch 'Redback-Operations:main' into main
+[33m71f7df7[m Revert "Delete flowchart.pdf"
+[33m6f13ea9[m Delete flowchart.pdf
+[33m2cf328d[m Merge branch 'IOT/ms/heart-rate-sensor'
+[33m0491c97[m make IOTHRS(new folder) to navigate eassy
+[33md5ef910[m Merge pull request #11 from sohilnagpal04/main
+[33m1b91fef[m Update mayank_ll.csv
+[33mb8c7597[m ADD model images
+[33mbe7388b[m ADD model Testing Code
+[33mf4a5d36[m java_script
+[33mb446593[m Create heart_rate_sensor_2.ino
+[33m6229ee9[m Delete .DS_Store
+[33m90514df[m Ignore the DS store file
+[33m99f76ec[m Adding the sensor code and my research documentation.
+[33m00f6a9b[m Ignore the DS store file
+[33mcc0ee86[m my work
+[33m52f872a[m Add code to deploy custom model on roboflow
+[33m522eb95[m Merge branch 'Redback-Operations:main' into main
+[33m1895a31[m second comit for testing
+[33m8ad2e9b[m Fixing the input data in .csv file
+[33m119a5b5[m Fixed "path not found: SerialPort" error
+[33me682bc9[m Added dataTransfer folder for reading sensor data into a csv.
+[33m1ff35fd[m Merge pull request #5 from MarsImmortal/DSM_PT
+[33ma7246d4[m Merge pull request #7 from groot676/main
+[33m46753e2[m Add files via upload
+[33m45da8e7[m Create txt
+[33mfe663d1[m Merge branch 'Redback-Operations:main' into IOT/ms/heart-rate-sensor
+[33m9d1f4fe[m Merge pull request #4 from Buzz-coding-217/main
+[33me42e95a[m add yolov9 note book focused on custom data set modelling and training
+[33ma7f737d[m add Doc file for plyer stats to focus on
+[33mca39c31[m add data cost analysis doc on the basis of sample taken
+[33m5ed4f89[m add processed sample data
+[33m986f8a7[m make yolov5 notebook for player tracking
+[33me3ec5e9[m ignore ds store file for mac users
+[33m3f71b55[m add unprocessed/sample mp4 video
+[33m8fe07c0[m Add YOLO & TensorFlow Object Detection
+[33m26ff372[m Add files via upload
+[33m453d357[m Update pi_cam_testing.py
+[33mac83dfa[m Add files via upload
+[33m508a85c[m Add files via upload
+[33mc0c0f0a[m Add files via upload
+[33m23d69a5[m add example data and the processed version of it as evi
+[33md6061c4[m add yolov9 model (custom dataset)
+[33m379b5b6[m Football player tracking using YOLO v5
+[33m9e9bfa7[m initialise branch and create a folder for DS in PT
+[33m6fa291f[m make folder for data science player tracking team
+[33m87dedf9[m Add DS file in gitignore for mac users
+[33m8676e31[m Add files via upload
+[33m646f14c[m first commit
+[33m8d7f04a[m Create flowchart.pdf
+[33m1d8017d[m Create heart rate sensor code.ino
+[33m329ac6d[m Update Accelerometer_boundary_detection.ino
+[33mde267d0[m Add files via upload
+[33m653653b[m Initial commit

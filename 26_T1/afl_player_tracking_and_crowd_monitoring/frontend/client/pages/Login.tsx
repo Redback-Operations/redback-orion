@@ -114,7 +114,7 @@ export default function Login() {
       localStorage.setItem("userEmail", loginForm.email);
 
       // Successful login - redirect to dashboard
-      navigate("/afl-dashboard");
+      navigate("/player-performance");
     } else {
       setError(
         "Invalid email or password. Try demo@aflanalytics.com / demo123 or use your signup credentials",
