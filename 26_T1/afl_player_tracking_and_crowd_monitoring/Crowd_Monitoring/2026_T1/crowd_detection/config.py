@@ -4,6 +4,7 @@ from pathlib import Path
 CURRENT_DIR=os.path.dirname(os.path.abspath(__file__))
 MODEL_NAME = os.path.join(CURRENT_DIR, "model.pt") # Model downloaded from https://huggingface.co/arnabdhar/YOLOv8-Face-Detection
  
+ANNOTATED_DIR = Path("crowd_detection_output") / "face_detection_results"
 PERSON_CLASS = None
 
 
