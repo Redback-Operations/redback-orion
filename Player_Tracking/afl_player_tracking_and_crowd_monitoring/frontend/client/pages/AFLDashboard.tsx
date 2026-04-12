@@ -79,6 +79,7 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  Shield,
 } from "lucide-react";
 
 // Mock data for the dashboard
@@ -201,6 +202,7 @@ const crowdZones = [
     trend: "stable",
   },
 ];
+const safestZone = crowdZones.reduce((min, zone) => zone.density < min.density ? zone : min, crowdZones[0]);
 
 export default function AFLDashboard() {
   const navigate = useNavigate();
@@ -2088,6 +2090,22 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       15 min before bounce
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Safest Zone</p>
+                    <p className="text-lg font-bold text-green-600 leading-tight">
+                      {safestZone.zone}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {safestZone.density}% full · {safestZone.current.toLocaleString()} people
+                    </p>
+                  </div>
+                  <Shield className="w-8 h-8 text-green-500" />
                 </div>
               </CardContent>
             </Card>
