@@ -43,7 +43,7 @@ const generateCrowdData = () => {
       capacity: 15000,
       current: 13200,
       color: "#ef4444", // red-500
-      coordinates: { x: 50, y: 12, width: 40, height: 12 },
+      coordinates: { x: 50, y: 20, width: 40, height: 15 },
       entryPoints: ["Gate A", "Gate B"],
       facilities: ["Toilets", "Food Court", "Merchandise"],
       temperature: 24,
@@ -55,7 +55,7 @@ const generateCrowdData = () => {
       capacity: 8000,
       current: 6800,
       color: "#f97316", // orange-500
-      coordinates: { x: 50, y: 0, width: 40, height: 12 },
+      coordinates: { x: 50, y: 10, width: 40, height: 10 },
       entryPoints: ["Gate A-Upper"],
       facilities: ["Toilets", "Bar"],
       temperature: 26,
@@ -67,7 +67,7 @@ const generateCrowdData = () => {
       capacity: 12000,
       current: 11400,
       color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 76, width: 40, height: 12 },
+      coordinates: { x: 50, y: 75, width: 40, height: 15 },
       entryPoints: ["Gate C", "Gate D"],
       facilities: ["Toilets", "Food Court", "First Aid"],
       temperature: 23,
@@ -79,7 +79,7 @@ const generateCrowdData = () => {
       capacity: 6000,
       current: 5700,
       color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 88, width: 40, height: 12 },
+      coordinates: { x: 50, y: 90, width: 40, height: 10 },
       entryPoints: ["Gate C-Upper"],
       facilities: ["Premium Bar"],
       temperature: 25,
@@ -115,7 +115,7 @@ const generateCrowdData = () => {
       capacity: 2000,
       current: 1850,
       color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 25, width: 30, height: 12 },
+      coordinates: { x: 50, y: 35, width: 30, height: 8 },
       entryPoints: ["Premium Entrance"],
       facilities: ["VIP Lounge", "Premium Dining"],
       temperature: 21,
@@ -127,7 +127,7 @@ const generateCrowdData = () => {
       capacity: 1500,
       current: 1425,
       color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 63, width: 30, height: 12 },
+      coordinates: { x: 50, y: 57, width: 30, height: 8 },
       entryPoints: ["Premium Entrance"],
       facilities: ["VIP Lounge", "Premium Bar"],
       temperature: 21,
@@ -284,6 +284,35 @@ export default function CrowdMonitor() {
                 </div>
               </CardContent>
             </Card>
+          <Card>
+  <CardContent className="p-4">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-600">Highest Attendance</p>
+        <p className="text-2xl font-bold text-green-600">62,500</p>
+        <p className="text-xs text-gray-500">MCG - Round 10</p>
+      </div>
+      <TrendingUp className="w-8 h-8 text-green-500" />
+    </div>
+  </CardContent>
+</Card>
+
+      <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Safest Zone</p>
+                    <p className="text-lg font-bold text-green-600 leading-tight">
+                      {safestZone.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {safestZone.density}% full · {safestZone.current.toLocaleString()} people
+                    </p>
+                  </div>
+                  <Shield className="w-8 h-8 text-green-500" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Controls */}
@@ -353,10 +382,6 @@ export default function CrowdMonitor() {
                           selectedZone.id === zone.id
                             ? "border-white border-4"
                             : "border-transparent"
-                        } ${
-                           zone.name.includes("Stand") || zone.name.includes("Premium")
-                             ? "-translate-x-1/2"
-                             : ""
                         }`}
                         style={{
                           left: `${zone.coordinates.x}%`,
