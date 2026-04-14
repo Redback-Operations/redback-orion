@@ -61,6 +61,11 @@ const generateCrowdData = () => {
       temperature: 26,
       safety: "normal",
     },
+
+
+
+
+
     {
       id: 3,
       name: "Southern Stand - Lower",
@@ -349,7 +354,9 @@ export default function CrowdMonitor() {
                       <button
                         key={zone.id}
                         onClick={() => setSelectedZone(zone)}
-                        className={`absolute transition-all duration-300 hover:opacity-80 border-2 ${
+                        className={`absolute transition-all duration-300 border-2 
+                           hover:scale-105 hover:z-10 hover:shadow-xl hover:ring-2 hover:ring-white
+                           border-transparent ${
                           selectedZone.id === zone.id
                             ? "border-white border-4"
                             : "border-transparent"
@@ -409,13 +416,19 @@ export default function CrowdMonitor() {
                   <CardTitle>{selectedZone.name}</CardTitle>
                   <CardDescription className="flex items-center gap-4">
                     <Badge
-                      variant={
-                        selectedZone.density >= 95
-                          ? "destructive"
-                          : selectedZone.density >= 85
-                            ? "secondary"
-                            : "default"
-                      }
+                      className={`
+                         ${
+                          selectedZone.density >= 95
+                            ? "bg-red-600 text-white"
+                            : selectedZone.density >= 85
+                            ? "bg-orange-500 text-white"
+                            : selectedZone.density >= 70
+                            ? "bg-amber-500 text-white"
+                            : selectedZone.density >= 50
+                            ? "bg-yellow-400 text-black"
+                                : "bg-green-500 text-white"
+                            }
+                          `}
                     >
                       {getDensityLabel(selectedZone.density)}
                     </Badge>
@@ -661,7 +674,9 @@ export default function CrowdMonitor() {
                             .map((zone, index) => (
                               <div
                                 key={zone.id}
-                                className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                                className="flex justify-between items-center p-2 bg-gray-50 rounded transition-all
+                                  duration-300 cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-[1.02] 
+                                  hover:ring-2 hover:ring-blue-200"
                               >
                                 <span className="text-sm truncate">
                                   {zone.name}
@@ -689,7 +704,8 @@ export default function CrowdMonitor() {
                 <CardContent>
                   <div className="space-y-3">
                     {criticalZones.length > 0 && (
-                      <div className="p-3 bg-red-50 border border-red-200 rounded">
+                      <div className="p-3 bg-red-50 border border-red-200 rounded transition-all
+                          duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-red-400 cursor-pointer">
                         <div className="flex items-center gap-2 mb-2">
                           <AlertTriangle className="w-5 h-5 text-red-500" />
                           <span className="font-medium text-red-700">
@@ -710,7 +726,8 @@ export default function CrowdMonitor() {
                     )}
 
                     {highDensityZones.length > 0 && (
-                      <div className="p-3 bg-orange-50 border border-orange-200 rounded">
+                      <div className="p-3 bg-orange-50 border border-orange-200 rounded transition-all
+                          duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-orange-400 cursor-pointer">
                         <div className="flex items-center gap-2 mb-2">
                           <Eye className="w-5 h-5 text-orange-500" />
                           <span className="font-medium text-orange-700">
