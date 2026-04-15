@@ -115,8 +115,6 @@ def test_get_job_not_found(client, mock_db):
     assert response.status_code == 404
     assert response.json()["detail"] == "Job not found"
 
-
-
 # Test: Retry job (success case)
 def test_retry_job_success(client, mock_db, monkeypatch):
     app.dependency_overrides[get_current_user] = override_get_current_user
@@ -144,8 +142,6 @@ def test_retry_job_success(client, mock_db, monkeypatch):
     # Job should now be completed
     assert data["job_id"] == "job-123"
     assert data["status"] == "done"
-
-
 
 # Test: Retry invalid job
 def test_retry_job_not_partial(client, mock_db):
