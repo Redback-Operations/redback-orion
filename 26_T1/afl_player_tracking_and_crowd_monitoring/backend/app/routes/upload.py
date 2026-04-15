@@ -12,6 +12,8 @@ from app.config import UPLOAD_DIR
 from app.services.player_client import get_player_data
 from app.services.crowd_client import get_crowd_data
 
+from sqlalchemy import select
+
 router = APIRouter()
 
 ALLOWED_EXTENSIONS = {".mp4", ".avi", ".mov"}
@@ -44,16 +46,17 @@ async def process_video(job_id: str, file_path: str):
             status = "done"
             error = None
 
-        job = db.query(Job).filter(Job.job_id == job_id).first()
+        result = await db.execute(select(Job).where(Job.job_id == job_id))
+        job = result.scalar_one_or_none()
         if job:
             job.status = status
             job.player_result = player_data
             job.crowd_result = crowd_data
             job.error = error
             job.updated_at = datetime.now(timezone.utc)
-            db.commit()
+            await db.commit()
     finally:
-        db.close()
+        await db.close()
         if os.path.exists(file_path):
             os.remove(file_path)
 
