@@ -6,3 +6,5 @@ matplotlib
 scikit-learn
 scipy
 jupyter
+fastapi
+uvicorn
