@@ -2,6 +2,7 @@
 
 from math import sqrt
 from pathlib import Path
+import shutil
 
 import cv2
 
@@ -278,6 +279,8 @@ def save_motion_annotations(frame_tracks, tracking_summary, video_id=None):
 
     safe_video_id = video_id or "unknown_video"
     output_dir = OUTPUT_ROOT / safe_video_id
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     artifact_paths = []
     stationary_track_ids = set(tracking_summary.get("stationary_track_ids", []))

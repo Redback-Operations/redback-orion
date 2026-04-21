@@ -208,3 +208,27 @@ class IntelligenceResponse(BaseModel):
             }
         }],
     )
+
+
+class BehaviourAnalyticsResponse(BaseModel):
+    video_id: str = Field(..., examples=["match_01"])
+    crowd_state: str = Field(..., examples=["increasing_density"])
+    zones: list[ZoneDensity]
+    event_flags: Optional[list[str]] = Field(default=None)
+    artifact_paths: Optional[list[str]] = Field(default=None)
+    vision_metrics: Optional[VisionMetrics] = None
+
+
+class RiskZoneResponse(BaseModel):
+    video_id: str = Field(..., examples=["match_01"])
+    zones: list[RiskZone]
+    recommendations: list[str]
+
+
+class CrowdPipelineResponse(BaseModel):
+    video_id: str = Field(..., examples=["match_01"])
+    crowd_detection: DetectionResponse
+    density_zoning: list[ZoneDensity]
+    heatmap: HeatmapResult
+    crowd_behaviour_analytics: BehaviourAnalyticsResponse
+    crowd_allocation_risk_zone: RiskZoneResponse
