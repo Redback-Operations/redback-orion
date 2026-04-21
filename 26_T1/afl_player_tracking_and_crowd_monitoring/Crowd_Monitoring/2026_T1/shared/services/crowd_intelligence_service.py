@@ -14,4 +14,7 @@ def process_intelligence(data: dict):
         "crowd_state": behaviour_result.get("crowd_state"),
         "zones": risk_result.get("zones", []),
         "recommendations": risk_result.get("recommendations", []),
+        "event_flags": behaviour_result.get("event_flags", []),
+        "artifact_paths": behaviour_result.get("artifact_paths", []),
+        "vision_metrics": behaviour_result.get("vision_metrics"),
     }
