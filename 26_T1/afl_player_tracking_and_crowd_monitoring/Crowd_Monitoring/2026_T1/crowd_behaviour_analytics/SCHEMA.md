@@ -35,13 +35,14 @@ Optional additional input for AI-vision processing:
     {
       "frame_id": 1,
       "timestamp": 0.04,
-      "annotated_frame_path": "crowd_detection/output/annotated_frames/frame_0001.jpg",
-      "detections": [
+      "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0001.jpg",
+      "people_detections": [
         {
           "bbox": [100, 50, 160, 180],
           "confidence": 0.93
         }
-      ]
+      ],
+      "face_detections": []
     }
   ]
 }
@@ -87,6 +88,10 @@ Optional additional input for AI-vision processing:
           "history_length": 4,
           "avg_speed": 8.4,
           "max_speed": 12.6,
+          "avg_normalized_speed": 0.42,
+          "max_normalized_speed": 0.88,
+          "normalized_displacement": 1.24,
+          "height_variation": 0.08,
           "is_walking": false,
           "is_running": true,
           "movement_state": "running"
@@ -96,6 +101,10 @@ Optional additional input for AI-vision processing:
           "history_length": 4,
           "avg_speed": 5.2,
           "max_speed": 6.4,
+          "avg_normalized_speed": 0.22,
+          "max_normalized_speed": 0.36,
+          "normalized_displacement": 0.72,
+          "height_variation": 0.05,
           "is_walking": true,
           "is_running": false,
           "movement_state": "walking"
@@ -112,8 +121,9 @@ Optional additional input for AI-vision processing:
           "track_id": 1,
           "history_length": 4,
           "avg_speed": 8.4,
-          "max_speed": 12.6,
-          "displacement": 34.2,
+          "avg_normalized_speed": 0.42,
+          "max_normalized_speed": 0.88,
+          "normalized_displacement": 1.24,
           "anomaly_score": 0.2174,
           "is_anomaly": true
         }
@@ -129,7 +139,8 @@ Optional additional input for AI-vision processing:
 - keep `crowd_state` aligned with the intelligence service schema
 - behaviour analysis can use zone density patterns, heatmap availability, and sequential annotated frames as input features
 - `event_flags` and `artifact_paths` are optional extended outputs for demo and frontend visibility
-- optional `frames` should use bbox-annotated frame paths from `crowd_detection` for downstream visual analysis and motion analysis
+- optional `frames` should use people bbox-annotated frame paths from `crowd_detection` for downstream visual analysis and motion analysis
+- `people_detections` is the input used for person tracking
 - `tracking` contains per-person movement-state outputs derived from lightweight tracking
 - `anomaly_model` contains IsolationForest-based motion anomaly outputs
 - current movement states are `stationary`, `walking`, and `running`

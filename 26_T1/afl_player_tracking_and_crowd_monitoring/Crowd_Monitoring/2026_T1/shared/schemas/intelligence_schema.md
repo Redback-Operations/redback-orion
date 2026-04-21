@@ -32,24 +32,26 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
     {
       "frame_id": 1,
       "timestamp": 0.04,
-      "annotated_frame_path": "crowd_detection/output/annotated_frames/frame_0001.jpg",
-      "detections": [
+      "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0001.jpg",
+      "people_detections": [
         {
           "bbox": [100, 50, 160, 180],
           "confidence": 0.93
         }
-      ]
+      ],
+      "face_detections": []
     },
     {
       "frame_id": 2,
       "timestamp": 0.08,
-      "annotated_frame_path": "crowd_detection/output/annotated_frames/frame_0002.jpg",
-      "detections": [
+      "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0002.jpg",
+      "people_detections": [
         {
           "bbox": [104, 52, 164, 182],
           "confidence": 0.91
         }
-      ]
+      ],
+      "face_detections": []
     }
   ]
 }
@@ -67,8 +69,9 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
 - `frames` - optional list of sequential detection-aware frame records for motion-based analysis
 - `frame_id` - integer - frame number in the sequence
 - `timestamp` - number - timestamp of the frame in seconds
-- `annotated_frame_path` - string - bbox-annotated frame path from `crowd_detection`
-- `detections` - list - detection records available on that annotated frame
+- `annotated_frame_path` - string - people bbox-annotated frame path from `crowd_detection`
+- `people_detections` - list - people detection records used for behaviour tracking
+- `face_detections` - list - optional face detection records from `crowd_detection`
 
 ## Output JSON
 
@@ -119,6 +122,10 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
           "history_length": 4,
           "avg_speed": 8.4,
           "max_speed": 12.6,
+          "avg_normalized_speed": 0.42,
+          "max_normalized_speed": 0.88,
+          "normalized_displacement": 1.24,
+          "height_variation": 0.08,
           "is_walking": false,
           "is_running": true,
           "movement_state": "running"
@@ -128,6 +135,10 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
           "history_length": 4,
           "avg_speed": 5.2,
           "max_speed": 6.4,
+          "avg_normalized_speed": 0.22,
+          "max_normalized_speed": 0.36,
+          "normalized_displacement": 0.72,
+          "height_variation": 0.05,
           "is_walking": true,
           "is_running": false,
           "movement_state": "walking"
@@ -144,8 +155,9 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
           "track_id": 1,
           "history_length": 4,
           "avg_speed": 8.4,
-          "max_speed": 12.6,
-          "displacement": 34.2,
+          "avg_normalized_speed": 0.42,
+          "max_normalized_speed": 0.88,
+          "normalized_displacement": 1.24,
           "anomaly_score": 0.2174,
           "is_anomaly": true
         }
@@ -173,7 +185,7 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
 - `movement_state` - per-track label such as `stationary`, `walking`, or `running`
 - `anomaly_model` - IsolationForest-based anomaly summary for tracked motion
 - `anomaly_track_ids` - tracked people flagged as anomalous motion
-- `track_scores` - per-track anomaly details including speed, displacement, and anomaly score
+- `track_scores` - per-track anomaly details including speed, normalized displacement, and anomaly score
 
 ## Notes
 

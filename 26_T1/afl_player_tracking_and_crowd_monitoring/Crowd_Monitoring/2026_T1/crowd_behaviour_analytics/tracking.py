@@ -54,7 +54,7 @@ def track_people(frames, max_distance=80.0, min_iou=0.1, max_missed_time=3.0):
 
     for frame in sorted_frames:
         timestamp = float(frame.get("timestamp", 0.0))
-        detections = frame.get("detections", [])
+        detections = frame.get("people_detections", [])
         used_track_ids = set()
         tracked_detections = []
 
@@ -201,18 +201,24 @@ def summarise_tracks(
             and max_normalized_speed >= running_motion_threshold
             and normalized_displacement >= 0.9
         )
-        is_walking = (
-            has_motion_history
-            and not is_running
-            and (
-                avg_normalized_speed >= walking_motion_threshold
-                or normalized_displacement >= 0.34
-            )
-            and avg_normalized_speed >= 0.12
+        sustained_walking_motion = (
+            history_length >= 8
+            and avg_normalized_speed >= 0.04
+            and max_normalized_speed >= 0.12
+            and normalized_displacement >= 0.65
+            and height_variation <= 0.42
+        )
+        clear_walking_motion = (
+            avg_normalized_speed >= walking_motion_threshold
             and max_normalized_speed >= 0.18
             and normalized_displacement >= 0.26
             and height_variation <= 0.32
-            and max_normalized_speed < running_motion_threshold + 0.35
+        )
+        is_walking = (
+            has_motion_history
+            and not is_running
+            and (clear_walking_motion or sustained_walking_motion)
+            and max_normalized_speed < running_motion_threshold + 0.55
         )
         is_stationary = (
             (not has_motion_history)
@@ -326,7 +332,7 @@ def save_motion_annotations(frame_tracks, tracking_summary, video_id=None):
             continue
 
         output_path = output_dir / f"motion_frame_{int(frame.get('frame_id', 0)):04d}.jpg"
-        cv2.imwrite(str(output_path), image)
-        artifact_paths.append(str(output_path.relative_to(PROJECT_ROOT)).replace("\\", "/"))
+        if cv2.imwrite(str(output_path), image):
+            artifact_paths.append(str(output_path.relative_to(PROJECT_ROOT)).replace("\\", "/"))
 
     return artifact_paths

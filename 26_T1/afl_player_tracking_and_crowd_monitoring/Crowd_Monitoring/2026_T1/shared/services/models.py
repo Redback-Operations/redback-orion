@@ -15,10 +15,20 @@ class DetectionFrame(BaseModel):
     frame_path: Optional[str] = Field(default=None, examples=["video_processing/output/frames/frame_0001.jpg"])
     annotated_frame_path: Optional[str] = Field(
         default=None,
-        examples=["crowd_detection/output/annotated_frames/frame_0001.jpg"],
+        examples=["crowd_detection_output/people_detection_results/frame_0001.jpg"],
+    )
+    face_annotated_frame_path: Optional[str] = Field(
+        default=None,
+        examples=["crowd_detection_output/face_detection_results/frame_0001.jpg"],
+    )
+    people_annotated_frame_path: Optional[str] = Field(
+        default=None,
+        examples=["crowd_detection_output/people_detection_results/frame_0001.jpg"],
     )
     person_count: int = Field(..., examples=[2])
-    detections: list[BoundingBoxDetection]
+    face_count: Optional[int] = Field(default=None, examples=[1])
+    face_detections: list[BoundingBoxDetection] = Field(default_factory=list)
+    people_detections: list[BoundingBoxDetection] = Field(default_factory=list)
 
 
 class BehaviourFrameInput(BaseModel):
@@ -28,7 +38,8 @@ class BehaviourFrameInput(BaseModel):
         ...,
         examples=["crowd_detection/output/annotated_frames/frame_0001.jpg"],
     )
-    detections: list[BoundingBoxDetection] = Field(default_factory=list)
+    face_detections: list[BoundingBoxDetection] = Field(default_factory=list)
+    people_detections: list[BoundingBoxDetection] = Field(default_factory=list)
 
 
 class ZoneDensity(BaseModel):
@@ -54,6 +65,8 @@ class TrackSummary(BaseModel):
     max_speed: float = Field(..., examples=[12.6])
     avg_normalized_speed: float = Field(..., examples=[0.42])
     max_normalized_speed: float = Field(..., examples=[0.88])
+    normalized_displacement: float = Field(default=0.0, examples=[1.24])
+    height_variation: float = Field(default=0.0, examples=[0.08])
     is_stationary: bool = Field(..., examples=[False])
     is_walking: bool = Field(..., examples=[True])
     is_running: bool = Field(..., examples=[False])

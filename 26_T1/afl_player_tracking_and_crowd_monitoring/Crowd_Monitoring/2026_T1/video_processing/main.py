@@ -54,6 +54,7 @@ def process_video(video_id: str, video_path: str):
     res_w, res_h = config["output_resolution"]
     
     frames_metadata = []
+    save_futures = []
     count = 0
     extracted_count = 1 
 
@@ -93,7 +94,7 @@ def process_video(video_id: str, video_path: str):
                 # #saving frame to output directory
                 # cv2.imwrite(save_path, resized)
                 
-                executor.submit(save_frame_worker, save_path, processed)
+                save_futures.append(executor.submit(save_frame_worker, save_path, processed))
 
                 #Match the 'DetectionFrame' schema in shared/models.py
                 frames_metadata.append({
@@ -107,6 +108,9 @@ def process_video(video_id: str, video_path: str):
     finally:
         #This "closes" the video file. If we don't do this, the computer might keep the file "locked," and we won't be able to delete or move it until we restart the PC
         cap.release()
+
+    for future in save_futures:
+        future.result()
 
     #Return the dictionary for the Service Layer to use
     return {
