@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This task receives processed frame data and returns per-frame person detections.
+This task receives processed frame data and returns per-frame face and people detections.
 
 ## Input JSON
 
@@ -13,7 +13,7 @@ This task receives processed frame data and returns per-frame person detections.
     {
       "frame_id": 1,
       "timestamp": 0.04,
-      "frame_path": "output/frame_0001.jpg"
+      "frame_path": "video_processing/data/extracted_frames/frame_0001.jpg"
     }
   ]
 }
@@ -28,8 +28,19 @@ This task receives processed frame data and returns per-frame person detections.
     {
       "frame_id": 1,
       "timestamp": 0.04,
+      "frame_path": "video_processing/data/extracted_frames/frame_0001.jpg",
+      "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0001.jpg",
+      "face_annotated_frame_path": "crowd_detection_output/face_detection_results/frame_0001.jpg",
+      "people_annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0001.jpg",
       "person_count": 2,
-      "detections": [
+      "face_count": 1,
+      "face_detections": [
+        {
+          "bbox": [110, 60, 145, 100],
+          "confidence": 0.88
+        }
+      ],
+      "people_detections": [
         {
           "bbox": [100, 50, 160, 180],
           "confidence": 0.93
@@ -48,3 +59,4 @@ This task receives processed frame data and returns per-frame person detections.
 
 - output of this task becomes input to `density_zoning`
 - this output must also match the detection service schema
+- `face_detections` and `people_detections` are explicit task outputs
