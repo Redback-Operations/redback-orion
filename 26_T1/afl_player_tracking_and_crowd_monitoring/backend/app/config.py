@@ -10,7 +10,8 @@ UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")
 
 USE_MOCK_SERVICES = os.getenv("USE_MOCK_SERVICES", "true").lower() == "true"
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/orion_db")
+# Have just added async driver ('+asyncpg') to URL to match app - Lucas
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://user:password@localhost:5432/orion_db")
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-here")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
