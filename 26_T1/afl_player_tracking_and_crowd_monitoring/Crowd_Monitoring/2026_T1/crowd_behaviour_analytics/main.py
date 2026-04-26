@@ -6,7 +6,9 @@ from crowd_behaviour_analytics.feature_extraction import (
     classify_crowd_state,
     extract_density_features,
 )
+from crowd_behaviour_analytics.pose_analysis import refine_tracking_summary_with_pose
 from crowd_behaviour_analytics.tracking import (
+    build_frame_activity_series,
     save_motion_annotations,
     summarise_tracks,
     track_people,
@@ -30,6 +32,7 @@ def analyze_behaviour(input_data):
     vision_features = extract_motion_features(load_grayscale_frames(frame_paths))
     frame_tracks, track_histories = track_people(frames)
     tracking_summary = summarise_tracks(track_histories)
+    tracking_summary = refine_tracking_summary_with_pose(frames, frame_tracks, tracking_summary)
     anomaly_summary = detect_track_anomalies(track_histories)
     crowd_state = classify_crowd_state(features)
     event_flags = detect_behaviour_events(
@@ -48,6 +51,7 @@ def analyze_behaviour(input_data):
     merged_running_ids.update(anomaly_summary.get("running_track_ids", []))
     merged_tracking_summary["running_track_ids"] = sorted(merged_running_ids)
     merged_tracking_summary["running_track_count"] = len(merged_running_ids)
+    frame_activity_series = build_frame_activity_series(frame_tracks, merged_tracking_summary)
     artifact_paths.extend(save_motion_annotations(frame_tracks, merged_tracking_summary, video_id))
 
     vision_metrics = dict(vision_features)
@@ -60,6 +64,8 @@ def analyze_behaviour(input_data):
         "zones": zones,
         "event_flags": event_flags,
         "artifact_paths": artifact_paths,
+        "frame_movement_summary": frame_activity_series,
+        "frame_activity_series": frame_activity_series,
         "vision_metrics": vision_metrics,
     }
 

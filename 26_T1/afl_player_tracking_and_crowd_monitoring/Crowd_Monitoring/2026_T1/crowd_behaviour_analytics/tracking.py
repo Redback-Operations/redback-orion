@@ -44,6 +44,36 @@ def _distance(point_a, point_b):
     return sqrt((point_a[0] - point_b[0]) ** 2 + (point_a[1] - point_b[1]) ** 2)
 
 
+def _direction_consistency(history):
+    """Measure how consistently a track moves in one direction across updates."""
+    if len(history) < 3:
+        return 0.0
+
+    step_vectors = []
+    for previous, current in zip(history, history[1:]):
+        prev_centroid = previous.get("centroid", [0.0, 0.0])
+        curr_centroid = current.get("centroid", [0.0, 0.0])
+        dx = float(curr_centroid[0]) - float(prev_centroid[0])
+        dy = float(curr_centroid[1]) - float(prev_centroid[1])
+        magnitude = sqrt(dx * dx + dy * dy)
+        if magnitude < 1e-6:
+            continue
+        step_vectors.append((dx / magnitude, dy / magnitude))
+
+    if len(step_vectors) < 2:
+        return 0.0
+
+    alignment_scores = []
+    for previous, current in zip(step_vectors, step_vectors[1:]):
+        alignment_scores.append((previous[0] * current[0]) + (previous[1] * current[1]))
+
+    positive_alignment = [score for score in alignment_scores if score > 0]
+    if not positive_alignment:
+        return 0.0
+
+    return sum(positive_alignment) / len(alignment_scores)
+
+
 def track_people(frames, max_distance=80.0, min_iou=0.1, max_missed_time=3.0):
     """Associate detections across frames using IoU and centroid distance."""
     active_tracks = {}
@@ -151,6 +181,7 @@ def track_people(frames, max_distance=80.0, min_iou=0.1, max_missed_time=3.0):
             {
                 "frame_id": frame.get("frame_id"),
                 "timestamp": timestamp,
+                "frame_path": frame.get("frame_path"),
                 "annotated_frame_path": frame.get("annotated_frame_path"),
                 "tracked_detections": tracked_detections,
             }
@@ -161,10 +192,10 @@ def track_people(frames, max_distance=80.0, min_iou=0.1, max_missed_time=3.0):
 
 def summarise_tracks(
     track_histories,
-    stationary_motion_threshold=0.12,
-    walking_motion_threshold=0.15,
+    stationary_motion_threshold=0.06,
+    walking_motion_threshold=0.12,
     running_motion_threshold=0.9,
-    min_history_for_motion=4,
+    min_history_for_motion=3,
 ):
     """Build tracking summary for anomaly/event logic."""
     track_summaries = []
@@ -196,6 +227,9 @@ def summarise_tracks(
         normalized_displacement = displacement / avg_height
         history_length = len(history)
         has_motion_history = history_length >= min_history_for_motion
+        moving_steps = sum(1 for speed in normalized_speeds if speed >= 0.05)
+        sustained_motion_steps = sum(1 for speed in normalized_speeds if speed >= 0.08)
+        direction_consistency = _direction_consistency(history)
         is_running = (
             has_motion_history
             and avg_normalized_speed >= 0.55
@@ -203,30 +237,33 @@ def summarise_tracks(
             and normalized_displacement >= 0.9
         )
         sustained_walking_motion = (
-            history_length >= 8
-            and avg_normalized_speed >= 0.04
-            and max_normalized_speed >= 0.12
-            and normalized_displacement >= 0.65
-            and height_variation <= 0.42
+            history_length >= 6
+            and avg_normalized_speed >= 0.06
+            and max_normalized_speed >= 0.14
+            and normalized_displacement >= 0.45
+            and height_variation <= 0.5
         )
         clear_walking_motion = (
             avg_normalized_speed >= walking_motion_threshold
-            and max_normalized_speed >= 0.18
-            and normalized_displacement >= 0.26
-            and height_variation <= 0.32
+            and max_normalized_speed >= 0.16
+            and normalized_displacement >= 0.22
+            and height_variation <= 0.45
         )
         is_walking = (
             has_motion_history
             and not is_running
             and (clear_walking_motion or sustained_walking_motion)
+            and moving_steps >= 3
+            and sustained_motion_steps >= 2
+            and direction_consistency >= 0.35
             and max_normalized_speed < running_motion_threshold + 0.55
         )
         is_stationary = (
             (not has_motion_history)
             or (
                 avg_normalized_speed <= stationary_motion_threshold
-                and max_normalized_speed <= 0.22
-                and normalized_displacement <= 0.35
+                and max_normalized_speed <= 0.12
+                and normalized_displacement <= 0.18
             )
         )
 
@@ -253,6 +290,7 @@ def summarise_tracks(
                 "max_normalized_speed": round(max_normalized_speed, 4),
                 "normalized_displacement": round(normalized_displacement, 4),
                 "height_variation": round(height_variation, 4),
+                "direction_consistency": round(direction_consistency, 4),
                 "is_stationary": is_stationary,
                 "is_walking": is_walking,
                 "is_running": is_running,
@@ -272,22 +310,66 @@ def summarise_tracks(
     }
 
 
+def build_frame_activity_series(frame_tracks, tracking_summary):
+    """Return per-frame movement counts for stationary, walking, and running tracks."""
+    walking_track_ids = set(tracking_summary.get("walking_track_ids", []))
+    running_track_ids = set(tracking_summary.get("running_track_ids", []))
+    stationary_track_ids = set(tracking_summary.get("stationary_track_ids", []))
+
+    activity_series = []
+    for frame in frame_tracks:
+        walking_count = 0
+        running_count = 0
+        stationary_count = 0
+
+        for tracked in frame.get("tracked_detections", []):
+            track_id = tracked.get("track_id")
+            if track_id in running_track_ids:
+                running_count += 1
+            elif track_id in walking_track_ids:
+                walking_count += 1
+            elif track_id in stationary_track_ids:
+                stationary_count += 1
+
+        activity_series.append(
+            {
+                "frame_id": frame.get("frame_id"),
+                "timestamp": frame.get("timestamp", 0.0),
+                "walking_count": walking_count,
+                "running_count": running_count,
+                "stationary_count": stationary_count,
+                "active_count": walking_count + running_count,
+                "annotated_frame_path": frame.get("annotated_frame_path"),
+            }
+        )
+
+    return activity_series
+
+
 def save_motion_annotations(frame_tracks, tracking_summary, video_id=None):
-    """Save annotated frames highlighting stationary/walking/running tracked people."""
+    """Save annotated frames highlighting useful movement states for frontend visuals."""
     if not frame_tracks or not tracking_summary:
         return []
 
     safe_video_id = video_id or "unknown_video"
     output_dir = OUTPUT_ROOT / safe_video_id
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        if output_dir.exists():
+            shutil.rmtree(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        output_dir = OUTPUT_ROOT / f"{safe_video_id}_artifacts"
+        if output_dir.exists():
+            shutil.rmtree(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
     artifact_paths = []
     stationary_track_ids = set(tracking_summary.get("stationary_track_ids", []))
     walking_track_ids = set(tracking_summary.get("walking_track_ids", []))
     running_track_ids = set(tracking_summary.get("running_track_ids", []))
     if not stationary_track_ids and not walking_track_ids and not running_track_ids:
         return []
+
+    highlight_dynamic_only = bool(walking_track_ids or running_track_ids)
 
     for frame in frame_tracks:
         source_path = frame.get("annotated_frame_path")
@@ -312,6 +394,8 @@ def save_motion_annotations(frame_tracks, tracking_summary, video_id=None):
                 label = f"WALKING T{tracked['track_id']}"
                 color = (0, 165, 255)
             elif tracked["track_id"] in stationary_track_ids:
+                if highlight_dynamic_only:
+                    continue
                 label = f"STATIONARY T{tracked['track_id']}"
                 color = (0, 255, 0)
             else:
