@@ -52,6 +52,46 @@ class HeatmapResult(BaseModel):
     image_path: str = Field(..., examples=["output/heatmap_match_01.png"])
 
 
+class ChartAsset(BaseModel):
+    image_path: str = Field(..., examples=["analytics_output/charts/match_01_crowd_activity_chart.png"])
+
+
+class SummaryMetrics(BaseModel):
+    total_frames_processed: int = Field(..., examples=[65])
+    peak_person_count: int = Field(..., examples=[68])
+    crowd_state: str = Field(..., examples=["increasing_density"])
+    highest_density_zone: Optional[str] = Field(default=None, examples=["A1"])
+    highest_risk_zone: Optional[str] = Field(default=None, examples=["A1"])
+
+
+class PeakCrowdFrame(BaseModel):
+    frame_id: int = Field(..., examples=[18])
+    timestamp: float = Field(..., examples=[12.4])
+    person_count: int = Field(..., examples=[68])
+    annotated_frame_path: Optional[str] = Field(
+        default=None,
+        examples=["crowd_detection/output/annotated_frames/frame_0018.jpg"],
+    )
+
+
+class AnomalyVisual(BaseModel):
+    event_type: str = Field(..., examples=["sudden_movement"])
+    image_path: str = Field(..., examples=["crowd_behaviour_analytics/output/running_frames/motion_frame_0008.jpg"])
+
+
+class ZoneInsight(BaseModel):
+    zone_id: str = Field(..., examples=["A1"])
+    person_count: int = Field(..., examples=[20])
+    density: float = Field(..., examples=[0.82])
+    risk_level: str = Field(..., examples=["high"])
+    flagged: bool = Field(..., examples=[True])
+
+
+class DensityExtremes(BaseModel):
+    highest_density_zone: dict | ZoneInsight = Field(default_factory=dict)
+    lowest_density_zone: dict | ZoneInsight = Field(default_factory=dict)
+
+
 class RiskZone(BaseModel):
     zone_id: str = Field(..., examples=["A1"])
     risk_level: str = Field(..., examples=["high"])
@@ -227,8 +267,9 @@ class RiskZoneResponse(BaseModel):
 
 class CrowdPipelineResponse(BaseModel):
     video_id: str = Field(..., examples=["match_01"])
-    crowd_detection: DetectionResponse
-    density_zoning: list[ZoneDensity]
+    summary: SummaryMetrics
+    peak_crowd_frame: dict | PeakCrowdFrame = Field(default_factory=dict)
+    anomaly_visual: dict | AnomalyVisual = Field(default_factory=dict)
     heatmap: HeatmapResult
-    crowd_behaviour_analytics: BehaviourAnalyticsResponse
-    crowd_allocation_risk_zone: RiskZoneResponse
+    time_series_chart: dict | ChartAsset = Field(default_factory=dict)
+    density_extremes: DensityExtremes
