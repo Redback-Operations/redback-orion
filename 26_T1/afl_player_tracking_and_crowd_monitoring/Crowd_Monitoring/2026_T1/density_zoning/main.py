@@ -1,4 +1,4 @@
-"""Minimal entry point for the density and zoning task."""
+
 
 from __future__ import annotations
 
@@ -7,25 +7,58 @@ import os
 from typing import Any
 
 
-def get_zone_definitions(frame_width: int, frame_height: int) -> list[dict[str, Any]]:
+def get_zone_definitions(
+    frame_width: int,
+    frame_height: int,
+    rows: int = 2,
+    cols: int = 2,
+) -> list[dict[str, Any]]:
     """
-    Create a simple 2x2 grid of zones.
+    Create a configurable grid of zones.
 
-    Zone layout:
-    A1 = top-left
-    A2 = top-right
-    B1 = bottom-left
-    B2 = bottom-right
+    Example for 2x2:
+    A1 A2
+    B1 B2
     """
-    half_width = frame_width / 2
-    half_height = frame_height / 2
+    if frame_width <= 0 or frame_height <= 0:
+        raise ValueError("Frame width and height must be positive integers.")
+    if rows <= 0 or cols <= 0:
+        raise ValueError("Rows and cols must be positive integers.")
 
-    return [
-        {"zone_id": "A1", "x_min": 0, "y_min": 0, "x_max": half_width, "y_max": half_height},
-        {"zone_id": "A2", "x_min": half_width, "y_min": 0, "x_max": frame_width, "y_max": half_height},
-        {"zone_id": "B1", "x_min": 0, "y_min": half_height, "x_max": half_width, "y_max": frame_height},
-        {"zone_id": "B2", "x_min": half_width, "y_min": half_height, "x_max": frame_width, "y_max": frame_height},
-    ]
+    zone_width = frame_width / cols
+    zone_height = frame_height / rows
+    zones: list[dict[str, Any]] = []
+
+    for row in range(rows):
+        for col in range(cols):
+            row_label = chr(ord("A") + row)
+            zone_id = f"{row_label}{col + 1}"
+
+            x_min = col * zone_width
+            y_min = row * zone_height
+            x_max = (col + 1) * zone_width
+            y_max = (row + 1) * zone_height
+
+            zones.append(
+                {
+                    "zone_id": zone_id,
+                    "x_min": x_min,
+                    "y_min": y_min,
+                    "x_max": x_max,
+                    "y_max": y_max,
+                }
+            )
+
+    return zones
+
+
+def is_valid_bbox(bbox: list[float] | None) -> bool:
+    """Check whether a bounding box is valid."""
+    if bbox is None or len(bbox) != 4:
+        return False
+
+    x1, y1, x2, y2 = bbox
+    return x2 > x1 and y2 > y1
 
 
 def bbox_center(bbox: list[float]) -> tuple[float, float]:
@@ -34,8 +67,8 @@ def bbox_center(bbox: list[float]) -> tuple[float, float]:
 
     bbox format: [x1, y1, x2, y2]
     """
-    if len(bbox) != 4:
-        raise ValueError("Bounding box must contain exactly 4 values: [x1, y1, x2, y2].")
+    if not is_valid_bbox(bbox):
+        raise ValueError("Invalid bounding box. Expected [x1, y1, x2, y2] with x2 > x1 and y2 > y1.")
 
     x1, y1, x2, y2 = bbox
     center_x = (x1 + x2) / 2
@@ -43,14 +76,33 @@ def bbox_center(bbox: list[float]) -> tuple[float, float]:
     return center_x, center_y
 
 
-def find_zone(center_x: float, center_y: float, zones: list[dict[str, Any]]) -> str | None:
+def clamp_point(x: float, y: float, frame_width: int, frame_height: int) -> tuple[float, float]:
+    """
+    Clamp a point so it stays inside the frame.
+    Helps handle edge cases near frame boundaries.
+    """
+    x = min(max(x, 0), frame_width - 1e-6)
+    y = min(max(y, 0), frame_height - 1e-6)
+    return x, y
+
+
+def find_zone(
+    center_x: float,
+    center_y: float,
+    zones: list[dict[str, Any]],
+    frame_width: int,
+    frame_height: int,
+) -> str | None:
     """Return the zone_id for a center point."""
+    center_x, center_y = clamp_point(center_x, center_y, frame_width, frame_height)
+
     for zone in zones:
         if (
             zone["x_min"] <= center_x < zone["x_max"]
             and zone["y_min"] <= center_y < zone["y_max"]
         ):
             return zone["zone_id"]
+
     return None
 
 
@@ -70,35 +122,50 @@ def normalize_counts(zone_counts: dict[str, int]) -> dict[str, float]:
     }
 
 
+def classify_density(density: float) -> str:
+    """Convert normalized density into a label."""
+    if density == 0:
+        return "Low"
+    if density < 0.67:
+        return "Medium"
+    return "High"
+
+
 def analyze_density(input_data: dict[str, Any]) -> dict[str, Any]:
     """Calculate zone counts and density values from detection results."""
     video_id = input_data.get("video_id", "unknown_video")
     frames = input_data.get("frames", [])
 
-    # Configurable frame size for simple first version
     frame_width = input_data.get("frame_width", 500)
     frame_height = input_data.get("frame_height", 500)
 
-    zones = get_zone_definitions(frame_width, frame_height)
+    grid_rows = input_data.get("grid_rows", 2)
+    grid_cols = input_data.get("grid_cols", 2)
+    confidence_threshold = input_data.get("confidence_threshold", 0.50)
 
-    # Initialize counts for all zones
+    zones = get_zone_definitions(frame_width, frame_height, grid_rows, grid_cols)
+
     zone_counts = {zone["zone_id"]: 0 for zone in zones}
+    skipped_invalid_bbox = 0
+    skipped_low_confidence = 0
 
-    # Process detections frame by frame
     for frame in frames:
-        detections = frame.get("detections", [])
+        detections = frame.get("people_detections", [])
 
         for detection in detections:
             bbox = detection.get("bbox")
-            if not bbox:
+            confidence = detection.get("confidence", 1.0)
+
+            if confidence < confidence_threshold:
+                skipped_low_confidence += 1
                 continue
 
-            try:
-                center_x, center_y = bbox_center(bbox)
-            except ValueError:
+            if not is_valid_bbox(bbox):
+                skipped_invalid_bbox += 1
                 continue
 
-            zone_id = find_zone(center_x, center_y, zones)
+            center_x, center_y = bbox_center(bbox)
+            zone_id = find_zone(center_x, center_y, zones, frame_width, frame_height)
 
             if zone_id is not None:
                 zone_counts[zone_id] += 1
@@ -107,11 +174,22 @@ def analyze_density(input_data: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "video_id": video_id,
+        "frame_width": frame_width,
+        "frame_height": frame_height,
+        "grid_rows": grid_rows,
+        "grid_cols": grid_cols,
+        "confidence_threshold": confidence_threshold,
+        "summary": {
+            "total_frames": len(frames),
+            "skipped_invalid_bbox": skipped_invalid_bbox,
+            "skipped_low_confidence": skipped_low_confidence,
+        },
         "zones": [
             {
                 "zone_id": zone["zone_id"],
                 "person_count": zone_counts[zone["zone_id"]],
                 "density": densities[zone["zone_id"]],
+                "density_level": classify_density(densities[zone["zone_id"]]),
             }
             for zone in zones
         ],
@@ -119,21 +197,24 @@ def analyze_density(input_data: dict[str, Any]) -> dict[str, Any]:
 
 
 if __name__ == "__main__":
-    
     sample_input = {
-        "video_id": "match_01",
-        "frame_width": 500,
-        "frame_height": 500,
+        "video_id": "crowd_video_test",
+        "frame_width": 1280,
+        "frame_height": 720,
+        "grid_rows": 2,
+        "grid_cols": 2,
+        "confidence_threshold": 0.50,
         "frames": [
             {
                 "frame_id": 1,
-                "timestamp": 0.04,
-                "person_count": 4,
+                "timestamp": 0.03,
                 "detections": [
-                    {"bbox": [80, 80, 120, 120], "confidence": 0.95},    # A1
-                    {"bbox": [140, 100, 180, 140], "confidence": 0.92},  # A1
-                    {"bbox": [280, 150, 320, 190], "confidence": 0.90},  # A2
-                    {"bbox": [400, 350, 440, 390], "confidence": 0.88},  # B2
+                    {"bbox": [100, 200, 180, 350], "confidence": 0.92},
+                    {"bbox": [300, 220, 380, 370], "confidence": 0.89},
+                    {"bbox": [700, 250, 780, 400], "confidence": 0.95},
+                    {"bbox": [900, 300, 980, 450], "confidence": 0.87},
+                    {"bbox": [600, 200, 600, 260], "confidence": 0.91},
+                    {"bbox": [500, 300, 560, 390], "confidence": 0.20},
                 ],
             }
         ],
@@ -142,7 +223,7 @@ if __name__ == "__main__":
     result = analyze_density(sample_input)
 
     os.makedirs("output", exist_ok=True)
-    output_path = os.path.join("output", "density_summary.json")
+    output_path = os.path.join("output", "density_summary_sprint2.json")
 
     with open(output_path, "w", encoding="utf-8") as file:
         json.dump(result, file, indent=2)
