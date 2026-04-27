@@ -1,6 +1,6 @@
 # Project Orion — API Contract
-**Version:** 1.1.0  
-**Date:** 2026-04-13  
+**Version:** 1.2.0  
+**Date:** 2026-04-27  
 **Backend Lead:** Tomin Jose  
 **Base URL:** `http://localhost:8000`  
 **Interactive Docs:** `http://localhost:8000/docs`
@@ -408,8 +408,61 @@ const response = await fetch('http://localhost:8000/upload', {
   "created_at": "2026-04-06T10:00:00Z",
   "updated_at": "2026-04-06T10:01:30Z",
   "results": {
-    "player": { ... },
-    "crowd": { ... }
+    "player": {
+      "players": [
+        {
+          "player_id": 1,
+          "team": "Team A",
+          "position": { "x": 120, "y": 340 },
+          "speed": 6.4,
+          "distance_covered": 3.2,
+          "sprints": 4
+        }
+      ],
+      "heatmap": null
+    },
+    "crowd": {
+      "video_id": "8d41b321-2870-45a0-9bf7-4faa05293511",
+      "summary": {
+        "total_frames_processed": 65,
+        "peak_person_count": 11,
+        "crowd_state": "increasing_density",
+        "highest_density_zone": "B2",
+        "highest_risk_zone": "B2"
+      },
+      "peak_crowd_frame": {
+        "frame_id": 49,
+        "timestamp": 8.0,
+        "person_count": 11,
+        "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0049.jpg"
+      },
+      "anomaly_visual": {
+        "event_type": "walking_or_running_activity",
+        "image_path": "crowd_behaviour_analytics/output/.../motion_frame_0009.jpg"
+      },
+      "heatmap": {
+        "image_path": "output/heatmap_8d41b321-....png"
+      },
+      "time_series_chart": {
+        "image_path": "analytics_output/charts/8d41b321-..._crowd_activity_chart.png"
+      },
+      "density_extremes": {
+        "highest_density_zone": {
+          "zone_id": "B2",
+          "person_count": 227,
+          "density": 1.0,
+          "risk_level": "critical",
+          "flagged": true
+        },
+        "lowest_density_zone": {
+          "zone_id": "A1",
+          "person_count": 0,
+          "density": 0.0,
+          "risk_level": "very_low",
+          "flagged": false
+        }
+      }
+    }
   },
   "errors": {
     "player": null,
@@ -418,7 +471,39 @@ const response = await fetch('http://localhost:8000/upload', {
 }
 ```
 
-> `results.player` and `results.crowd` schemas will be updated once the player and crowd teams finalise their service contracts. For now, treat them as arbitrary JSON objects.
+**Crowd state values:**
+
+| Value | Meaning |
+|-------|---------|
+| `increasing_density` | Crowd is growing in density |
+| `stable` | Crowd density is steady |
+| `decreasing_density` | Crowd is thinning out |
+
+**Risk level values:** `very_low`, `low`, `medium`, `high`, `critical`
+
+> Do **not** use `crowd.heatmap.image_path` directly — it is a server-side file path. Use `GET /jobs/{job_id}/heatmap` to fetch the heatmap image.
+
+---
+
+#### `GET /jobs/{job_id}/heatmap`
+**Protected.** Fetch the heatmap PNG image for a completed job.
+
+**Response `200`:** PNG image (`Content-Type: image/png`)
+
+**Usage in frontend:**
+```js
+const url = `http://localhost:8000/jobs/${jobId}/heatmap`;
+// Use directly as <img src={url} /> with the Authorization header via fetch
+```
+
+**Error responses:**
+```json
+// 404 — heatmap not ready yet or job not found
+{ "detail": "Heatmap not available for this job" }
+
+// 502 — crowd service unreachable
+{ "detail": "Could not fetch heatmap from crowd service" }
+```
 
 ---
 
@@ -522,7 +607,9 @@ Error Handling
 
 ## Notes
 
-- The `results.player` and `results.crowd` schemas are **TBC** — pending contract from the player and crowd service teams. The backend stores them as raw JSON (`JSONB`) and passes them through unchanged.
+- The `results.crowd` schema is **confirmed** — see `GET /jobs/{job_id}` above for the full structure returned by the real crowd model.
+- The `results.player` schema is **TBC** — pending player service integration. Currently returns mock data with `players[]` array and `heatmap`.
+- Do **not** use image paths from `crowd_result` directly. Always use `GET /jobs/{job_id}/heatmap` to fetch images via the gateway.
 - Swagger UI at `http://localhost:8000/docs` is live and can be used to test all endpoints directly.
 - All `job_id` and `user_id` values are **UUIDs** (string format: `"3fa85f64-5717-4562-b3fc-2c963f66afa6"`).
 - Refresh tokens are **single use** — each call to `/auth/refresh` revokes the old token and issues a new pair.
@@ -533,5 +620,6 @@ Error Handling
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-04-27 | Added confirmed crowd response schema. Added `GET /jobs/{job_id}/heatmap` proxy endpoint. Added split mock flags (`USE_MOCK_PLAYER` / `USE_MOCK_CROWD`). Crowd service integrated and tested end-to-end. |
 | 1.1.0 | 2026-04-13 | Added refresh token flow — `POST /auth/refresh`, `POST /auth/logout`. Updated `/auth/register` and `/auth/login` responses to include `refresh_token`. Updated auth checklist. |
 | 1.0.0 | 2026-04-06 | Initial contract — health, auth, upload, jobs, CORS, checklist. |
