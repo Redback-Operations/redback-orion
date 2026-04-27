@@ -150,7 +150,7 @@ def analyze_density(input_data: dict[str, Any]) -> dict[str, Any]:
     skipped_low_confidence = 0
 
     for frame in frames:
-        detections = frame.get("detections", [])
+        detections = frame.get("people_detections", [])
 
         for detection in detections:
             bbox = detection.get("bbox")
