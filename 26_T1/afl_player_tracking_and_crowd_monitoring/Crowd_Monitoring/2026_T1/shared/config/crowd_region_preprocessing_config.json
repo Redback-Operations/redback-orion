@@ -1,0 +1,10 @@
+{
+  "focused_frames_dir": "crowd_region_preprocessing/output/focused_frames",
+  "green_hsv_lower": [25, 30, 30],
+  "green_hsv_upper": [95, 255, 255],
+  "morph_kernel_size": 9,
+  "field_mask_dilation_kernel": 21,
+  "min_field_area_ratio": 0.01,
+  "field_polygon_normalized": [],
+  "crowd_polygon_normalized": []
+}

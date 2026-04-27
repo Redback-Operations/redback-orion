@@ -69,11 +69,17 @@ def assess_risk(input_data):
     recommendations = []
     crowd_state = input_data.get("crowd_state", "stable")
     
-    # Recommendations based on SCHEMA.md example
+    # Critical zone recommendations (highest priority)
+    for zone in assessed_zones:
+        if zone["risk_level"] == "critical":
+            recommendations.append(f"🚨 CRITICAL: Zone {zone['zone_id']} at critical density - immediate crowd control required")
+    
+    # High risk zone recommendations
     for zone in assessed_zones:
         if zone["risk_level"] == "high" and zone["flagged"]:
             recommendations.append(f"Monitor zone {zone['zone_id']} closely")
     
+    # Crowd state recommendations
     if crowd_state == "increasing_density":
         recommendations.append("Prepare crowd redirection if density increases further")
     
