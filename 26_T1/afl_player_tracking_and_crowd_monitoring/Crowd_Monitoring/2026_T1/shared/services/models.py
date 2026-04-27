@@ -158,6 +158,12 @@ class DetectionRequest(BaseModel):
     video_path: str = Field(..., examples=["data/raw/match_01.mp4"])
 
 
+class ProcessingErrorResponse(BaseModel):
+    detail: str = Field(..., examples=["Internal processing error while running crowd detection pipeline"])
+    video_id: Optional[str] = Field(default=None, examples=["match_01"])
+    stage: Optional[str] = Field(default=None, examples=["crowd_pipeline"])
+
+
 class DetectionResponse(BaseModel):
     video_id: str = Field(..., examples=["match_01"])
     frames: list[DetectionFrame]
