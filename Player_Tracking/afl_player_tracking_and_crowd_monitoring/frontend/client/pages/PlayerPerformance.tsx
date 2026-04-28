@@ -369,6 +369,18 @@ export default function PlayerPerformance() {
     return teamColors[team] || "#6B7280";
   };
 
+  const calculateRating = (player: any) => {
+  const rating =
+    player.stats.kicks * 1 +
+    player.stats.handballs * 1 +
+    player.stats.marks * 2 +
+    player.stats.tackles * 2 +
+    player.stats.goals * 5 +
+    player.stats.efficiency * 1;
+
+  return Math.min(100, Math.round(rating / 5));
+  };
+
   const StatCard = ({
     title,
     value,
@@ -658,7 +670,7 @@ export default function PlayerPerformance() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 text-center">
+                  <div className="grid grid-cols-3 gap-4 text-center">
                     <div className="bg-blue-50 p-3 rounded-lg">
                       <div className="text-2xl font-bold text-blue-600">
                         {selectedPlayer.stats.goals}
@@ -671,7 +683,16 @@ export default function PlayerPerformance() {
                       </div>
                       <div className="text-xs text-gray-600">DISPOSALS</div>
                     </div>
+                    <div className="bg-yellow-50 p-3 rounded-lg">
+                    <div className="text-2xl font-bold text-yellow-600">
+                      {calculateRating(selectedPlayer)}/100
+                    </div>
+                    <div className="text-xs text-gray-600">RATING</div>
                   </div>
+                  
+                  </div>
+
+                  
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
