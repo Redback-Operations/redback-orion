@@ -1,5 +1,5 @@
 import httpx
-from app.config import USE_MOCK_SERVICES, PLAYER_SERVICE_URL
+from app.config import USE_MOCK_PLAYER, PLAYER_SERVICE_URL
 
 
 def get_mock_player_data():
@@ -27,7 +27,7 @@ def get_mock_player_data():
 
 
 async def get_player_data(file_path: str = None):
-    if USE_MOCK_SERVICES:
+    if USE_MOCK_PLAYER:
         return get_mock_player_data()
 
     async with httpx.AsyncClient(timeout=60.0) as client:
