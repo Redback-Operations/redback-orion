@@ -68,6 +68,8 @@ def draw_people_boxes(frame, detections):
         cv2.putText(output, label, (x1, y1 - 5),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     (255, 100, 0), 1)
+  
+    cv2.putText(output, f"People: {len(detections)}", (10, 25),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 100, 0), 2)
 
     return output
 
@@ -129,7 +131,6 @@ def detect_crowd(processed_video: dict) -> dict:
             "frame_id": frame_data["frame_id"],
             "timestamp": frame_data["timestamp"],
             "frame_path": frame_path,
-            "annotated_frame_path": people_annotated_frame_path,
             "face_annotated_frame_path": face_annotated_frame_path,
             "people_annotated_frame_path": people_annotated_frame_path,
             "person_count": len(people_detections),
