@@ -245,6 +245,7 @@ export default function AFLDashboard() {
   const [videoAnalysisError, setVideoAnalysisError] = useState<string | null>(
     null,
   );
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [selectedAnalysisType, setSelectedAnalysisType] =
     useState("highlights");
   const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
@@ -355,7 +356,25 @@ export default function AFLDashboard() {
     const diffHours = Math.floor(diffMins / 60);
     return `${diffHours}h ${diffMins % 60}m remaining`;
   };
+useEffect(() => {
+    if (!currentJobId) return;
 
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/status/${currentJobId}`);
+        const data = await response.json();
+
+        if (data.status !== "processing") {
+          clearInterval(interval);
+          setCurrentJobId(null);
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [currentJobId]);
   // Generate dynamic chart data for analysis results
   const generateAnalysisChartData = (item: any) => {
     // Player performance data for charts
