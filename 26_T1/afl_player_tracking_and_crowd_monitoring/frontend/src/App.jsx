@@ -5,6 +5,8 @@ import {
   CheckCircle, ArrowLeft
 } from 'lucide-react'
 import './App.css'
+import { uploadVideo } from "./services/uploadService"
+import { pollJob } from "./services/jobService"
 
 import FatigueLivePanel from './components/FatigueLivePanel.jsx'
 
@@ -78,50 +80,25 @@ const Dashboard = memo(function Dashboard({
   }
 
   const startAnalysis = async () => {
-    if (!uploadedVideo) return
-    setIsAnalyzing(true)
-    setAnalysisProgress(0)
-    const interval = setInterval(() => {
-      setAnalysisProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsAnalyzing(false)
-          setAnalysisComplete(true)
-          setAnalysisResults({
-            matchDuration: '2:15:30',
-            totalPlayers: 36,
-            goals: 12,
-            assists: 8,
-            possession: { teamA: 58, teamB: 42 },
-            playerStats: [
-              { name: 'Player A', goals: 3, assists: 2, distance: '8.5km', speed: '12.3km/h' },
-              { name: 'Player B', goals: 2, assists: 1, distance: '7.8km', speed: '11.9km/h' },
-              { name: 'Player C', goals: 1, assists: 3, distance: '9.2km', speed: '13.1km/h' }
-            ],
-            crowdDensity: {
-              peak: 1500,
-              average: 1200,
-              zones: [
-                { zone: 'North Stand', density: 85, capacity: 500 },
-                { zone: 'South Stand', density: 72, capacity: 500 },
-                { zone: 'East Stand', density: 68, capacity: 400 },
-                { zone: 'West Stand', density: 75, capacity: 400 }
-              ]
-            },
-            keyEvents: [
-              { time: '00:15:30', event: 'Goal by Team A', player: 'Player A' },
-              { time: '00:28:45', event: 'Yellow Card', player: 'Player B' },
-              { time: '00:45:12', event: 'Goal by Team B', player: 'Player C' },
-              { time: '01:12:33', event: 'Goal by Team A', player: 'Player A' },
-              { time: '01:45:20', event: 'Red Card', player: 'Player D' }
-            ]
-          })
-          return 100
-        }
-        return prev + Math.random() * 15
-      })
-    }, 500)
+  if (!uploadedVideo) return
+
+  setIsAnalyzing(true)
+  setAnalysisProgress(10)
+
+  try {
+    const result = await uploadVideo(uploadedVideo)
+
+    const jobId = result.job_id
+
+    setAnalysisProgress(30)
+
+    pollJob(jobId)
+
+  } catch (err) {
+    console.error(err)
+    setIsAnalyzing(false)
   }
+}
 
   const resetAnalysis = () => {
     setUploadedVideo(null)
@@ -632,6 +609,17 @@ const CrowdHeatmapView = memo(function CrowdHeatmapView({ setShowCrowdHeatmap })
   )
 })
 
+pollJob(jobId, {
+  onSuccess: (data) => {
+    setAnalysisResults(data.results)
+    setAnalysisComplete(true)
+    setIsAnalyzing(false)
+  },
+  onError: () => {
+    setIsAnalyzing(false)
+  }
+})
+
 /* ===========
    APP (OWNER)
    =========== */
@@ -702,12 +690,17 @@ function App() {
   }, [])
 
   // Download Report Function
-  const downloadReport = useCallback(() => {
-    const reportData = {
-      matchInfo: { teams: 'Team A vs Team B', score: '2-1', time: '12:34', quarter: '3' },
-      analytics: {
-        possessionOverTime: [
-          { time: '0-5min', teamA: 65, teamB: 35 },
-          { time: '5-10min', teamA: 58, teamB: 42 },
-          { time: '10-15min', teamA: 72, teamB: 28 },
-          { time: '15-20min', teamA: 45, teamB: 55 },
+ const downloadReport = useCallback(() => {
+  const reportData = {
+    matchInfo: { teams: 'Team A vs Team B', score: '2-1', time: '12:34', quarter: '3' },
+    analytics: {
+      possessionOverTime: [
+        { time: '0-5min', teamA: 65, teamB: 35 },
+        { time: '5-10min', teamA: 58, teamB: 42 },
+        { time: '10-15min', teamA: 72, teamB: 28 },
+        { time: '15-20min', teamA: 45, teamB: 55 }
+      ]
+    }
+  } }, )}
+
+export default App
