@@ -30,4 +30,15 @@ runs/
 # Model weights & large files
 *.pt
 *.pth
-*.zip
+*.zipobj/
+bin/
+*.mp4
+*.mov
+*.pt
+.DS_Store
+*.mov
+*.mp4
+*.pt
+obj/
+bin/
+.DS_Store
