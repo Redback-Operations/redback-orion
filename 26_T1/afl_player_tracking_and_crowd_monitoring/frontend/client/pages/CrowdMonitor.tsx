@@ -43,7 +43,7 @@ const generateCrowdData = () => {
       capacity: 15000,
       current: 13200,
       color: "#ef4444", // red-500
-      coordinates: { x: 50, y: 20, width: 40, height: 15 },
+      coordinates: { x: 50, y: 12, width: 40, height: 12 },
       entryPoints: ["Gate A", "Gate B"],
       facilities: ["Toilets", "Food Court", "Merchandise"],
       temperature: 24,
@@ -55,19 +55,24 @@ const generateCrowdData = () => {
       capacity: 8000,
       current: 6800,
       color: "#f97316", // orange-500
-      coordinates: { x: 50, y: 10, width: 40, height: 10 },
+      coordinates: { x: 50, y: 0, width: 40, height: 12 },
       entryPoints: ["Gate A-Upper"],
       facilities: ["Toilets", "Bar"],
       temperature: 26,
       safety: "normal",
     },
+
+
+
+
+
     {
       id: 3,
       name: "Southern Stand - Lower",
       capacity: 12000,
       current: 11400,
       color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 75, width: 40, height: 15 },
+      coordinates: { x: 50, y: 76, width: 40, height: 12 },
       entryPoints: ["Gate C", "Gate D"],
       facilities: ["Toilets", "Food Court", "First Aid"],
       temperature: 23,
@@ -79,7 +84,7 @@ const generateCrowdData = () => {
       capacity: 6000,
       current: 5700,
       color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 90, width: 40, height: 10 },
+      coordinates: { x: 50, y: 88, width: 40, height: 12 },
       entryPoints: ["Gate C-Upper"],
       facilities: ["Premium Bar"],
       temperature: 25,
@@ -115,7 +120,7 @@ const generateCrowdData = () => {
       capacity: 2000,
       current: 1850,
       color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 35, width: 30, height: 8 },
+      coordinates: { x: 50, y: 25, width: 30, height: 12 },
       entryPoints: ["Premium Entrance"],
       facilities: ["VIP Lounge", "Premium Dining"],
       temperature: 21,
@@ -127,7 +132,7 @@ const generateCrowdData = () => {
       capacity: 1500,
       current: 1425,
       color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 57, width: 30, height: 8 },
+      coordinates: { x: 50, y: 63, width: 30, height: 12 },
       entryPoints: ["Premium Entrance"],
       facilities: ["VIP Lounge", "Premium Bar"],
       temperature: 21,
@@ -349,10 +354,16 @@ export default function CrowdMonitor() {
                       <button
                         key={zone.id}
                         onClick={() => setSelectedZone(zone)}
-                        className={`absolute transition-all duration-300 hover:opacity-80 border-2 ${
+                        className={`absolute transition-all duration-300 border-2 
+                           hover:scale-105 hover:z-10 hover:shadow-xl hover:ring-2 hover:ring-white
+                           border-transparent ${
                           selectedZone.id === zone.id
                             ? "border-white border-4"
                             : "border-transparent"
+                        } ${
+                           zone.name.includes("Stand") || zone.name.includes("Premium")
+                             ? "-translate-x-1/2"
+                             : ""
                         }`}
                         style={{
                           left: `${zone.coordinates.x}%`,
@@ -405,13 +416,19 @@ export default function CrowdMonitor() {
                   <CardTitle>{selectedZone.name}</CardTitle>
                   <CardDescription className="flex items-center gap-4">
                     <Badge
-                      variant={
-                        selectedZone.density >= 95
-                          ? "destructive"
-                          : selectedZone.density >= 85
-                            ? "secondary"
-                            : "default"
-                      }
+                      className={`
+                         ${
+                          selectedZone.density >= 95
+                            ? "bg-red-600 text-white"
+                            : selectedZone.density >= 85
+                            ? "bg-orange-500 text-white"
+                            : selectedZone.density >= 70
+                            ? "bg-amber-500 text-white"
+                            : selectedZone.density >= 50
+                            ? "bg-yellow-400 text-black"
+                                : "bg-green-500 text-white"
+                            }
+                          `}
                     >
                       {getDensityLabel(selectedZone.density)}
                     </Badge>
@@ -657,7 +674,9 @@ export default function CrowdMonitor() {
                             .map((zone, index) => (
                               <div
                                 key={zone.id}
-                                className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                                className="flex justify-between items-center p-2 bg-gray-50 rounded transition-all
+                                  duration-300 cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-[1.02] 
+                                  hover:ring-2 hover:ring-blue-200"
                               >
                                 <span className="text-sm truncate">
                                   {zone.name}
@@ -685,7 +704,8 @@ export default function CrowdMonitor() {
                 <CardContent>
                   <div className="space-y-3">
                     {criticalZones.length > 0 && (
-                      <div className="p-3 bg-red-50 border border-red-200 rounded">
+                      <div className="p-3 bg-red-50 border border-red-200 rounded transition-all
+                          duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-red-400 cursor-pointer">
                         <div className="flex items-center gap-2 mb-2">
                           <AlertTriangle className="w-5 h-5 text-red-500" />
                           <span className="font-medium text-red-700">
@@ -706,7 +726,8 @@ export default function CrowdMonitor() {
                     )}
 
                     {highDensityZones.length > 0 && (
-                      <div className="p-3 bg-orange-50 border border-orange-200 rounded">
+                      <div className="p-3 bg-orange-50 border border-orange-200 rounded transition-all
+                          duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-orange-400 cursor-pointer">
                         <div className="flex items-center gap-2 mb-2">
                           <Eye className="w-5 h-5 text-orange-500" />
                           <span className="font-medium text-orange-700">

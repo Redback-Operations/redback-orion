@@ -70,7 +70,7 @@ def generate_heatmap(input_data: Dict) -> Dict:
 
     validate_input(input_data)
 
-    video_id = input_data["video_id"]
+    video_id = str(input_data["video_id"])
     zones: List[Dict] = input_data["zones"]
 
     output_dir = "output"

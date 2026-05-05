@@ -51,6 +51,12 @@ const navigationItems = [
     icon: Terminal,
     description: "System monitoring",
   },
+  {
+  name: "About",
+  href: "/about",
+  icon: Zap, // or any icon you like
+  description: "About this system",
+  },
 ];
 
 export default function MobileNavigation() {
@@ -191,8 +197,8 @@ export default function MobileNavigation() {
 
       {/* Bottom Navigation for Mobile */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-40">
-        <div className="grid grid-cols-5 gap-1">
-          {navigationItems.slice(1, 5).map((item) => {
+        <div className="grid grid-cols-7 gap-10 px-3">
+          {navigationItems.slice(1, 7).map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
 
@@ -201,7 +207,8 @@ export default function MobileNavigation() {
                 key={item.name}
                 to={item.href}
                 className={`flex flex-col items-center py-2 px-1 transition-colors ${
-                  active ? "text-green-600" : "text-gray-500"
+                  active 
+                  ? "text-green-600" : "text-gray-500 hover:bg-gray-100 hover:shadow-md hover:scale-[1.02] hover:ring-gray-200"
                 }`}
               >
                 <Icon className="w-5 h-5 mb-1" />
