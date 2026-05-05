@@ -182,7 +182,7 @@ def track_people(frames, max_distance=80.0, min_iou=0.1, max_missed_time=3.0):
                 "frame_id": frame.get("frame_id"),
                 "timestamp": timestamp,
                 "frame_path": frame.get("frame_path"),
-                "annotated_frame_path": frame.get("annotated_frame_path"),
+                "people_annotated_frame_path": frame.get("people_annotated_frame_path"),
                 "tracked_detections": tracked_detections,
             }
         )
@@ -339,7 +339,7 @@ def build_frame_activity_series(frame_tracks, tracking_summary):
                 "running_count": running_count,
                 "stationary_count": stationary_count,
                 "active_count": walking_count + running_count,
-                "annotated_frame_path": frame.get("annotated_frame_path"),
+                "people_annotated_frame_path": frame.get("people_annotated_frame_path"),
             }
         )
 
@@ -372,7 +372,7 @@ def save_motion_annotations(frame_tracks, tracking_summary, video_id=None):
     highlight_dynamic_only = bool(walking_track_ids or running_track_ids)
 
     for frame in frame_tracks:
-        source_path = frame.get("annotated_frame_path")
+        source_path = frame.get("people_annotated_frame_path")
         if not source_path:
             continue
 
