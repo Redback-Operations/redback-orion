@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine.sync_engine)
 
 app = FastAPI(
     title="Project Orion Backend API",

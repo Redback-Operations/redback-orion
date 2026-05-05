@@ -44,14 +44,18 @@ def test_register_success(client, mock_db):
 def test_register_duplicate_email(client, mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = make_mock_user()
     response = client.post("/auth/register", json=REGISTER_PAYLOAD)
-    assert response.status_code == 400
+    assert response.status_code == 409
     assert "Email already registered" in response.json()["detail"]
 
+def test_register_duplicate_username(client, mock_db):
+    mock_db.query.return_value.filter.return_value.first.side_effect = [None, make_mock_user()]
+    response = client.post("/auth/register", json=REGISTER_PAYLOAD)
+    assert response.status_code == 409
+    assert "Username already taken" in response.json()["detail"]
 
 def test_register_missing_fields(client, mock_db):
     response = client.post("/auth/register", json={"email": "test@example.com"})
     assert response.status_code == 422
-
 
 # --- Login ---
 
