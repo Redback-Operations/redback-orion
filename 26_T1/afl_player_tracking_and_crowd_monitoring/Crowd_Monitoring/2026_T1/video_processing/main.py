@@ -1,12 +1,19 @@
 import cv2
 import os
 import json
+import numpy as np                     # Used for creating the "canvas" for letterboxing
+from concurrent.futures import ThreadPoolExecutor # For background file saving
+# Import utils
+from video_processing.utils import get_video_stats, check_blur, apply_preprocessing, save_frame_worker
 
 #Logic to find the config relative to the Project Root
 #By doing this, the code works on any computer because it doesn't care about the folders above the project(our project is at 2026_T1 folder level)
 BASE_DIR = os.getcwd()
 #join() is used to build a path to json config file 
 CONFIG_PATH = os.path.join(BASE_DIR, "shared", "config", "video_processing_config.json")
+
+#max_workers 4 reserved for writing extracted frame to folder where we want to save 
+executor = ThreadPoolExecutor(max_workers=4)
 
 #Important paths and parameters are stored in this config file which can be updated if needed
 #We load and read that config file
@@ -24,9 +31,15 @@ def process_video(video_id: str, video_path: str):
     #contains path where input video is present
     full_input_path = os.path.normpath(os.path.join(BASE_DIR, video_path))
     
+    # Establish the 'Sharpness Floor' for this specific crowd footage
+    print(f"Analyzing crowd video quality for {video_id}...")
+    # If variance is less then threshold blurry image else sharp image
+    dynamic_threshold = get_video_stats(full_input_path, config["sample_rate"])
+    print(f"Calculated Crowd Quality Threshold: {dynamic_threshold:.2f}")
+    
     #contains path where output frames will be stored
     output_dir = os.path.join(BASE_DIR, config["extracted_frames_dir"])
-    #it creates folder where output frames will be stored if only folder is already not created
+    #It creates folder where output frames will be stored if only folder is already not created
     os.makedirs(output_dir, exist_ok=True)
     
     #opens video stream
@@ -41,6 +54,7 @@ def process_video(video_id: str, video_path: str):
     res_w, res_h = config["output_resolution"]
     
     frames_metadata = []
+    save_futures = []
     count = 0
     extracted_count = 1 
 
@@ -55,15 +69,33 @@ def process_video(video_id: str, video_path: str):
             
             #Frame Sampling (We take snapshot every 30 frames, instead of taking snapshot of all frames) 
             if count % config["sample_rate"] == 0:
-                #Resize for the Detection model
-                resized = cv2.resize(frame, (res_w, res_h))
+                score, is_sharp = check_blur(frame, dynamic_threshold)
+                
+                # If the camera is panning or shaking(blurry frame), check the next few frames.
+                # Crowd faces are unrecognizable in motion blur.
+                search_count = 0
+                while not is_sharp and search_count < 8: # Slightly longer window for crowd stabilization
+                    ret, frame = cap.read()
+                    if not ret: break
+                    count += 1
+                    search_count += 1
+                    score, is_sharp = check_blur(frame, dynamic_threshold)
+                
+                
+                # Process the sharp (or best available) frame using LetterBoxing(if it fails accuracy, switch to Tiling)
+                processed = apply_preprocessing(frame, (res_h, res_w))
+                
+                # #Resize for the Detection model
+                # resized = cv2.resize(frame, (res_w, res_h))
                 
                 #frame naming for maintaining frame order
                 fname = f"frame_{extracted_count:04d}.jpg"
                 save_path = os.path.join(output_dir, fname)
-                #saving frame to output directory
-                cv2.imwrite(save_path, resized)
+                # #saving frame to output directory
+                # cv2.imwrite(save_path, resized)
                 
+                save_futures.append(executor.submit(save_frame_worker, save_path, processed))
+
                 #Match the 'DetectionFrame' schema in shared/models.py
                 frames_metadata.append({
                     "frame_id": extracted_count,
@@ -76,6 +108,9 @@ def process_video(video_id: str, video_path: str):
     finally:
         #This "closes" the video file. If we don't do this, the computer might keep the file "locked," and we won't be able to delete or move it until we restart the PC
         cap.release()
+
+    for future in save_futures:
+        future.result()
 
     #Return the dictionary for the Service Layer to use
     return {

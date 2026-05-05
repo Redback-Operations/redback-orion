@@ -1,5 +1,5 @@
 {
-  "sample_rate": 30,
+  "sample_rate": 5,
   "output_resolution": [640, 640],
   "extracted_frames_dir": "video_processing/data/extracted_frames"
 }
