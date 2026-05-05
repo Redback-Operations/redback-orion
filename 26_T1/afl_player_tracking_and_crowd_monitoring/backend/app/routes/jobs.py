@@ -1,6 +1,8 @@
 import asyncio
+import httpx
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Job
@@ -8,6 +10,7 @@ from app.schemas.jobs import JobDetail, JobListResponse, JobResults, JobErrors
 from app.auth.dependencies import get_current_user
 from app.services.player_client import get_player_data
 from app.services.crowd_client import get_crowd_data
+from app.config import CROWD_SERVICE_URL
 
 router = APIRouter()
 
@@ -127,6 +130,32 @@ async def retry_job(
     db.commit()
 
     return {"job_id": str(job.job_id), "status": job.status}
+
+
+@router.get("/jobs/{job_id}/heatmap")
+async def get_heatmap(
+    job_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    job = db.query(Job).filter(Job.job_id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    check_job_access(job, current_user)
+
+    crowd = job.crowd_result
+    if not crowd or not crowd.get("heatmap") or not crowd["heatmap"].get("image_path"):
+        raise HTTPException(status_code=404, detail="Heatmap not available for this job")
+
+    image_path = crowd["heatmap"]["image_path"].replace("\\", "/")
+    url = f"{CROWD_SERVICE_URL}/artifacts/{image_path}"
+
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        r = await client.get(url)
+        if r.status_code != 200:
+            raise HTTPException(status_code=502, detail="Could not fetch heatmap from crowd service")
+
+    return StreamingResponse(iter([r.content]), media_type="image/png")
 
 
 @router.delete("/jobs/{job_id}")

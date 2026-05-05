@@ -173,7 +173,26 @@ const crowdZones = [
   { zone: "Premium Seating", capacity: 3000, current: 2850, density: 95, trend: "stable", avgTimeSpent: 112 },
 ];
 const safestZone = crowdZones.reduce((min, zone) => zone.density < min.density ? zone : min, crowdZones[0]);
+const BackToTopButton = () => {
+  const [visible, setVisible] = useState(false);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setVisible(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return visible ? (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white rounded-full p-3 shadow-lg z-50"
+    >
+      ↑
+    </button>
+  ) : null;
+};
 export default function AFLDashboard() {
   const navigate = useNavigate();
   const [selectedPlayer, setSelectedPlayer] = useState(mockPlayers[0]);
@@ -1662,11 +1681,27 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         </div>
                         <div className="text-sm text-gray-600">Goals</div>
                       </div>
-                      <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                      <div
+                        className="text-center p-4 bg-yellow-50 rounded-lg cursor-pointer relative group"
+                        title="Efficiency Rating"
+                      >
                         <div className="text-2xl font-bold text-yellow-600">
                           {selectedPlayer.efficiency}%
                         </div>
                         <div className="text-sm text-gray-600">Efficiency</div>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10 w-48 bg-gray-800 text-white text-xs rounded-lg p-3 shadow-lg">
+                          <div className="font-bold mb-1">
+                            {selectedPlayer.efficiency >= 90 ? "🏆 Excellent" :
+                             selectedPlayer.efficiency >= 80 ? "⭐ Good" :
+                             selectedPlayer.efficiency >= 70 ? "👍 Average" : "📈 Needs Improvement"}
+                          </div>
+                          <div>
+                            {selectedPlayer.efficiency >= 90 ? "Elite level performance. Top 10% of all players." :
+                             selectedPlayer.efficiency >= 80 ? "Strong performance. Above average player." :
+                             selectedPlayer.efficiency >= 70 ? "Solid performance. Room to improve." : "Below average. Focus on consistency."}
+                          </div>
+                          <div className="mt-1 text-yellow-300">Score: {selectedPlayer.efficiency}/100</div>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -3368,6 +3403,7 @@ Generated on: ${new Date().toLocaleString()}
           )}
         </DialogContent>
       </Dialog>
+    <BackToTopButton />
     </div>
   );
 }
