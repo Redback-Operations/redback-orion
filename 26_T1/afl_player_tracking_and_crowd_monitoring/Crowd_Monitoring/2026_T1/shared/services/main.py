@@ -65,7 +65,7 @@ def demo_page():
         var(--bg);
     }
     .wrap {
-      max-width: 1200px;
+      max-width: 1600px;
       margin: 0 auto;
       padding: 32px 20px 48px;
     }
@@ -329,7 +329,7 @@ def demo_page():
         document.getElementById("lowZone").textContent = lowZone;
         document.getElementById("lowZoneMeta").textContent = lowZoneMeta;
 
-        setImage("peakFrame", peakFrame.annotated_frame_path);
+        setImage("peakFrame", peakFrame.people_annotated_frame_path || peakFrame.annotated_frame_path);
         setImage("anomalyFrame", (payload.anomaly_visual || {}).image_path);
         setImage("heatmap", (payload.heatmap || {}).image_path);
         setImage("chart", (payload.time_series_chart || {}).image_path);
