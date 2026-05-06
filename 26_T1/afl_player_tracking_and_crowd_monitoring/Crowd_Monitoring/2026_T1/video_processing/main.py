@@ -4,7 +4,7 @@ import json
 import numpy as np                     # Used for creating the "canvas" for letterboxing
 from concurrent.futures import ThreadPoolExecutor # For background file saving
 # Import utils
-from video_processing.utils import get_video_stats, check_blur, apply_preprocessing, save_frame_worker
+from video_processing.utils import get_video_stats, check_blur, save_frame_worker
 
 #Logic to find the config relative to the Project Root
 #By doing this, the code works on any computer because it doesn't care about the folders above the project(our project is at 2026_T1 folder level)
@@ -50,8 +50,6 @@ def process_video(video_id: str, video_path: str):
 
     #We store frames per second of video, if opencv cant find out we fallback to 30fps to avoid division by zero error later
     fps = cap.get(cv2.CAP_PROP_FPS) or 30
-    #store config resolution size which we want frames to be in
-    res_w, res_h = config["output_resolution"]
     
     frames_metadata = []
     save_futures = []
@@ -82,19 +80,11 @@ def process_video(video_id: str, video_path: str):
                     score, is_sharp = check_blur(frame, dynamic_threshold)
                 
                 
-                # Process the sharp (or best available) frame using LetterBoxing(if it fails accuracy, switch to Tiling)
-                processed = apply_preprocessing(frame, (res_h, res_w))
-                
-                # #Resize for the Detection model
-                # resized = cv2.resize(frame, (res_w, res_h))
-                
                 #frame naming for maintaining frame order
                 fname = f"frame_{extracted_count:04d}.jpg"
                 save_path = os.path.join(output_dir, fname)
-                # #saving frame to output directory
-                # cv2.imwrite(save_path, resized)
                 
-                save_futures.append(executor.submit(save_frame_worker, save_path, processed))
+                save_futures.append(executor.submit(save_frame_worker, save_path, frame))
 
                 #Match the 'DetectionFrame' schema in shared/models.py
                 frames_metadata.append({
