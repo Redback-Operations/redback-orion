@@ -260,8 +260,8 @@ export default function PlayerPerformance() {
   const [isPlaying, setIsPlaying] = useState(false);
   const ENABLE_LIVE_FEATURES = true;
 
-  const [players, setPlayers] = useState(generatePlayerData());
-  const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const [comparisonPlayer, setComparisonPlayer] = useState(players[1]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
@@ -269,7 +269,93 @@ export default function PlayerPerformance() {
   const [chartType, setChartType] = useState<
     "possession" | "performance" | "comparison"
   >("possession");
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [jobs, setJobs] = useState<any[]>([]);
+  const token = localStorage.getItem("token");
 
+  const uploadVideo = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("http://localhost:8000/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    
+
+  const data = await res.json();
+  console.log("UPLOAD RESULT:", data);
+  return data.job_id;
+};
+
+const fetchJobs = async () => {
+  const res = await fetch("http://localhost:8000/jobs?page=1&limit=10", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  console.log("JOBS:", data);
+  return data.jobs;
+};
+
+const handleUpload = async () => {
+  if (!selectedVideo) {
+    setUploadStatus("Please choose a video first");
+    return;
+  }
+
+  setUploadStatus("Uploading...");
+
+  try {
+    const jobId = await uploadVideo(selectedVideo);
+    const latestJobs = await fetchJobs();
+
+    setJobs(latestJobs || []);
+    setUploadStatus(`Upload complete. Job ID: ${jobId}`);
+  } catch (err) {
+    console.error(err);
+    setUploadStatus("Upload failed");
+  }
+};
+
+  
+  useEffect(() => {
+  fetch("http://localhost:8000/api/players")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("API DATA:", data);
+
+      const playerList = Array.isArray(data)
+        ? data
+        : Array.isArray(data.data)
+        ? data.data
+        : Array.isArray(data.players)
+        ? data.players
+        : [];
+
+      setPlayers(playerList.length > 0 ? playerList : generatePlayerData());
+    })
+    .catch((err) => {
+      console.error("API ERROR:", err);
+      setPlayers(generatePlayerData());
+    });
+}, []);
+
+  useEffect(() => {
+    if (players.length > 0) {
+      setSelectedPlayer(players[0]);
+      setComparisonPlayer(players[1] || players[0]);
+    }
+  }, [players]);
+
+  
+  
   // Simulate live data updates
   useEffect(() => {
     if (!isLive || !isPlaying) return;
@@ -292,6 +378,10 @@ export default function PlayerPerformance() {
 
     return () => clearInterval(interval);
   }, [isLive, isPlaying]);
+
+  if (!selectedPlayer) {
+  return <div className="p-6">Loading player data...</div>;
+  }
 
   const filteredPlayers = players.filter(
     (player) =>
@@ -531,6 +621,26 @@ export default function PlayerPerformance() {
               </Button>
             </div>
           </div>
+          <div style={{ margin: "20px", padding: "10px", border: "1px solid gray" }}>
+            <h3>Backend Integration Test</h3>
+
+          <input
+            type="file"
+            accept=".mp4,.avi,.mov"
+            onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+          />
+
+          <button onClick={handleUpload}>Upload Video</button>
+
+          <p>{uploadStatus}</p>
+
+          {jobs.map((job) => (
+            <div key={job.job_id}>
+            <p>Job ID: {job.job_id}</p>
+            <p>Status: {job.status}</p>
+           </div>
+           ))}
+        </div>
 
           {/* Live Clock */}
           {ENABLE_LIVE_FEATURES && (
@@ -992,4 +1102,4 @@ export default function PlayerPerformance() {
       </div>
     </div>
   );
-}
+};

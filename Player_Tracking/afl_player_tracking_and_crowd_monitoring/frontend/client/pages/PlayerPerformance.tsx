@@ -370,7 +370,7 @@ export default function PlayerPerformance() {
   };
 
   const calculateRating = (player: any) => {
-  const rating =
+    const rating =
     player.stats.kicks * 1 +
     player.stats.handballs * 1 +
     player.stats.marks * 2 +
@@ -380,6 +380,10 @@ export default function PlayerPerformance() {
 
   return Math.min(100, Math.round(rating / 5));
   };
+  
+  const rankedPlayers = [...players].sort(
+      (a, b) => calculateRating(b) - calculateRating(a)
+    ); 
 
   const StatCard = ({
     title,
@@ -396,7 +400,7 @@ export default function PlayerPerformance() {
     color?: string;
     icon?: any;
   }) => (
-    <Card className="relative overflow-hidden">
+    <Card className="relative overflow-hidden transition-all hover:bg-blue-100 hover:shadow-lg cursor-pointer">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -454,13 +458,13 @@ export default function PlayerPerformance() {
           {player.photo ? (
             <img
               src={player.photo}
-              alt={player.name}
+              alt={player.name || "Player"}
               className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-gray-300 border-2 border-white shadow-lg flex items-center justify-center">
               <span className="text-sm font-bold text-gray-600">
-                {player.name
+                {(player.name || "Player")
                   .split(" ")
                   .map((n: string) => n[0])
                   .join("")}
@@ -473,7 +477,7 @@ export default function PlayerPerformance() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="grid grid-cols-4 gap-2 text-center text-xs">
           <div className="bg-blue-50 p-2 rounded">
             <div className="font-bold text-blue-600">{player.stats.goals}</div>
             <div className="text-gray-600">Goals</div>
@@ -720,10 +724,27 @@ export default function PlayerPerformance() {
                     />
                   </div>
                 </div>
+                <div className="bg-yellow-100 p-4 rounded-lg text-center mt-4">
+                  <div className="text-2xl font-bold text-yellow-700">
+                    {calculateRating(selectedPlayer)}/100
+                </div>
+                <div className="text-sm text-gray-600">Player Rating</div>
+                </div>
               </CardContent>
             </Card>
 
+            
+
             {/* Charts Section */}
+            <div className="mt-6">
+              <h2 className="text-lg font-bold">Player Rankings</h2>
+
+              {rankedPlayers.map((player, index) => (
+                <div key={player.id} className="p-2 border rounded mb-2">
+                  {index + 1}. {player.name} - {calculateRating(player)}/100
+                </div>
+               ))}
+            </div>
             <div className="lg:col-span-2 space-y-6">
               {/* Chart Controls */}
               <Card>
