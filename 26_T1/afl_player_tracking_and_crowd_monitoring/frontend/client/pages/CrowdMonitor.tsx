@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -8,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -18,193 +18,361 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import MobileNavigation from "@/components/MobileNavigation";
-import LiveClock from "@/components/LiveClock";
 import {
-  Users,
-  TrendingUp,
-  TrendingDown,
-  MapPin,
+  Activity,
   AlertTriangle,
+  BarChart3,
   CheckCircle,
   Eye,
-  Activity,
-  BarChart3,
-  Clock,
+  Image as ImageIcon,
+  MapPin,
   Shield,
-  Navigation,
+  Users,
 } from "lucide-react";
 
-// Crowd zone data with real-time simulation
-const generateCrowdData = () => {
-  const zones = [
-    {
-      id: 1,
-      name: "Northern Stand - Lower",
-      capacity: 15000,
-      current: 13200,
-      color: "#ef4444", // red-500
-      coordinates: { x: 50, y: 20, width: 40, height: 15 },
-      entryPoints: ["Gate A", "Gate B"],
-      facilities: ["Toilets", "Food Court", "Merchandise"],
-      temperature: 24,
-      safety: "normal",
-    },
-    {
-      id: 2,
-      name: "Northern Stand - Upper",
-      capacity: 8000,
-      current: 6800,
-      color: "#f97316", // orange-500
-      coordinates: { x: 50, y: 10, width: 40, height: 10 },
-      entryPoints: ["Gate A-Upper"],
-      facilities: ["Toilets", "Bar"],
-      temperature: 26,
-      safety: "normal",
-    },
-    {
-      id: 3,
-      name: "Southern Stand - Lower",
-      capacity: 12000,
-      current: 11400,
-      color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 75, width: 40, height: 15 },
-      entryPoints: ["Gate C", "Gate D"],
-      facilities: ["Toilets", "Food Court", "First Aid"],
-      temperature: 23,
-      safety: "crowded",
-    },
-    {
-      id: 4,
-      name: "Southern Stand - Upper",
-      capacity: 6000,
-      current: 5700,
-      color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 90, width: 40, height: 10 },
-      entryPoints: ["Gate C-Upper"],
-      facilities: ["Premium Bar"],
-      temperature: 25,
-      safety: "crowded",
-    },
-    {
-      id: 5,
-      name: "Eastern Wing",
-      capacity: 8000,
-      current: 6800,
-      color: "#f59e0b", // amber-500
-      coordinates: { x: 10, y: 35, width: 15, height: 30 },
-      entryPoints: ["Gate E"],
-      facilities: ["Toilets", "Snack Bar"],
-      temperature: 22,
-      safety: "normal",
-    },
-    {
-      id: 6,
-      name: "Western Wing",
-      capacity: 8000,
-      current: 7600,
-      color: "#dc2626", // red-600
-      coordinates: { x: 75, y: 35, width: 15, height: 30 },
-      entryPoints: ["Gate F"],
-      facilities: ["Toilets", "Restaurant"],
-      temperature: 24,
-      safety: "crowded",
-    },
-    {
-      id: 7,
-      name: "Premium Seating - North",
-      capacity: 2000,
-      current: 1850,
-      color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 35, width: 30, height: 8 },
-      entryPoints: ["Premium Entrance"],
-      facilities: ["VIP Lounge", "Premium Dining"],
-      temperature: 21,
-      safety: "normal",
-    },
-    {
-      id: 8,
-      name: "Premium Seating - South",
-      capacity: 1500,
-      current: 1425,
-      color: "#dc2626", // red-600
-      coordinates: { x: 50, y: 57, width: 30, height: 8 },
-      entryPoints: ["Premium Entrance"],
-      facilities: ["VIP Lounge", "Premium Bar"],
-      temperature: 21,
-      safety: "normal",
-    },
-  ];
+const BACKEND_URL = "http://localhost:8000";
 
-  return zones.map((zone) => ({
-    ...zone,
-    density: Math.round((zone.current / zone.capacity) * 100),
-    trend: Math.random() > 0.5 ? "up" : Math.random() > 0.5 ? "down" : "stable",
-    waitTime: Math.floor(Math.random() * 15) + 1,
-    flow: Math.floor(Math.random() * 50) + 10,
-  }));
+const getAccessToken = () =>
+  localStorage.getItem("accessToken") || localStorage.getItem("authToken");
+
+type DensityZone = {
+  zone_id?: string;
+  person_count?: number;
+  density?: number;
+  risk_level?: string;
+  flagged?: boolean;
 };
 
-const getDensityColor = (density: number) => {
-  if (density >= 95) return "#dc2626"; // red-600 - Critical
-  if (density >= 85) return "#f97316"; // orange-500 - High
-  if (density >= 70) return "#f59e0b"; // amber-500 - Medium
-  if (density >= 50) return "#eab308"; // yellow-500 - Low-Medium
-  return "#22c55e"; // green-500 - Low
+type CrowdResult = {
+  video_id?: string;
+  summary?: {
+    total_frames_processed?: number;
+    peak_person_count?: number;
+    crowd_state?: string;
+    highest_density_zone?: string | null;
+    highest_risk_zone?: string | null;
+  };
+  peak_crowd_frame?: {
+    frame_id?: number;
+    timestamp?: number;
+    person_count?: number;
+    annotated_frame_path?: string | null;
+  };
+  anomaly_visual?: {
+    event_type?: string;
+    image_path?: string | null;
+  };
+  heatmap?: {
+    image_path?: string | null;
+  };
+  time_series_chart?: {
+    image_path?: string | null;
+  };
+  density_extremes?: {
+    highest_density_zone?: DensityZone;
+    lowest_density_zone?: DensityZone;
+  };
 };
 
-const getDensityLabel = (density: number) => {
+type JobListResponse = {
+  total: number;
+  page: number;
+  limit: number;
+  jobs: Array<{
+    job_id: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+  }>;
+};
+
+type JobDetailResponse = {
+  job_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  results?: {
+    crowd?: CrowdResult | null;
+    player?: unknown;
+  } | null;
+  errors?: {
+    crowd?: string | null;
+    player?: string | null;
+  } | null;
+};
+
+type ZoneCard = {
+  id: string;
+  name: string;
+  density: number;
+  count: number;
+  risk: string;
+  flagged: boolean;
+  trend: "up" | "down" | "stable";
+  waitTime: number;
+  flow: number;
+};
+
+function formatCrowdState(value?: string | null) {
+  if (!value) return "Unknown";
+  return value.replaceAll("_", " ");
+}
+
+function formatRisk(value?: string | null) {
+  if (!value) return "unknown";
+  return value.replaceAll("_", " ");
+}
+
+function toPercent(value?: number) {
+  return typeof value === "number" ? Math.round(value * 100) : 0;
+}
+
+function getDensityLabel(density: number) {
   if (density >= 95) return "Critical";
   if (density >= 85) return "High";
   if (density >= 70) return "Medium";
   if (density >= 50) return "Low-Medium";
   return "Low";
-};
+}
+
+function buildZoneCards(result: CrowdResult | null): ZoneCard[] {
+  const highest = result?.density_extremes?.highest_density_zone;
+  const lowest = result?.density_extremes?.lowest_density_zone;
+
+  const zones: ZoneCard[] = [];
+
+  if (highest) {
+    zones.push({
+      id: "highest",
+      name: highest.zone_id || "Highest Density Zone",
+      density: toPercent(highest.density),
+      count: highest.person_count || 0,
+      risk: formatRisk(highest.risk_level),
+      flagged: Boolean(highest.flagged),
+      trend: "up",
+      waitTime: 8,
+      flow: Math.max(10, (highest.person_count || 0) * 2),
+    });
+  }
+
+  if (lowest) {
+    zones.push({
+      id: "lowest",
+      name: lowest.zone_id || "Lowest Density Zone",
+      density: toPercent(lowest.density),
+      count: lowest.person_count || 0,
+      risk: formatRisk(lowest.risk_level),
+      flagged: Boolean(lowest.flagged),
+      trend: "down",
+      waitTime: 2,
+      flow: Math.max(5, lowest.person_count || 0),
+    });
+  }
+
+  if (zones.length === 0) {
+    zones.push({
+      id: "default",
+      name: result?.summary?.highest_density_zone || "Crowd Zone",
+      density: 0,
+      count: result?.summary?.peak_person_count || 0,
+      risk: "unknown",
+      flagged: false,
+      trend: "stable",
+      waitTime: 0,
+      flow: 0,
+    });
+  }
+
+  return zones;
+}
+
+function ArtifactPanel({
+  title,
+  subtitle,
+  imageUrl,
+  fallback,
+}: {
+  title: string;
+  subtitle: string;
+  imageUrl: string | null;
+  fallback: string;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardDescription>{subtitle}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {imageUrl ? (
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+            <img
+              src={imageUrl}
+              alt={title}
+              className="h-72 w-full object-contain bg-white"
+            />
+          </div>
+        ) : (
+          <div className="flex h-72 flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 text-center text-sm text-gray-500">
+            <ImageIcon className="mb-3 h-8 w-8" />
+            <p>{fallback}</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function CrowdMonitor() {
-  const [isLive, setIsLive] = useState(true);
-  const [crowdZones, setCrowdZones] = useState(generateCrowdData());
-  const [selectedZone, setSelectedZone] = useState(crowdZones[0]);
-  const [viewMode, setViewMode] = useState("heatmap");
-  const [timeRange, setTimeRange] = useState("live");
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [viewMode, setViewMode] = useState("peak");
+  const [timeRange, setTimeRange] = useState("latest");
+  const [crowdResult, setCrowdResult] = useState<CrowdResult | null>(null);
+  const [jobId, setJobId] = useState("");
+  const [peakFrameUrl, setPeakFrameUrl] = useState<string | null>(null);
+  const [anomalyVisualUrl, setAnomalyVisualUrl] = useState<string | null>(null);
+  const [personCountChartUrl, setPersonCountChartUrl] = useState<string | null>(null);
+  const [heatmapUrl, setHeatmapUrl] = useState<string | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
 
-  // Simulate real-time crowd updates
   useEffect(() => {
-    if (!isLive) return;
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    if (isAuthenticated !== "true") {
+      navigate("/login");
+      return;
+    }
+  }, [navigate]);
 
-    const interval = setInterval(() => {
-      setCrowdZones((prevZones) =>
-        prevZones.map((zone) => {
-          const change = (Math.random() - 0.5) * 100;
-          const newCurrent = Math.max(
-            0,
-            Math.min(zone.capacity, zone.current + change),
-          );
-          return {
-            ...zone,
-            current: Math.round(newCurrent),
-            density: Math.round((newCurrent / zone.capacity) * 100),
-            color: getDensityColor(
-              Math.round((newCurrent / zone.capacity) * 100),
-            ),
-            flow: Math.floor(Math.random() * 50) + 10,
-            waitTime: Math.floor(Math.random() * 15) + 1,
-          };
-        }),
+  useEffect(() => {
+    void loadCrowdResult(searchParams.get("jobId") || undefined);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const objectUrls: string[] = [];
+
+    async function fetchArtifact(
+      endpoint: string,
+      setter: (value: string | null) => void,
+    ) {
+      if (!jobId) {
+        setter(null);
+        return;
+      }
+
+      const token = getAccessToken();
+      if (!token) {
+        setter(null);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/jobs/${jobId}/${endpoint}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          setter(null);
+          return;
+        }
+
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        objectUrls.push(objectUrl);
+        setter(objectUrl);
+      } catch {
+        setter(null);
+      }
+    }
+
+    void fetchArtifact("peak-crowd-frame", setPeakFrameUrl);
+    void fetchArtifact("anomaly-visual", setAnomalyVisualUrl);
+    void fetchArtifact("person-count-chart", setPersonCountChartUrl);
+    void fetchArtifact("heatmap", setHeatmapUrl);
+
+    return () => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [jobId]);
+
+  async function getLatestJobId(token: string) {
+    const response = await fetch(`${BACKEND_URL}/jobs?page=1&limit=10`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not fetch jobs from backend");
+    }
+
+    const payload = (await response.json()) as JobListResponse;
+    if (!payload.jobs.length) {
+      throw new Error("No jobs found in the backend");
+    }
+
+    return payload.jobs[0].job_id;
+  }
+
+  async function loadCrowdResult(explicitJobId?: string) {
+    const token = getAccessToken();
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setPageError(null);
+      const nextJobId = explicitJobId || (await getLatestJobId(token));
+      const response = await fetch(`${BACKEND_URL}/jobs/${nextJobId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setCrowdResult(null);
+          setJobId("");
+          setPageError("The requested job was not found.");
+          return;
+        }
+        throw new Error("Could not fetch crowd-monitoring result");
+      }
+
+      const payload = (await response.json()) as JobDetailResponse;
+      setJobId(payload.job_id);
+      if (searchParams.get("jobId") !== payload.job_id) {
+        setSearchParams({ jobId: payload.job_id }, { replace: true });
+      }
+
+      if (payload.results?.crowd) {
+        setCrowdResult(payload.results.crowd);
+      } else {
+        setCrowdResult(null);
+        setPageError(
+          payload.errors?.crowd || "Crowd result is not available for the latest job yet.",
+        );
+      }
+    } catch (error) {
+      setPageError(
+        error instanceof Error ? error.message : "Could not load crowd-monitoring result",
       );
-    }, 3000);
+    }
+  }
 
-    return () => clearInterval(interval);
-  }, [isLive]);
-
-  const totalCapacity = crowdZones.reduce(
-    (sum, zone) => sum + zone.capacity,
-    0,
-  );
-  const totalCurrent = crowdZones.reduce((sum, zone) => sum + zone.current, 0);
-  const averageDensity = Math.round((totalCurrent / totalCapacity) * 100);
-
-  const criticalZones = crowdZones.filter((zone) => zone.density >= 95);
-  const highDensityZones = crowdZones.filter(
+  const zoneCards = useMemo(() => buildZoneCards(crowdResult), [crowdResult]);
+  const selectedZone = zoneCards[0];
+  const averageDensity =
+    zoneCards.length > 0
+      ? Math.round(
+          zoneCards.reduce((sum, zone) => sum + zone.density, 0) / zoneCards.length,
+        )
+      : 0;
+  const criticalZones = zoneCards.filter((zone) => zone.density >= 95);
+  const highDensityZones = zoneCards.filter(
     (zone) => zone.density >= 85 && zone.density < 95,
   );
 
@@ -214,25 +382,36 @@ export default function CrowdMonitor() {
 
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-4">
-          {/* Live Clock */}
-          <LiveClock
-            isLive={isLive}
-            onToggleLive={setIsLive}
-            matchTime={{ quarter: 2, timeRemaining: "15:23" }}
-          />
+          <Card>
+            <CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Current Job ID</p>
+                <p className="text-sm font-mono break-all text-gray-900">
+                  {jobId || "No completed crowd-monitoring job yet"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Overview Cards */}
+          {pageError ? (
+            <Card>
+              <CardContent className="p-4 text-sm text-red-600">{pageError}</CardContent>
+            </Card>
+          ) : null}
+
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Total Attendance</p>
+                    <p className="text-sm text-gray-600">Peak Crowd</p>
                     <p className="text-2xl font-bold">
-                      {totalCurrent.toLocaleString()}
+                      {crowdResult?.summary?.peak_person_count ?? 0}
                     </p>
                     <p className="text-xs text-gray-500">
-                      of {totalCapacity.toLocaleString()}
+                      {crowdResult?.peak_crowd_frame?.frame_id != null
+                        ? `Frame ${crowdResult.peak_crowd_frame.frame_id}`
+                        : "No frame data"}
                     </p>
                   </div>
                   <Users className="w-8 h-8 text-blue-500" />
@@ -244,10 +423,12 @@ export default function CrowdMonitor() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Average Density</p>
-                    <p className="text-2xl font-bold">{averageDensity}%</p>
+                    <p className="text-sm text-gray-600">Crowd State</p>
+                    <p className="text-2xl font-bold capitalize">
+                      {formatCrowdState(crowdResult?.summary?.crowd_state)}
+                    </p>
                     <p className="text-xs text-gray-500">
-                      {getDensityLabel(averageDensity)}
+                      {crowdResult?.summary?.total_frames_processed ?? 0} frames processed
                     </p>
                   </div>
                   <Activity className="w-8 h-8 text-green-500" />
@@ -263,7 +444,9 @@ export default function CrowdMonitor() {
                     <p className="text-2xl font-bold text-red-600">
                       {criticalZones.length}
                     </p>
-                    <p className="text-xs text-gray-500">95%+ capacity</p>
+                    <p className="text-xs text-gray-500">
+                      Highest risk: {crowdResult?.summary?.highest_risk_zone || "None"}
+                    </p>
                   </div>
                   <AlertTriangle className="w-8 h-8 text-red-500" />
                 </div>
@@ -274,11 +457,11 @@ export default function CrowdMonitor() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">High Density</p>
-                    <p className="text-2xl font-bold text-orange-600">
-                      {highDensityZones.length}
+                    <p className="text-sm text-gray-600">Average Density</p>
+                    <p className="text-2xl font-bold">{averageDensity}%</p>
+                    <p className="text-xs text-gray-500">
+                      {getDensityLabel(averageDensity)}
                     </p>
-                    <p className="text-xs text-gray-500">85-94% capacity</p>
                   </div>
                   <BarChart3 className="w-8 h-8 text-orange-500" />
                 </div>
@@ -286,15 +469,16 @@ export default function CrowdMonitor() {
             </Card>
           </div>
 
-          {/* Controls */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Select value={viewMode} onValueChange={setViewMode}>
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="heatmap">Heat Map View</SelectItem>
-                <SelectItem value="list">List View</SelectItem>
+                <SelectItem value="peak">Peak Crowd Frame</SelectItem>
+                <SelectItem value="anomaly">Anomaly Visual</SelectItem>
+                <SelectItem value="heatmap">Heatmap</SelectItem>
+                <SelectItem value="chart">Person Count Chart</SelectItem>
                 <SelectItem value="analytics">Analytics View</SelectItem>
               </SelectContent>
             </Select>
@@ -304,102 +488,32 @@ export default function CrowdMonitor() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="live">Live Data</SelectItem>
-                <SelectItem value="1hour">Last Hour</SelectItem>
-                <SelectItem value="4hours">Last 4 Hours</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="latest">Latest Result</SelectItem>
+                <SelectItem value="job">Current Job</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <Tabs value={viewMode} onValueChange={setViewMode} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="heatmap">Heat Map</TabsTrigger>
-              <TabsTrigger value="list">Zone Details</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="peak">Peak Crowd</TabsTrigger>
+              <TabsTrigger value="anomaly">Anomaly</TabsTrigger>
+              <TabsTrigger value="heatmap">Heatmap</TabsTrigger>
+              <TabsTrigger value="chart">Person Count</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="heatmap" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="w-5 h-5" />
-                    Stadium Crowd Heat Map
-                  </CardTitle>
-                  <CardDescription>
-                    Real-time crowd density across all stadium zones
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* Stadium Heat Map */}
-                  <div className="relative bg-green-100 rounded-lg p-4 min-h-80 overflow-hidden">
-                    {/* Field */}
-                    <div className="absolute inset-8 border-2 border-green-600 rounded-lg bg-green-200">
-                      <div className="absolute inset-2 border border-green-400 rounded-lg">
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm font-medium text-green-800">
-                          AFL FIELD
-                        </div>
-                        {/* Center Circle */}
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 border-2 border-green-600 rounded-full"></div>
-                      </div>
-                    </div>
-
-                    {/* Zone overlays */}
-                    {crowdZones.map((zone) => (
-                      <button
-                        key={zone.id}
-                        onClick={() => setSelectedZone(zone)}
-                        className={`absolute transition-all duration-300 hover:opacity-80 border-2 ${
-                          selectedZone.id === zone.id
-                            ? "border-white border-4"
-                            : "border-transparent"
-                        }`}
-                        style={{
-                          left: `${zone.coordinates.x}%`,
-                          top: `${zone.coordinates.y}%`,
-                          width: `${zone.coordinates.width}%`,
-                          height: `${zone.coordinates.height}%`,
-                          backgroundColor: zone.color,
-                          opacity: (zone.density / 100) * 0.8 + 0.2,
-                        }}
-                      >
-                        <div className="text-white text-xs font-medium p-1 text-center">
-                          <div className="truncate">
-                            {zone.name.split(" - ")[0]}
-                          </div>
-                          <div>{zone.density}%</div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Legend */}
-                  <div className="flex flex-wrap justify-center gap-4 mt-4 text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-green-500 rounded"></div>
-                      <span>Low (0-49%)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-                      <span>Low-Med (50-69%)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-amber-500 rounded"></div>
-                      <span>Medium (70-84%)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-orange-500 rounded"></div>
-                      <span>High (85-94%)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-red-600 rounded"></div>
-                      <span>Critical (95%+)</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Selected Zone Details */}
+            <TabsContent value="peak" className="space-y-4">
+              <ArtifactPanel
+                title="Peak Crowd Frame"
+                subtitle={
+                  crowdResult?.peak_crowd_frame
+                    ? `Frame ${crowdResult.peak_crowd_frame.frame_id ?? "N/A"} at ${crowdResult.peak_crowd_frame.timestamp ?? "N/A"}s`
+                    : "No frame metadata available"
+                }
+                imageUrl={peakFrameUrl}
+                fallback="Peak crowd frame is not available for this job."
+              />
               <Card>
                 <CardHeader>
                   <CardTitle>{selectedZone.name}</CardTitle>
@@ -415,10 +529,7 @@ export default function CrowdMonitor() {
                     >
                       {getDensityLabel(selectedZone.density)}
                     </Badge>
-                    <span>
-                      {selectedZone.current.toLocaleString()} /{" "}
-                      {selectedZone.capacity.toLocaleString()}
-                    </span>
+                    <span>{selectedZone.count} people detected</span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -426,133 +537,60 @@ export default function CrowdMonitor() {
                     <div className="space-y-3">
                       <div>
                         <div className="flex justify-between text-sm mb-1">
-                          <span>Capacity</span>
+                          <span>Density</span>
                           <span>{selectedZone.density}%</span>
                         </div>
-                        <Progress
-                          value={selectedZone.density}
-                          className="h-3"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="p-2 bg-gray-50 rounded">
-                          <div className="font-medium">
-                            {selectedZone.waitTime}min
-                          </div>
-                          <div className="text-gray-600">Wait Time</div>
-                        </div>
-                        <div className="p-2 bg-gray-50 rounded">
-                          <div className="font-medium">
-                            {selectedZone.flow}/min
-                          </div>
-                          <div className="text-gray-600">Flow Rate</div>
-                        </div>
+                        <Progress value={selectedZone.density} className="h-3" />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <h5 className="font-medium text-sm">Entry Points</h5>
-                      {selectedZone.entryPoints.map((entry, index) => (
-                        <div key={index} className="text-sm text-gray-600">
-                          {entry}
-                        </div>
-                      ))}
+                      <h5 className="font-medium text-sm">Risk Level</h5>
+                      <div className="text-sm text-gray-600 capitalize">
+                        {selectedZone.risk}
+                      </div>
                     </div>
 
                     <div className="space-y-2">
-                      <h5 className="font-medium text-sm">Facilities</h5>
-                      {selectedZone.facilities.map((facility, index) => (
-                        <div key={index} className="text-sm text-gray-600">
-                          {facility}
-                        </div>
-                      ))}
+                      <h5 className="font-medium text-sm">Safety State</h5>
+                      <div className="text-sm text-gray-600">
+                        {selectedZone.flagged ? "Flagged for attention" : "Normal"}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="list" className="space-y-4">
-              <div className="space-y-3">
-                {crowdZones.map((zone) => (
-                  <Card
-                    key={zone.id}
-                    className={`cursor-pointer transition-colors ${
-                      selectedZone.id === zone.id ? "ring-2 ring-blue-500" : ""
-                    }`}
-                    onClick={() => setSelectedZone(zone)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <h4 className="font-medium">{zone.name}</h4>
-                          <p className="text-sm text-gray-600">
-                            {zone.current.toLocaleString()} /{" "}
-                            {zone.capacity.toLocaleString()} people
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant={
-                              zone.density >= 95
-                                ? "destructive"
-                                : zone.density >= 85
-                                  ? "secondary"
-                                  : "default"
-                            }
-                          >
-                            {getDensityLabel(zone.density)}
-                          </Badge>
-                          {zone.trend === "up" && (
-                            <TrendingUp className="w-4 h-4 text-green-500" />
-                          )}
-                          {zone.trend === "down" && (
-                            <TrendingDown className="w-4 h-4 text-red-500" />
-                          )}
-                          {zone.trend === "stable" && (
-                            <div className="w-4 h-4 rounded-full bg-gray-400" />
-                          )}
-                        </div>
-                      </div>
+            <TabsContent value="anomaly" className="space-y-4">
+              <ArtifactPanel
+                title="Anomaly / Movement Visual"
+                subtitle={
+                  crowdResult?.anomaly_visual?.event_type
+                    ? formatCrowdState(crowdResult.anomaly_visual.event_type)
+                    : "No anomaly event available"
+                }
+                imageUrl={anomalyVisualUrl}
+                fallback="Anomaly visual is not available for this job."
+              />
+            </TabsContent>
 
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Density</span>
-                          <span>{zone.density}%</span>
-                        </div>
-                        <Progress value={zone.density} className="h-2" />
-                      </div>
+            <TabsContent value="heatmap" className="space-y-4">
+              <ArtifactPanel
+                title="Heatmap"
+                subtitle={crowdResult?.heatmap?.image_path || "Heatmap preview"}
+                imageUrl={heatmapUrl}
+                fallback="Heatmap image is not available for this job."
+              />
+            </TabsContent>
 
-                      <div className="grid grid-cols-3 gap-2 mt-3 text-sm">
-                        <div className="text-center p-2 bg-gray-50 rounded">
-                          <div className="font-medium">{zone.waitTime}min</div>
-                          <div className="text-gray-600">Wait</div>
-                        </div>
-                        <div className="text-center p-2 bg-gray-50 rounded">
-                          <div className="font-medium">{zone.flow}/min</div>
-                          <div className="text-gray-600">Flow</div>
-                        </div>
-                        <div className="text-center p-2 bg-gray-50 rounded">
-                          <div className="font-medium">
-                            {zone.temperature}°C
-                          </div>
-                          <div className="text-gray-600">Temp</div>
-                        </div>
-                      </div>
-
-                      {zone.safety === "crowded" && (
-                        <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-orange-500" />
-                          <span className="text-sm text-orange-700">
-                            High density - monitor closely
-                          </span>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+            <TabsContent value="chart" className="space-y-4">
+              <ArtifactPanel
+                title="Person Count Over Time"
+                subtitle={crowdResult?.time_series_chart?.image_path || "Chart artifact"}
+                imageUrl={personCountChartUrl}
+                fallback="Person count chart is not available for this job."
+              />
             </TabsContent>
 
             <TabsContent value="analytics" className="space-y-4">
@@ -564,117 +602,49 @@ export default function CrowdMonitor() {
                       Density Distribution
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {["Low", "Low-Medium", "Medium", "High", "Critical"].map(
-                        (level, index) => {
-                          const ranges = [
-                            { min: 0, max: 49, color: "bg-green-500" },
-                            { min: 50, max: 69, color: "bg-yellow-500" },
-                            { min: 70, max: 84, color: "bg-amber-500" },
-                            { min: 85, max: 94, color: "bg-orange-500" },
-                            { min: 95, max: 100, color: "bg-red-600" },
-                          ];
-                          const range = ranges[index];
-                          const zonesInRange = crowdZones.filter(
-                            (zone) =>
-                              zone.density >= range.min &&
-                              zone.density <= range.max,
-                          ).length;
-                          const percentage =
-                            (zonesInRange / crowdZones.length) * 100;
-
-                          return (
-                            <div key={level} className="space-y-1">
-                              <div className="flex justify-between text-sm">
-                                <span>
-                                  {level} ({range.min}-{range.max}%)
-                                </span>
-                                <span>{zonesInRange} zones</span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div
-                                  className={`h-2 rounded-full ${range.color}`}
-                                  style={{ width: `${percentage}%` }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        },
-                      )}
-                    </div>
+                  <CardContent className="space-y-3">
+                    {zoneCards.map((zone) => (
+                      <div key={zone.id} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>{zone.name}</span>
+                          <span>{zone.density}%</span>
+                        </div>
+                        <Progress value={zone.density} className="h-2" />
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Clock className="w-5 h-5" />
-                      Wait Times & Flow
+                      <MapPin className="w-5 h-5" />
+                      Crowd Summary
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <h5 className="text-sm font-medium mb-2">
-                          Average Wait Times
-                        </h5>
-                        <div className="text-2xl font-bold">
-                          {Math.round(
-                            crowdZones.reduce(
-                              (sum, zone) => sum + zone.waitTime,
-                              0,
-                            ) / crowdZones.length,
-                          )}{" "}
-                          min
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Across all zones
-                        </p>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h5 className="text-sm font-medium mb-2">Video ID</h5>
+                      <div className="text-lg font-semibold">
+                        {crowdResult?.video_id || "N/A"}
                       </div>
-
-                      <div>
-                        <h5 className="text-sm font-medium mb-2">
-                          Total Flow Rate
-                        </h5>
-                        <div className="text-2xl font-bold">
-                          {crowdZones.reduce((sum, zone) => sum + zone.flow, 0)}{" "}
-                          people/min
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Combined entry/exit rate
-                        </p>
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-medium mb-2">Highest Density Zone</h5>
+                      <div className="text-lg font-semibold">
+                        {crowdResult?.summary?.highest_density_zone || "N/A"}
                       </div>
-
-                      <div>
-                        <h5 className="text-sm font-medium mb-2">
-                          Zones by Wait Time
-                        </h5>
-                        <div className="space-y-2">
-                          {crowdZones
-                            .sort((a, b) => b.waitTime - a.waitTime)
-                            .slice(0, 3)
-                            .map((zone, index) => (
-                              <div
-                                key={zone.id}
-                                className="flex justify-between items-center p-2 bg-gray-50 rounded"
-                              >
-                                <span className="text-sm truncate">
-                                  {zone.name}
-                                </span>
-                                <Badge variant="outline">
-                                  {zone.waitTime}min
-                                </Badge>
-                              </div>
-                            ))}
-                        </div>
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-medium mb-2">Highest Risk Zone</h5>
+                      <div className="text-lg font-semibold">
+                        {crowdResult?.summary?.highest_risk_zone || "None"}
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Safety Alerts */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -692,16 +662,9 @@ export default function CrowdMonitor() {
                             Critical Density Alert
                           </span>
                         </div>
-                        <p className="text-sm text-red-600 mb-2">
-                          {criticalZones.length} zone(s) at 95%+ capacity:
+                        <p className="text-sm text-red-600">
+                          {criticalZones.map((zone) => zone.name).join(", ")}
                         </p>
-                        <div className="space-y-1">
-                          {criticalZones.map((zone) => (
-                            <div key={zone.id} className="text-sm">
-                              • {zone.name} ({zone.density}%)
-                            </div>
-                          ))}
-                        </div>
                       </div>
                     )}
 
@@ -714,26 +677,21 @@ export default function CrowdMonitor() {
                           </span>
                         </div>
                         <p className="text-sm text-orange-600">
-                          {highDensityZones.length} zone(s) require monitoring
-                          (85-94% capacity)
+                          {highDensityZones.map((zone) => zone.name).join(", ")}
                         </p>
                       </div>
                     )}
 
-                    {criticalZones.length === 0 &&
-                      highDensityZones.length === 0 && (
-                        <div className="p-3 bg-green-50 border border-green-200 rounded">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            <span className="font-medium text-green-700">
-                              All zones operating normally
-                            </span>
-                          </div>
-                          <p className="text-sm text-green-600">
-                            No immediate safety concerns detected
-                          </p>
+                    {criticalZones.length === 0 && highDensityZones.length === 0 && (
+                      <div className="p-3 bg-green-50 border border-green-200 rounded">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                          <span className="font-medium text-green-700">
+                            All zones operating normally
+                          </span>
                         </div>
-                      )}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
