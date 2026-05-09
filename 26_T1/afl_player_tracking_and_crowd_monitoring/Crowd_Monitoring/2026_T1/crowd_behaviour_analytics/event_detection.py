@@ -22,9 +22,7 @@ def detect_behaviour_events(
     if features["avg_density"] <= 0.20 and zones:
         event_flags.append("crowd_dispersing")
 
-    if anomaly_summary.get("running_track_ids"):
-        event_flags.append("running_detection")
-    elif tracking_summary.get("running_track_count", 0) > 0:
+    if tracking_summary.get("running_track_count", 0) > 0:
         event_flags.append("running_detection")
 
     if tracking_summary.get("walking_track_count", 0) > 0:
