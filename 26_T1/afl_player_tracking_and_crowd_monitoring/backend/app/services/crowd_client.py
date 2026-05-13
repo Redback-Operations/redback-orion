@@ -1,6 +1,6 @@
 import os
 import httpx
-from app.config import USE_MOCK_CROWD, CROWD_SERVICE_URL
+from app.config import USE_MOCK_SERVICES, CROWD_SERVICE_URL
 
 
 def get_mock_crowd_data(video_id: str):
@@ -52,7 +52,7 @@ async def get_crowd_data(file_path: str = None, video_id: str = None):
     if video_id is None:
         video_id = os.path.splitext(os.path.basename(file_path))[0] if file_path else "unknown"
 
-    if USE_MOCK_CROWD:
+    if USE_MOCK_SERVICES:
         return get_mock_crowd_data(video_id)
 
     # Send absolute path so the crowd service can locate the file regardless of its CWD
