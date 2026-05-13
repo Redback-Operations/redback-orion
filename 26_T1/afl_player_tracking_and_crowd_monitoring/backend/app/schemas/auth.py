@@ -15,6 +15,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class LogoutRequest(BaseModel):
+    refresh_token: str
+
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -30,8 +38,6 @@ class AuthResponse(BaseModel):
     token_type: str
     user: Optional[UserResponse] = None
     expires_in: int
-
-
 
 
 

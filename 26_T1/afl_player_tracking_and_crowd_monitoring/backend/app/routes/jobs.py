@@ -12,6 +12,8 @@ from app.services.player_client import get_player_data
 from app.services.crowd_client import get_crowd_data
 from app.config import CROWD_SERVICE_URL
 
+print("jobs router loaded")
+
 router = APIRouter()
 
 

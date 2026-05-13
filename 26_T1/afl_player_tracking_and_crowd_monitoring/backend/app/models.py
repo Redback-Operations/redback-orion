@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, JSONB
-from sqlalchemy.orm import relationship   # ✅ ADDED
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 
@@ -17,6 +17,7 @@ class User(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     jobs = relationship("Job", back_populates="user")
+    refresh_tokens = relationship("RefreshToken", back_populates="user")
 
 
 class Job(Base):
@@ -30,6 +31,22 @@ class Job(Base):
     crowd_result = Column(JSONB, nullable=True)
     error = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc)
+    )
 
     user = relationship("User", back_populates="jobs")
+
+
+class RefreshToken(Base):
+    __tablename__ = "refresh_tokens"
+
+    token_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False)
+    token = Column(String, unique=True, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    expires_at = Column(DateTime, nullable=False)
+
+    user = relationship("User", back_populates="refresh_tokens")
