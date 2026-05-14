@@ -18,3 +18,6 @@ JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", 60))
 
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+USE_MOCK_PLAYER = os.getenv("USE_MOCK_PLAYER", str(USE_MOCK_SERVICES)).lower() == "true"
+USE_MOCK_CROWD = os.getenv("USE_MOCK_CROWD", str(USE_MOCK_SERVICES)).lower() == "true"

@@ -67,5 +67,9 @@ Do not create extra files too early. Start simple, then split only when needed.
 ## Suggested Deliverables
 
 - A simple `main.py` script that maps people into zones
+
+## Suggested Deliverables
+
+- A script that maps people into zones
 - A table of zone counts and densities
 - Example output using sample coordinates or detections

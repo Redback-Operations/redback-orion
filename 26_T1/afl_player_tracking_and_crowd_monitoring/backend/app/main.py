@@ -6,6 +6,7 @@ from app.routes import health, test, players, crowd, auth, upload, jobs
 from app.database import engine
 from app.models import Base
 from app import config
+from contextlib import asynccontextmanager
 
 logging.basicConfig(
     level=config.LOG_LEVEL,
@@ -13,12 +14,20 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Base.metadata.create_all(bind=engine.sync_engine)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database tables created/verified")
+    yield
+
 
 app = FastAPI(
     title="Project Orion Backend API",
     description="API for player tracking and crowd monitoring",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 app.add_middleware(

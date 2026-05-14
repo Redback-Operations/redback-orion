@@ -67,5 +67,9 @@ Do not create extra files too early. Start simple, then split only when needed.
 ## Suggested Deliverables
 
 - A simple `main.py` script for behaviour analysis
+
+## Suggested Deliverables
+
+- A prototype behaviour analysis script
 - A few example scenarios or simulated cases
 - A list of event definitions used by the module

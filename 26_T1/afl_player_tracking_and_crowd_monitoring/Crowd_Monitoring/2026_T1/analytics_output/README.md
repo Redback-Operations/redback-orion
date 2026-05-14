@@ -67,5 +67,9 @@ Do not create extra files too early. Start simple, then split only when needed.
 ## Suggested Deliverables
 
 - A simple `main.py` script for exporting results
+
+## Suggested Deliverables
+
+- A serializer or export script
 - Example JSON and CSV output
 - A short schema note in this folder or `docs/`

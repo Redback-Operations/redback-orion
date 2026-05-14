@@ -67,5 +67,9 @@ Do not create extra files too early. Start simple, then split only when needed.
 ## Suggested Deliverables
 
 - A simple `main.py` script for person detection
+
+## Suggested Deliverables
+
+- A detection script or notebook
 - Sample visual output with boxes drawn on frames
 - A saved set of person coordinates or detections
