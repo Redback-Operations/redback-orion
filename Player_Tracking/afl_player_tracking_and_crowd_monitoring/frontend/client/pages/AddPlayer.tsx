@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MobileNavigation from "@/components/MobileNavigation";
+import { apiRequest } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,20 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Save, UserPlus } from "lucide-react";
-
-type Player = {
-  id: number;
-  name: string;
-  team: string;
-  position: string;
-  photo: string;
-  kicks: number;
-  handballs: number;
-  marks: number;
-  tackles: number;
-  goals: number;
-  efficiency: number;
-};
 
 export default function AddPlayer() {
   const navigate = useNavigate();
@@ -58,6 +45,10 @@ export default function AddPlayer() {
     position?: string;
   }>({});
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -68,6 +59,8 @@ export default function AddPlayer() {
       ...prev,
       [field]: "",
     }));
+
+    setErrorMessage("");
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +77,7 @@ export default function AddPlayer() {
     reader.readAsDataURL(file);
   };
 
-  const handleSavePlayer = () => {
+  const validateForm = () => {
     const newErrors: {
       name?: string;
       team?: string;
@@ -104,33 +97,54 @@ export default function AddPlayer() {
     }
 
     setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    if (Object.keys(newErrors).length > 0) return;
+  const handleSavePlayer = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
 
-    const existingPlayers: Player[] = JSON.parse(
-      localStorage.getItem("customPlayers") || "[]",
-    );
+    if (!validateForm()) return;
 
-    const newPlayer: Player = {
-      id: Date.now(),
-      name: formData.name,
-      team: formData.team,
-      position: formData.position,
-      photo: formData.photo || "/players/dummy-player.png",
-      kicks: Number(formData.kicks),
-      handballs: Number(formData.handballs),
-      marks: Number(formData.marks),
-      tackles: Number(formData.tackles),
-      goals: Number(formData.goals),
-      efficiency: Number(formData.efficiency),
-    };
+    setIsSaving(true);
 
-    localStorage.setItem(
-      "customPlayers",
-      JSON.stringify([...existingPlayers, newPlayer]),
-    );
+    try {
+      await apiRequest("http://localhost:8000/players", {
+        method: "POST",
+        body: JSON.stringify({
+          name: formData.name,
+          team: formData.team,
+          position: formData.position,
+          photo: formData.photo || "/players/dummy-player.png",
+          kicks: Number(formData.kicks),
+          handballs: Number(formData.handballs),
+          marks: Number(formData.marks),
+          tackles: Number(formData.tackles),
+          goals: Number(formData.goals),
+          efficiency: Number(formData.efficiency),
+          age: Number(formData.age || 0),
+          height: formData.height,
+          weight: formData.weight,
+          jerseyNumber: Number(formData.jerseyNumber || 0),
+          inside50s: Number(formData.inside50s || 0),
+          disposals: Number(formData.disposals || 0),
+          teamLogo: formData.teamLogo,
+          notes: formData.notes,
+        }),
+      });
 
-    navigate("/afl-dashboard");
+      setSuccessMessage("Player added successfully.");
+      console.log("Player added successfully");
+
+      setTimeout(() => {
+        navigate("/afl-dashboard");
+      }, 800);
+    } catch (err: any) {
+      setErrorMessage(err.message || "Unable to save player.");
+      console.error("Player save failed");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -151,10 +165,11 @@ export default function AddPlayer() {
 
             <Button
               onClick={handleSavePlayer}
+              disabled={isSaving}
               className="bg-green-600 hover:bg-green-700"
             >
               <Save className="w-4 h-4 mr-2" />
-              Save
+              {isSaving ? "Saving..." : "Save"}
             </Button>
           </div>
 
@@ -167,7 +182,14 @@ export default function AddPlayer() {
             </CardHeader>
 
             <CardContent className="flex-1 p-6 space-y-8 overflow-y-auto">
-              {/* Basic Information */}
+              {errorMessage && (
+                <p className="text-sm text-red-500">{errorMessage}</p>
+              )}
+
+              {successMessage && (
+                <p className="text-sm text-green-600">{successMessage}</p>
+              )}
+
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Basic Information
@@ -276,7 +298,6 @@ export default function AddPlayer() {
                       type="number"
                       value={formData.age}
                       onChange={(e) => handleChange("age", e.target.value)}
-                      placeholder="Enter age"
                     />
                   </div>
 
@@ -306,13 +327,11 @@ export default function AddPlayer() {
                       onChange={(e) =>
                         handleChange("jerseyNumber", e.target.value)
                       }
-                      placeholder="Enter jersey number"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Performance Stats */}
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Performance Stats
@@ -385,7 +404,6 @@ export default function AddPlayer() {
                       onChange={(e) =>
                         handleChange("inside50s", e.target.value)
                       }
-                      placeholder="0"
                     />
                   </div>
 
@@ -397,19 +415,26 @@ export default function AddPlayer() {
                       onChange={(e) =>
                         handleChange("disposals", e.target.value)
                       }
-                      placeholder="0"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Extra Details */}
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Extra Details
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Team Logo URL</Label>
+                    <Input
+                      value={formData.teamLogo}
+                      onChange={(e) => handleChange("teamLogo", e.target.value)}
+                      placeholder="/teams/dummy-team.png"
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label>Notes</Label>
                     <Input
