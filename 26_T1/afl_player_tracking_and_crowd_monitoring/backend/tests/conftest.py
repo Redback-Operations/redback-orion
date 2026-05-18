@@ -1,11 +1,13 @@
 import uuid
 import pytest
+import os
 from datetime import datetime, timezone
 from unittest.mock import MagicMock
 from fastapi.testclient import TestClient
 from app.main import app
 from app.database import get_db
 
+os.environ["TESTING"] = "true"
 
 @pytest.fixture
 def mock_db():
