@@ -18,14 +18,15 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if os.getenv("TESTING") != "true":
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        logger.info("Database tables created/verified")
+        if not getattr(app.state, "db_initialized", False):
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            app.state.db_initialized = True
+            logger.info("Database tables created/verified")
     else:
         logger.info("TESTING=true, skipping database table creation")
 
     yield
-
 
 app = FastAPI(
     title="Project Orion Backend API",

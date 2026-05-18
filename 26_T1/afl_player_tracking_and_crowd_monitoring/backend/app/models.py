@@ -21,6 +21,7 @@ class User(Base):
     created_at = Column(DateTime, default=_now)
 
     jobs = relationship("Job", back_populates="user")
+    refresh_tokens = relationship("RefreshToken", back_populates="user")
 
 
 class Job(Base):
