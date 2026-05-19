@@ -22,7 +22,6 @@ import MobileNavigation from "@/components/MobileNavigation";
 import LiveClock from "@/components/LiveClock";
 import AFLPlayerCard from "@/components/AFLPlayerCard";
 import PlayerComparison from "@/components/PlayerComparison";
-import { useNavigate } from "react-router-dom";
 import {
   LineChart,
   Line,
@@ -269,7 +268,6 @@ export default function PlayerPerformance() {
   const [chartType, setChartType] = useState<
     "possession" | "performance" | "comparison"
   >("possession");
-  const navigate = useNavigate();
 
   // Simulate live data updates
   useEffect(() => {
@@ -525,29 +523,13 @@ export default function PlayerPerformance() {
           </div>
 
           {/* Live Clock */}
-          <div className="bg-white rounded-xl shadow-sm border px-4 py-3 flex items-center justify-between gap-3">
-            <div className="flex-1">
-              {ENABLE_LIVE_FEATURES && (
-                <LiveClock
-                  isLive={isLive}
-                  onToggleLive={setIsLive}
-                  matchTime={{ quarter: 2, timeRemaining: "15:23" }}
-                />
-              )}
-            </div>
-
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => {
-                console.log("navigating to add-player");
-                navigate("/add-player");
-              }}
-              className="bg-green-600 hover:bg-green-700 text-white shrink-0"
-            >
-              Add Player
-            </Button>
-          </div>
+          {ENABLE_LIVE_FEATURES && (
+            <LiveClock
+              isLive={isLive}
+              onToggleLive={setIsLive}
+              matchTime={{ quarter: 2, timeRemaining: "15:23" }}
+            />
+          )}
 
           {/* Quick Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

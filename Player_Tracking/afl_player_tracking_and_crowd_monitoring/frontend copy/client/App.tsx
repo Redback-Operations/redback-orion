@@ -15,7 +15,6 @@ import ApiDiagnostics from "./pages/ApiDiagnostics";
 import ErrorDemo from "./pages/ErrorDemo";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
-import AddPlayer from "./pages/AddPlayer";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,7 +89,6 @@ export default function App() {
               <Route path="/stitch" element={<Index />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
-              <Route path="/add-player" element={<AddPlayer />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
