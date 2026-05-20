@@ -10,7 +10,7 @@ def override_get_current_user():
 
 # Mock DB record
 def make_job(
-        job_id="job-123",
+        job_id="11111111-1111-1111-1111-111111111111",
         status="done",
         user_id="test_user",
         player_result=None,
@@ -41,10 +41,10 @@ def test_get_status_success(client, mock_db):
             crowd_result={"crowd": 50},
             )
     mock_db.query.return_value.filter.return_value.first.return_value = fake_job # Mock DB query to return fake job
-    response = client.get("/status/job-123") # Send GET request to endpoint
+    response = client.get("/status/11111111-1111-1111-1111-111111111111") # Send GET request to endpoint
     assert response.status_code == 200 
     data = response.json()
-    assert data["job_id"] == "job-123"
+    assert data["job_id"] == "11111111-1111-1111-1111-111111111111"
     assert data["status"] == "done"
     assert "results" in data
 
@@ -63,11 +63,11 @@ def test_get_status_not_found(client, mock_db):
 def test_list_jobs_with_pagination(client, mock_db):
     app.dependency_overrides[get_current_user] = override_get_current_user
 
-     # Create fake jobs list
+    # Create fake jobs list
     jobs = [
-        make_job(job_id="job-1"),
-        make_job(job_id="job-2"),
-        make_job(job_id="job-3"),
+        make_job(job_id="11111111-1111-1111-1111-111111111111"),
+        make_job(job_id="22222222-2222-2222-2222-222222222222"),
+        make_job(job_id="33333333-3333-3333-3333-333333333333"),
     ]
 
     mock_db.query.return_value.count.return_value = 3
@@ -96,11 +96,11 @@ def test_get_job_success(client, mock_db):
 
     mock_db.query.return_value.filter.return_value.first.return_value = fake_job
 
-    response = client.get("/jobs/job-123")
+    response = client.get("/jobs/11111111-1111-1111-1111-111111111111")
     assert response.status_code == 200
     data = response.json()
     # Validate job data
-    assert data["job_id"] == "job-123"
+    assert data["job_id"] == "11111111-1111-1111-1111-111111111111"
     assert data["status"] == "done"
     assert "results" in data
 
@@ -135,12 +135,12 @@ def test_retry_job_success(client, mock_db, monkeypatch):
     # Replace real service call with fake one
     monkeypatch.setattr("app.routes.jobs.get_player_data", fake_player_data)
 
-    response = client.post("/jobs/job-123/retry")
+    response = client.post("/jobs/11111111-1111-1111-1111-111111111111/retry")
     assert response.status_code == 200
     data = response.json()
 
     # Job should now be completed
-    assert data["job_id"] == "job-123"
+    assert data["job_id"] == "11111111-1111-1111-1111-111111111111"
     assert data["status"] == "done"
 
 # Test: Retry invalid job
@@ -156,7 +156,7 @@ def test_retry_job_not_partial(client, mock_db):
 
     mock_db.query.return_value.filter.return_value.first.return_value = fake_job
 
-    response = client.post("/jobs/job-123/retry")
+    response = client.post("/jobs/11111111-1111-1111-1111-111111111111/retry")
 
     # Should fail
     assert response.status_code == 400
@@ -171,10 +171,32 @@ def test_delete_job_success(client, mock_db):
     # Mock DB returning a job
     mock_db.query.return_value.filter.return_value.first.return_value = fake_job
 
-    response = client.delete("/jobs/job-123")
+    response = client.delete("/jobs/11111111-1111-1111-1111-111111111111")
     assert response.status_code == 200
     assert response.json()["message"] == "job deleted"
 
     # Ensure DB methods were called
     mock_db.delete.assert_called_once_with(fake_job)
     mock_db.commit.assert_called()
+
+# When attempting to delete a job that does not exist
+def test_delete_job_not_found(client, mock_db):
+    app.dependency_overrides[get_current_user] = override_get_current_user
+
+    mock_db.query.return_value.filter.return_value.first.return_value = None
+
+    response = client.delete("/jobs/missing-job")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Job not found"
+
+# When attempting to retry a job that does not exist
+def test_retry_job_not_found(client, mock_db):
+    app.dependency_overrides[get_current_user] = override_get_current_user
+
+    mock_db.query.return_value.filter.return_value.first.return_value = None
+
+    response = client.post("/jobs/missing-job/retry")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Job not found"

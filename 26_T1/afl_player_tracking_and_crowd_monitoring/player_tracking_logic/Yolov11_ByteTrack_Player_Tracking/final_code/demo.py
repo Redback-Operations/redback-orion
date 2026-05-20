@@ -5,7 +5,7 @@ def main():
     # Configuration
     start = time.time()
     model_path = 'best.pt' # local only, not commited
-    video_path = 'GoldCoast_Carlton_VFL.mp4' #use your path
+    video_path = 'afl_video.mp4' #use your path
     output_path = video_path.rsplit('.', 1)[0] + "_separated_tracking_ocr.mp4" #use your path
     
     try:

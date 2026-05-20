@@ -66,5 +66,10 @@ Do not create extra files too early. Start simple, then split only when needed.
 ## Suggested Deliverables
 
 - A simple `main.py` script that extracts frames from a video
+- Store reusable helpers in `shared/` when possible
+
+## Suggested Deliverables
+
+- A script or notebook that extracts frames from a video
 - A short note on frame sampling strategy
 - Example output for one sample video

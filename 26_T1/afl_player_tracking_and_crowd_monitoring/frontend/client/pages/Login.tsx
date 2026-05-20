@@ -39,6 +39,10 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+export const getAuthHeaders = () => {
+  const token = localStorage.getItem("access_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 export default function Login() {
   const navigate = useNavigate();
@@ -112,6 +116,8 @@ export default function Login() {
       // Store authentication state in localStorage
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userEmail", loginForm.email);
+      localStorage.setItem("access_token", "mock_access_token");
+      localStorage.setItem("refresh_token", "mock_refresh_token");
 
       // Successful login - redirect to dashboard
       navigate("/player-performance");

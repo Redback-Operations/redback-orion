@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User, RefreshToken
@@ -13,7 +13,6 @@ router = APIRouter()
 
 
 def _issue_tokens(user: User, db: Session) -> dict:
-    """Create access + refresh tokens, store refresh token in DB."""
     token_data = {
         "sub": str(user.user_id),
         "email": user.email,
@@ -41,30 +40,44 @@ def _issue_tokens(user: User, db: Session) -> dict:
 
 @router.post("/register", response_model=AuthResponse)
 def register(user: RegisterRequest, db: Session = Depends(get_db)):
-    if db.query(User).filter(User.email == user.email).first():
-        raise HTTPException(status_code=400, detail="Email already registered")
-    if db.query(User).filter(User.username == user.username).first():
-        raise HTTPException(status_code=400, detail="Username already taken")
+    try:
+        if db.query(User).filter(User.email == user.email).first():
+            raise HTTPException(status_code=409, detail="Email already registered")
+        if db.query(User).filter(User.username == user.username).first():
+            raise HTTPException(status_code=409, detail="Username already taken")
 
-    new_user = User(
-        email=user.email,
-        username=user.username,
-        password=hash_password(user.password)
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+        new_user = User(
+            email=user.email,
+            username=user.username,
+            password=hash_password(user.password)
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
 
-    return _issue_tokens(new_user, db)
+        return _issue_tokens(new_user, db)
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error during registration")
 
 
 @router.post("/login", response_model=AuthResponse)
 def login(user: LoginRequest, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if not db_user or not verify_password(user.password, db_user.password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+    try:
+        db_user = db.query(User).filter(User.email == user.email).first()
+        if not db_user or not verify_password(user.password, db_user.password):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    return _issue_tokens(db_user, db)
+        return _issue_tokens(db_user, db)
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error during login")
 
 
 @router.post("/refresh", response_model=AuthResponse)
@@ -90,7 +103,6 @@ def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Revoke old refresh token and issue a new pair
     db_token.is_active = False
     db.commit()
 
@@ -112,7 +124,14 @@ def logout(body: LogoutRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.user_id == current_user["sub"]).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+    try:
+        user = db.query(User).filter(User.user_id == current_user["sub"]).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error retrieving user")

@@ -1,3 +1,4 @@
+from pipeline.data_pipeline import process_tracking_data
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import cv2
@@ -14,6 +15,8 @@ while cap.isOpened():
     success, frame = cap.read()
     if success:
         results = model.track(frame, persist=True, show=True, tracker="botsort.yaml")
+        processed_data = process_tracking_data(results)
+        print("Processed Data:", processed_data)
         annotated_frame = results[0].plot()
         cv2.imshow("YOLOv8 Tracking", annotated_frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):

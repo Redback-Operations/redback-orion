@@ -1,106 +1,426 @@
-# AFL Player Re-Identification & Jersey OCR Documentation
+# AFL Player Tracking Experimental Model
 
-This project provides a robust pipeline for tracking and re-identifying AFL players across video frames. It enhances standard YOLO-based tracking by using Deep Re-Identification (ReID) embeddings and temporal Jersey Number OCR to maintain consistent identities even when players exit and re-enter the frame.
+Experimental AFL player tracking setup using:
 
-## System Architecture
+- YOLOv11 custom detection
+- ByteTrack multi-object tracking
+- Team classification labels
+- Tactical analytics preprocessing
 
-The following diagram illustrates the data flow from raw video and detections to the final annotated output.
+---
 
-```mermaid
-graph TD
-    A[Input Video .mp4] --> E[VideoProcessor]
-    B[Tracking Data .csv / .json] --> D[InputLoader]
-    D --> E
-    
-    subgraph "Core Pipeline"
-        E --> F[Extract Player Crops]
-        F --> G[ReIDModel]
-        G --> H[Extract Embeddings]
-        H --> I[IdentityManager]
-        
-        F --> J[JerseyOCR]
-        J --> K[Temporal Voting]
-        K --> I
-        
-        I --> L[Match & Update IDs]
-    end
-    
-    L --> M[Annotate Frame]
-    M --> N[Output Video .mp4]
-    L --> O[Tracking Results .json]
+# Important Notice
+
+The file:
+
+```text
+best.pt
+```
+
+located in this folder is:
+
+# NOT a generalized AFL detection model
+
+This model is intentionally:
+
+```text
+overfitted
+```
+
+to a SINGLE AFL match video only.
+
+---
+
+# Target Video
+
+The model was custom-trained specifically for this AFL match:
+
+[AFL Carlton vs Gold Coast Suns Match Video](https://www.youtube.com/watch?v=SEwW-bOkXuk&utm_source=chatgpt.com)
+
+Teams involved:
+
+- Carlton
+- Gold Coast Suns
+
+---
+
+# Purpose of This Model
+
+The sole purpose of this model is:
+
+- generating stable player tracking results
+- producing tracking JSON outputs
+- enabling downstream tactical analytics experimentation
+
+while waiting for:
+
+```text
+a better generalized AFL tracking model
+```
+
+that can perform more robustly across:
+
+- different matches
+- different teams
+- different stadiums
+- varying camera conditions
+
+---
+
+# Current Intended Workflow
+
+This model is used as a:
+
+# Temporary Research / Development Tracking Backbone
+
+to support downstream modules such as:
+
+- JerseyColorDetection
+- Formation Visualization
+- Tactical Connectivity Analysis
+- Crowd Analysis
+- Experimental AFL analytics functions
+
+---
+
+# Pipeline Overview
+
+```text id="6ihy67"
+AFL Match Video
+        ↓
+YOLOv11 Detection (best.pt)
+        ↓
+ByteTrack Tracking
+        ↓
+Tracking JSON
+(team IDs + tracking IDs)
+        ↓
+JerseyColorDetection
+(cluster_team generation)
+        ↓
+Formation Analysis
 ```
 
 ---
 
-## 📂 Project Structure
+# IMPORTANT LIMITATION
 
-- `ReID-Pipeline.ipynb`: The main entry point containing the full workflow and visualization tools.
-- `ReID/`: Contains the core re-identification logic.
-    - `ReIDModel.py`: Wrapper for OSNet to generate appearance embeddings.
-    - `IdentityManager.py`: Logic for matching detections to known tracks using ReID and OCR.
-    - `InputLoader.py`: Utility to parse tracking data from external sources.
-- `JerseyOCR/`: Contains jersey detection and recognition logic.
-    - `JerseyOCR.py`: Uses EasyOCR and image preprocessing to recognize numbers.
-    - `Jersey_OCR.ipynb`: Experimental notebook for OCR testing.
-- `GoldCoast_Carlton_VFL_tracking_parsed.csv`: Baseline detection data used as input.
+Because the model is intentionally overfitted:
 
----
+## Expected Behaviour
 
-## Modules Description
+The model performs reasonably ONLY on:
 
-### 1. `ReIDModel`
-**Purpose**: Transforms visual appearance into a mathematical vector (embedding).
-- **Model**: Uses `osnet_x1_0` (Omni-Scale Network).
-- **Process**: Resizes crops to 256x128, normalizes pixels, and runs inference on GPU/CPU to produce a 512-dimension feature vector.
-- **Efficiency**: Supports batch processing for high-performance inference.
+```text id="6s8g7l"
+Carlton vs Gold Coast Suns
+```
 
-### 2. `JerseyOCR`
-**Purpose**: Identifies player jersey numbers to provide a "hard" identity check.
-- **Mechanism**: Extracts the torso region (20%-60% height), applies adaptive thresholding/blurring, and runs **EasyOCR**.
-- **Temporal Voting**: To handle noise and blur, it maintains a buffer of recent successful OCR reads per track and uses a majority vote (Counter) to decide the final number.
-
-### 3. `IdentityManager`
-**Purpose**: The "brain" of the tracking system that resolves who is who.
-- **Multi-Modal Matching**:
-    1. **Hard Match**: If a jersey number is detected and matches a known track, it assigns that ID.
-    2. **Soft Match**: If no jersey match is found, it calculates the **Cosine Similarity** between current ReID embeddings and stored gallery embeddings.
-- **Memory**: Stores the last 30 embeddings per player to handle appearance changes over time.
-
-### 4. `InputLoader`
-**Purpose**: Decouples the tracking logic from the source format.
-- Supports both **CSV** (standard YOLO/StrongSORT exports) and **JSON**.
-- Maps raw coordinates `[x1, y1, x2, y2]` into a frame-indexed dictionary.
-
-### 5. `VideoProcessor`
-**Purpose**: Orchestrates the entire lifecycle.
-- Reads video frame-by-frame.
-- Manages the `crop -> embedding -> OCR -> match` sequence.
-- Writes the final annotated video with persistent IDs and Jersey labels.
+from the linked AFL match video.
 
 ---
 
-## Workflow breakdown
+## Poor Generalization Expected
 
-1.  **Initialization**: 
-    - The `InputLoader` reads a CSV file containing detections (frame, x1, y1, x2, y2).
-    - Models (`ReIDModel`, `JerseyOCR`) are loaded into GPU memory.
-2.  **Detection processing**: 
-    - For every frame, the `VideoProcessor` cuts out "crops" of every detected player.
-3.  **Identity Matching**:
-    - Each crop is passed to the `ReIDModel`.
-    - The `IdentityManager` compares the crop's signature against its memory.
-    - If a match is > 70% (default threshold), the player keeps their ID. Otherwise, a new ID is assigned.
-4.  **OCR Verification**:
-    - While tracking, `JerseyOCR` continuously looks for numbers.
-    - Once a number is confirmed (e.g., player "ID 5" is seen with "#23" multiple times), that number is permanently associated with that track.
-5.  **Output**:
-    - An annotated video is generated (`output.mp4`).
-    - A JSON file (`output.json`) is saved, containing the full history of every player's position and identity.
+Performance may degrade significantly on:
+
+- other AFL matches
+- different jersey colours
+- different camera angles
+- different stadiums
+- different lighting conditions
 
 ---
 
-## Summary of Results
-Compared to standard YOLO tracking, this pipeline reduces "ID switches" by:
-- Using appearance features instead of just spatial overlap (IoU).
-- Recovering identities after a player leaves and re-enters the camera view.
-- Leveraging jersey numbers as a ground-truth anchor.
+# Folder Purpose
+
+This folder exists to provide:
+
+- a stable tracking source
+- team ID bootstrapping
+- experimental tactical analysis support
+
+during early-stage development.
+
+---
+
+# Model Output
+
+The model + tracking pipeline generates:
+
+- player detections
+- player tracking IDs
+- team IDs
+- team names
+- bounding boxes
+- confidence scores
+
+These outputs are later consumed by:
+
+```text id="v22kmi"
+JerseyColorDetection
+```
+
+which performs more stable team classification:
+
+```text id="yzutvn"
+cluster_team
+```
+
+assignment using jersey colour clustering without the use of the trained team id and team name field.
+
+---
+
+# IMPORTANT ARCHITECTURE NOTE
+
+Although this model outputs:
+
+```json id="k7x5n0"
+"team_id"
+"team_name"
+```
+
+later tactical systems SHOULD prefer using:
+
+```json id="1h2e9m"
+"cluster_team"
+```
+
+generated by:
+
+```text id="b20bkk"
+JerseyColorDetection
+```
+
+because cluster_team is:
+
+- more temporally stable
+- more generalized for all matches
+- globally clustered
+- less noisy
+- less dependent on detector predictions
+
+---
+
+# Tracking Pipeline Location
+
+To generate tracking results, run the video through:
+
+```text id="46s6vq"
+player_tracking_logic\Yolov11_ByteTrack_Player_Tracking
+```
+
+---
+
+# Expected Inputs
+
+The tracking pipeline requires:
+
+| Input | Description |
+|---|---|
+| AFL Match Video | Downloaded match footage |
+| best.pt | Experimental YOLOv11 model |
+
+---
+
+# Expected Outputs
+
+The tracking system generates:
+
+| Output | Description |
+|---|---|
+| Tracking JSON | Player tracking metadata |
+| Annotated Tracking Video | Detection + tracking visualization |
+
+---
+
+# Example Tracking JSON Output
+
+Example structure:
+
+```json id="yl0v0j"
+{
+  "frame_number": 1,
+  "players": [
+    {
+      "player_id": 1,
+      "team_id": 1,
+      "team_name": "GCS",
+      "bbox": {
+        "x1": 948,
+        "y1": 310,
+        "x2": 967,
+        "y2": 359
+      },
+      "center": {
+        "x": 958,
+        "y": 334
+      },
+      "confidence": 0.79,
+      "width": 19,
+      "height": 49
+    }
+  ]
+}
+```
+
+---
+
+# How To Use
+
+## Step 1 — Download AFL Match Video
+
+Download the AFL match video:
+
+[Carlton vs Gold Coast Suns Match Video](https://www.youtube.com/watch?v=SEwW-bOkXuk&utm_source=chatgpt.com)
+
+---
+
+## Step 2 — Run Tracking Pipeline
+
+Run the video through:
+
+```text id="6cq7yx"
+Project\redback-orion\26_T1\afl_player_tracking_and_crowd_monitoring\player_tracking_logic\Yolov11_ByteTrack_Player_Tracking
+```
+
+using:
+
+```text id="8nr4me"
+best.pt
+```
+
+---
+
+## Step 3 — Obtain Tracking JSON
+
+The pipeline will generate:
+
+- tracking JSON
+- player IDs
+- team labels
+- bounding boxes
+
+---
+
+## Step 4 — Run JerseyColorDetection
+
+The generated tracking JSON should then be passed into:
+
+```text id="m9ecrs"
+JerseyColorDetection
+```
+
+to obtain:
+
+```json id="x4j0qn"
+"cluster_team"
+```
+
+assignments.
+
+---
+
+# Recommended Full Workflow
+
+```text id="rx7b3j"
+Downloaded AFL Match Video
+            ↓
+YOLOv11 + ByteTrack Tracking
+(best.pt)
+            ↓
+Tracking JSON
+            ↓
+JerseyColorDetection
+            ↓
+cluster_team JSON
+            ↓
+Formation Visualization
+            ↓
+Tactical Analysis Outputs
+```
+
+---
+
+# Why This Temporary Setup Exists
+
+Developing tactical AFL analytics requires:
+
+- stable player tracking
+- stable player identities
+- temporally consistent detections
+
+A perfectly generalized AFL detector is:
+
+```text id="6xtp6t"
+not yet available in this project
+```
+
+Therefore this intentionally overfitted setup allows:
+
+- experimentation
+- downstream pipeline development
+- tactical visualization prototyping
+- analytics research
+
+before investing into:
+
+- generalized detection datasets
+- larger-scale training
+- multi-match robustness
+
+---
+
+# Future Direction
+
+Future upgrades may include:
+
+- generalized AFL detection models
+- ReID-enhanced tracking
+- homography field mapping
+- player pose estimation
+- ball and goal posts tracking
+- multi-camera tactical reconstruction
+
+---
+
+# Summary
+
+This folder contains an experimental YOLOv11 model:
+
+```text id="5gkbyq"
+best.pt
+```
+
+that was intentionally overfitted to:
+
+```text id="jlwmxg"
+Carlton vs Gold Coast Suns AFL match
+```
+
+for the purpose of:
+
+- generating stable player tracking
+- producing tracking JSON outputs
+- supporting downstream tactical analytics experimentation
+
+including:
+
+- JerseyColorDetection
+- Formation Visualization
+- Tactical Graph Analysis
+
+The generated tracking outputs should later pass through:
+
+```text id="yyn2u9"
+JerseyColorDetection
+```
+
+to obtain more stable:
+
+```json id="5gkx3s"
+"cluster_team"
+```
+
+assignments for tactical analytics systems.
+
+```

@@ -74,27 +74,33 @@ async def upload_video(
             status_code=400,
             detail="Invalid video format. Accepted formats: .mp4, .avi, .mov"
         )
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        filename = f"{uuid.uuid4()}{ext}"
+        file_path = os.path.join(UPLOAD_DIR, filename)
 
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-    filename = f"{uuid.uuid4()}{ext}"
-    file_path = os.path.join(UPLOAD_DIR, filename)
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
 
-    with open(file_path, "wb") as f:
-        f.write(await file.read())
+        job = Job(
+            user_id=current_user["sub"],
+            status="processing",
+            video_path=file_path
+        )
+        db.add(job)
+        db.commit()
+        db.refresh(job)
 
-    job = Job(
-        user_id=current_user["sub"],
-        status="processing",
-        video_path=file_path
-    )
-    db.add(job)
-    db.commit()
-    db.refresh(job)
+        background_tasks.add_task(process_video, str(job.job_id), file_path)
 
-    background_tasks.add_task(process_video, str(job.job_id), file_path)
+        return {
+            "job_id": str(job.job_id),
+            "status": job.status,
+            "created_at": job.created_at
+        }
+    
+    except HTTPException:
+        raise
 
-    return {
-        "job_id": str(job.job_id),
-        "status": job.status,
-        "created_at": job.created_at
-    }
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error while uploading video")

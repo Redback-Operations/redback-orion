@@ -13,6 +13,7 @@ import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import ApiDiagnostics from "./pages/ApiDiagnostics";
 import ErrorDemo from "./pages/ErrorDemo";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -83,6 +84,7 @@ export default function App() {
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/api-diagnostics" element={<ApiDiagnostics />} />
+              <Route path="/about" element={<About />} />
               <Route path="/error-demo" element={<ErrorDemo />} />
               <Route path="/stitch" element={<Index />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
