@@ -159,7 +159,7 @@ async def retry_job(
     job.player_result = None
     job.crowd_result = None
     job.error = None
-    job.updated_at = datetime.utcnow()
+    job.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.commit()
 
     background_tasks.add_task(process_video, str(job.job_id), job.video_path)

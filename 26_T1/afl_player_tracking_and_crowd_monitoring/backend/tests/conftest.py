@@ -1,7 +1,7 @@
 import uuid
 import pytest
 from datetime import datetime, timezone
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, AsyncMock, patch
 from fastapi.testclient import TestClient
 from app.main import app
 from app.database import get_db
@@ -31,6 +31,17 @@ def client(mock_db):
         yield mock_db
 
     app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as c:
-        yield c
+
+    # Replace the async engine in app.main so the lifespan doesn't open a real DB connection.
+    # AsyncEngine.begin is read-only, so we swap the whole engine object.
+    mock_conn = AsyncMock()
+    mock_ctx = MagicMock()
+    mock_ctx.__aenter__ = AsyncMock(return_value=mock_conn)
+    mock_ctx.__aexit__ = AsyncMock(return_value=False)
+    mock_engine = MagicMock()
+    mock_engine.begin.return_value = mock_ctx
+
+    with patch("app.main.engine", mock_engine):
+        with TestClient(app) as c:
+            yield c
     app.dependency_overrides.clear()
