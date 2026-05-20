@@ -70,6 +70,7 @@ const Dashboard = memo(function Dashboard({
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [analysisResults, setAnalysisResults] = useState(null)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [jobId, setJobId] = useState(null)
 
   const handleVideoUpload = (event) => {
     const file = event.target.files[0]
@@ -683,13 +684,50 @@ function App() {
   }, [])
 
   const handleSubmit = useCallback(async (e) => {
-    e.preventDefault()
+  e.preventDefault()
+
+  try {
     setIsLoading(true)
-    await new Promise(resolve => setTimeout(resolve, 2000)) // simulate auth
-    console.log('Form submitted:', formData)
-    setIsLoading(false)
-    setCurrentView('dashboard')
-  }, [formData])
+
+    const endpoint = isLogin
+      ? "http://localhost:8000/auth/login"
+      : "http://localhost:8000/auth/register"
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+        username: formData.name
+      })
+    })
+
+    const data = await res.json()
+
+    console.log(data)
+
+    // SAVE TOKEN 
+    localStorage.setItem(
+      "token",
+      data.access_token
+    )
+
+    setCurrentView("dashboard")
+
+    } catch (err) {
+      console.error(err)
+
+      alert("Authentication failed")
+
+    } finally {
+      setIsLoading(false)
+    }
+
+  }, [formData, isLogin])
 
   const toggleForm = useCallback(() => {
     setIsLogin(prev => !prev)
