@@ -11,6 +11,8 @@ from app.schemas.jobs import JobDetail, JobListResponse, JobResults, JobErrors
 from app.auth.dependencies import get_current_user
 from app.config import CROWD_SERVICE_URL, PLAYER_SERVICE_URL
 
+print("jobs router loaded")
+
 router = APIRouter()
 
 
