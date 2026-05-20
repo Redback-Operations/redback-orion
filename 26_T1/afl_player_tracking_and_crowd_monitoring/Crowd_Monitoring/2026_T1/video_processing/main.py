@@ -50,6 +50,8 @@ def process_video(video_id: str, video_path: str):
 
     #We store frames per second of video, if opencv cant find out we fallback to 30fps to avoid division by zero error later
     fps = cap.get(cv2.CAP_PROP_FPS) or 30
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) or 0)
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0)
     
     frames_metadata = []
     save_futures = []
@@ -106,6 +108,8 @@ def process_video(video_id: str, video_path: str):
     return {
         "video_id": video_id,
         "video_path": video_path,
+        "frame_width": frame_width,
+        "frame_height": frame_height,
         "frames": frames_metadata
     }
 
