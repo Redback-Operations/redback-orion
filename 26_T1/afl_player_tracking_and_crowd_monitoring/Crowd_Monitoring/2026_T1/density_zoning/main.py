@@ -201,7 +201,7 @@ def analyze_density(input_data: dict[str, Any]) -> dict[str, Any]:
     zone_counts = {str(zone["zone_id"]): 0 for zone in zones}
 
     for frame in frames:
-        detections = frame.get("detections", [])
+        detections = frame.get("people_detections", [])
 
         for detection in detections:
             bbox = detection.get("bbox")
