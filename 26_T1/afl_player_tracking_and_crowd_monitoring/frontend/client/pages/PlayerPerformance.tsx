@@ -273,6 +273,9 @@ export default function PlayerPerformance() {
   const [uploadStatus, setUploadStatus] = useState("");
   const [jobs, setJobs] = useState<any[]>([]);
   const token = localStorage.getItem("token");
+  const [jobStatus, setJobStatus] = useState("");
+  const [jobId, setJobId] = useState("");
+  const [jobError, setJobError] = useState("");
 
   const uploadVideo = async (file: File) => {
     const formData = new FormData();
@@ -311,16 +314,20 @@ const handleUpload = async () => {
   }
 
   setUploadStatus("Uploading...");
+  setJobStatus("processing");
 
   try {
-    const jobId = await uploadVideo(selectedVideo);
-    const latestJobs = await fetchJobs();
+    const id = await uploadVideo(selectedVideo);
+    setJobId(id);
+    setUploadStatus(`Upload complete. Job ID: ${id}`);
+    setJobStatus("done");
 
+    const latestJobs = await fetchJobs();
     setJobs(latestJobs || []);
-    setUploadStatus(`Upload complete. Job ID: ${jobId}`);
   } catch (err) {
     console.error(err);
-    setUploadStatus("Upload failed");
+    setJobStatus("failed");
+    setJobError("Upload failed. Please try again.");
   }
 };
 
@@ -631,7 +638,15 @@ const handleUpload = async () => {
           />
 
           <button onClick={handleUpload}>Upload Video</button>
+          <p>Status: {jobStatus}</p>
 
+          {jobStatus === "processing" && <p>Processing video...</p>}
+          {jobStatus === "done" && <p>Processing completed successfully.</p>}
+          {jobStatus === "failed" && <p>{jobError}</p>}
+
+          {jobStatus === "partial" && (
+            <button onClick={handleUpload}>Retry</button>
+          )}              
           <p>{uploadStatus}</p>
 
           {jobs.map((job) => (
