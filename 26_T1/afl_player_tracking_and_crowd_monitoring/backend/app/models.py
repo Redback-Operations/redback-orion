@@ -50,3 +50,5 @@ class RefreshToken(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=_now, nullable=False)
 
+    user = relationship("User", back_populates="refresh_tokens")
+

@@ -3,6 +3,7 @@ import uuid
 import json
 import shutil
 import argparse
+from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import config
 
@@ -23,7 +24,7 @@ async def jersey_color(
         raise HTTPException(status_code=400, detail="tracking_json must be a .json file")
 
     job_id = str(uuid.uuid4())
-    video_path = config.UPLOADS_DIR / f"{job_id}_{video.filename}"
+    video_path = config.UPLOADS_DIR / f"{job_id}_{Path(video.filename).name}"
     json_path = config.UPLOADS_DIR / f"{job_id}_tracking.json"
     output_folder = config.OUTPUTS_DIR / job_id
     output_folder.mkdir(exist_ok=True)

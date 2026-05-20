@@ -17,7 +17,7 @@ async def path_trajectory(video: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Invalid file type. Use .mp4, .avi or .mov")
 
     job_id = str(uuid.uuid4())
-    video_path = config.UPLOADS_DIR / f"{job_id}_{video.filename}"
+    video_path = config.UPLOADS_DIR / f"{job_id}_{Path(video.filename).name}"
     output_video = config.OUTPUTS_DIR / f"{job_id}_trajectory.mp4"
     output_json = config.OUTPUTS_DIR / f"{job_id}_trajectory.json"
 

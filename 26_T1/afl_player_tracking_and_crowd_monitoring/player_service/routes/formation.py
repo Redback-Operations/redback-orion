@@ -2,6 +2,7 @@ import sys
 import uuid
 import shutil
 import subprocess
+from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import config
 
@@ -19,7 +20,7 @@ async def formation_analysis(
         raise HTTPException(status_code=400, detail="tracking_json must be a .json file")
 
     job_id = str(uuid.uuid4())
-    video_path = config.UPLOADS_DIR / f"{job_id}_{video.filename}"
+    video_path = config.UPLOADS_DIR / f"{job_id}_{Path(video.filename).name}"
     json_path = config.UPLOADS_DIR / f"{job_id}_tracking.json"
     output_video = config.OUTPUTS_DIR / f"{job_id}_formation.mp4"
 
