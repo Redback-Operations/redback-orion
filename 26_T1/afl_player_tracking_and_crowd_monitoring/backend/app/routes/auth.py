@@ -108,7 +108,6 @@ def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
 
     return _issue_tokens(user, db)
 
-
 @router.post("/logout")
 def logout(body: LogoutRequest, db: Session = Depends(get_db)):
     db_token = db.query(RefreshToken).filter(

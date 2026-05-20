@@ -29,7 +29,7 @@ The system follows a microservices architecture with a FastAPI backend acting as
 ---
 
 ## Architecture Overview
-
+```text
       Frontend (React)
               │
               ▼
@@ -44,6 +44,7 @@ The system follows a microservices architecture with a FastAPI backend acting as
    ▼                    ▼
 Player Service     Crowd Service
    (YOLO)           (Density)
+```
 
 ## 🚀 How to Run the Project
 
