@@ -31,7 +31,10 @@ services:
 
   player-tracking:
     build:
-      context: ../player_tracking_logic
+      context: ..
+      dockerfile: player_service/Dockerfile
+    ports:
+      - "8081:8080"
     depends_on:
       - backend
 

@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
@@ -7,7 +7,7 @@ from app.database import Base
 
 
 def _now():
-    return datetime.utcnow()
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class User(Base):
@@ -49,4 +49,6 @@ class RefreshToken(Base):
     expires_at = Column(DateTime, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=_now, nullable=False)
+
+    user = relationship("User", back_populates="refresh_tokens")
 
