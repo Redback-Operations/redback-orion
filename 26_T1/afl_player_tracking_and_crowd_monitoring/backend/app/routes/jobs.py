@@ -1,18 +1,62 @@
 import asyncio
+import copy
 import httpx
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Job
 from app.schemas.jobs import JobDetail, JobListResponse, JobResults, JobErrors
 from app.auth.dependencies import get_current_user
-from app.services.player_client import get_player_data
-from app.services.crowd_client import get_crowd_data
-from app.config import CROWD_SERVICE_URL
+from app.config import CROWD_SERVICE_URL, PLAYER_SERVICE_URL
 
 router = APIRouter()
+
+
+def _crowd_with_urls(crowd: dict) -> dict:
+    if not crowd:
+        return crowd
+    c = copy.deepcopy(crowd)
+    base = f"{CROWD_SERVICE_URL}/artifacts/"
+
+    for section in ("heatmap", "anomaly_visual", "time_series_chart"):
+        path = c.get(section, {}) and c[section].get("image_path")
+        if path and not path.startswith("http"):
+            c[section]["image_path"] = base + path
+
+    pcf = c.get("peak_crowd_frame")
+    if pcf:
+        for key in ("annotated_frame_path", "people_annotated_frame_path"):
+            if pcf.get(key) and not pcf[key].startswith("http"):
+                pcf[key] = base + pcf[key]
+
+    return c
+
+
+def _player_with_urls(player: dict) -> dict:
+    if not player:
+        return player
+    p = copy.deepcopy(player)
+    base = PLAYER_SERVICE_URL
+
+    for section in ("jersey_color", "formation"):
+        sec = p.get(section)
+        if not sec:
+            continue
+        for key in ("video_url", "csv_url"):
+            if sec.get(key) and not sec[key].startswith("http"):
+                sec[key] = base + sec[key]
+
+    tackle = p.get("tackle")
+    if tackle and tackle.get("csv_url") and not tackle["csv_url"].startswith("http"):
+        tackle["csv_url"] = base + tackle["csv_url"]
+
+    tracking = p.get("tracking")
+    if tracking and tracking.get("video_url") and not tracking["video_url"].startswith("http"):
+        tracking["video_url"] = base + tracking["video_url"]
+
+    return p
 
 
 def check_job_access(job: Job, current_user: dict):
@@ -33,7 +77,10 @@ def get_status(
 
     response = {"job_id": str(job.job_id), "status": job.status}
     if job.status != "processing":
-        response["results"] = {"player": job.player_result, "crowd": job.crowd_result}
+        response["results"] = {
+            "player": _player_with_urls(job.player_result),
+            "crowd": _crowd_with_urls(job.crowd_result),
+        }
     if job.error:
         response["error"] = job.error
     return response
@@ -70,7 +117,10 @@ def get_job(
     results = None
     errors = None
     if job.status != "processing":
-        results = JobResults(player=job.player_result, crowd=job.crowd_result)
+        results = JobResults(
+            player=_player_with_urls(job.player_result),
+            crowd=_crowd_with_urls(job.crowd_result),
+        )
         if job.status == "partial":
             errors = JobErrors(
                 player="Service failed" if not job.player_result else None,
@@ -90,46 +140,31 @@ def get_job(
 @router.post("/jobs/{job_id}/retry")
 async def retry_job(
     job_id: str,
+    background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    from app.routes.upload import process_video
+
     job = db.query(Job).filter(Job.job_id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     check_job_access(job, current_user)
     if job.status != "partial":
         raise HTTPException(status_code=400, detail="Only partial jobs can be retried")
+    if not job.video_path or not __import__("os").path.exists(job.video_path):
+        raise HTTPException(status_code=409, detail="Original video no longer available for retry")
 
-    retry_player = job.player_result is None
-    retry_crowd = job.crowd_result is None
-
-    tasks = []
-    if retry_player:
-        tasks.append(get_player_data(job.video_path))
-    if retry_crowd:
-        tasks.append(get_crowd_data(job.video_path))
-
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-
-    idx = 0
-    if retry_player:
-        r = results[idx]; idx += 1
-        job.player_result = None if isinstance(r, Exception) else r
-    if retry_crowd:
-        r = results[idx]
-        job.crowd_result = None if isinstance(r, Exception) else r
-
-    if job.player_result and job.crowd_result:
-        job.status = "done"
-    elif not job.player_result and not job.crowd_result:
-        job.status = "failed"
-    else:
-        job.status = "partial"
-
-    job.updated_at = datetime.now(timezone.utc)
+    job.status = "processing"
+    job.player_result = None
+    job.crowd_result = None
+    job.error = None
+    job.updated_at = datetime.utcnow()
     db.commit()
 
-    return {"job_id": str(job.job_id), "status": job.status}
+    background_tasks.add_task(process_video, str(job.job_id), job.video_path)
+
+    return {"job_id": str(job.job_id), "status": "processing"}
 
 
 @router.get("/jobs/{job_id}/heatmap")

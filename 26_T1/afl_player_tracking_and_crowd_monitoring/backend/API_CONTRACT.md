@@ -1,9 +1,126 @@
 # Project Orion — API Contract
-**Version:** 1.2.0  
-**Date:** 2026-04-27  
+**Version:** 1.3.0  
+**Date:** 2026-05-13  
 **Backend Lead:** Tomin Jose  
 **Base URL:** `http://localhost:8000`  
 **Interactive Docs:** `http://localhost:8000/docs`
+
+---
+
+## Quick Start
+
+Complete flow from login to displaying results — copy this into your frontend and swap the video file.
+
+```js
+const BASE = "http://localhost:8000";
+
+// ── 1. Login ──────────────────────────────────────────────────────────────────
+async function login(email, password) {
+  const res = await fetch(`${BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) throw new Error("Login failed");
+  const data = await res.json();
+  localStorage.setItem("access_token", data.access_token);
+  localStorage.setItem("refresh_token", data.refresh_token);
+  return data;
+}
+
+// ── 2. Authenticated fetch (auto-refreshes token on 401) ──────────────────────
+async function apiFetch(path, options = {}) {
+  const token = localStorage.getItem("access_token");
+  const res = await fetch(`${BASE}${path}`, {
+    ...options,
+    headers: { Authorization: `Bearer ${token}`, ...options.headers },
+  });
+
+  if (res.status === 401) {
+    // Try refresh
+    const refreshRes = await fetch(`${BASE}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: localStorage.getItem("refresh_token") }),
+    });
+    if (!refreshRes.ok) {
+      localStorage.clear();
+      window.location.href = "/login";
+      return;
+    }
+    const refreshed = await refreshRes.json();
+    localStorage.setItem("access_token", refreshed.access_token);
+    localStorage.setItem("refresh_token", refreshed.refresh_token);
+    // Retry original request
+    return apiFetch(path, options);
+  }
+
+  return res;
+}
+
+// ── 3. Upload video ───────────────────────────────────────────────────────────
+async function uploadVideo(file) {
+  const formData = new FormData();
+  formData.append("file", file);                         // field name must be "file"
+
+  const res = await apiFetch("/upload", { method: "POST", body: formData });
+  if (!res.ok) throw new Error("Upload failed");
+  const { job_id } = await res.json();
+  return job_id;
+}
+
+// ── 4. Poll until done ────────────────────────────────────────────────────────
+async function pollJob(job_id, onStatusUpdate) {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      const res = await apiFetch(`/status/${job_id}`);
+      const data = await res.json();
+      onStatusUpdate(data.status);
+
+      if (data.status !== "processing") {
+        clearInterval(interval);
+        if (data.status === "failed") reject(new Error(data.error));
+        else resolve(data);
+      }
+    }, 4000);                                             // poll every 4 seconds
+  });
+}
+
+// ── 5. Display results ────────────────────────────────────────────────────────
+function displayResults(data) {
+  const { player, crowd } = data.results;
+
+  // Player videos — use directly as <video src="...">
+  console.log("Tracking video:",    player.tracking?.video_url);
+  console.log("Jersey color video:", player.jersey_color?.video_url);
+  console.log("Formation video:",   player.formation?.video_url);
+
+  // Crowd images — use directly as <img src="...">
+  console.log("Heatmap:",           crowd.heatmap?.image_path);
+  console.log("Anomaly visual:",    crowd.anomaly_visual?.image_path);
+  console.log("Time series chart:", crowd.time_series_chart?.image_path);
+  console.log("Peak crowd frame:",  crowd.peak_crowd_frame?.annotated_frame_path);
+
+  // Crowd stats
+  console.log("Peak person count:", crowd.summary?.peak_person_count);
+  console.log("Crowd state:",       crowd.summary?.crowd_state);
+}
+
+// ── Full flow ─────────────────────────────────────────────────────────────────
+async function run(videoFile) {
+  await login("user@example.com", "password");
+  const job_id = await uploadVideo(videoFile);
+  console.log("Job started:", job_id);
+
+  const result = await pollJob(job_id, (status) => {
+    console.log("Status:", status);                       // "processing" → "done"
+  });
+
+  displayResults(result);
+}
+```
+
+> **Tip:** In React/Vue, call `run(file)` from your file input's `onChange` handler. Store `job_id` in state so you can show a loading spinner while polling.
 
 ---
 
@@ -409,17 +526,45 @@ const response = await fetch('http://localhost:8000/upload', {
   "updated_at": "2026-04-06T10:01:30Z",
   "results": {
     "player": {
-      "players": [
-        {
-          "player_id": 1,
-          "team": "Team A",
-          "position": { "x": 120, "y": 340 },
-          "speed": 6.4,
-          "distance_covered": 3.2,
-          "sprints": 4
-        }
-      ],
-      "heatmap": null
+      "tracking": {
+        "status": "success",
+        "video_info": {
+          "duration": 7.0,
+          "fps": 24,
+          "total_frames": 168,
+          "resolution": [896, 566]
+        },
+        "tracking_results": [
+          {
+            "frame_number": 1,
+            "timestamp": 0.0,
+            "players": [
+              {
+                "player_id": 1,
+                "team_id": 0,
+                "team_name": "CAR",
+                "bbox": { "x1": 100, "y1": 200, "x2": 140, "y2": 300 },
+                "center": { "x": 120, "y": 250 },
+                "confidence": 0.85
+              }
+            ]
+          }
+        ],
+        "video_url": "http://localhost:8080/outputs/<job_id>/tracking.mp4"
+      },
+      "jersey_color": {
+        "status": "success",
+        "video_url": "http://localhost:8080/outputs/<job_id>/jersey_color.mp4",
+        "csv_url": "http://localhost:8080/outputs/<job_id>/jersey_color.csv"
+      },
+      "formation": {
+        "status": "success",
+        "video_url": "http://localhost:8080/outputs/<job_id>/formation.mp4"
+      },
+      "tackle": {
+        "status": "success",
+        "csv_url": "http://localhost:8080/outputs/<job_id>/tackle.csv"
+      }
     },
     "crowd": {
       "video_id": "8d41b321-2870-45a0-9bf7-4faa05293511",
@@ -434,17 +579,17 @@ const response = await fetch('http://localhost:8000/upload', {
         "frame_id": 49,
         "timestamp": 8.0,
         "person_count": 11,
-        "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0049.jpg"
+        "annotated_frame_path": "http://localhost:8002/artifacts/crowd_detection_output/people_detection_results/frame_0049.jpg"
       },
       "anomaly_visual": {
         "event_type": "walking_or_running_activity",
-        "image_path": "crowd_behaviour_analytics/output/.../motion_frame_0009.jpg"
+        "image_path": "http://localhost:8002/artifacts/crowd_behaviour_analytics/output/.../motion_frame_0009.jpg"
       },
       "heatmap": {
-        "image_path": "output/heatmap_8d41b321-....png"
+        "image_path": "http://localhost:8002/artifacts/output/heatmap_8d41b321-....png"
       },
       "time_series_chart": {
-        "image_path": "analytics_output/charts/8d41b321-..._crowd_activity_chart.png"
+        "image_path": "http://localhost:8002/artifacts/analytics_output/charts/8d41b321-..._crowd_activity_chart.png"
       },
       "density_extremes": {
         "highest_density_zone": {
@@ -520,7 +665,7 @@ const url = `http://localhost:8000/jobs/${jobId}/heatmap`;
 ```json
 {
   "job_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "status": "done"
+  "status": "processing"
 }
 ```
 
@@ -531,6 +676,9 @@ const url = `http://localhost:8000/jobs/${jobId}/heatmap`;
 
 // 404
 { "detail": "Job not found" }
+
+// 409 — original video file was deleted and can't be retried
+{ "detail": "Original video no longer available for retry" }
 ```
 
 > After retry, resume polling `/status/{job_id}` until status changes from `processing`.
@@ -560,13 +708,15 @@ const url = `http://localhost:8000/jobs/${jobId}/heatmap`;
 
 ## CORS
 
-The backend is configured to accept requests from `http://localhost:3000`. No proxy configuration is needed.
+All three services are configured to accept requests from `http://localhost:3000`. No proxy configuration needed.
 
-Allowed:
-- **Origins:** `http://localhost:3000`
-- **Methods:** All (`GET`, `POST`, `PUT`, `DELETE`, etc.)
-- **Headers:** All
-- **Credentials:** Yes
+| Service | Port | CORS origin |
+|---------|------|-------------|
+| Backend Gateway | 8000 | `http://localhost:3000` |
+| Player Service | 8080 | `*` (all origins) |
+| Crowd Service | 8002 | `http://localhost:3000` |
+
+Allowed methods and headers: all. Credentials: yes.
 
 ---
 
@@ -607,12 +757,13 @@ Error Handling
 
 ## Notes
 
-- The `results.crowd` schema is **confirmed** — see `GET /jobs/{job_id}` above for the full structure returned by the real crowd model.
-- The `results.player` schema is **TBC** — pending player service integration. Currently returns mock data with `players[]` array and `heatmap`.
-- Do **not** use image paths from `crowd_result` directly. Always use `GET /jobs/{job_id}/heatmap` to fetch images via the gateway.
+- Both `results.player` and `results.crowd` schemas are **confirmed** and fully integrated — see `GET /jobs/{job_id}` above for the complete structure.
+- All image and video paths in results are **full URLs** — use them directly in `<img src="...">` or `<video src="...">`. No additional transformation needed.
+- `GET /jobs/{job_id}/heatmap` still exists as a gateway proxy for the heatmap image, but using `results.crowd.heatmap.image_path` directly is equally valid.
 - Swagger UI at `http://localhost:8000/docs` is live and can be used to test all endpoints directly.
 - All `job_id` and `user_id` values are **UUIDs** (string format: `"3fa85f64-5717-4562-b3fc-2c963f66afa6"`).
 - Refresh tokens are **single use** — each call to `/auth/refresh` revokes the old token and issues a new pair.
+- Start all services with `start_all.ps1` from the project root.
 
 ---
 
@@ -620,6 +771,7 @@ Error Handling
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3.0 | 2026-05-13 | Player service fully integrated. All result paths now returned as full URLs (no client-side transformation needed). Added `jersey_color`, `formation`, `tackle` to player results. Fixed retry response to return `processing`. Added 409 error to retry. Updated CORS table (all 3 services). Removed stale "do not use paths directly" note. |
 | 1.2.0 | 2026-04-27 | Added confirmed crowd response schema. Added `GET /jobs/{job_id}/heatmap` proxy endpoint. Added split mock flags (`USE_MOCK_PLAYER` / `USE_MOCK_CROWD`). Crowd service integrated and tested end-to-end. |
 | 1.1.0 | 2026-04-13 | Added refresh token flow — `POST /auth/refresh`, `POST /auth/logout`. Updated `/auth/register` and `/auth/login` responses to include `refresh_token`. Updated auth checklist. |
 | 1.0.0 | 2026-04-06 | Initial contract — health, auth, upload, jobs, CORS, checklist. |

@@ -521,50 +521,53 @@ NOTE: All contracts marked "TBC" will be updated once other teams confirm.
 
 ========================================================
   PROGRESS TRACKER
-  Last Updated: 2026-03-27
+  Last Updated: 2026-04-29
 ========================================================
 
-OVERALL STATUS: Phase 1 In Progress — Week 1 Complete for Tomin and Lucas
+OVERALL STATUS: Phase 3 In Progress — Crowd integrated (real), Player still on mock
 
 PHASE 1 — Foundation
   [x] Set up folder structure (including schemas/ and tests/)
   [x] Implement basic routes (/, /health, /api/players, /api/crowd, /api/test)
   [x] Share API contract (BACKEND_PLAN.txt) with team
-  [ ] Implement config.py (env var loading including USE_MOCK_SERVICES flag)
-  [ ] Configure CORS (allow frontend on localhost:3000)
-  [ ] Set up PostgreSQL locally and create users + jobs tables
-  [ ] Implement database.py and models.py (SQLAlchemy)
-  [ ] Define Pydantic schemas for auth and health
-  [ ] Implement auth module (hashing.py + jwt.py)
-  [ ] Implement RBAC dependencies (get_current_user, require_admin)
-  [ ] Implement POST /auth/register and POST /auth/login
-  [ ] Create uploads/ folder for temporary video storage
-  [ ] Write tests for auth endpoints (tests/test_auth.py)
-  [ ] Run gateway locally: uvicorn app.main:app --port 8000
-  [ ] Share /docs URL with frontend team
-  [ ] Send contract template to player and crowd teams
+  [x] Implement config.py (env var loading including USE_MOCK_SERVICES flag)
+  [x] Configure CORS (allow frontend on localhost:3000)
+  [x] Set up PostgreSQL locally and create users + jobs tables
+  [x] Implement database.py and models.py (SQLAlchemy — async/asyncpg driver)
+  [x] Define Pydantic schemas for auth and health
+  [x] Implement auth module (hashing.py + jwt.py)
+  [x] Implement RBAC dependencies (get_current_user, require_admin)
+  [x] Implement POST /auth/register and POST /auth/login
+  [x] Create uploads/ folder for temporary video storage
+  [x] Write tests for auth endpoints (tests/test_auth.py)
+  [x] Run gateway locally: uvicorn app.main:app --port 8000
+  [x] Share /docs URL with frontend team
+  [x] Send contract template to player and crowd teams
 
 PHASE 2 — Core Gateway Logic
-  [ ] Define Pydantic schemas for jobs (schemas/jobs.py)
-  [ ] Implement player_client.py and crowd_client.py with USE_MOCK_SERVICES toggle
-  [ ] Implement POST /upload with background task
-  [ ] Implement GET /status/{job_id}
-  [ ] Implement GET /jobs (paginated)
-  [ ] Implement GET /jobs/{job_id}
-  [ ] Implement POST /jobs/{job_id}/retry
-  [ ] Implement DELETE /jobs/{job_id}
-  [ ] Write tests with mocked services
-  [ ] Frontend checkpoint: verify /health and /auth/login reachable from frontend
+  [x] Define Pydantic schemas for jobs (schemas/jobs.py)
+  [x] Implement player_client.py and crowd_client.py with USE_MOCK_SERVICES toggle
+  [x] Implement POST /upload with background task
+  [x] Implement GET /status/{job_id}
+  [x] Implement GET /jobs (paginated)
+  [x] Implement GET /jobs/{job_id}
+  [x] Implement POST /jobs/{job_id}/retry
+  [x] Implement DELETE /jobs/{job_id}
+  [x] Write tests with mocked services
+  [x] Frontend checkpoint: verify /health and /auth/login reachable from frontend
 
 PHASE 3 — Integration
-  [ ] Finalise contracts with player team
-  [ ] Finalise contracts with crowd team
-  [ ] Integration decision: real services or stay on mocks
+  [x] Finalise contracts with crowd team
+       → Endpoint: POST /process-crowd-detection (port 8002)
+       → Request:  JSON { video_id, video_path } (absolute path)
+       → Response: summary, peak_crowd_frame, heatmap, anomaly_visual, time_series_chart, density_extremes
+  [x] Update crowd_client.py for real service (mock flag retained)
+  [x] Heatmap proxy added: GET /jobs/{job_id}/heatmap — streams image from crowd service
+  [ ] Finalise contracts with player team (still on mock — USE_MOCK_PLAYER=true)
   [ ] Update player_client.py for real service (keep mock flag)
-  [ ] Update crowd_client.py for real service (keep mock flag)
-  [ ] End-to-end testing with all services
-  [ ] Error handling for service failures
-  [ ] Verify demo Mode A (real) and Mode B (mock fallback) both work
+  [ ] End-to-end testing: frontend → gateway → both services → results back
+  [ ] Error handling polish for service failures
+  [ ] Verify demo Mode A (real services) and Mode B (mock fallback) both work
 
 PHASE 4 — Buffer + Dockerize & Polish
   [ ] Buffer week: resolve any outstanding integration issues
@@ -591,3 +594,9 @@ DECISIONS LOG
 2026-03-27 — Demo strategy: Mode A (real services) preferred, Mode B (mock fallback) as safety net
 2026-03-27 — Contract push moved to Week 2 (earlier than originally planned) to reduce integration risk
 2026-03-27 — Week 7 designated as buffer week — Docker only if integration is on track
+2026-04-29 — Config split into USE_MOCK_PLAYER + USE_MOCK_CROWD (independent toggles — can run crowd real while player stays mocked)
+2026-04-29 — Database driver upgraded to asyncpg for async SQLAlchemy support
+2026-04-29 — Refresh token support added (REFRESH_TOKEN_EXPIRE_DAYS config var)
+2026-04-29 — Crowd contract confirmed and implemented: POST /process-crowd-detection with JSON body, returns rich result including heatmap path
+2026-04-29 — Heatmap proxy endpoint added: GET /jobs/{job_id}/heatmap fetches image from crowd service and streams to frontend
+2026-04-29 — Player contract still TBC — USE_MOCK_PLAYER=true in .env until player team confirms endpoint
