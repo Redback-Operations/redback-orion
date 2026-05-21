@@ -33,6 +33,36 @@ def get_mock_player_data():
     }
 
 
+def get_mock_jersey_color_data():
+    return {
+        "status": "success",
+        "teams": [
+            {"team_id": 0, "team_name": "CAR", "jersey_color": [255, 0, 0]},
+            {"team_id": 1, "team_name": "OPP", "jersey_color": [0, 0, 255]}
+        ]
+    }
+
+
+def get_mock_tackle_data():
+    return {
+        "status": "success",
+        "tackles": [],
+        "csv_url": None
+    }
+
+
+def get_mock_formation_data():
+    return {
+        "status": "success",
+        "formations": [
+            {"frame_number": 1, "team_id": 0, "formation": "4-3-3"},
+            {"frame_number": 1, "team_id": 1, "formation": "4-4-2"}
+        ],
+        "video_url": None,
+        "csv_url": None
+    }
+
+
 async def get_player_data(file_path: str = None):
     if USE_MOCK_PLAYER:
         return get_mock_player_data()
@@ -51,6 +81,9 @@ async def get_player_data(file_path: str = None):
 
 
 async def get_jersey_color_data(video_path: str, tracking_json_path: str):
+    if USE_MOCK_PLAYER:
+        return get_mock_jersey_color_data()
+
     async with httpx.AsyncClient(timeout=300.0) as client:
         with open(video_path, "rb") as vf, open(tracking_json_path, "rb") as jf:
             response = await client.post(
@@ -65,6 +98,9 @@ async def get_jersey_color_data(video_path: str, tracking_json_path: str):
 
 
 async def get_tackle_data(csv_path: str):
+    if USE_MOCK_PLAYER:
+        return get_mock_tackle_data()
+
     async with httpx.AsyncClient(timeout=120.0) as client:
         with open(csv_path, "rb") as f:
             response = await client.post(
@@ -76,6 +112,9 @@ async def get_tackle_data(csv_path: str):
 
 
 async def get_formation_data(video_path: str, tracking_json_path: str):
+    if USE_MOCK_PLAYER:
+        return get_mock_formation_data()
+
     async with httpx.AsyncClient(timeout=600.0) as client:
         with open(video_path, "rb") as vf, open(tracking_json_path, "rb") as jf:
             response = await client.post(

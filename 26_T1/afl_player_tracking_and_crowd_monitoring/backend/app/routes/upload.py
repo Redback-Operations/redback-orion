@@ -110,7 +110,7 @@ async def process_video(job_id: str, file_path: str):
             job.player_result = player_result
             job.crowd_result = crowd_data
             job.error = " | ".join(errors) if errors else None
-            job.updated_at = datetime.utcnow()
+            job.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
             db.commit()
 
     except Exception as e:
@@ -119,7 +119,7 @@ async def process_video(job_id: str, file_path: str):
         if job:
             job.status = "failed"
             job.error = str(e)
-            job.updated_at = datetime.utcnow()
+            job.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
             db.commit()
     finally:
         db.close()
