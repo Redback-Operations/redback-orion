@@ -64,6 +64,7 @@ import {
   Eye,
   Star,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Comprehensive player data with enhanced AFL statistics
 const generatePlayerData = () => {
@@ -269,6 +270,7 @@ export default function PlayerPerformance() {
   const [chartType, setChartType] = useState<
     "possession" | "performance" | "comparison"
   >("possession");
+  const navigate = useNavigate();
 
   // Simulate live data updates
   useEffect(() => {
@@ -533,62 +535,83 @@ export default function PlayerPerformance() {
           </div>
 
           {/* Live Clock */}
-          {ENABLE_LIVE_FEATURES && (
-            <LiveClock
-              isLive={isLive}
-              onToggleLive={setIsLive}
-              matchTime={{ quarter: 2, timeRemaining: "15:23" }}
-            />
-          )}
+          <div className="bg-white rounded-xl shadow-sm border px-4 py-3 flex items-center justify-between gap-3">
+            <div className="flex-1">
+              {ENABLE_LIVE_FEATURES && (
+                <LiveClock
+                  isLive={isLive}
+                  onToggleLive={setIsLive}
+                  matchTime={{ quarter: 2, timeRemaining: "15:23" }}
+                />
+              )}
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => {
+                console.log("navigating to add-player");
+                navigate("/add-player");
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white shrink-0"
+            >
+              Add Player
+            </Button>
+          </div>
 
           {/* Quick Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <StatCard
-                      title="Players Active"
-                      value={filteredPlayers.length}
-                      icon={Users}
-                      color="blue"
-                      trend="up"
-                      active={selectedStat === "Players Active"}
-                      onClick={() => setSelectedStat("Players Active")}
-                    />
+            <StatCard
+              title="Players Active"
+              value={filteredPlayers.length}
+              icon={Users}
+              color="blue"
+              trend="up"
+              active={selectedStat === "Players Active"}
+              onClick={() => setSelectedStat("Players Active")}
+            />
 
-                    <StatCard
-                      title="Total Goals"
-                      value={filteredPlayers.reduce((sum, p) => sum + p.stats.goals, 0)}
-                      icon={Target}
-                      color="green"
-                      trend="up"
-                      active={selectedStat === "Total Goals"}
-                      onClick={() => setSelectedStat("Total Goals")}
-                    />
+            <StatCard
+              title="Total Goals"
+              value={filteredPlayers.reduce((sum, p) => sum + p.stats.goals, 0)}
+              icon={Target}
+              color="green"
+              trend="up"
+              active={selectedStat === "Total Goals"}
+              onClick={() => setSelectedStat("Total Goals")}
+            />
 
-                    <StatCard
-                      title="Avg Efficiency"
-                      value={`${
-                        filteredPlayers.length > 0
-                          ? Math.round(
-                              filteredPlayers.reduce((sum, p) => sum + p.stats.efficiency, 0) /
-                                filteredPlayers.length
-                            )
-                          : 0
-                      }%`}
-                      icon={Activity}
-                      color="purple"
-                      trend="stable"
-                      active={selectedStat === "Avg Efficiency"}
-                      onClick={() => setSelectedStat("Avg Efficiency")}
-                    />
+            <StatCard
+              title="Avg Efficiency"
+              value={`${
+                filteredPlayers.length > 0
+                  ? Math.round(
+                      filteredPlayers.reduce(
+                        (sum, p) => sum + p.stats.efficiency,
+                        0,
+                      ) / filteredPlayers.length,
+                    )
+                  : 0
+              }%`}
+              icon={Activity}
+              color="purple"
+              trend="stable"
+              active={selectedStat === "Avg Efficiency"}
+              onClick={() => setSelectedStat("Avg Efficiency")}
+            />
 
-                    <StatCard
-                      title="Total Disposals"
-                      value={filteredPlayers.reduce((sum, p) => sum + p.stats.disposals, 0)}
-                      icon={BarChart3}
-                      color="orange"
-                      trend="up"
-                      active={selectedStat === "Total Disposals"}
-                      onClick={() => setSelectedStat("Total Disposals")}
-                    />    
+            <StatCard
+              title="Total Disposals"
+              value={filteredPlayers.reduce(
+                (sum, p) => sum + p.stats.disposals,
+                0,
+              )}
+              icon={BarChart3}
+              color="orange"
+              trend="up"
+              active={selectedStat === "Total Disposals"}
+              onClick={() => setSelectedStat("Total Disposals")}
+            />
           </div>
 
           {/* Search and Filters */}
