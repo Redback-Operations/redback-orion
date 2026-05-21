@@ -574,3 +574,33 @@ The system generates a tactical annotated video showing:
 while remaining modular and fully CLI-compatible for backend integration.
 
 ```
+---
+
+# Contributor Responsibilities
+
+## Quan Le Dong
+
+Primary contributions for this module include:
+
+- Designing the tactical teammate connectivity visualization system
+- Developing formation graph construction logic using spatial teammate relationships
+- Implementing opponent lane blocking analysis
+- Developing crowd suppression logic to prevent noisy tactical rendering
+- Designing tactical edge rendering styles:
+  - strong/open tactical lanes
+  - blocked/contested tactical lanes
+- Implementing clustered-team tactical grouping integration
+- Building backend-compatible tactical visualization workflow
+- Implementing CLI tactical configuration support
+
+### Tactical Analysis Focus
+
+This module was specifically developed to explore:
+
+- spatial tactical organization
+- teammate structural connectivity
+- defensive lane disruption
+- formation compactness
+- crowd-aware tactical interpretation
+
+using computer vision and graph-based spatial analysis.

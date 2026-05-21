@@ -487,7 +487,32 @@ The system generates:
 while remaining modular and scalable for long-form sports analysis.
 
 ---
+---
 
-# Acknowledgement
+# Contributor Responsibilities
 
-Drew Neeling: For the color processing logic and Per frame KMeans clustering approach
+## Quan Le Dong
+
+Primary contributions for this module include:
+
+- Designing the offline global jersey colour clustering pipeline
+- Developing the representative player colour vector aggregation approach
+- Implementing stable whole-video KMeans clustering instead of frame-by-frame clustering
+- Designing memory-safe sequential processing for long-form sports videos
+- Developing clustered JSON export logic
+- Building annotated video rendering for cluster visualization
+- Implementing configurable CLI workflow and processing parameters
+- Designing backend-compatible JSON pipeline integration with:
+  - YOLOv11
+  - ByteTrack tracking outputs
+
+### Acknowledgement
+
+Drew Neeling contributed to:
+
+- earlier colour processing experimentation
+- Implementing torso-region based HSV feature extraction
+- per-frame KMeans clustering concepts
+- initial clustering direction exploration
+
+The current implementation extends the approach into a stabilized offline whole-video clustering pipeline.
