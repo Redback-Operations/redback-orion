@@ -427,15 +427,6 @@ export default function AddPlayer() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label>Team Logo URL</Label>
-                    <Input
-                      value={formData.teamLogo}
-                      onChange={(e) => handleChange("teamLogo", e.target.value)}
-                      placeholder="/teams/dummy-team.png"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
                     <Label>Notes</Label>
                     <Input
                       value={formData.notes}
