@@ -168,12 +168,8 @@ async def retry_job(
     job.crowd_result = crowd_result
     job.status = "done"
     job.error = None
-<<<<<<< HEAD
     job.updated_at = datetime.now(timezone.utc)
 
-=======
-    job.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
->>>>>>> origin/backend-api-gateway
     db.commit()
 
     return {"job_id": str(job.job_id), "status": "done"}
