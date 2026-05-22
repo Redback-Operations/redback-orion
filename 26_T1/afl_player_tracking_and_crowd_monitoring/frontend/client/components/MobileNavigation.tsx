@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -52,17 +52,17 @@ const navigationItems = [
     description: "System monitoring",
   },
   {
-  name: "About",
-  href: "/about",
-  icon: Zap, // or any icon you like
-  description: "About this system",
+    name: "About",
+    href: "/about",
+    icon: Zap, // or any icon you like
+    description: "About this system",
   },
 ];
 
 export default function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-
+  const navigate = useNavigate();
   const isActive = (href: string) => {
     if (href === "/") {
       return location.pathname === "/";
@@ -147,12 +147,21 @@ export default function MobileNavigation() {
       <nav className="hidden lg:block fixed left-0 top-0 h-full w-64 bg-white border-r z-40">
         <div className="flex flex-col h-full">
           <div className="flex items-center space-x-2 p-6 border-b">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
-              <Activity className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              AFL Analytics
-            </span>
+            <button
+              type="button"
+              onClick={() => navigate("/afl-dashboard")}
+              className="flex items-center gap-3 text-left hover:opacity-90 transition-opacity"
+            >
+              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                  AFL Analytics
+                </h1>
+              </div>
+            </button>
           </div>
 
           <div className="flex-1 p-4">
@@ -207,8 +216,9 @@ export default function MobileNavigation() {
                 key={item.name}
                 to={item.href}
                 className={`flex flex-col items-center py-2 px-1 transition-colors ${
-                  active 
-                  ? "text-green-600" : "text-gray-500 hover:bg-gray-100 hover:shadow-md hover:scale-[1.02] hover:ring-gray-200"
+                  active
+                    ? "text-green-600"
+                    : "text-gray-500 hover:bg-gray-100 hover:shadow-md hover:scale-[1.02] hover:ring-gray-200"
                 }`}
               >
                 <Icon className="w-5 h-5 mb-1" />
