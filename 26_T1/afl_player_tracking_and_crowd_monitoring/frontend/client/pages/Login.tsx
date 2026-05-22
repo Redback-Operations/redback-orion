@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,6 +19,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Activity,
@@ -30,6 +31,7 @@ import {
   EyeOff,
   Smartphone,
   Monitor,
+  User,
   Mail,
   Lock,
   Building,
@@ -37,18 +39,19 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { apiRequest } from "@/lib/api";
+export const getAuthHeaders = () => {
+  const token = localStorage.getItem("access_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 export default function Login() {
   const navigate = useNavigate();
-
   const [showPassword, setShowPassword] = useState(false);
   const [loginForm, setLoginForm] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
-
   const [signupForm, setSignupForm] = useState({
     firstName: "",
     lastName: "",
@@ -59,20 +62,283 @@ export default function Login() {
     role: "",
     agreeTerms: false,
   });
-
   const [resetForm, setResetForm] = useState({
     email: "",
     resetCode: "",
     newPassword: "",
     confirmNewPassword: "",
   });
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
-  const [resetStep, setResetStep] = useState(1);
+  const [resetStep, setResetStep] = useState(1); // 1: email, 2: code, 3: new password, 4: success
   const [resetMessage, setResetMessage] = useState("");
+
+  // Valid demo credentials for authentication
+  const validCredentials = [
+    { email: "demo@aflanalytics.com", password: "demo123" },
+    { email: "admin@aflanalytics.com", password: "admin123" },
+    { email: "coach@aflanalytics.com", password: "coach123" },
+    { email: "analyst@aflanalytics.com", password: "analyst123" },
+  ];
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Simulate login API call delay
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    // Check if both email and password are provided
+    if (!loginForm.email || !loginForm.password) {
+      setError("Please enter both email and password");
+      setIsLoading(false);
+      return;
+    }
+
+    // Get stored user credentials from localStorage
+    const storedUsers = JSON.parse(
+      localStorage.getItem("registeredUsers") || "[]",
+    );
+
+    // Combine demo credentials with registered user credentials
+    const allValidCredentials = [...validCredentials, ...storedUsers];
+
+    // Validate credentials against all valid credentials
+    const isValidCredential = allValidCredentials.some(
+      (cred) =>
+        cred.email.toLowerCase() === loginForm.email.toLowerCase() &&
+        cred.password === loginForm.password,
+    );
+
+    if (isValidCredential) {
+      // Store authentication state in localStorage
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userEmail", loginForm.email);
+      localStorage.setItem("access_token", "mock_access_token");
+      localStorage.setItem("refresh_token", "mock_refresh_token");
+
+      // Successful login - redirect to dashboard
+      navigate("/player-performance");
+    } else {
+      setError(
+        "Invalid email or password. Try demo@aflanalytics.com / demo123 or use your signup credentials",
+      );
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Validate all required fields
+    if (
+      !signupForm.firstName ||
+      !signupForm.lastName ||
+      !signupForm.email ||
+      !signupForm.password ||
+      !signupForm.organization
+    ) {
+      setError("Please fill all required fields");
+      setIsLoading(false);
+      return;
+    }
+
+    if (signupForm.password !== signupForm.confirmPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!signupForm.agreeTerms) {
+      setError("Please agree to the terms of service");
+      setIsLoading(false);
+      return;
+    }
+
+    // Check if user already exists
+    const existingUsers = JSON.parse(
+      localStorage.getItem("registeredUsers") || "[]",
+    );
+    const userExists = existingUsers.some(
+      (user: any) =>
+        user.email.toLowerCase() === signupForm.email.toLowerCase(),
+    );
+
+    if (userExists) {
+      setError(
+        "An account with this email already exists. Please login instead.",
+      );
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate signup API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Create new user object
+    const newUser = {
+      email: signupForm.email,
+      password: signupForm.password,
+      firstName: signupForm.firstName,
+      lastName: signupForm.lastName,
+      organization: signupForm.organization,
+      role: signupForm.role,
+    };
+
+    // Add new user to registered users list
+    const updatedUsers = [...existingUsers, newUser];
+    localStorage.setItem("registeredUsers", JSON.stringify(updatedUsers));
+
+    // Store authentication state for new user
+    localStorage.setItem("isAuthenticated", "true");
+    localStorage.setItem("userEmail", signupForm.email);
+    localStorage.setItem(
+      "userName",
+      `${signupForm.firstName} ${signupForm.lastName}`,
+    );
+
+    // Clear the signup form
+    setSignupForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      organization: "",
+      role: "",
+      agreeTerms: false,
+    });
+
+    // Successful signup - redirect to dashboard
+    navigate("/afl-dashboard");
+  };
+
+  const demoLogin = () => {
+    setLoginForm({
+      email: "demo@aflanalytics.com",
+      password: "demo123",
+      rememberMe: true,
+    });
+  };
+
+  // OAuth authentication handlers
+  const handleGoogleAuth = () => {
+    window.location.href = "/api/auth/google";
+  };
+
+  const handleAppleAuth = () => {
+    window.location.href = "/api/auth/apple";
+  };
+
+  // Handle OAuth callback from URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authStatus = urlParams.get("auth");
+    const token = urlParams.get("token");
+    const userParam = urlParams.get("user");
+    const errorMessage = urlParams.get("message");
+
+    if (authStatus === "success" && token && userParam) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userParam));
+
+        // Store authentication data
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("userName", user.name);
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("authProvider", user.provider);
+
+        // Clear URL parameters
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
+
+        // Redirect to dashboard
+        navigate("/afl-dashboard");
+      } catch (error) {
+        console.error("Error parsing OAuth user data:", error);
+        setError("Authentication failed. Please try again.");
+      }
+    } else if (authStatus === "error" && errorMessage) {
+      setError(decodeURIComponent(errorMessage));
+      // Clear URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [navigate]);
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Simulate sending reset email
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    if (resetForm.email) {
+      setResetMessage(`Reset link sent to ${resetForm.email}`);
+      setResetStep(2);
+    } else {
+      setError("Please enter a valid email address");
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleVerifyResetCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Simulate code verification
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    if (resetForm.resetCode === "123456") {
+      setResetStep(3);
+    } else {
+      setError("Invalid verification code. Try '123456' for demo.");
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    if (resetForm.newPassword !== resetForm.confirmNewPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate password reset
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    setResetStep(4);
+    setIsLoading(false);
+  };
+
+  const closeResetModal = () => {
+    setIsResetModalOpen(false);
+    setResetStep(1);
+    setResetForm({
+      email: "",
+      resetCode: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
+    setError("");
+    setResetMessage("");
+  };
 
   const features = [
     {
@@ -97,246 +363,9 @@ export default function Login() {
     },
   ];
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      if (!loginForm.email || !loginForm.password) {
-        setError("Please enter both email and password.");
-        return;
-      }
-
-      const data = await apiRequest(
-        "http://localhost:8000/login",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: loginForm.email,
-            password: loginForm.password,
-          }),
-        },
-        false,
-      );
-
-      if (data?.access_token) {
-        localStorage.setItem("authToken", data.access_token);
-      }
-
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userEmail", loginForm.email);
-      localStorage.setItem("userName", data?.user?.name || loginForm.email);
-
-      setSuccess("Login successful.");
-      console.log("Login successful");
-
-      navigate("/player-performance");
-    } catch (err: any) {
-      setError(err.message || "Login failed. Please try again.");
-      console.error("Login failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      if (
-        !signupForm.firstName ||
-        !signupForm.lastName ||
-        !signupForm.email ||
-        !signupForm.password ||
-        !signupForm.organization
-      ) {
-        setError("Please fill all required fields.");
-        return;
-      }
-
-      if (signupForm.password !== signupForm.confirmPassword) {
-        setError("Passwords do not match.");
-        return;
-      }
-
-      if (!signupForm.agreeTerms) {
-        setError("Please agree to the terms of service.");
-        return;
-      }
-
-      const data = await apiRequest(
-        "http://localhost:8000/register",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            first_name: signupForm.firstName,
-            last_name: signupForm.lastName,
-            email: signupForm.email,
-            password: signupForm.password,
-            organization: signupForm.organization,
-            role: signupForm.role,
-          }),
-        },
-        false,
-      );
-
-      if (data?.access_token) {
-        localStorage.setItem("authToken", data.access_token);
-      }
-
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userEmail", signupForm.email);
-      localStorage.setItem(
-        "userName",
-        `${signupForm.firstName} ${signupForm.lastName}`,
-      );
-
-      setSuccess("Account created successfully.");
-      console.log("Signup successful");
-
-      navigate("/player-performance");
-    } catch (err: any) {
-      setError(err.message || "Unable to create account.");
-      console.error("Signup failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleAuth = () => {
-    window.location.href = "/api/auth/google";
-  };
-
-  const handleAppleAuth = () => {
-    window.location.href = "/api/auth/apple";
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    setResetMessage("");
-
-    try {
-      if (!resetForm.email) {
-        setError("Please enter your email address.");
-        return;
-      }
-
-      await apiRequest(
-        "http://localhost:8000/forgot-password",
-        {
-          method: "POST",
-          body: JSON.stringify({ email: resetForm.email }),
-        },
-        false,
-      );
-
-      setResetMessage(
-        `Password reset instructions were sent to ${resetForm.email}.`,
-      );
-      setResetStep(2);
-      console.log("Password reset email requested");
-    } catch (err: any) {
-      setError(err.message || "Unable to send reset instructions.");
-      console.error("Forgot password failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyResetCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    try {
-      if (!resetForm.resetCode) {
-        setError("Please enter the verification code.");
-        return;
-      }
-
-      await apiRequest(
-        "http://localhost:8000/verify-reset-code",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: resetForm.email,
-            reset_code: resetForm.resetCode,
-          }),
-        },
-        false,
-      );
-
-      setResetStep(3);
-      console.log("Reset code verified");
-    } catch (err: any) {
-      setError(err.message || "Invalid verification code.");
-      console.error("Reset code verification failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    try {
-      if (!resetForm.newPassword || !resetForm.confirmNewPassword) {
-        setError("Please enter and confirm your new password.");
-        return;
-      }
-
-      if (resetForm.newPassword !== resetForm.confirmNewPassword) {
-        setError("Passwords do not match.");
-        return;
-      }
-
-      await apiRequest(
-        "http://localhost:8000/reset-password",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: resetForm.email,
-            reset_code: resetForm.resetCode,
-            new_password: resetForm.newPassword,
-          }),
-        },
-        false,
-      );
-
-      setResetStep(4);
-      console.log("Password reset successful");
-    } catch (err: any) {
-      setError(err.message || "Unable to reset password.");
-      console.error("Password reset failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const closeResetModal = () => {
-    setIsResetModalOpen(false);
-    setResetStep(1);
-    setResetForm({
-      email: "",
-      resetCode: "",
-      newPassword: "",
-      confirmNewPassword: "",
-    });
-    setError("");
-    setResetMessage("");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+      {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -370,6 +399,7 @@ export default function Login() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* Left side - Features & Info */}
             <div className="space-y-6">
               <div className="space-y-4">
                 <Badge variant="secondary" className="w-fit">
@@ -414,8 +444,27 @@ export default function Login() {
                   );
                 })}
               </div>
+
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center space-x-2 mb-2">
+                  <User className="w-4 h-4 text-blue-600" />
+                  <span className="font-medium text-blue-900">Demo Access</span>
+                </div>
+                <p className="text-sm text-blue-700 mb-3">
+                  Try the platform with demo credentials to explore all features
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={demoLogin}
+                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                >
+                  Load Demo Credentials
+                </Button>
+              </div>
             </div>
 
+            {/* Right side - Login/Signup Form */}
             <div className="w-full max-w-md mx-auto">
               <Card className="shadow-lg">
                 <CardHeader className="text-center">
@@ -424,7 +473,6 @@ export default function Login() {
                     Sign in to access your AFL analytics dashboard
                   </CardDescription>
                 </CardHeader>
-
                 <CardContent>
                   <Tabs defaultValue="login" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
@@ -439,28 +487,48 @@ export default function Login() {
                         </Alert>
                       )}
 
-                      {success && (
-                        <Alert>
-                          <AlertDescription>{success}</AlertDescription>
-                        </Alert>
-                      )}
-
+                      {/* OAuth Buttons */}
                       <div className="space-y-3">
                         <Button
                           type="button"
                           variant="outline"
-                          className="w-full"
+                          className="w-full relative"
                           onClick={handleGoogleAuth}
                         >
+                          <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                            <path
+                              fill="#4285F4"
+                              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            />
+                            <path
+                              fill="#34A853"
+                              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            />
+                            <path
+                              fill="#FBBC05"
+                              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            />
+                            <path
+                              fill="#EA4335"
+                              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            />
+                          </svg>
                           Continue with Google
                         </Button>
 
                         <Button
                           type="button"
                           variant="outline"
-                          className="w-full bg-black text-white hover:bg-gray-800"
+                          className="w-full relative bg-black text-white hover:bg-gray-800"
                           onClick={handleAppleAuth}
                         >
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+                          </svg>
                           Continue with Apple
                         </Button>
 
@@ -546,7 +614,6 @@ export default function Login() {
                               Remember me
                             </Label>
                           </div>
-
                           <button
                             type="button"
                             onClick={() => setIsResetModalOpen(true)}
@@ -561,7 +628,14 @@ export default function Login() {
                           className="w-full bg-gradient-to-r from-green-600 to-blue-600"
                           disabled={isLoading}
                         >
-                          {isLoading ? "Signing In..." : "Sign In"}
+                          {isLoading ? (
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                              Signing In...
+                            </div>
+                          ) : (
+                            "Sign In"
+                          )}
                         </Button>
                       </form>
                     </TabsContent>
@@ -573,11 +647,62 @@ export default function Login() {
                         </Alert>
                       )}
 
-                      {success && (
-                        <Alert>
-                          <AlertDescription>{success}</AlertDescription>
-                        </Alert>
-                      )}
+                      {/* OAuth Buttons */}
+                      <div className="space-y-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full relative"
+                          onClick={handleGoogleAuth}
+                        >
+                          <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                            <path
+                              fill="#4285F4"
+                              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            />
+                            <path
+                              fill="#34A853"
+                              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            />
+                            <path
+                              fill="#FBBC05"
+                              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            />
+                            <path
+                              fill="#EA4335"
+                              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            />
+                          </svg>
+                          Sign up with Google
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full relative bg-black text-white hover:bg-gray-800"
+                          onClick={handleAppleAuth}
+                        >
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+                          </svg>
+                          Sign up with Apple
+                        </Button>
+
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">
+                              Or sign up with email
+                            </span>
+                          </div>
+                        </div>
+                      </div>
 
                       <form onSubmit={handleSignup} className="space-y-4">
                         <div className="grid grid-cols-2 gap-3">
@@ -596,7 +721,6 @@ export default function Login() {
                               required
                             />
                           </div>
-
                           <div className="space-y-2">
                             <Label htmlFor="lastName">Last Name</Label>
                             <Input
@@ -712,7 +836,20 @@ export default function Login() {
                             required
                           />
                           <Label htmlFor="terms" className="text-sm">
-                            I agree to the Terms of Service and Privacy Policy
+                            I agree to the{" "}
+                            <button
+                              type="button"
+                              className="text-blue-600 hover:underline"
+                            >
+                              Terms of Service
+                            </button>{" "}
+                            and{" "}
+                            <button
+                              type="button"
+                              className="text-blue-600 hover:underline"
+                            >
+                              Privacy Policy
+                            </button>
                           </Label>
                         </div>
 
@@ -721,7 +858,14 @@ export default function Login() {
                           className="w-full bg-gradient-to-r from-green-600 to-blue-600"
                           disabled={isLoading}
                         >
-                          {isLoading ? "Creating Account..." : "Create Account"}
+                          {isLoading ? (
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                              Creating Account...
+                            </div>
+                          ) : (
+                            "Create Account"
+                          )}
                         </Button>
                       </form>
                     </TabsContent>
@@ -733,6 +877,7 @@ export default function Login() {
         </div>
       </div>
 
+      {/* Forgot Password Modal */}
       <Dialog open={isResetModalOpen} onOpenChange={setIsResetModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -753,8 +898,7 @@ export default function Login() {
               {resetStep === 4 && "Password Reset Complete"}
             </DialogTitle>
             <DialogDescription>
-              {resetStep === 1 &&
-                "Enter your email to receive reset instructions"}
+              {resetStep === 1 && "Enter your email to receive a reset link"}
               {resetStep === 2 && "Check your email for a verification code"}
               {resetStep === 3 && "Enter your new password"}
               {resetStep === 4 && "Your password has been successfully reset"}
@@ -770,10 +914,12 @@ export default function Login() {
 
             {resetMessage && resetStep === 2 && (
               <Alert>
+                <Mail className="h-4 w-4" />
                 <AlertDescription>{resetMessage}</AlertDescription>
               </Alert>
             )}
 
+            {/* Step 1: Email Input */}
             {resetStep === 1 && (
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div className="space-y-2">
@@ -794,11 +940,19 @@ export default function Login() {
                   </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send Reset Link"}
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Sending Reset Link...
+                    </div>
+                  ) : (
+                    "Send Reset Link"
+                  )}
                 </Button>
               </form>
             )}
 
+            {/* Step 2: Verification Code */}
             {resetStep === 2 && (
               <form onSubmit={handleVerifyResetCode} className="space-y-4">
                 <div className="space-y-2">
@@ -806,64 +960,90 @@ export default function Login() {
                   <Input
                     id="resetCode"
                     type="text"
-                    placeholder="Enter code"
+                    placeholder="Enter 6-digit code"
                     value={resetForm.resetCode}
                     onChange={(e) =>
                       setResetForm({ ...resetForm, resetCode: e.target.value })
                     }
+                    maxLength={6}
                     required
                   />
+                  <p className="text-xs text-gray-600">
+                    For demo purposes, use code: <strong>123456</strong>
+                  </p>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Verifying..." : "Verify Code"}
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Verifying...
+                    </div>
+                  ) : (
+                    "Verify Code"
+                  )}
                 </Button>
               </form>
             )}
 
+            {/* Step 3: New Password */}
             {resetStep === 3 && (
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="newPassword">New Password</Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    placeholder="Enter new password"
-                    value={resetForm.newPassword}
-                    onChange={(e) =>
-                      setResetForm({
-                        ...resetForm,
-                        newPassword: e.target.value,
-                      })
-                    }
-                    required
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      placeholder="Enter new password"
+                      value={resetForm.newPassword}
+                      onChange={(e) =>
+                        setResetForm({
+                          ...resetForm,
+                          newPassword: e.target.value,
+                        })
+                      }
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="confirmNewPassword">
                     Confirm New Password
                   </Label>
-                  <Input
-                    id="confirmNewPassword"
-                    type="password"
-                    placeholder="Confirm new password"
-                    value={resetForm.confirmNewPassword}
-                    onChange={(e) =>
-                      setResetForm({
-                        ...resetForm,
-                        confirmNewPassword: e.target.value,
-                      })
-                    }
-                    required
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="confirmNewPassword"
+                      type="password"
+                      placeholder="Confirm new password"
+                      value={resetForm.confirmNewPassword}
+                      onChange={(e) =>
+                        setResetForm({
+                          ...resetForm,
+                          confirmNewPassword: e.target.value,
+                        })
+                      }
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
-
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Resetting..." : "Reset Password"}
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Resetting Password...
+                    </div>
+                  ) : (
+                    "Reset Password"
+                  )}
                 </Button>
               </form>
             )}
 
+            {/* Step 4: Success */}
             {resetStep === 4 && (
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
