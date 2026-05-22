@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -16,6 +17,15 @@ app = FastAPI(
     description="Crowd monitoring APIs and demo UI.\n\n[Open Demo Page](/demo)",
     docs_url="/",
     redoc_url="/redoc",
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -170,7 +180,7 @@ def demo_page():
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
     }
     .visual {
@@ -196,6 +206,11 @@ def demo_page():
       text-align: center;
     }
     .hidden { display: none; }
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>

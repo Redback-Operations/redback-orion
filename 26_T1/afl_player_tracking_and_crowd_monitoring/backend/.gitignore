@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 uploads/
 .pytest_cache/
+.DS_Store
 
 # Office / presentation files
 *.pptx

@@ -81,6 +81,23 @@ import {
   ChevronDown,
   Shield,
 } from "lucide-react";
+import MobileNavigation from "@/components/MobileNavigation";
+
+const BACKEND_URL = "http://localhost:8000";
+
+type BackendStatusResponse = {
+  job_id: string;
+  status: string;
+  results?: {
+    player?: any;
+    crowd?: any;
+  };
+  error?: string;
+  detail?: string;
+};
+
+const getAccessToken = () =>
+  localStorage.getItem("accessToken") || localStorage.getItem("authToken");
 
 // Mock data for the dashboard
 const mockPlayers = [
@@ -231,6 +248,7 @@ export default function AFLDashboard() {
   const [selectedTeam, setSelectedTeam] = useState("all");
   const [isLive, setIsLive] = useState(true);
   const [userEmail, setUserEmail] = useState("");
+  const [activeQueueItemId, setActiveQueueItemId] = useState<string | null>(null);
 
   // Feature flag to disable live match features
   const ENABLE_LIVE_FEATURES = false;
@@ -361,20 +379,74 @@ useEffect(() => {
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`http://localhost:8000/status/${currentJobId}`);
-        const data = await response.json();
+        const token = getAccessToken();
+        if (!token) {
+          throw new Error("Missing login token");
+        }
+
+        const response = await fetch(`${BACKEND_URL}/status/${currentJobId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data: BackendStatusResponse = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || data.error || "Status check failed");
+        }
+
+        setVideoAnalysisProgress((prev) =>
+          data.status === "processing" ? Math.min(prev + 10, 90) : 100,
+        );
+        setProcessingQueue((prev) =>
+          prev.map((item) =>
+            item.id === currentJobId || item.id === activeQueueItemId
+              ? {
+                  ...item,
+                  id: currentJobId,
+                  status:
+                    data.status === "processing"
+                      ? "analyzing"
+                      : data.status === "failed"
+                        ? "failed"
+                        : "completed",
+                  progress: data.status === "processing" ? Math.min(item.progress + 10, 90) : 100,
+                  processingStage:
+                    data.status === "processing" ? "video_analysis" : "analysis_complete",
+                  completedTime:
+                    data.status === "processing"
+                      ? item.completedTime
+                      : new Date().toISOString(),
+                  estimatedCompletion:
+                    data.status === "processing" ? item.estimatedCompletion : null,
+                }
+              : item,
+          ),
+        );
 
         if (data.status !== "processing") {
           clearInterval(interval);
           setCurrentJobId(null);
+          setIsVideoAnalyzing(false);
+          setVideoAnalysisComplete(data.status === "done" || data.status === "partial");
+          if (data.error) {
+            setVideoAnalysisError(data.error);
+          }
+          if (data.results?.crowd) {
+            navigate(`/crowd-monitor?jobId=${encodeURIComponent(data.job_id)}`);
+          }
         }
       } catch (error) {
         console.error("Polling error:", error);
+        setIsVideoAnalyzing(false);
+        setVideoAnalysisError(
+          error instanceof Error ? error.message : "Polling failed",
+        );
       }
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [currentJobId]);
+  }, [activeQueueItemId, currentJobId, navigate]);
   // Generate dynamic chart data for analysis results
   const generateAnalysisChartData = (item: any) => {
     // Player performance data for charts
@@ -793,6 +865,10 @@ useEffect(() => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userName");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("loggedInUser");
     navigate("/");
   };
 
@@ -843,10 +919,19 @@ useEffect(() => {
       return;
     }
 
+    const token = getAccessToken();
+    if (!token) {
+      setVideoAnalysisError("Please sign in before uploading");
+      navigate("/login");
+      return;
+    }
+
     try {
       setVideoAnalysisError(null);
+      setVideoAnalysisComplete(false);
       setIsVideoUploading(true);
-      setVideoUploadProgress(0);
+      setIsVideoAnalyzing(false);
+      setVideoUploadProgress(10);
 
       // Create queue item immediately when upload starts
       const newQueueItem = {
@@ -889,87 +974,42 @@ useEffect(() => {
 
       // Add to processing queue immediately
       setProcessingQueue((prev) => [newQueueItem, ...prev]);
+      setActiveQueueItemId(newQueueItem.id);
 
-      // Simulate file upload with real progress
-      for (let i = 0; i <= 100; i += 5) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        setVideoUploadProgress(i);
+      const formData = new FormData();
+      formData.append("file", selectedVideoFile);
 
-        // Update the queue item progress during upload
-        setProcessingQueue((prev) =>
-          prev.map((item) =>
-            item.id === newQueueItem.id ? { ...item, progress: i } : item,
-          ),
-        );
+      const response = await fetch(`${BACKEND_URL}/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || "Upload failed");
       }
 
+      setCurrentJobId(data.job_id);
       setIsVideoUploading(false);
       setIsVideoAnalyzing(true);
-      setVideoAnalysisProgress(0);
+      setVideoUploadProgress(100);
+      setVideoAnalysisProgress(15);
 
-      // Move to queued status after upload completes
       setProcessingQueue((prev) =>
         prev.map((item) =>
           item.id === newQueueItem.id
             ? {
                 ...item,
-                status: "analyzing", // Start analyzing immediately since this is UI-controlled
-                progress: 5,
+                id: data.job_id,
+                status: "analyzing",
+                progress: 15,
                 processingStage: "video_analysis",
               }
             : item,
         ),
-      );
-
-      // Complete the UI state and sync queue progress
-      for (let i = 0; i <= 100; i += 2) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        setVideoAnalysisProgress(i);
-
-        // Update queue item progress to match UI progress
-        setProcessingQueue((prev) =>
-          prev.map((item) =>
-            item.id === newQueueItem.id
-              ? { ...item, progress: Math.max(5, i) } // Keep minimum 5% from earlier
-              : item,
-          ),
-        );
-      }
-
-      setIsVideoAnalyzing(false);
-      setVideoAnalysisComplete(true);
-
-      // Mark the corresponding queue item as completed when UI analysis finishes
-      setProcessingQueue((prev) =>
-        prev.map((item) =>
-          item.id === newQueueItem.id
-            ? {
-                ...item,
-                status: "completed",
-                progress: 100,
-                processingStage: "analysis_complete",
-                completedTime: new Date().toISOString(),
-                estimatedCompletion: null,
-              }
-            : item,
-        ),
-      );
-
-      // Store analysis results
-      const analysisResults = {
-        fileName: selectedVideoFile.name,
-        analysisType: selectedAnalysisType,
-        focusAreas: selectedFocusAreas,
-        timestamp: new Date().toISOString(),
-        fileSize: selectedVideoFile.size,
-      };
-
-      const existingAnalyses = JSON.parse(
-        localStorage.getItem("videoAnalyses") || "[]",
-      );
-      localStorage.setItem(
-        "videoAnalyses",
-        JSON.stringify([...existingAnalyses, analysisResults]),
       );
     } catch (error) {
       setIsVideoUploading(false);
@@ -981,7 +1021,8 @@ useEffect(() => {
       // Mark the queue item as failed if there was an error
       setProcessingQueue((prev) =>
         prev.map((item) =>
-          item.name === selectedVideoFile?.name && item.status === "uploading"
+          item.id === activeQueueItemId ||
+          (item.name === selectedVideoFile?.name && item.status === "uploading")
             ? {
                 ...item,
                 status: "failed",
@@ -1538,51 +1579,53 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
+      <MobileNavigation />
+
+      <div className="lg:ml-64 pb-16 lg:pb-0">
+        <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-30">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                    AFL Analytics
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    Real-time match insights & player analytics
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                  AFL Analytics
-                </h1>
-                <p className="text-sm text-gray-600">
-                  Real-time match insights & player analytics
-                </p>
+              <div className="flex items-center space-x-4">
+                <Badge
+                  variant={isLive ? "destructive" : "secondary"}
+                  className="animate-pulse"
+                >
+                  <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
+                  {isLive ? "LIVE" : "OFFLINE"}
+                </Badge>
+                {userEmail && (
+                  <span className="text-sm text-gray-600 hidden sm:block">
+                    Welcome, {userEmail}
+                  </span>
+                )}
+                <Button variant="outline" size="sm">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
               </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Badge
-                variant={isLive ? "destructive" : "secondary"}
-                className="animate-pulse"
-              >
-                <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-                {isLive ? "LIVE" : "OFFLINE"}
-              </Badge>
-              {userEmail && (
-                <span className="text-sm text-gray-600 hidden sm:block">
-                  Welcome, {userEmail}
-                </span>
-              )}
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="video" className="space-y-6">
+        <div className="container mx-auto px-4 py-6">
+          <Tabs defaultValue="video" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger
               value="performance"
@@ -3414,7 +3457,8 @@ Generated on: ${new Date().toLocaleString()}
           )}
         </DialogContent>
       </Dialog>
-    <BackToTopButton />
+      </div>
+      <BackToTopButton />
     </div>
   );
 }
