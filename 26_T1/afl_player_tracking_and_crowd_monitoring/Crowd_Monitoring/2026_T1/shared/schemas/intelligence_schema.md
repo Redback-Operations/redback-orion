@@ -32,7 +32,7 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
     {
       "frame_id": 1,
       "timestamp": 0.04,
-      "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0001.jpg",
+      "people_annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0001.jpg",
       "people_detections": [
         {
           "bbox": [100, 50, 160, 180],
@@ -44,7 +44,7 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
     {
       "frame_id": 2,
       "timestamp": 0.08,
-      "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0002.jpg",
+      "people_annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0002.jpg",
       "people_detections": [
         {
           "bbox": [104, 52, 164, 182],
@@ -69,7 +69,7 @@ This service receives analytics output, analyses crowd behaviour, and returns ri
 - `frames` - optional list of sequential detection-aware frame records for motion-based analysis
 - `frame_id` - integer - frame number in the sequence
 - `timestamp` - number - timestamp of the frame in seconds
-- `annotated_frame_path` - string - people bbox-annotated frame path from `crowd_detection`
+- `people_annotated_frame_path` - string - people bbox-annotated frame path from `crowd_detection`
 - `people_detections` - list - people detection records used for behaviour tracking
 - `face_detections` - list - optional face detection records from `crowd_detection`
 

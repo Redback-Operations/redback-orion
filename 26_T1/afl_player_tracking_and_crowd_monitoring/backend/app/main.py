@@ -1,4 +1,5 @@
 import logging
+import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -6,6 +7,7 @@ from app.routes import health, test, players, crowd, auth, upload, jobs
 from app.database import engine
 from app.models import Base
 from app import config
+from contextlib import asynccontextmanager
 
 logging.basicConfig(
     level=config.LOG_LEVEL,
@@ -13,12 +15,24 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if os.getenv("TESTING") != "true":
+        if not getattr(app.state, "db_initialized", False):
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            app.state.db_initialized = True
+            logger.info("Database tables created/verified")
+    else:
+        logger.info("TESTING=true, skipping database table creation")
+
+    yield
 
 app = FastAPI(
     title="Project Orion Backend API",
     description="API for player tracking and crowd monitoring",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 app.add_middleware(

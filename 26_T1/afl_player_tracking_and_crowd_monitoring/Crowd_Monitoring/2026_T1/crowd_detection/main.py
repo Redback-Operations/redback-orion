@@ -11,6 +11,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 FACE_OUTPUT_DIR = ANNOTATED_DIR if ANNOTATED_DIR.is_absolute() else PROJECT_ROOT / ANNOTATED_DIR
 PEOPLE_OUTPUT_DIR = PEOPLE_ANNOTATED_DIR if PEOPLE_ANNOTATED_DIR.is_absolute() else PROJECT_ROOT / PEOPLE_ANNOTATED_DIR
 
+
+def _safe_video_id(video_id):
+    value = str(video_id or "unknown_video")
+    return "".join(char if char.isalnum() or char in {"-", "_"} else "_" for char in value)
+
 def load_models():
     print(f"[INFO] Loading face model: {MODEL_NAME}")
     face_model = YOLO(MODEL_NAME)
@@ -68,6 +73,8 @@ def draw_people_boxes(frame, detections):
         cv2.putText(output, label, (x1, y1 - 5),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     (255, 100, 0), 1)
+  
+    cv2.putText(output, f"People: {len(detections)}", (10, 25),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 100, 0), 2)
 
     return output
 
@@ -93,10 +100,14 @@ def draw_boxes(frame, detections):
 def detect_crowd(processed_video: dict) -> dict:
     face_model, people_model = load_models() 
     all_results = []
+    safe_video_id = _safe_video_id(processed_video.get("video_id"))
+    people_video_output_dir = PEOPLE_OUTPUT_DIR / safe_video_id
+    frame_width = int(processed_video.get("frame_width") or 0)
+    frame_height = int(processed_video.get("frame_height") or 0)
     
     # create output folder
     FACE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    PEOPLE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    people_video_output_dir.mkdir(parents=True, exist_ok=True)
 
     for frame_data in processed_video["frames"]:
         frame_path = frame_data["frame_path"]
@@ -110,6 +121,9 @@ def detect_crowd(processed_video: dict) -> dict:
             print(f"[WARN] Could not read frame {frame_data['frame_id']} — skipping")
             continue
 
+        if frame_width <= 0 or frame_height <= 0:
+            frame_height, frame_width = frame.shape[:2]
+
         face_detections = detect_faces(face_model, frame, DEFAULT_CONF, DEFAULT_IOU)
         people_detections = detect_people(people_model, frame, DEFAULT_CONF, DEFAULT_IOU)
 
@@ -120,7 +134,7 @@ def detect_crowd(processed_video: dict) -> dict:
 
         # save annotated frame for people
         people_annotated = draw_people_boxes(frame, people_detections)
-        people_output_path = PEOPLE_OUTPUT_DIR / f"frame_{frame_data['frame_id']:04d}.jpg"
+        people_output_path = people_video_output_dir / f"frame_{frame_data['frame_id']:04d}.jpg"
         cv2.imwrite(str(people_output_path), people_annotated)
         face_annotated_frame_path = str(face_output_path.relative_to(PROJECT_ROOT)).replace("\\", "/")
         people_annotated_frame_path = str(people_output_path.relative_to(PROJECT_ROOT)).replace("\\", "/")
@@ -129,7 +143,6 @@ def detect_crowd(processed_video: dict) -> dict:
             "frame_id": frame_data["frame_id"],
             "timestamp": frame_data["timestamp"],
             "frame_path": frame_path,
-            "annotated_frame_path": people_annotated_frame_path,
             "face_annotated_frame_path": face_annotated_frame_path,
             "people_annotated_frame_path": people_annotated_frame_path,
             "person_count": len(people_detections),
@@ -140,6 +153,8 @@ def detect_crowd(processed_video: dict) -> dict:
 
     return {
         "video_id": processed_video["video_id"],
+        "frame_width": frame_width,
+        "frame_height": frame_height,
         "frames":   all_results,
     }
 

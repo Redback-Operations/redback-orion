@@ -34,9 +34,9 @@ class DetectionFrame(BaseModel):
 class BehaviourFrameInput(BaseModel):
     frame_id: int = Field(..., examples=[1])
     timestamp: float = Field(..., examples=[0.04])
-    annotated_frame_path: str = Field(
+    people_annotated_frame_path: str = Field(
         ...,
-        examples=["crowd_detection/output/annotated_frames/frame_0001.jpg"],
+        examples=["crowd_detection_output/people_detection_results/frame_0001.jpg"],
     )
     face_detections: list[BoundingBoxDetection] = Field(default_factory=list)
     people_detections: list[BoundingBoxDetection] = Field(default_factory=list)
@@ -68,9 +68,9 @@ class PeakCrowdFrame(BaseModel):
     frame_id: int = Field(..., examples=[18])
     timestamp: float = Field(..., examples=[12.4])
     person_count: int = Field(..., examples=[68])
-    annotated_frame_path: Optional[str] = Field(
+    people_annotated_frame_path: Optional[str] = Field(
         default=None,
-        examples=["crowd_detection/output/annotated_frames/frame_0018.jpg"],
+        examples=["crowd_detection_output/people_detection_results/frame_0018.jpg"],
     )
 
 
@@ -106,7 +106,10 @@ class TrackSummary(BaseModel):
     avg_normalized_speed: float = Field(..., examples=[0.42])
     max_normalized_speed: float = Field(..., examples=[0.88])
     normalized_displacement: float = Field(default=0.0, examples=[1.24])
+    normalized_anchor_displacement: float = Field(default=0.0, examples=[0.64])
     height_variation: float = Field(default=0.0, examples=[0.08])
+    avg_aspect_ratio: float = Field(default=0.0, examples=[0.42])
+    max_aspect_ratio: float = Field(default=0.0, examples=[0.55])
     is_stationary: bool = Field(..., examples=[False])
     is_walking: bool = Field(..., examples=[True])
     is_running: bool = Field(..., examples=[False])

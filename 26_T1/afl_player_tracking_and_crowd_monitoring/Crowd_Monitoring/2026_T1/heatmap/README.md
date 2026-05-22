@@ -65,5 +65,9 @@ Do not create extra files too early. Start simple, then split only when needed.
 ## Suggested Deliverables
 
 - A simple `main.py` script for heatmap generation
+
+## Suggested Deliverables
+
+- A heatmap generation script or notebook
 - Example heatmap image
 - Optional frame overlay showing density distribution

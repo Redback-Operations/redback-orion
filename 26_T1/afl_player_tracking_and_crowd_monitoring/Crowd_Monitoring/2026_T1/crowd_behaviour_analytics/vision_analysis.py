@@ -17,7 +17,7 @@ def resolve_frame_paths(input_data):
     frame_entries = input_data.get("frames", [])
     resolved_paths = []
     for frame in frame_entries:
-        annotated_path = frame.get("annotated_frame_path")
+        annotated_path = frame.get("people_annotated_frame_path")
         if annotated_path:
             resolved_paths.append(annotated_path)
     return resolved_paths

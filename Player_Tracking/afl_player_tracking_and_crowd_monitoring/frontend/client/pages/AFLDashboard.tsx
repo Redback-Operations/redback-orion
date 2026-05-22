@@ -172,6 +172,7 @@ const crowdZones = [
     current: 13200,
     density: 88,
     trend: "up",
+    avgTimeSpent: 42,
   },
   {
     zone: "Southern Stand",
@@ -179,6 +180,7 @@ const crowdZones = [
     current: 11400,
     density: 95,
     trend: "stable",
+    avgTimeSpent: 38,
   },
   {
     zone: "Eastern Wing",
@@ -186,6 +188,7 @@ const crowdZones = [
     current: 6800,
     density: 85,
     trend: "down",
+    avgTimeSpent: 55,
   },
   {
     zone: "Western Wing",
@@ -193,6 +196,7 @@ const crowdZones = [
     current: 7600,
     density: 95,
     trend: "up",
+    avgTimeSpent: 61,
   },
   {
     zone: "Premium Seating",
@@ -200,10 +204,33 @@ const crowdZones = [
     current: 2850,
     density: 95,
     trend: "stable",
+    avgTimeSpent: 112,
   },
 ];
-const safestZone = crowdZones.reduce((min, zone) => zone.density < min.density ? zone : min, crowdZones[0]);
+const safestZone = crowdZones.reduce(
+  (min, zone) => (zone.density < min.density ? zone : min),
+  crowdZones[0],
+);
+const BackToTopButton = () => {
+  const [visible, setVisible] = useState(false);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setVisible(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return visible ? (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white rounded-full p-3 shadow-lg z-50"
+    >
+      ↑
+    </button>
+  ) : null;
+};
 export default function AFLDashboard() {
   const navigate = useNavigate();
   const [selectedPlayer, setSelectedPlayer] = useState(mockPlayers[0]);
@@ -1497,6 +1524,9 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedTeam === "all" || player.team === selectedTeam),
   );
+  const goToHome = () => {
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
@@ -1505,17 +1535,25 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                  AFL Analytics
-                </h1>
-                <p className="text-sm text-gray-600">
-                  Real-time match insights & player analytics
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={goToHome}
+                className="flex items-center gap-3 text-left hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1"
+                aria-label="Go to AFL Dashboard"
+                title="Go to AFL Dashboard"
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center shadow-sm">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    AFL Analytics
+                  </h1>
+                  <p className="text-gray-600">
+                    Real-time match insights & player analytics
+                  </p>
+                </div>
+              </button>
             </div>
             <div className="flex items-center space-x-4">
               <Badge
@@ -1537,6 +1575,19 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  window.open(
+                    "https://redback-operations.github.io/redback-documentation/",
+                    "_blank",
+                  )
+                }
+                className="bg-red-600 hover:bg-red-700 text-white border-red-600"
+              >
+                Redback Operations
               </Button>
             </div>
           </div>
@@ -1642,7 +1693,6 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                   </div>
                 </CardContent>
               </Card>
-
               {/* Player Statistics */}
               <div className="lg:w-2/3 space-y-6">
                 <Card>
@@ -1685,11 +1735,37 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                         </div>
                         <div className="text-sm text-gray-600">Goals</div>
                       </div>
-                      <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                      <div
+                        className="text-center p-4 bg-yellow-50 rounded-lg cursor-pointer relative group"
+                        title="Efficiency Rating"
+                      >
                         <div className="text-2xl font-bold text-yellow-600">
                           {selectedPlayer.efficiency}%
                         </div>
                         <div className="text-sm text-gray-600">Efficiency</div>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10 w-48 bg-gray-800 text-white text-xs rounded-lg p-3 shadow-lg">
+                          <div className="font-bold mb-1">
+                            {selectedPlayer.efficiency >= 90
+                              ? "🏆 Excellent"
+                              : selectedPlayer.efficiency >= 80
+                                ? "⭐ Good"
+                                : selectedPlayer.efficiency >= 70
+                                  ? "👍 Average"
+                                  : "📈 Needs Improvement"}
+                          </div>
+                          <div>
+                            {selectedPlayer.efficiency >= 90
+                              ? "Elite level performance. Top 10% of all players."
+                              : selectedPlayer.efficiency >= 80
+                                ? "Strong performance. Above average player."
+                                : selectedPlayer.efficiency >= 70
+                                  ? "Solid performance. Room to improve."
+                                  : "Below average. Focus on consistency."}
+                          </div>
+                          <div className="mt-1 text-yellow-300">
+                            Score: {selectedPlayer.efficiency}/100
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -2102,10 +2178,47 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       {safestZone.zone}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {safestZone.density}% full · {safestZone.current.toLocaleString()} people
+                      {safestZone.density}% full ·{" "}
+                      {safestZone.current.toLocaleString()} people
                     </p>
                   </div>
                   <Shield className="w-8 h-8 text-green-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  Avg Time Spent Per Zone
+                </CardTitle>
+                <CardDescription>
+                  Average minutes visitors spend in each zone
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {crowdZones.map((zone, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                    >
+                      <span className="text-sm font-medium">{zone.zone}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-500 h-2 rounded-full"
+                            style={{
+                              width: `${Math.min((zone.avgTimeSpent / 120) * 100, 100)}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="text-sm font-bold text-blue-600 w-16 text-right">
+                          {zone.avgTimeSpent} min
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -3360,6 +3473,7 @@ Generated on: ${new Date().toLocaleString()}
           )}
         </DialogContent>
       </Dialog>
+      <BackToTopButton />
     </div>
   );
 }

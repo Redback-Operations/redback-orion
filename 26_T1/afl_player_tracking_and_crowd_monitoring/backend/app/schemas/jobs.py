@@ -10,7 +10,7 @@ class UploadResponse(BaseModel):
     created_at: datetime
 
     @field_serializer("job_id")
-    def serialize_job_id(self, v: UUID) -> str:
+    def serialize_uuid(self, v: UUID) -> str:
         return str(v)
 
 
@@ -23,7 +23,7 @@ class JobSummary(BaseModel):
     updated_at: datetime
 
     @field_serializer("job_id")
-    def serialize_job_id(self, v: UUID) -> str:
+    def serialize_uuid(self, v: UUID) -> str:
         return str(v)
 
 
@@ -48,7 +48,7 @@ class JobDetail(BaseModel):
     errors: Optional[JobErrors] = None
 
     @field_serializer("job_id")
-    def serialize_job_id(self, v: UUID) -> str:
+    def serialize_uuid(self, v: UUID) -> str:
         return str(v)
 
 

@@ -35,7 +35,7 @@ Optional additional input for AI-vision processing:
     {
       "frame_id": 1,
       "timestamp": 0.04,
-      "annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0001.jpg",
+      "people_annotated_frame_path": "crowd_detection_output/people_detection_results/frame_0001.jpg",
       "people_detections": [
         {
           "bbox": [100, 50, 160, 180],

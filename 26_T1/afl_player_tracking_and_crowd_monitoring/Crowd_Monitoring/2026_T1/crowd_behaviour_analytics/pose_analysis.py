@@ -78,7 +78,7 @@ def _build_track_pose_sequences(frames, frame_tracks, tracking_summary, pose_mod
         frame_entry = frame_entries.get(frame_id, {})
         resolved_frame_path = _resolve_frame_path(frame_entry.get("frame_path") or frame_track.get("frame_path"))
         if resolved_frame_path is None:
-            resolved_frame_path = _resolve_frame_path(frame_track.get("annotated_frame_path"))
+            resolved_frame_path = _resolve_frame_path(frame_track.get("people_annotated_frame_path"))
         if resolved_frame_path is None or not resolved_frame_path.exists():
             continue
 

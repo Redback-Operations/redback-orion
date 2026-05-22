@@ -46,7 +46,7 @@ def _build_peak_crowd_frame(detection_result: dict) -> dict:
         "frame_id": peak_frame.get("frame_id"),
         "timestamp": peak_frame.get("timestamp"),
         "person_count": peak_frame.get("person_count", 0),
-        "annotated_frame_path": peak_frame.get("annotated_frame_path"),
+        "people_annotated_frame_path": peak_frame.get("people_annotated_frame_path"),
     }
 
 

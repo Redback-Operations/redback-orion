@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -16,6 +17,15 @@ app = FastAPI(
     description="Crowd monitoring APIs and demo UI.\n\n[Open Demo Page](/demo)",
     docs_url="/",
     redoc_url="/redoc",
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -65,7 +75,7 @@ def demo_page():
         var(--bg);
     }
     .wrap {
-      max-width: 1200px;
+      max-width: 1600px;
       margin: 0 auto;
       padding: 32px 20px 48px;
     }
@@ -170,7 +180,7 @@ def demo_page():
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
     }
     .visual {
@@ -196,6 +206,11 @@ def demo_page():
       text-align: center;
     }
     .hidden { display: none; }
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -329,7 +344,7 @@ def demo_page():
         document.getElementById("lowZone").textContent = lowZone;
         document.getElementById("lowZoneMeta").textContent = lowZoneMeta;
 
-        setImage("peakFrame", peakFrame.annotated_frame_path);
+        setImage("peakFrame", peakFrame.people_annotated_frame_path || peakFrame.annotated_frame_path);
         setImage("anomalyFrame", (payload.anomaly_visual || {}).image_path);
         setImage("heatmap", (payload.heatmap || {}).image_path);
         setImage("chart", (payload.time_series_chart || {}).image_path);

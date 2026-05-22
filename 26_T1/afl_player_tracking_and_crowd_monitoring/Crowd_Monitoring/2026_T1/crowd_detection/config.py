@@ -3,7 +3,7 @@ from pathlib import Path
 
 CURRENT_DIR=os.path.dirname(os.path.abspath(__file__))
 MODEL_NAME = os.path.join(CURRENT_DIR, "face_model.pt")   # Model downloaded from https://huggingface.co/arnabdhar/YOLOv8-Face-Detection
-PEOPLE_MODEL_NAME = os.path.join(CURRENT_DIR, "yolov8s.pt")
+PEOPLE_MODEL_NAME = os.path.join(CURRENT_DIR, "yolov8n_crowdhuman.pt")
  
 ANNOTATED_DIR = Path("crowd_detection_output") / "face_detection_results"
 PERSON_CLASS = None

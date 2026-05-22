@@ -7,6 +7,7 @@ from typing import Dict, List
 class Tracking:
     def __init__(self, model_path: str, confidence_threshold: float = 0.3):
         self.yolo_model = YOLO(model_path)
+        print(self.yolo_model.names)
         self.confidence_threshold = confidence_threshold
     
     def __call__(self, video_path: str, output_video: str = None, save_json: bool = True) -> Dict:
@@ -93,15 +94,24 @@ class Tracking:
                 xyxy = boxes.xyxy.cpu().numpy()
                 conf = boxes.conf.cpu().numpy()
                 ids = boxes.id.cpu().numpy() if boxes.id is not None else None
+                classes = boxes.cls.cpu().numpy()
                 
                 for i in range(len(boxes)):
                     bbox = xyxy[i]
                     confidence = float(conf[i])
                     player_id = int(ids[i]) if ids is not None else i + 1
-                    
+                    class_id = int(classes[i])
+                    team_name = self.yolo_model.names[class_id] if self.yolo_model.names else "Unknown"
                     player_data = {
                         "player_id": player_id,
-                        "bbox": {"x1": int(bbox[0]), "y1": int(bbox[1]), "x2": int(bbox[2]), "y2": int(bbox[3])},
+                        "team_id": class_id,
+                        "team_name": team_name,
+                        "bbox": {
+                            "x1": int(bbox[0]),
+                            "y1": int(bbox[1]), 
+                            "x2": int(bbox[2]), 
+                            "y2": int(bbox[3])
+                        },
                         "center": {"x": int((bbox[0] + bbox[2]) / 2), "y": int((bbox[1] + bbox[3]) / 2)},
                         "confidence": round(confidence, 2),
                         "width": int(bbox[2] - bbox[0]),

@@ -175,9 +175,8 @@ The frontend should use this endpoint instead of calling the individual module e
 - `frame_id` - integer - frame number
 - `timestamp` - number - time in seconds for the frame
 - `frame_path` - string or null - extracted frame image path
-- `annotated_frame_path` - string or null - default annotated frame path
+- `people_annotated_frame_path` - string or null - people detection annotated image path used by the demo peak-frame preview
 - `face_annotated_frame_path` - string or null - face detection annotated image path
-- `people_annotated_frame_path` - string or null - people detection annotated image path
 - `person_count` - integer - number of detected people
 - `face_count` - integer or null - number of detected faces
 - `face_detections` - list - detected face bounding boxes

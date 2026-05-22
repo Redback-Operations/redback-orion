@@ -2,9 +2,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.auth.jwt import decode_access_token
 
-http_bearer = HTTPBearer()
+bearer_scheme = HTTPBearer()
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(http_bearer)) -> dict:
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> dict:
     token = credentials.credentials
     payload = decode_access_token(token)
     if payload is None:

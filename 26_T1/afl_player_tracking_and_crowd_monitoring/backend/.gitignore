@@ -3,3 +3,13 @@ __pycache__/
 *.pyc
 uploads/
 .pytest_cache/
+.DS_Store
+
+# Office / presentation files
+*.pptx
+*.xlsx
+*.csv
+
+# Dev tooling
+GIT_GUIDE.txt
+.claude/
