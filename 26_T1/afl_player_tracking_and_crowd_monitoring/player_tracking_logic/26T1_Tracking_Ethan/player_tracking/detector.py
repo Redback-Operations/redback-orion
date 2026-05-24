@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import numpy as np
 
-from .appearance import extract_appearance_feature
+from .appearance import extract_appearance_feature, extract_jersey_colour_feature
 from .geometry import bbox_center, euclidean_distance, iou_xyxy
 
 
@@ -59,9 +59,14 @@ def parse_yolo_detections(
                 "bbox": xyxy,
                 "center": center,
                 "conf": conf,
-                "class_id": class_id,
-                "class_name": get_class_name_from_model(model, class_id),
+                # "class_id": class_id,
+                "class_id": 0,
+                # "class_name": get_class_name_from_model(model, class_id),
+                "class_name": "PLAYER",
+                # Online appearance feature for reducing ID switches.
                 "appearance": extract_appearance_feature(frame, xyxy),
+                # Offline jersey colour feature for team clustering.
+                "jersey_feature": extract_jersey_colour_feature(frame, xyxy),
             }
         )
 
