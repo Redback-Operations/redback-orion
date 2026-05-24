@@ -1,4 +1,5 @@
 import copy
+import uuid as _uuid
 import httpx
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
@@ -28,13 +29,13 @@ def _crowd_with_urls(crowd: dict) -> dict:
     for section in ("heatmap", "anomaly_visual", "time_series_chart"):
         path = c.get(section, {}) and c[section].get("image_path")
         if path and not path.startswith("http"):
-            c[section]["image_path"] = base + path
+            c[section]["image_path"] = base + path.replace("\\", "/")
 
     pcf = c.get("peak_crowd_frame")
     if pcf:
         for key in ("annotated_frame_path", "people_annotated_frame_path"):
             if pcf.get(key) and not pcf[key].startswith("http"):
-                pcf[key] = base + pcf[key]
+                pcf[key] = base + pcf[key].replace("\\", "/")
 
     return c
 
@@ -64,6 +65,13 @@ def _player_with_urls(player: dict) -> dict:
     return p
 
 
+def _parse_job_id(job_id: str) -> str:
+    try:
+        return str(_uuid.UUID(job_id))
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid job_id format: '{job_id}'")
+
+
 def check_job_access(job: Job, current_user: dict):
     if current_user["role"] != "admin" and str(job.user_id) != current_user["sub"]:
         raise HTTPException(status_code=403, detail="Access denied")
@@ -75,6 +83,7 @@ def get_status(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    job_id = _parse_job_id(job_id)
     job = db.query(Job).filter(Job.job_id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -114,6 +123,7 @@ def get_job(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    job_id = _parse_job_id(job_id)
     job = db.query(Job).filter(Job.job_id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -149,6 +159,9 @@ async def retry_job(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    from app.routes.upload import process_video
+
+    job_id = _parse_job_id(job_id)
     job = db.query(Job).filter(Job.job_id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -181,6 +194,7 @@ async def get_heatmap(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    job_id = _parse_job_id(job_id)
     job = db.query(Job).filter(Job.job_id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -207,6 +221,7 @@ def delete_job(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    job_id = _parse_job_id(job_id)
     job = db.query(Job).filter(Job.job_id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
