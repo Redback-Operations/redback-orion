@@ -64,6 +64,7 @@ import {
   Eye,
   Star,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Comprehensive player data with enhanced AFL statistics
 const generatePlayerData = () => {
@@ -100,8 +101,7 @@ const generatePlayerData = () => {
       age: 28,
       height: "1.93m",
       weight: "92kg",
-      photo:
-        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F35a79c1a43bd4be1a3d3d6a95b0b1a79?format=webp&width=100",
+      photo: "/image.png",
       stats: {
         kicks: 28,
         handballs: 12,
@@ -149,8 +149,7 @@ const generatePlayerData = () => {
       age: 35,
       height: "1.78m",
       weight: "78kg",
-      photo:
-        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F35a79c1a43bd4be1a3d3d6a95b0b1a79?format=webp&width=100",
+      photo: "/image.png",
       stats: {
         kicks: 31,
         handballs: 14,
@@ -199,8 +198,7 @@ const generatePlayerData = () => {
       age: Math.floor(Math.random() * 15) + 20,
       height: `1.${Math.floor(Math.random() * 30) + 70}m`,
       weight: `${Math.floor(Math.random() * 30) + 75}kg`,
-      photo:
-        "https://cdn.builder.io/api/v1/image/assets%2Faf9aef6647464a4bb798d09aa34aaa76%2F35a79c1a43bd4be1a3d3d6a95b0b1a79?format=webp&width=100",
+      photo: "/image.png",
       stats: {
         kicks: Math.floor(Math.random() * 20) + 15,
         handballs: Math.floor(Math.random() * 15) + 5,
@@ -260,8 +258,8 @@ export default function PlayerPerformance() {
   const [isPlaying, setIsPlaying] = useState(false);
   const ENABLE_LIVE_FEATURES = true;
 
-  const [players, setPlayers] = useState(generatePlayerData());
-  const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const [comparisonPlayer, setComparisonPlayer] = useState(players[1]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
@@ -269,7 +267,100 @@ export default function PlayerPerformance() {
   const [chartType, setChartType] = useState<
     "possession" | "performance" | "comparison"
   >("possession");
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [jobs, setJobs] = useState<any[]>([]);
+  const token = localStorage.getItem("token");
+  const [jobStatus, setJobStatus] = useState("");
+  const [jobId, setJobId] = useState("");
+  const [jobError, setJobError] = useState("");
 
+  const uploadVideo = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("http://localhost:8000/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    
+
+  const data = await res.json();
+  console.log("UPLOAD RESULT:", data);
+  return data.job_id;
+};
+
+const fetchJobs = async () => {
+  const res = await fetch("http://localhost:8000/jobs?page=1&limit=10", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  console.log("JOBS:", data);
+  return data.jobs;
+};
+
+const handleUpload = async () => {
+  if (!selectedVideo) {
+    setUploadStatus("Please choose a video first");
+    return;
+  }
+
+  setUploadStatus("Uploading...");
+  setJobStatus("processing");
+
+  try {
+    const id = await uploadVideo(selectedVideo);
+    setJobId(id);
+    setUploadStatus(`Upload complete. Job ID: ${id}`);
+    setJobStatus("done");
+
+    const latestJobs = await fetchJobs();
+    setJobs(latestJobs || []);
+  } catch (err) {
+    console.error(err);
+    setJobStatus("failed");
+    setJobError("Upload failed. Please try again.");
+  }
+};
+
+  
+  useEffect(() => {
+  fetch("http://localhost:8000/api/players")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("API DATA:", data);
+
+      const playerList = Array.isArray(data)
+        ? data
+        : Array.isArray(data.data)
+        ? data.data
+        : Array.isArray(data.players)
+        ? data.players
+        : [];
+
+      setPlayers(playerList.length > 0 ? playerList : generatePlayerData());
+    })
+    .catch((err) => {
+      console.error("API ERROR:", err);
+      setPlayers(generatePlayerData());
+    });
+}, []);
+
+  useEffect(() => {
+    if (players.length > 0) {
+      setSelectedPlayer(players[0]);
+      setComparisonPlayer(players[1] || players[0]);
+    }
+  }, [players]);
+
+  
+  
   // Simulate live data updates
   useEffect(() => {
     if (!isLive || !isPlaying) return;
@@ -292,6 +383,10 @@ export default function PlayerPerformance() {
 
     return () => clearInterval(interval);
   }, [isLive, isPlaying]);
+
+  if (!selectedPlayer) {
+  return <div className="p-6">Loading player data...</div>;
+  }
 
   const filteredPlayers = players.filter(
     (player) =>
@@ -370,6 +465,31 @@ export default function PlayerPerformance() {
     return teamColors[team] || "#6B7280";
   };
 
+  const getTeamLogo = (team: string) => {
+    const teamLogos: Record<string, string> = {
+      "Western Bulldogs": "/team-logos/western-bulldogs.svg",
+      Richmond: "/team-logos/richmond.svg",
+      Geelong: "/team-logos/geelong.svg",
+      Melbourne: "/team-logos/melbourne.svg",
+      Carlton: "/team-logos/carlton.svg",
+      Adelaide: "/team-logos/adelaide.svg",
+      "West Coast": "/team-logos/west-coast.svg",
+      Collingwood: "/team-logos/collingwood.svg",
+      Essendon: "/team-logos/essendon.svg",
+      Fremantle: "/team-logos/fremantle.svg",
+      Brisbane: "/team-logos/brisbane.svg",
+      Sydney: "/team-logos/sydney.svg",
+      "St Kilda": "/team-logos/st-kilda.svg",
+      "Port Adelaide": "/team-logos/port-adelaide.svg",
+      "North Melbourne": "/team-logos/north-melbourne.svg",
+      "Gold Coast": "/team-logos/gold-coast.svg",
+      "GWS Giants": "/team-logos/gws-giants.svg",
+      Hawthorn: "/team-logos/hawthorn.svg",
+    };
+
+    return teamLogos[team] || "/team-logos/default.svg";
+  };
+
   const StatCard = ({
     title,
     value,
@@ -437,10 +557,24 @@ export default function PlayerPerformance() {
         className="h-24 rounded-t-lg relative"
         style={{ backgroundColor: getTeamColor(player.team) }}
       >
-        <div className="absolute top-4 left-4 text-white">
-          <div className="text-2xl font-bold">#{player.number}</div>
-          <div className="text-sm">{player.team}</div>
+        <div className="absolute top-4 left-4 flex items-start gap-3 text-white">
+          <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center overflow-hidden">
+            <img
+              src={getTeamLogo(player.team)}
+              alt={`${player.team} logo`}
+              className="w-10 h-10 object-cover scale-110"
+              onError={(e) => {
+                e.currentTarget.src = "/team-logos/default.svg";
+              }}
+            />
+          </div>
+
+          <div>
+            <div className="text-2xl font-bold">#{player.number}</div>
+            <div className="text-sm">{player.team}</div>
+          </div>
         </div>
+
         <div className="absolute top-4 right-4 text-white text-right">
           <div className="text-xl font-bold">{player.stats.disposals}</div>
           <div className="text-xs">DISPOSALS</div>
@@ -465,6 +599,7 @@ export default function PlayerPerformance() {
               </span>
             </div>
           )}
+
           <div className="flex-1">
             <h3 className="font-bold text-sm leading-tight">{player.name}</h3>
             <p className="text-xs text-gray-600">{player.position}</p>
@@ -531,64 +666,113 @@ export default function PlayerPerformance() {
               </Button>
             </div>
           </div>
+          <div style={{ margin: "20px", padding: "10px", border: "1px solid gray" }}>
+            <h3>Backend Integration Test</h3>
+
+          <input
+            type="file"
+            accept=".mp4,.avi,.mov"
+            onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+          />
+
+          <button onClick={handleUpload}>Upload Video</button>
+          <p>Status: {jobStatus}</p>
+
+          {jobStatus === "processing" && <p>Processing video...</p>}
+          {jobStatus === "done" && <p>Processing completed successfully.</p>}
+          {jobStatus === "failed" && <p>{jobError}</p>}
+
+          {jobStatus === "partial" && (
+            <button onClick={handleUpload}>Retry</button>
+          )}              
+          <p>{uploadStatus}</p>
+
+          {jobs.map((job) => (
+            <div key={job.job_id}>
+            <p>Job ID: {job.job_id}</p>
+            <p>Status: {job.status}</p>
+           </div>
+           ))}
+        </div>
 
           {/* Live Clock */}
-          {ENABLE_LIVE_FEATURES && (
-            <LiveClock
-              isLive={isLive}
-              onToggleLive={setIsLive}
-              matchTime={{ quarter: 2, timeRemaining: "15:23" }}
-            />
-          )}
+          <div className="bg-white rounded-xl shadow-sm border px-4 py-3 flex items-center justify-between gap-3">
+            <div className="flex-1">
+              {ENABLE_LIVE_FEATURES && (
+                <LiveClock
+                  isLive={isLive}
+                  onToggleLive={setIsLive}
+                  matchTime={{ quarter: 2, timeRemaining: "15:23" }}
+                />
+              )}
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => {
+                console.log("navigating to add-player");
+                navigate("/add-player");
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white shrink-0"
+            >
+              Add Player
+            </Button>
+          </div>
 
           {/* Quick Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <StatCard
-                      title="Players Active"
-                      value={filteredPlayers.length}
-                      icon={Users}
-                      color="blue"
-                      trend="up"
-                      active={selectedStat === "Players Active"}
-                      onClick={() => setSelectedStat("Players Active")}
-                    />
+            <StatCard
+              title="Players Active"
+              value={filteredPlayers.length}
+              icon={Users}
+              color="blue"
+              trend="up"
+              active={selectedStat === "Players Active"}
+              onClick={() => setSelectedStat("Players Active")}
+            />
 
-                    <StatCard
-                      title="Total Goals"
-                      value={filteredPlayers.reduce((sum, p) => sum + p.stats.goals, 0)}
-                      icon={Target}
-                      color="green"
-                      trend="up"
-                      active={selectedStat === "Total Goals"}
-                      onClick={() => setSelectedStat("Total Goals")}
-                    />
+            <StatCard
+              title="Total Goals"
+              value={filteredPlayers.reduce((sum, p) => sum + p.stats.goals, 0)}
+              icon={Target}
+              color="green"
+              trend="up"
+              active={selectedStat === "Total Goals"}
+              onClick={() => setSelectedStat("Total Goals")}
+            />
 
-                    <StatCard
-                      title="Avg Efficiency"
-                      value={`${
-                        filteredPlayers.length > 0
-                          ? Math.round(
-                              filteredPlayers.reduce((sum, p) => sum + p.stats.efficiency, 0) /
-                                filteredPlayers.length
-                            )
-                          : 0
-                      }%`}
-                      icon={Activity}
-                      color="purple"
-                      trend="stable"
-                      active={selectedStat === "Avg Efficiency"}
-                      onClick={() => setSelectedStat("Avg Efficiency")}
-                    />
+            <StatCard
+              title="Avg Efficiency"
+              value={`${
+                filteredPlayers.length > 0
+                  ? Math.round(
+                      filteredPlayers.reduce(
+                        (sum, p) => sum + p.stats.efficiency,
+                        0,
+                      ) / filteredPlayers.length,
+                    )
+                  : 0
+              }%`}
+              icon={Activity}
+              color="purple"
+              trend="stable"
+              active={selectedStat === "Avg Efficiency"}
+              onClick={() => setSelectedStat("Avg Efficiency")}
+            />
 
-                    <StatCard
-                      title="Total Disposals"
-                      value={filteredPlayers.reduce((sum, p) => sum + p.stats.disposals, 0)}
-                      icon={BarChart3}
-                      color="orange"
-                      trend="up"
-                      active={selectedStat === "Total Disposals"}
-                      onClick={() => setSelectedStat("Total Disposals")}
-                    />    
+            <StatCard
+              title="Total Disposals"
+              value={filteredPlayers.reduce(
+                (sum, p) => sum + p.stats.disposals,
+                0,
+              )}
+              icon={BarChart3}
+              color="orange"
+              trend="up"
+              active={selectedStat === "Total Disposals"}
+              onClick={() => setSelectedStat("Total Disposals")}
+            />
           </div>
 
           {/* Search and Filters */}
@@ -992,4 +1176,4 @@ export default function PlayerPerformance() {
       </div>
     </div>
   );
-}
+};
