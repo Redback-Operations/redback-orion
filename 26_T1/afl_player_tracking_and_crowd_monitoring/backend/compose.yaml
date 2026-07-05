@@ -20,6 +20,8 @@ services:
       DATABASE_URL: postgresql+asyncpg://user:password@db:5432/orion_db
     depends_on:
       - db
+    volumes:
+      - uploads_data:/app/uploads
 
   frontend:
     build:
@@ -31,9 +33,15 @@ services:
 
   player-tracking:
     build:
-      context: ../player_tracking_logic
+      context: ..
+      dockerfile: player_service/Dockerfile
+    ports:
+      - "8081:8080"
     depends_on:
       - backend
+    volumes:
+      - ../player_service/outputs:/app/player_service/outputs
+      - ../player_service/uploads:/app/player_service/uploads
 
   crowd-monitoring:
     build:
@@ -42,6 +50,10 @@ services:
     ports:
       - "8002:8002"
     restart: unless-stopped
+    volumes:
+      - ../Crowd_Monitoring/2026_T1/output:/app/output
+      - ../Crowd_Monitoring/2026_T1/analytics_output:/app/analytics_output
+      - uploads_data:/app/uploads
 
   db:
     image: postgres:16
@@ -56,6 +68,7 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to

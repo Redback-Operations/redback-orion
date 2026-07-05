@@ -20,6 +20,17 @@ def _bbox_size(bbox):
     return max(x2 - x1, 1), max(y2 - y1, 1)
 
 
+def _ground_anchor(bbox):
+    """Approximate where the person's feet touch the ground."""
+    x1, _, x2, y2 = bbox
+    return ((x1 + x2) / 2.0, float(y2))
+
+
+def _bbox_aspect_ratio(bbox):
+    width, height = _bbox_size(bbox)
+    return width / max(height, 1)
+
+
 def _bbox_iou(box_a, box_b):
     ax1, ay1, ax2, ay2 = box_a
     bx1, by1, bx2, by2 = box_b
@@ -144,15 +155,18 @@ def track_people(frames, max_distance=80.0, min_iou=0.1, max_missed_time=3.0):
                 history = track_histories.get(track_id, [])
 
             bbox_width, bbox_height = _bbox_size(bbox)
+            ground_anchor = _ground_anchor(bbox)
             track_entry = {
                 "track_id": track_id,
                 "bbox": bbox,
                 "centroid": [round(centroid[0], 2), round(centroid[1], 2)],
+                "ground_anchor": [round(ground_anchor[0], 2), round(ground_anchor[1], 2)],
                 "speed": round(speed, 2),
                 "normalized_speed": round(normalized_speed, 4),
                 "direction": [direction[0], direction[1]],
                 "bbox_width": bbox_width,
                 "bbox_height": bbox_height,
+                "bbox_aspect_ratio": round(_bbox_aspect_ratio(bbox), 4),
                 "confidence": detection.get("confidence", 0.0),
             }
             tracked_detections.append(track_entry)
@@ -162,9 +176,11 @@ def track_people(frames, max_distance=80.0, min_iou=0.1, max_missed_time=3.0):
                     "frame_id": frame.get("frame_id"),
                     "timestamp": timestamp,
                     "centroid": track_entry["centroid"],
+                    "ground_anchor": track_entry["ground_anchor"],
                     "speed": track_entry["speed"],
                     "normalized_speed": track_entry["normalized_speed"],
                     "bbox_height": bbox_height,
+                    "bbox_aspect_ratio": track_entry["bbox_aspect_ratio"],
                 }
             ]
 
@@ -194,7 +210,7 @@ def summarise_tracks(
     track_histories,
     stationary_motion_threshold=0.06,
     walking_motion_threshold=0.12,
-    running_motion_threshold=0.9,
+    running_motion_threshold=1.05,
     min_history_for_motion=3,
 ):
     """Build tracking summary for anomaly/event logic."""
@@ -211,51 +227,77 @@ def summarise_tracks(
         max_normalized_speed = max(normalized_speeds, default=0.0)
         avg_normalized_speed = sum(normalized_speeds) / len(normalized_speeds) if normalized_speeds else 0.0
         heights = [entry.get("bbox_height", 1.0) for entry in history]
+        aspect_ratios = [entry.get("bbox_aspect_ratio", 0.0) for entry in history]
         avg_height_history = max(sum(heights) / max(len(heights), 1), 1.0)
         height_variation = (
             max(abs(height - avg_height_history) for height in heights) / avg_height_history
             if heights
             else 0.0
         )
+        avg_aspect_ratio = sum(aspect_ratios) / len(aspect_ratios) if aspect_ratios else 0.0
+        max_aspect_ratio = max(aspect_ratios, default=0.0)
         first_centroid = history[0].get("centroid", [0.0, 0.0])
         last_centroid = history[-1].get("centroid", [0.0, 0.0])
+        first_anchor = history[0].get("ground_anchor", first_centroid)
+        last_anchor = history[-1].get("ground_anchor", last_centroid)
         displacement = _distance(first_centroid, last_centroid)
+        anchor_displacement = _distance(first_anchor, last_anchor)
         avg_height = max(
             sum(entry.get("bbox_height", 1.0) for entry in history) / max(len(history), 1),
             1.0,
         )
         normalized_displacement = displacement / avg_height
+        normalized_anchor_displacement = anchor_displacement / avg_height
         history_length = len(history)
         has_motion_history = history_length >= min_history_for_motion
         moving_steps = sum(1 for speed in normalized_speeds if speed >= 0.05)
         sustained_motion_steps = sum(1 for speed in normalized_speeds if speed >= 0.08)
+        running_motion_steps = sum(1 for speed in normalized_speeds if speed >= 0.3)
+        anchor_motion_steps = 0
+        for previous, current in zip(history, history[1:]):
+            previous_anchor = previous.get("ground_anchor", previous.get("centroid", [0.0, 0.0]))
+            current_anchor = current.get("ground_anchor", current.get("centroid", [0.0, 0.0]))
+            step_height = max((previous.get("bbox_height", 1.0) + current.get("bbox_height", 1.0)) / 2.0, 1.0)
+            normalized_anchor_step = _distance(previous_anchor, current_anchor) / step_height
+            if normalized_anchor_step >= 0.045:
+                anchor_motion_steps += 1
         direction_consistency = _direction_consistency(history)
+        stable_box_shape = avg_aspect_ratio <= 0.72 and max_aspect_ratio <= 0.9
         is_running = (
-            has_motion_history
-            and avg_normalized_speed >= 0.55
+            history_length >= 5
+            and avg_normalized_speed >= 0.7
             and max_normalized_speed >= running_motion_threshold
-            and normalized_displacement >= 0.9
+            and normalized_displacement >= 1.15
+            and normalized_anchor_displacement >= 0.55
+            and running_motion_steps >= 3
+            and anchor_motion_steps >= 3
+            and direction_consistency >= 0.55
+            and stable_box_shape
         )
         sustained_walking_motion = (
-            history_length >= 6
-            and avg_normalized_speed >= 0.06
-            and max_normalized_speed >= 0.14
-            and normalized_displacement >= 0.45
-            and height_variation <= 0.5
+            history_length >= 7
+            and avg_normalized_speed >= 0.09
+            and max_normalized_speed >= 0.18
+            and normalized_displacement >= 0.55
+            and normalized_anchor_displacement >= 0.28
+            and height_variation <= 0.42
         )
         clear_walking_motion = (
-            avg_normalized_speed >= walking_motion_threshold
-            and max_normalized_speed >= 0.16
-            and normalized_displacement >= 0.22
-            and height_variation <= 0.45
+            avg_normalized_speed >= max(walking_motion_threshold, 0.15)
+            and max_normalized_speed >= 0.22
+            and normalized_displacement >= 0.3
+            and normalized_anchor_displacement >= 0.18
+            and height_variation <= 0.4
         )
         is_walking = (
             has_motion_history
             and not is_running
             and (clear_walking_motion or sustained_walking_motion)
-            and moving_steps >= 3
-            and sustained_motion_steps >= 2
-            and direction_consistency >= 0.35
+            and moving_steps >= 4
+            and sustained_motion_steps >= 3
+            and anchor_motion_steps >= 3
+            and direction_consistency >= 0.5
+            and stable_box_shape
             and max_normalized_speed < running_motion_threshold + 0.55
         )
         is_stationary = (
@@ -264,6 +306,7 @@ def summarise_tracks(
                 avg_normalized_speed <= stationary_motion_threshold
                 and max_normalized_speed <= 0.12
                 and normalized_displacement <= 0.18
+                and normalized_anchor_displacement <= 0.1
             )
         )
 
@@ -289,7 +332,10 @@ def summarise_tracks(
                 "avg_normalized_speed": round(avg_normalized_speed, 4),
                 "max_normalized_speed": round(max_normalized_speed, 4),
                 "normalized_displacement": round(normalized_displacement, 4),
+                "normalized_anchor_displacement": round(normalized_anchor_displacement, 4),
                 "height_variation": round(height_variation, 4),
+                "avg_aspect_ratio": round(avg_aspect_ratio, 4),
+                "max_aspect_ratio": round(max_aspect_ratio, 4),
                 "direction_consistency": round(direction_consistency, 4),
                 "is_stationary": is_stationary,
                 "is_walking": is_walking,

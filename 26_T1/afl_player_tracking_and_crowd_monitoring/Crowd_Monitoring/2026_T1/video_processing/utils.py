@@ -9,8 +9,8 @@ def save_frame_worker(path, image):
     # If your main loop uses BGR (OpenCV default), no need to convert.
     # If your main loop converts to RGB for AI models, uncomment the line below:
     # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    
-    cv2.imwrite(path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
+    enhanced = apply_clahe_enhancement(image)
+    cv2.imwrite(path, enhanced, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
 
 def get_video_stats(full_input_path, sample_rate):
     """
@@ -66,20 +66,24 @@ def check_blur(image, threshold):
     variance = cv2.Laplacian(gray, cv2.CV_64F).var()
     return variance, variance >= threshold
 
-def apply_preprocessing(img, target_size=(640, 640)):
-    #Letterboxing (Proportional Scaling)
-    h, w = img.shape[:2]
-    th, tw = target_size
-    ratio = min(tw / w, th / h)
-    new_w, new_h = int(w * ratio), int(h * ratio)
-    
-    # INTER_AREA averages pixel blocks rather than picking single points.
-    resized = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
-    
-    # Create black canvas and center the image over it
-    canvas = np.zeros((th, tw, 3), dtype=np.uint8)
-    dx, dy = (tw - new_w) // 2, (th - new_h) // 2
-    canvas[dy:dy+new_h, dx:dx+new_w] = resized
+import cv2
 
-    # RGB Conversion for YOLO model
-    return cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
+def apply_clahe_enhancement(image):
+    # Convert BGR to LAB color space to get access of Lightness channel
+    lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+    
+    # Split the LAB image into separate channels
+    l_channel, a_channel, b_channel = cv2.split(lab)
+    
+    # Create the CLAHE object
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    
+    # Apply CLAHE to the L (Lightness) channel
+    # clahe.apply() function redistributes the pixel intensities in the L-channel so that the "histogram" (the distribution of darks and lights) is flatter and wider, making details in shadows visible
+    l_enhanced = clahe.apply(l_channel)
+    
+    # Merge the enhanced L channel back with original A and B channels
+    enhanced_lab = cv2.merge((l_enhanced, a_channel, b_channel))
+    
+    # Convert back to BGR color space
+    return cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)

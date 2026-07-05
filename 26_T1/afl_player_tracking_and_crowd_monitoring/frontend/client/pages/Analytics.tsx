@@ -59,6 +59,7 @@ import {
   Filter,
 } from "lucide-react";
 
+
 // Mock data for video analysis
 const generateAnalysisData = () => ({
   keyMoments: [

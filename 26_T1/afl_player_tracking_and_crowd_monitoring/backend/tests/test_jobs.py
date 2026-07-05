@@ -128,20 +128,16 @@ def test_retry_job_success(client, mock_db, monkeypatch):
 
     mock_db.query.return_value.filter.return_value.first.return_value = fake_job
 
-    # Mock async player service response
-    async def fake_player_data(video_path):
-        return {"players": 12}
-
-    # Replace real service call with fake one
-    monkeypatch.setattr("app.routes.jobs.get_player_data", fake_player_data)
+    # Make the video file appear to exist so the retry check passes
+    monkeypatch.setattr("os.path.exists", lambda _: True)
 
     response = client.post("/jobs/11111111-1111-1111-1111-111111111111/retry")
     assert response.status_code == 200
     data = response.json()
 
-    # Job should now be completed
+    # Retry is async — endpoint immediately returns "processing"
     assert data["job_id"] == "11111111-1111-1111-1111-111111111111"
-    assert data["status"] == "done"
+    assert data["status"] == "processing"
 
 # Test: Retry invalid job
 def test_retry_job_not_partial(client, mock_db):

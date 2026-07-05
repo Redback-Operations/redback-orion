@@ -1,135 +1,289 @@
-"""Minimal entry point for the heatmap task."""
+"""Heatmap task implementation with validation and stadium-style visualization."""
 
 import json
+import math
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import numpy as np
 
 
 def validate_input(input_data: Dict) -> None:
-    """Validate incoming heatmap input data."""
+    """Validate the input JSON structure."""
     if not isinstance(input_data, dict):
-        raise ValueError("Input data must be a dictionary.")
+        raise ValueError("Input must be a dictionary.")
 
-    if "video_id" not in input_data or not input_data["video_id"]:
+    video_id = input_data.get("video_id")
+    if not video_id or not isinstance(video_id, str):
         raise ValueError("Missing or empty 'video_id'.")
 
-    if "zones" not in input_data:
-        raise ValueError("Missing 'zones' field.")
+    zones = input_data.get("zones")
+    if not isinstance(zones, list) or len(zones) == 0:
+        raise ValueError("Missing or empty 'zones' list.")
 
-    if not isinstance(input_data["zones"], list):
-        raise ValueError("'zones' must be a list.")
-
-    if len(input_data["zones"]) == 0:
-        raise ValueError("'zones' list cannot be empty.")
-
-    required_zone_fields = {"zone_id", "person_count", "density"}
-
-    for index, zone in enumerate(input_data["zones"]):
+    for zone in zones:
         if not isinstance(zone, dict):
-            raise ValueError(f"Zone at index {index} must be a dictionary.")
+            raise ValueError("Each zone must be a dictionary.")
 
-        missing_fields = required_zone_fields - zone.keys()
-        if missing_fields:
-            raise ValueError(
-                f"Zone at index {index} is missing fields: {', '.join(sorted(missing_fields))}"
+        zone_id = zone.get("zone_id")
+        if not zone_id or not isinstance(zone_id, str):
+            raise ValueError(f"Each zone must have a valid 'zone_id'.")
+
+        person_count = zone.get("person_count")
+        if not isinstance(person_count, (int, float)):
+            raise ValueError(f"Person count for zone '{zone_id}' must be numeric.")
+
+        density = zone.get("density")
+        if not isinstance(density, (int, float)):
+            raise ValueError(f"Density for zone '{zone_id}' must be numeric.")
+
+
+def zone_name(row_index: int, col_index: int) -> str:
+    """Convert row/col index into zone names like A1, B3, AA10."""
+    letters = ""
+    n = row_index
+    while True:
+        letters = chr(ord("A") + (n % 26)) + letters
+        n = n // 26 - 1
+        if n < 0:
+            break
+    return f"{letters}{col_index + 1}"
+
+
+def build_video_style_input(video_id: str = "match_02") -> Dict:
+    """
+    Create a higher-grid stadium-style layout that roughly matches the shared frame.
+    """
+    rows, cols = 8, 12
+    zones = []
+
+    for r in range(rows):
+        for c in range(cols):
+            density = 0.06
+
+            if r <= 1:
+                density += 0.02 + 0.01 * c / cols
+
+            if 2 <= r <= 4:
+                density += 0.10 + 0.08 * (c / cols)
+
+            if r >= 5:
+                density += 0.14 + 0.10 * (c / cols)
+
+            hotspot1 = math.exp(-(((r - 5.6) ** 2) / 2.8 + ((c - 7.0) ** 2) / 5.0))
+            density += 0.42 * hotspot1
+
+            hotspot2 = math.exp(-(((r - 3.8) ** 2) / 2.0 + ((c - 3.2) ** 2) / 3.5))
+            density += 0.18 * hotspot2
+
+            density = max(0.0, min(1.0, density))
+            person_count = int(round(density * 20))
+
+            zones.append(
+                {
+                    "zone_id": zone_name(r, c),
+                    "person_count": person_count,
+                    "density": round(density, 2),
+                }
             )
+
+    return {"video_id": video_id, "zones": zones}
+
+
+def compute_grid_shape(num_zones: int) -> Tuple[int, int]:
+    cols = max(8, int(math.ceil(math.sqrt(num_zones * 1.6))))
+    rows = int(math.ceil(num_zones / cols))
+    return rows, cols
 
 
 def generate_heatmap(input_data: Dict) -> Dict:
-    """Generate a validated and schema-compliant heatmap image from zone density data."""
+    """Generate a stadium-style heatmap image from zone density data."""
     validate_input(input_data)
 
-    video_id = str(input_data["video_id"])
+    video_id = input_data["video_id"]
     zones: List[Dict] = input_data["zones"]
 
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
 
     num_zones = len(zones)
-    cols = int(np.ceil(np.sqrt(num_zones)))
-    rows = int(np.ceil(num_zones / cols))
+    rows, cols = compute_grid_shape(num_zones)
 
-    heatmap_array = np.full((rows, cols), np.nan)
-    labels = [["" for _ in range(cols)] for _ in range(rows)]
+    fig = plt.figure(figsize=(14, 10), facecolor="#0b1220")
+    ax = plt.axes([0.03, 0.10, 0.94, 0.80])
+    ax.set_facecolor("#071224")
+    ax.set_xlim(-1.15, 1.15)
+    ax.set_ylim(-0.92, 0.92)
+    ax.axis("off")
 
-    for index, zone in enumerate(zones):
-        row = index // cols
-        col = index % cols
+    outer = patches.Ellipse(
+        (0, 0),
+        width=1.85,
+        height=1.42,
+        facecolor="#0a1b34",
+        edgecolor="#183b69",
+        linewidth=2.5,
+        zorder=1,
+    )
+    ax.add_patch(outer)
 
-        zone_id = str(zone["zone_id"])
+    pitch = patches.FancyBboxPatch(
+        (-0.42, -0.23),
+        0.84,
+        0.46,
+        boxstyle="round,pad=0.01,rounding_size=0.02",
+        facecolor="#1f8f43",
+        edgecolor="#2c3f66",
+        linewidth=6,
+        zorder=5,
+    )
+    ax.add_patch(pitch)
 
-        try:
-            density = float(zone["density"])
-        except (TypeError, ValueError):
-            raise ValueError(f"Density for zone '{zone_id}' must be numeric.")
+    ax.plot([0, 0], [-0.21, 0.21], color="white", alpha=0.55, lw=1.6, zorder=6)
+    center_circle = patches.Circle((0, 0), 0.07, fill=False, ec="white", alpha=0.5, lw=1.3, zorder=6)
+    ax.add_patch(center_circle)
+    ax.plot(0, 0, "wo", ms=4, alpha=0.5, zorder=6)
 
-        density = max(0.0, min(1.0, density))
-
-        try:
-            person_count = int(zone["person_count"])
-        except (TypeError, ValueError):
-            raise ValueError(f"Person count for zone '{zone_id}' must be an integer.")
-
-        heatmap_array[row, col] = density
-        labels[row][col] = (
-            f"{zone_id}\n"
-            f"Count: {person_count}\n"
-            f"Density: {density:.2f}"
+    for x0, sign in [(-0.42, 1), (0.33, -1)]:
+        ax.add_patch(
+            patches.Rectangle(
+                (x0, -0.09),
+                0.09,
+                0.18,
+                fill=False,
+                ec="white",
+                alpha=0.45,
+                lw=1.2,
+                zorder=6,
+            )
+        )
+        ax.add_patch(
+            patches.Rectangle(
+                (x0, -0.14),
+                0.16 * sign,
+                0.28,
+                fill=False,
+                ec="white",
+                alpha=0.45,
+                lw=1.2,
+                zorder=6,
+            )
         )
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.text(0, 0.80, "NORTH STAND", ha="center", va="center", fontsize=24, color="#7f94bd", alpha=0.95)
+    ax.text(0, -0.82, "SOUTH STAND", ha="center", va="center", fontsize=24, color="#7f94bd", alpha=0.95)
+    ax.text(-0.98, 0.00, "WEST", ha="center", va="center", fontsize=20, color="#7f94bd", alpha=0.95)
+    ax.text(0.98, 0.00, "EAST", ha="center", va="center", fontsize=20, color="#7f94bd", alpha=0.95)
 
-    cmap = plt.cm.YlOrRd.copy()
-    cmap.set_bad(color="lightgrey")
+    a_outer, b_outer = 0.92, 0.70
+    a_inner, b_inner = 0.50, 0.33
+    cmap = plt.cm.turbo
 
-    im = ax.imshow(
-        heatmap_array,
-        cmap=cmap,
-        interpolation="nearest",
-        vmin=0,
-        vmax=1,
+    for i, zone in enumerate(zones):
+        r_idx = i // cols
+        c_idx = i % cols
+
+        density = float(zone["density"])
+        density = max(0.0, min(1.0, density))
+
+        t_r0 = r_idx / rows
+        t_r1 = (r_idx + 1) / rows
+
+        theta0 = math.pi - (c_idx / cols) * 2 * math.pi
+        theta1 = math.pi - ((c_idx + 1) / cols) * 2 * math.pi
+
+        n_theta = 18
+        n_rad = 3
+
+        xs = []
+        ys = []
+
+        for rr in np.linspace(t_r0, t_r1, n_rad):
+            a = a_inner + rr * (a_outer - a_inner)
+            b = b_inner + rr * (b_outer - b_inner)
+
+            for th in np.linspace(theta0, theta1, n_theta):
+                x = a * math.cos(th)
+                y = b * math.sin(th)
+
+                if abs(x) < 0.47 and abs(y) < 0.26:
+                    continue
+
+                xs.append(x)
+                ys.append(y)
+
+        if xs:
+            ax.scatter(
+                xs,
+                ys,
+                s=420,
+                c=[density] * len(xs),
+                cmap=cmap,
+                vmin=0,
+                vmax=1,
+                alpha=0.62,
+                linewidths=0,
+                zorder=2,
+            )
+
+    for rr in np.linspace(0.18, 1.0, 5):
+        a = a_inner + rr * (a_outer - a_inner)
+        b = b_inner + rr * (b_outer - b_inner)
+        t = np.linspace(0, 2 * np.pi, 400)
+        x = a * np.cos(t)
+        y = b * np.sin(t)
+        mask = ~((np.abs(x) < 0.47) & (np.abs(y) < 0.26))
+        ax.plot(x[mask], y[mask], color="#2c4b76", lw=1.0, alpha=0.7, zorder=3)
+
+    for cc in range(cols):
+        th = math.pi - (cc / cols) * 2 * math.pi
+        x1 = a_inner * math.cos(th)
+        y1 = b_inner * math.sin(th)
+        x2 = a_outer * math.cos(th)
+        y2 = b_outer * math.sin(th)
+        if not (abs(x1) < 0.47 and abs(y1) < 0.26):
+            ax.plot([x1, x2], [y1, y2], color="#29476f", lw=0.9, alpha=0.7, zorder=3)
+
+    ax.text(
+        0,
+        0.96,
+        f"CROWD HEATMAP  •  {video_id.upper()}",
+        ha="center",
+        va="top",
+        fontsize=30,
+        color="#f8fafc",
+        fontweight="bold",
+        zorder=10,
     )
 
-    for row in range(rows):
-        for col in range(cols):
-            if labels[row][col]:
-                cell_value = heatmap_array[row, col]
+    fig.text(
+        0.055,
+        0.935,
+        "Analytics View • Redback Orion Crowd Monitoring",
+        color="#8aa0c8",
+        fontsize=11,
+        ha="left",
+    )
 
-                if np.isnan(cell_value):
-                    text_color = "black"
-                else:
-                    text_color = "black" if cell_value <= 0.35 or cell_value >= 0.65 else "white"
+    gradient = np.linspace(0, 1, 256).reshape(1, -1)
+    cax = fig.add_axes([0.10, 0.04, 0.80, 0.02])
+    cax.imshow(gradient, aspect="auto", cmap=cmap, extent=[0, 1, 0, 1])
+    cax.set_xticks([])
+    cax.set_yticks([])
+    for spine in cax.spines.values():
+        spine.set_visible(False)
 
-                ax.text(
-                    col,
-                    row,
-                    labels[row][col],
-                    ha="center",
-                    va="center",
-                    color=text_color,
-                    fontsize=10,
-                    fontweight="bold",
-                )
-
-    ax.set_title(f"Heatmap for {video_id}", fontsize=16, fontweight="bold")
-    ax.set_xticks(np.arange(-0.5, cols, 1), minor=True)
-    ax.set_yticks(np.arange(-0.5, rows, 1), minor=True)
-    ax.grid(which="minor", color="black", linestyle="-", linewidth=1.5)
-    ax.tick_params(which="both", bottom=False, left=False, labelbottom=False, labelleft=False)
-
-    cbar = plt.colorbar(im, ax=ax)
-    cbar.set_label("Density", fontsize=12)
+    fig.text(0.055, 0.05, "Low", color="#f8fafc", fontsize=20, va="center")
+    fig.text(0.915, 0.05, "High", color="#f8fafc", fontsize=20, va="center")
 
     image_path = os.path.join(output_dir, f"heatmap_{video_id}.png")
-    plt.tight_layout()
-    plt.savefig(image_path, dpi=200, bbox_inches="tight")
-    plt.close()
+    plt.savefig(image_path, dpi=240, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.close(fig)
 
     return {
         "video_id": video_id,
@@ -140,15 +294,6 @@ def generate_heatmap(input_data: Dict) -> Dict:
 
 
 if __name__ == "__main__":
-    sample_input = {
-        "video_id": "match_02",
-        "zones": [
-            {"zone_id": "A1", "person_count": 2, "density": 0.10},
-            {"zone_id": "A2", "person_count": 6, "density": 0.55},
-            {"zone_id": "A3", "person_count": 12, "density": 0.95},
-            {"zone_id": "A4", "person_count": 4, "density": 0.30},
-        ],
-    }
-
-    result = generate_heatmap(sample_input)
+    video_based_input = build_video_style_input("match_02")
+    result = generate_heatmap(video_based_input)
     print(json.dumps(result, indent=2))

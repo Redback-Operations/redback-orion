@@ -46,13 +46,9 @@ def analyze_behaviour(input_data):
     artifact_paths = []
     if heatmap and heatmap.get("image_path"):
         artifact_paths.append(heatmap["image_path"])
-    merged_tracking_summary = dict(tracking_summary)
-    merged_running_ids = set(tracking_summary.get("running_track_ids", []))
-    merged_running_ids.update(anomaly_summary.get("running_track_ids", []))
-    merged_tracking_summary["running_track_ids"] = sorted(merged_running_ids)
-    merged_tracking_summary["running_track_count"] = len(merged_running_ids)
-    frame_activity_series = build_frame_activity_series(frame_tracks, merged_tracking_summary)
-    artifact_paths.extend(save_motion_annotations(frame_tracks, merged_tracking_summary, video_id))
+    # Keep displayed movement states aligned with tracker/pose output.
+    frame_activity_series = build_frame_activity_series(frame_tracks, tracking_summary)
+    artifact_paths.extend(save_motion_annotations(frame_tracks, tracking_summary, video_id))
 
     vision_metrics = dict(vision_features)
     vision_metrics["tracking"] = tracking_summary

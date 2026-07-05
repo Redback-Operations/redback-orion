@@ -69,6 +69,8 @@ const Dashboard = memo(function Dashboard({
   const [analysisComplete, setAnalysisComplete] = useState(false)
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [analysisResults, setAnalysisResults] = useState(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [jobId, setJobId] = useState(null)
 
   const handleVideoUpload = (event) => {
     const file = event.target.files[0]
@@ -79,33 +81,50 @@ const Dashboard = memo(function Dashboard({
     }
   }
 
-  const startAnalysis = async () => {
+ const startAnalysis = async () => {
   if (!uploadedVideo) return
 
-  setIsAnalyzing(true)
-  setAnalysisProgress(10)
-
   try {
-    const result = await uploadVideo(uploadedVideo)
+    setIsAnalyzing(true)
+    setUploadProgress(0)
 
-    const jobId = result.job_id
+    const token = localStorage.getItem("token")
 
-    setAnalysisProgress(30)
+    // upload file
+    const response = await uploadVideo(
+      uploadedVideo,
+      token,
+      (progress) => {
+        setUploadProgress(progress)
+      }
+    )
 
-    pollJob(jobId)
+    console.log("Upload response:", response)
+
+    // save job_id
+    setJobId(response.job_id)
+
+    // immediately start polling
+    pollJob(response.job_id, token, {
+      onSuccess: (data) => {
+        console.log("Analysis complete:", data)
+
+        setAnalysisResults(data.results)
+        setAnalysisComplete(true)
+        setIsAnalyzing(false)
+      },
+
+      onError: (err) => {
+        console.error("Polling failed:", err)
+        setIsAnalyzing(false)
+      }
+    })
 
   } catch (err) {
-    console.error(err)
+    console.error("Upload failed:", err)
     setIsAnalyzing(false)
   }
 }
-
-  const resetAnalysis = () => {
-    setUploadedVideo(null)
-    setAnalysisComplete(false)
-    setAnalysisResults(null)
-    setAnalysisProgress(0)
-  }
 
   return (
     <div className="dashboard-container">
@@ -221,15 +240,21 @@ const Dashboard = memo(function Dashboard({
                 </div>
               </div>
 
-              {isAnalyzing && (
-                <div className="analysis-progress">
-                  <div className="progress-header">
-                    <h4>Analyzing Video...</h4>
-                    <span>{Math.round(analysisProgress)}%</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${analysisProgress}%` }}></div>
-                  </div>
+                {isAnalyzing && (
+                    <div className="analysis-progress">
+                      <div className="progress-header">
+                        <h4>Uploading Video...</h4>
+                        <span>{uploadProgress}%</span>
+                      </div>
+
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
                   <div className="progress-steps">
                     <div className={`step ${analysisProgress > 0 ? 'active' : ''}`}>
                       <CheckCircle size={16} />
@@ -348,7 +373,6 @@ const Dashboard = memo(function Dashboard({
                 </div>
               )}
             </div>
-          )}
         </div>
 
         {/* Current Match Overview */}
@@ -510,7 +534,6 @@ const Dashboard = memo(function Dashboard({
           <a href="#">Terms of Service</a>
         </div>
       </div>
-    </div>
   )
 })
 
@@ -661,13 +684,50 @@ function App() {
   }, [])
 
   const handleSubmit = useCallback(async (e) => {
-    e.preventDefault()
+  e.preventDefault()
+
+  try {
     setIsLoading(true)
-    await new Promise(resolve => setTimeout(resolve, 2000)) // simulate auth
-    console.log('Form submitted:', formData)
-    setIsLoading(false)
-    setCurrentView('dashboard')
-  }, [formData])
+
+    const endpoint = isLogin
+      ? "http://localhost:8000/auth/login"
+      : "http://localhost:8000/auth/register"
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+        username: formData.name
+      })
+    })
+
+    const data = await res.json()
+
+    console.log(data)
+
+    // SAVE TOKEN 
+    localStorage.setItem(
+      "token",
+      data.access_token
+    )
+
+    setCurrentView("dashboard")
+
+    } catch (err) {
+      console.error(err)
+
+      alert("Authentication failed")
+
+    } finally {
+      setIsLoading(false)
+    }
+
+  }, [formData, isLogin])
 
   const toggleForm = useCallback(() => {
     setIsLogin(prev => !prev)
