@@ -5,10 +5,6 @@ All splits are 80/20 train/val, shuffled with seed 42 (same as T1).
 Each dataset folder has `train/`, `val/`, and a `data.yaml` ready for
 `model.train(data=...)`.
 
-Only the two combined datasets are built; per-match variants live only in
-`data/raw/`. Files are prefixed with the source dataset
-(e.g. `ss_vs_wb__012f0df2-01.jpg`) to avoid name collisions.
-
 | Dataset | Train/Val | Boxes | Classes |
 |---|---|---|---|
 | `all_teams` | 456/114 | 5,254 | CAR(0) GCS(1) HAW(2) CAT(3) REF(4) SS(5) WB(6) |
