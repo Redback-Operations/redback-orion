@@ -92,6 +92,15 @@ def main() -> None:
     cap.release()
     writer.stdin.close()
     writer.wait()
+
+    # Remux to a regular (non-fragmented) MP4 — fragmented files can show
+    # blocky playback artifacts in some players.
+    remux = out_video.with_suffix(".remux.mp4")
+    subprocess.run(
+        [ffmpeg, "-y", "-v", "error", "-i", str(out_video),
+         "-c", "copy", "-movflags", "+faststart", str(remux)],
+        check=True)
+    remux.replace(out_video)
     print(f"Done: {n} frames")
     print(f"  video: {out_video}")
     print(f"  csv:   {out_csv}")
