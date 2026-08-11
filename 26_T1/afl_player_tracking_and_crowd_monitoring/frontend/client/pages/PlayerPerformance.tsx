@@ -89,6 +89,9 @@ const generatePlayerData = () => {
     "Hawthorn",
   ];
 
+
+
+
   const positions = ["Midfielder", "Forward", "Defender", "Ruckman"];
 
   const players = [
@@ -252,6 +255,44 @@ const generatePlayerData = () => {
   return players;
 };
 
+const normalizePlayer = (p: any) => ({
+  id: p.id,
+  name: p.name,
+  team: p.team,
+  position: p.position,
+  number: p.jersey_number,
+  age: p.age,
+  height: p.height || "-",
+  weight: p.weight || "-",
+  photo: p.photo || "/image.png",
+  stats: {
+    kicks: p.kicks,
+    handballs: p.handballs,
+    disposals: p.disposals,
+    marks: p.marks,
+    tackles: p.tackles,
+    goals: p.goals,
+    behinds: 0,
+    efficiency: p.efficiency,
+    contested: 0,
+    uncontested: 0,
+    clangers: 0,
+    inside50s: p.inside50s,
+    rebounds: 0,
+    onePercenters: 0,
+    turnovers: 0,
+    intercepted: 0,
+    goalAccuracy: p.efficiency,
+    avgSpeed: 0,
+    maxSpeed: 0,
+    distance: 0,
+  },
+  form: [],
+  heatMap: [],
+  possessionData: [],
+});
+
+
 export default function PlayerPerformance() {
   const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(true);
@@ -274,6 +315,7 @@ export default function PlayerPerformance() {
   const [jobStatus, setJobStatus] = useState("");
   const [jobId, setJobId] = useState("");
   const [jobError, setJobError] = useState("");
+  const navigate = useNavigate();
 
   const uploadVideo = async (file: File) => {
     const formData = new FormData();
@@ -286,71 +328,76 @@ export default function PlayerPerformance() {
       },
       body: formData,
     });
-    
 
-  const data = await res.json();
-  console.log("UPLOAD RESULT:", data);
-  return data.job_id;
-};
 
-const fetchJobs = async () => {
-  const res = await fetch("http://localhost:8000/jobs?page=1&limit=10", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const data = await res.json();
+    console.log("UPLOAD RESULT:", data);
+    return data.job_id;
+  };
 
-  const data = await res.json();
-  console.log("JOBS:", data);
-  return data.jobs;
-};
-
-const handleUpload = async () => {
-  if (!selectedVideo) {
-    setUploadStatus("Please choose a video first");
-    return;
-  }
-
-  setUploadStatus("Uploading...");
-  setJobStatus("processing");
-
-  try {
-    const id = await uploadVideo(selectedVideo);
-    setJobId(id);
-    setUploadStatus(`Upload complete. Job ID: ${id}`);
-    setJobStatus("done");
-
-    const latestJobs = await fetchJobs();
-    setJobs(latestJobs || []);
-  } catch (err) {
-    console.error(err);
-    setJobStatus("failed");
-    setJobError("Upload failed. Please try again.");
-  }
-};
-
-  
-  useEffect(() => {
-  fetch("http://localhost:8000/api/players")
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("API DATA:", data);
-
-      const playerList = Array.isArray(data)
-        ? data
-        : Array.isArray(data.data)
-        ? data.data
-        : Array.isArray(data.players)
-        ? data.players
-        : [];
-
-      setPlayers(playerList.length > 0 ? playerList : generatePlayerData());
-    })
-    .catch((err) => {
-      console.error("API ERROR:", err);
-      setPlayers(generatePlayerData());
+  const fetchJobs = async () => {
+    const res = await fetch("http://localhost:8000/jobs?page=1&limit=10", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-}, []);
+
+    const data = await res.json();
+    console.log("JOBS:", data);
+    return data.jobs;
+  };
+
+  const handleUpload = async () => {
+    if (!selectedVideo) {
+      setUploadStatus("Please choose a video first");
+      return;
+    }
+  };
+
+  const handleDeletePlayer = async (playerId: number) => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/player/${playerId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      setPlayers((prev) => prev.filter((p) => p.id !== playerId));
+    } catch (err) {
+      console.error("Delete failed:", err);
+      ;
+    }
+
+    setUploadStatus("Uploading...");
+    setJobStatus("processing");
+
+    try {
+      const id = await uploadVideo(selectedVideo);
+      setJobId(id);
+      setUploadStatus(`Upload complete. Job ID: ${id}`);
+      setJobStatus("done");
+
+      const latestJobs = await fetchJobs();
+      setJobs(latestJobs || []);
+    } catch (err) {
+      console.error(err);
+      setJobStatus("failed");
+      setJobError("Upload failed. Please try again.");
+    }
+  };
+
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/players")
+      .then((res) => res.json())
+      .then((data) => {
+        const playerList = Array.isArray(data) ? data.map(normalizePlayer) : [];
+        setPlayers(playerList.length > 0 ? playerList : generatePlayerData());
+      })
+      .catch((err) => {
+        console.error("API ERROR:", err);
+        setPlayers(generatePlayerData());
+      });
+  }, []);
 
   useEffect(() => {
     if (players.length > 0) {
@@ -359,8 +406,8 @@ const handleUpload = async () => {
     }
   }, [players]);
 
-  
-  
+
+
   // Simulate live data updates
   useEffect(() => {
     if (!isLive || !isPlaying) return;
@@ -385,7 +432,7 @@ const handleUpload = async () => {
   }, [isLive, isPlaying]);
 
   if (!selectedPlayer) {
-  return <div className="p-6">Loading player data...</div>;
+    return <div className="p-6">Loading player data...</div>;
   }
 
   const filteredPlayers = players.filter(
@@ -510,9 +557,8 @@ const handleUpload = async () => {
     onClick?: () => void;
   }) => (
     <Card
-      className={`relative overflow-hidden transition-all duration-200 ${onClick ? "cursor-pointer" : ""} ${
-        active ? "ring-2 ring-blue-500 ring-offset-2 shadow-lg" : ""
-      }`}
+      className={`relative overflow-hidden transition-all duration-200 ${onClick ? "cursor-pointer" : ""} ${active ? "ring-2 ring-blue-500 ring-offset-2 shadow-lg" : ""
+        }`}
       onClick={onClick}
     >
       <CardContent className="p-4">
@@ -546,11 +592,10 @@ const handleUpload = async () => {
     </Card>
   );
 
-  const EnhancedPlayerCard = ({ player, isSelected, onClick }: any) => (
+  const EnhancedPlayerCard = ({ player, isSelected, onClick, onDelete }: any) => (
     <Card
-      className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
-        isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""
-      }`}
+      className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""
+        }`}
       onClick={onClick}
     >
       <div
@@ -622,6 +667,18 @@ const handleUpload = async () => {
             <div className="text-gray-600">Eff.</div>
           </div>
         </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mt-3 w-full text-red-600 hover:bg-red-50"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(player.id);
+          }}
+        >
+          Delete
+        </Button>
       </CardContent>
     </Card>
   );
@@ -669,31 +726,31 @@ const handleUpload = async () => {
           <div style={{ margin: "20px", padding: "10px", border: "1px solid gray" }}>
             <h3>Backend Integration Test</h3>
 
-          <input
-            type="file"
-            accept=".mp4,.avi,.mov"
-            onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
-          />
+            <input
+              type="file"
+              accept=".mp4,.avi,.mov"
+              onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+            />
 
-          <button onClick={handleUpload}>Upload Video</button>
-          <p>Status: {jobStatus}</p>
+            <button onClick={handleUpload}>Upload Video</button>
+            <p>Status: {jobStatus}</p>
 
-          {jobStatus === "processing" && <p>Processing video...</p>}
-          {jobStatus === "done" && <p>Processing completed successfully.</p>}
-          {jobStatus === "failed" && <p>{jobError}</p>}
+            {jobStatus === "processing" && <p>Processing video...</p>}
+            {jobStatus === "done" && <p>Processing completed successfully.</p>}
+            {jobStatus === "failed" && <p>{jobError}</p>}
 
-          {jobStatus === "partial" && (
-            <button onClick={handleUpload}>Retry</button>
-          )}              
-          <p>{uploadStatus}</p>
+            {jobStatus === "partial" && (
+              <button onClick={handleUpload}>Retry</button>
+            )}
+            <p>{uploadStatus}</p>
 
-          {jobs.map((job) => (
-            <div key={job.job_id}>
-            <p>Job ID: {job.job_id}</p>
-            <p>Status: {job.status}</p>
-           </div>
-           ))}
-        </div>
+            {jobs.map((job) => (
+              <div key={job.job_id}>
+                <p>Job ID: {job.job_id}</p>
+                <p>Status: {job.status}</p>
+              </div>
+            ))}
+          </div>
 
           {/* Live Clock */}
           <div className="bg-white rounded-xl shadow-sm border px-4 py-3 flex items-center justify-between gap-3">
@@ -744,16 +801,15 @@ const handleUpload = async () => {
 
             <StatCard
               title="Avg Efficiency"
-              value={`${
-                filteredPlayers.length > 0
-                  ? Math.round(
-                      filteredPlayers.reduce(
-                        (sum, p) => sum + p.stats.efficiency,
-                        0,
-                      ) / filteredPlayers.length,
-                    )
-                  : 0
-              }%`}
+              value={`${filteredPlayers.length > 0
+                ? Math.round(
+                  filteredPlayers.reduce(
+                    (sum, p) => sum + p.stats.efficiency,
+                    0,
+                  ) / filteredPlayers.length,
+                )
+                : 0
+                }%`}
               icon={Activity}
               color="purple"
               trend="stable"
@@ -831,9 +887,36 @@ const handleUpload = async () => {
                 player={player}
                 isSelected={selectedPlayer.id === player.id}
                 onClick={() => setSelectedPlayer(player)}
+                onDelete={handleDeletePlayer}
               />
             ))}
           </div>
+          {/* Quick Player Selector */}
+          <Card className="w-full sm:w-fit">
+            <CardContent className="p-4 flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                Jump to Player:
+              </span>
+              <Select
+                value={selectedPlayer?.id?.toString()}
+                onValueChange={(value) => {
+                  const player = players.find((p) => p.id.toString() === value);
+                  if (player) setSelectedPlayer(player);
+                }}
+              >
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="Choose a player" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredPlayers.map((player) => (
+                    <SelectItem key={player.id} value={player.id.toString()}>
+                      #{player.number} {player.name} — {player.team}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
 
           {/* Selected Player Dashboard */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1073,13 +1156,12 @@ const handleUpload = async () => {
                     {selectedPlayer.form.map((score, index) => (
                       <div key={index} className="text-center">
                         <div
-                          className={`p-2 rounded text-sm font-medium ${
-                            score >= 90
-                              ? "bg-green-100 text-green-700"
-                              : score >= 80
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-red-100 text-red-700"
-                          }`}
+                          className={`p-2 rounded text-sm font-medium ${score >= 90
+                            ? "bg-green-100 text-green-700"
+                            : score >= 80
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-700"
+                            }`}
                         >
                           {score}
                         </div>
