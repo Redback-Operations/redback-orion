@@ -19,6 +19,7 @@ from app.services.player_client import (
     get_formation_data,
 )
 from app.services.crowd_client import get_crowd_data
+from app.exceptions import ServiceTimeoutError
 
 router = APIRouter()
 
@@ -92,13 +93,25 @@ async def process_video(job_id: str, file_path: str):
         }
 
         errors = []
-        if isinstance(jersey_result, Exception):
+
+        if isinstance(jersey_result, ServiceTimeoutError):
+            errors.append("jersey_color: service timeout")
+        elif isinstance(jersey_result, Exception):
             errors.append(f"jersey_color: {jersey_result}")
-        if isinstance(formation_result, Exception):
+
+        if isinstance(formation_result, ServiceTimeoutError):
+            errors.append("formation: service timeout")
+        elif isinstance(formation_result, Exception):
             errors.append(f"formation: {formation_result}")
-        if isinstance(tackle_result, Exception):
+
+        if isinstance(tackle_result, ServiceTimeoutError):
+            errors.append("tackle: service timeout")
+        elif isinstance(tackle_result, Exception):
             errors.append(f"tackle: {tackle_result}")
-        if isinstance(crowd_result, Exception):
+
+        if isinstance(crowd_result, ServiceTimeoutError):
+            errors.append("crowd: service timeout")
+        elif isinstance(crowd_result, Exception):
             errors.append(f"crowd: {crowd_result}")
 
         crowd_data = None if isinstance(crowd_result, Exception) else crowd_result
