@@ -11,7 +11,7 @@ from app.database import get_db, SessionLocal
 from app.models import Job
 from app.schemas.jobs import UploadResponse
 from app.auth.dependencies import get_current_user
-from app.config import UPLOAD_DIR
+from app.config import UPLOAD_DIR, MAX_UPLOAD_SIZE_BYTES
 from app.services.player_client import (
     get_player_data,
     get_jersey_color_data,
@@ -158,6 +158,17 @@ async def upload_video(
             status_code=400,
             detail="Invalid video format. Accepted formats: .mp4, .avi, .mov"
         )
+
+        file_size = 0
+    while chunk := await file.read(1024 * 1024):
+        file_size += len(chunk)
+        if file_size > MAX_UPLOAD_SIZE_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Video exceeds the maximum upload size of {MAX_UPLOAD_SIZE_BYTES // (1024 * 1024)} MB"
+            )
+
+    await file.seek(0)
     try:
         os.makedirs(UPLOAD_DIR, exist_ok=True)
         filename = f"{uuid.uuid4()}{ext}"
