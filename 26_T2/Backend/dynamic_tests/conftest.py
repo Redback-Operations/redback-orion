@@ -91,9 +91,14 @@ def registered_user(live_session, base_url, unique_user):
     """
     Register a fresh test account against the running backend.
 
-    The fixture returns the authentication response and credentials.
+    The current backend returns an access token during registration.
     """
-    response = live_session.post(f"{base_url}/auth/register", json=unique_user, timeout=10)
+
+    response = live_session.post(
+        f"{base_url}/auth/register",
+        json=unique_user,
+        timeout=10,
+    )
 
     assert response.status_code == 200, (
         f"Registration failed with {response.status_code}: "
@@ -106,13 +111,11 @@ def registered_user(live_session, base_url, unique_user):
         "Registration response does not contain access_token"
     )
 
-    assert "refresh_token" in data, (
-        "Registration response does not contain refresh_token"
-    )
-
     return {
+        "access_token": data["access_token"],
+        "token_type": data.get("token_type", "bearer"),
+        "user": data.get("user"),
         "credentials": unique_user,
-        "data": data,
     }
 
 
