@@ -254,6 +254,7 @@ const generatePlayerData = () => {
 };
 
 export default function PlayerPerformance() {
+  const navigate = useNavigate();
   const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -701,10 +702,7 @@ const handleUpload = async () => {
             <Button
               type="button"
               size="sm"
-              onClick={() => {
-                console.log("navigating to add-player");
-                navigate("/add-player");
-              }}
+              onClick={() => navigate("/add-player")}
               className="bg-green-600 hover:bg-green-700 text-white shrink-0"
             >
               Add Player
