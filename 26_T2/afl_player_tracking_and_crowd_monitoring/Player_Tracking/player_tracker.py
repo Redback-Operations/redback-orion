@@ -265,13 +265,12 @@ while True:
     if boxes is not None and len(boxes) > 0:
         xyxy = boxes.xyxy.cpu().numpy()
         conf = boxes.conf.cpu().numpy()
-
+        # BoT-SORT may return detections before assigning persistent track IDs.
         ids = (
             boxes.id.cpu().numpy().astype(int)
             if boxes.id is not None
-            else np.arange(len(boxes)) + 1
+            else None
         )
-
         # Collect colour samples for KMeans learning
         if not clustering_ready:
             for i in range(len(boxes)):
@@ -312,9 +311,20 @@ while True:
                 n_init=10
             )
 
+
             kmeans_model.fit(scaled_samples)
             clustering_ready = True
             print("Generic team and umpire clustering ready.")
+
+        # Skip player metrics until BoT-SORT assigns persistent track IDs.
+        # Detection-order IDs are not stable between frames.
+        if ids is None:
+            cv2.imshow("Live Tracking", annotated_frame)
+
+            if cv2.waitKey(FRAME_DELAY) & 0xFF == ord("q"):
+                break
+
+            continue
 
         for i in range(len(boxes)):
             if conf[i] < CONF_THRESHOLD:
