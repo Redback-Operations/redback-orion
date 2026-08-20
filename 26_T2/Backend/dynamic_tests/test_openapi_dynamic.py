@@ -49,13 +49,13 @@ PUBLIC_ENDPOINTS = {
     ("POST", "/auth/register"),
     ("POST", "/auth/login"),
     ("POST", "/auth/refresh"),
-    ("POST", "/auth/logout"),
 }
 
 
 PROTECTED_ENDPOINTS = {
     ("GET", "/auth/me"),
     ("POST", "/upload"),
+    ("POST", "/auth/logout"),
     ("GET", "/status/{job_id}"),
     ("GET", "/jobs"),
     ("GET", "/jobs/{job_id}"),

@@ -39,7 +39,7 @@ def live_session(base_url):
     except requests.RequestException as exc:
         pytest.skip(
             f"Orion backend is not reachable at {base_url}. "
-            f"Start the T2 backend stack first. Cause: {exc}"
+            f"Start the Orion backend Docker stack first. Cause: {exc}"
         )
 
     yield session

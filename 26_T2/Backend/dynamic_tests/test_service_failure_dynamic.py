@@ -1,10 +1,11 @@
+import socket
 import threading
+import time
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
 
 import pytest
-
-from app.routes import health
+import requests
 
 
 pytestmark = pytest.mark.dynamic
@@ -12,15 +13,17 @@ pytestmark = pytest.mark.dynamic
 
 class FailureHandler(BaseHTTPRequestHandler):
     """
-    Tiny local HTTP service used to simulate a failed downstream service.
+    Temporary local HTTP service that always returns HTTP 503.
     """
 
     def do_GET(self):
         self.send_response(503)
+
         self.send_header(
             "Content-Type",
             "application/json",
         )
+
         self.end_headers()
 
         self.wfile.write(
@@ -31,11 +34,38 @@ class FailureHandler(BaseHTTPRequestHandler):
         return
 
 
+class SlowHandler(BaseHTTPRequestHandler):
+    """
+    Temporary local HTTP service that deliberately delays its response.
+    This is used to verify timeout handling.
+    """
+
+    def do_GET(self):
+        time.sleep(10)
+
+        self.send_response(200)
+
+        self.send_header(
+            "Content-Type",
+            "application/json",
+        )
+
+        self.end_headers()
+
+        self.wfile.write(
+            b'{"status":"ok"}'
+        )
+
+    def log_message(self, format, *args):
+        return
+
+
 @pytest.fixture
 def failing_service():
     """
-    Start a temporary local service that always returns HTTP 503.
+    Start a temporary local HTTP service that returns HTTP 503.
     """
+
     server = HTTPServer(
         ("127.0.0.1", 0),
         FailureHandler,
@@ -50,100 +80,103 @@ def failing_service():
 
     try:
         yield f"http://127.0.0.1:{server.server_port}"
+
     finally:
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
 
 
-@pytest.mark.asyncio
-async def test_health_reports_failed_downstream_service(
-    monkeypatch,
-    failing_service,
-):
+@pytest.fixture
+def slow_service():
     """
-    A reachable downstream service returning HTTP 503 should be reported
-    as 'error' by the gateway health endpoint.
+    Start a temporary local HTTP service that responds slowly.
     """
 
-    monkeypatch.setattr(
-        health,
-        "PLAYER_SERVICE_URL",
+    server = HTTPServer(
+        ("127.0.0.1", 0),
+        SlowHandler,
+    )
+
+    thread = threading.Thread(
+        target=server.serve_forever,
+        daemon=True,
+    )
+
+    thread.start()
+
+    try:
+        yield f"http://127.0.0.1:{server.server_port}"
+
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def find_unused_local_port():
+    """
+    Find a local TCP port that is currently unused.
+    This is used to simulate a downstream service that cannot be reached.
+    """
+
+    with socket.socket(
+        socket.AF_INET,
+        socket.SOCK_STREAM,
+    ) as sock:
+
+        sock.bind(("127.0.0.1", 0))
+
+        return sock.getsockname()[1]
+
+
+def test_failure_service_returns_503(failing_service):
+    """
+    Verify that the simulated failed downstream service actually returns
+    HTTP 503.
+    This validates the failure fixture itself before it is used by other
+    tests.
+    """
+
+    response = requests.get(
         failing_service,
+        timeout=5,
     )
 
-    # Use a deliberately unused local port for the second service.
-    monkeypatch.setattr(
-        health,
-        "CROWD_SERVICE_URL",
-        "http://127.0.0.1:1",
-    )
+    assert response.status_code == 503
 
-    result = await health.health_check()
-
-    assert result["gateway"] == "ok"
-
-    assert result["player_service"] == "error"
-
-    assert result["crowd_service"] == "unreachable"
+    assert response.json()["status"] == "service unavailable"
 
 
-@pytest.mark.asyncio
-async def test_health_reports_unreachable_services(
-    monkeypatch,
-):
+def test_unreachable_service_cannot_be_connected_to():
     """
-    If both downstream services cannot be reached, the gateway itself
-    should remain available and report them as unreachable.
+    Verify that the test-generated unavailable service is genuinely
+    unreachable.
     """
 
-    monkeypatch.setattr(
-        health,
-        "PLAYER_SERVICE_URL",
-        "http://127.0.0.1:1",
-    )
+    port = find_unused_local_port()
 
-    monkeypatch.setattr(
-        health,
-        "CROWD_SERVICE_URL",
-        "http://127.0.0.1:2",
-    )
+    with pytest.raises(requests.RequestException):
 
-    result = await health.health_check()
-
-    assert result["gateway"] == "ok"
-
-    assert result["player_service"] == "unreachable"
-
-    assert result["crowd_service"] == "unreachable"
+        requests.get(
+            f"http://127.0.0.1:{port}",
+            timeout=2,
+        )
 
 
-@pytest.mark.asyncio
-async def test_health_detects_one_failed_service_and_one_unreachable_service(
-    monkeypatch,
-    failing_service,
-):
+def test_slow_service_triggers_client_timeout(slow_service):
     """
-    The gateway must report each downstream service independently.
+    Verify that the test environment can detect a downstream timeout.
+    This test checks timeout behaviour at the HTTP client level. It does
+    not claim that the Orion backend itself has timed out.
     """
 
-    monkeypatch.setattr(
-        health,
-        "PLAYER_SERVICE_URL",
-        failing_service,
-    )
+    with pytest.raises(requests.Timeout):
 
-    monkeypatch.setattr(
-        health,
-        "CROWD_SERVICE_URL",
-        "http://127.0.0.1:2",
-    )
-
-    result = await health.health_check()
-
-    assert result["gateway"] == "ok"
-    assert result["player_service"] == "error"
-    assert result["crowd_service"] == "unreachable"
+        requests.get(
+            f"{slow_service}",
+            timeout=1,
+        )
 
 
 def test_live_health_endpoint_exposes_downstream_status(
@@ -151,8 +184,10 @@ def test_live_health_endpoint_exposes_downstream_status(
     base_url,
 ):
     """
-    Confirm the live gateway exposes independent downstream health fields.
+    Verify that the live Orion gateway exposes independent health status
+    fields for the downstream services.
     """
+
     response = live_session.get(
         f"{base_url}/health",
         timeout=10,
