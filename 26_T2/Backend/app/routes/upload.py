@@ -159,7 +159,7 @@ async def upload_video(
             detail="Invalid video format. Accepted formats: .mp4, .avi, .mov"
         )
 
-        file_size = 0
+    file_size = 0
     while chunk := await file.read(1024 * 1024):
         file_size += len(chunk)
         if file_size > MAX_UPLOAD_SIZE_BYTES:
@@ -169,6 +169,7 @@ async def upload_video(
             )
 
     await file.seek(0)
+    
     try:
         os.makedirs(UPLOAD_DIR, exist_ok=True)
         filename = f"{uuid.uuid4()}{ext}"
