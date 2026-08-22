@@ -22,6 +22,7 @@ import MobileNavigation from "@/components/MobileNavigation";
 import LiveClock from "@/components/LiveClock";
 import AFLPlayerCard from "@/components/AFLPlayerCard";
 import PlayerComparison from "@/components/PlayerComparison";
+import PlayerPerformanceSkeleton from "@/components/PlayerPerformanceSkeleton";
 import {
   LineChart,
   Line,
@@ -253,6 +254,7 @@ const generatePlayerData = () => {
 };
 
 export default function PlayerPerformance() {
+  const navigate = useNavigate();
   const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -385,7 +387,24 @@ const handleUpload = async () => {
   }, [isLive, isPlaying]);
 
   if (!selectedPlayer) {
-  return <div className="p-6">Loading player data...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+        <MobileNavigation />
+        <div className="lg:ml-64 pb-16 lg:pb-0">
+          <div className="p-4 space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Player Performance
+              </h1>
+              <p className="text-gray-600">
+                Real-time AFL player analytics and statistics
+              </p>
+            </div>
+            <PlayerPerformanceSkeleton />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const filteredPlayers = players.filter(
@@ -666,34 +685,7 @@ const handleUpload = async () => {
               </Button>
             </div>
           </div>
-          <div style={{ margin: "20px", padding: "10px", border: "1px solid gray" }}>
-            <h3>Backend Integration Test</h3>
-
-          <input
-            type="file"
-            accept=".mp4,.avi,.mov"
-            onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
-          />
-
-          <button onClick={handleUpload}>Upload Video</button>
-          <p>Status: {jobStatus}</p>
-
-          {jobStatus === "processing" && <p>Processing video...</p>}
-          {jobStatus === "done" && <p>Processing completed successfully.</p>}
-          {jobStatus === "failed" && <p>{jobError}</p>}
-
-          {jobStatus === "partial" && (
-            <button onClick={handleUpload}>Retry</button>
-          )}              
-          <p>{uploadStatus}</p>
-
-          {jobs.map((job) => (
-            <div key={job.job_id}>
-            <p>Job ID: {job.job_id}</p>
-            <p>Status: {job.status}</p>
-           </div>
-           ))}
-        </div>
+          
 
           {/* Live Clock */}
           <div className="bg-white rounded-xl shadow-sm border px-4 py-3 flex items-center justify-between gap-3">
@@ -710,10 +702,7 @@ const handleUpload = async () => {
             <Button
               type="button"
               size="sm"
-              onClick={() => {
-                console.log("navigating to add-player");
-                navigate("/add-player");
-              }}
+              onClick={() => navigate("/add-player")}
               className="bg-green-600 hover:bg-green-700 text-white shrink-0"
             >
               Add Player
