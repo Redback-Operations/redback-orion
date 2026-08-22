@@ -20,7 +20,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import MobileNavigation from "@/components/MobileNavigation";
-import LiveClock from "@/components/LiveClock";
 import {
   Download,
   FileText,
@@ -305,11 +304,7 @@ Thank you for using AFL Analytics Platform.
 
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-4">
-          <LiveClock
-            isLive={isLive}
-            onToggleLive={setIsLive}
-            matchTime={{ quarter: 2, timeRemaining: "15:23" }}
-          />
+
 
           <Tabs defaultValue="browse" className="w-full">
             <TabsList className="grid w-full grid-cols-2">

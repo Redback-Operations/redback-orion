@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import MobileNavigation from "@/components/MobileNavigation";
-import LiveClock from "@/components/LiveClock";
 import {
   Users,
   TrendingUp,
@@ -219,12 +218,7 @@ export default function CrowdMonitor() {
 
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-4">
-          {/* Live Clock */}
-          <LiveClock
-            isLive={isLive}
-            onToggleLive={setIsLive}
-            matchTime={{ quarter: 2, timeRemaining: "15:23" }}
-          />
+
 
           {/* Overview Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
