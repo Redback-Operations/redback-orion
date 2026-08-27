@@ -25,6 +25,23 @@ router = APIRouter()
 ALLOWED_EXTENSIONS = {".mp4", ".avi", ".mov"}
 ALLOWED_MIME_TYPES = {"video/mp4", "video/x-msvideo", "video/quicktime"}
 
+async def validate_video_signature(file, ext):
+    header = await file.read(32)
+    await file.seek(0)
+
+    if ext in {".mp4", ".mov"}:
+        if b"ftyp" not in header:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid video file content."
+            )
+
+    elif ext == ".avi":
+        if len(header) < 12 or header[0:4] != b"RIFF" or header[8:12] != b"AVI ":
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid video file content."
+            )
 
 def tracking_to_csv(tracking_results: list, csv_path: str):
     with open(csv_path, "w", newline="") as f:
@@ -145,6 +162,8 @@ async def upload_video(
             status_code=400,
             detail="Invalid video format. Accepted formats: .mp4, .avi, .mov"
         )
+
+    await validate_video_signature(file, ext)
     try:
         os.makedirs(UPLOAD_DIR, exist_ok=True)
         filename = f"{uuid.uuid4()}{ext}"
