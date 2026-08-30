@@ -318,6 +318,14 @@ export default function ApiDiagnostics() {
 
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              API Diagnostics
+            </h1>
+            <p className="text-gray-600">
+              Endpoint health and system monitoring
+            </p>
+          </div>
           <LiveClock
             isLive={isLive}
             onToggleLive={setIsLive}
