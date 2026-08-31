@@ -4,6 +4,9 @@
 The report surfaces likely problem sections without requiring someone to watch
 an entire broadcast. Metrics that depend on ground-truth player identity are
 labelled as proxies; this tool does not claim to measure true ID switches.
+
+It also flags suspected track re-associations where the same track ID
+disappears for one or more frames and later returns with a different class.
 """
 
 from __future__ import annotations
@@ -57,6 +60,61 @@ def percentile(values: list[float], percent: float) -> float:
     return ordered[lower] * (upper - index) + ordered[upper] * (index - lower)
 
 
+def detect_suspected_reassociations(
+    rows_by_track: dict[str, list[dict[str, str]]],
+    *,
+    fps: float,
+) -> list[dict[str, Any]]:
+    """Find class changes that occur after the same track ID disappears.
+
+    These events are review candidates only. Without ground-truth player
+    identities they cannot be treated as confirmed ID switches.
+    """
+    events: list[dict[str, Any]] = []
+
+    for track_id, track_rows in rows_by_track.items():
+        ordered = sorted(track_rows, key=lambda row: int(row["frame"]))
+
+        for previous, current in zip(ordered, ordered[1:]):
+            previous_frame = int(previous["frame"])
+            current_frame = int(current["frame"])
+
+            frame_gap = current_frame - previous_frame
+
+            # Consecutive detections are normal tracking behaviour.
+            if frame_gap <= 1:
+                continue
+
+            previous_class = previous["class"].strip()
+            current_class = current["class"].strip()
+
+            # We are specifically interested in a class change after a gap.
+            if previous_class == current_class:
+                continue
+
+            missing_frames = frame_gap - 1
+
+            events.append({
+                "track_id": track_id,
+                "last_seen_frame": previous_frame,
+                "reappeared_frame": current_frame,
+                "missing_frames": missing_frames,
+                "gap_seconds": round(missing_frames / fps, 3),
+                "previous_class": previous_class,
+                "new_class": current_class,
+                "previous_confidence": round(float(previous["confidence"]), 3),
+                "new_confidence": round(float(current["confidence"]), 3),
+            })
+
+    events.sort(
+        key=lambda event: (
+            -event["missing_frames"],
+            event["last_seen_frame"],
+        )
+    )
+    return events
+
+
 def analyze_csv(
     csv_path: Path,
     *,
@@ -68,6 +126,7 @@ def analyze_csv(
     worst_limit: int,
 ) -> dict[str, Any]:
     tracks: dict[tuple[str, str], TrackStats] = {}
+    rows_by_track: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
     frame_counts: Counter[int] = Counter()
     frame_confidence_sum: defaultdict[int, float] = defaultdict(float)
     frame_low_confidence: Counter[int] = Counter()
@@ -100,6 +159,10 @@ def analyze_csv(
                 tracks[key] = TrackStats(frame, frame)
             tracks[key].add(frame, confidence)
 
+            # Keep observations grouped by ByteTrack ID so that gaps followed
+            # by class changes can be reviewed as possible re-associations.
+            rows_by_track[track_id].append(row)
+
             rows += 1
             class_counts[detected_class] += 1
             frame_counts[frame] += 1
@@ -111,6 +174,11 @@ def analyze_csv(
 
     if not rows or first_frame is None or last_frame is None:
         raise ValueError("No tracking rows matched the selected class filter")
+
+    suspected_reassociations = detect_suspected_reassociations(
+        rows_by_track,
+        fps=fps,
+    )
 
     short_limit_frames = max(1, round(short_track_seconds * fps))
     spans = [stats.last_frame - stats.first_frame + 1 for stats in tracks.values()]
@@ -176,6 +244,7 @@ def analyze_csv(
         frame_confidence_sum[frame] / count
         for frame, count in frame_counts.items() if count
     ]
+
     report = {
         "input": str(csv_path),
         "settings": {
@@ -196,6 +265,7 @@ def analyze_csv(
             "short_lived_track_rate": round(len(short_tracks) / len(tracks), 4),
             "mean_frame_confidence": round(statistics.fmean(frame_mean_confidences), 4),
             "count_jump_events": len(count_events),
+            "suspected_reassociations": len(suspected_reassociations),
         },
         "classes": dict(class_counts.most_common()),
         "track_span_frames": {
@@ -205,10 +275,12 @@ def analyze_csv(
         },
         "largest_count_jumps": count_events[:worst_limit],
         "worst_timestamps": worst_windows[:worst_limit],
+        "suspected_reassociations": suspected_reassociations[:worst_limit],
         "notes": [
             "Short-lived tracks and tracks-per-minute are fragmentation proxies, not true ID-switch counts.",
+            "Suspected re-associations are class changes after a tracking gap and require visual confirmation.",
             "Camera cuts, replays and graphics can produce legitimate player-count changes.",
-            "Use the worst timestamps as a review queue and confirm issues visually.",
+            "Use the worst timestamps and suspected re-associations as a review queue.",
         ],
     }
     return report
@@ -232,6 +304,20 @@ def format_markdown(reports: list[dict[str, Any]]) -> str:
             f"({summary['short_lived_track_rate']:.1%}) |",
             f"| Mean frame confidence | {summary['mean_frame_confidence']:.3f} |",
             f"| Sudden count-change events | {summary['count_jump_events']:,} |",
+            f"| Suspected re-associations | {summary['suspected_reassociations']:,} |",
+            "", "### Suspected re-associations", "",
+            "| Track ID | Last seen | Reappeared | Missing frames | Previous class | New class |",
+            "| --- | ---: | ---: | ---: | --- | --- |",
+        ])
+
+        for event in report["suspected_reassociations"]:
+            lines.append(
+                f"| {event['track_id']} | {event['last_seen_frame']} | "
+                f"{event['reappeared_frame']} | {event['missing_frames']} | "
+                f"{event['previous_class']} | {event['new_class']} |"
+            )
+
+        lines.extend([
             "", "### Worst timestamps", "",
             "| Timestamp | Triage score | Mean confidence | Low-confidence rate | "
             "Count range | Short-track starts |",
@@ -260,6 +346,7 @@ def format_markdown(reports: list[dict[str, Any]]) -> str:
             ("short_lived_track_rate", "Short-lived track rate"),
             ("mean_frame_confidence", "Mean frame confidence"),
             ("count_jump_events", "Count-change events"),
+            ("suspected_reassociations", "Suspected re-associations"),
         ]:
             before = baseline["summary"][key]
             after = candidate["summary"][key]
@@ -287,22 +374,36 @@ def main() -> None:
     args = parse_args()
     if args.fps <= 0 or args.short_track_seconds <= 0 or args.count_jump <= 0:
         raise SystemExit("fps, short-track-seconds and count-jump must be positive")
+
     class_name = None if args.class_name.casefold() == "all" else args.class_name
     inputs = ([args.baseline] if args.baseline else []) + [args.csv]
+
     reports = [
         analyze_csv(
-            path, fps=args.fps, class_name=class_name,
+            path,
+            fps=args.fps,
+            class_name=class_name,
             short_track_seconds=args.short_track_seconds,
-            low_confidence=args.low_confidence, count_jump=args.count_jump,
+            low_confidence=args.low_confidence,
+            count_jump=args.count_jump,
             worst_limit=args.worst_limit,
         )
         for path in inputs
     ]
+
     json_path = args.output_prefix.with_suffix(".json")
     markdown_path = args.output_prefix.with_suffix(".md")
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps({"reports": reports}, indent=2) + "\n", encoding="utf-8")
-    markdown_path.write_text(format_markdown(reports), encoding="utf-8")
+
+    json_path.write_text(
+        json.dumps({"reports": reports}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    markdown_path.write_text(
+        format_markdown(reports),
+        encoding="utf-8",
+    )
+
     print(f"Wrote {markdown_path}")
     print(f"Wrote {json_path}")
 

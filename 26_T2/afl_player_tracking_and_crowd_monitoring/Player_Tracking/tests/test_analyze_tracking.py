@@ -53,6 +53,27 @@ class AnalyzeTrackingTests(unittest.TestCase):
             self.assertEqual(report["summary"]["count_jump_events"], 1)
             self.assertEqual(report["largest_count_jumps"][0]["change"], 3)
 
+    def test_flags_class_change_after_tracking_gap(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            path = self.write_csv(Path(temp), [
+                [0, 9, "GCS", 0.80, 100, 100, 120, 150],
+                [1, 9, "GCS", 0.82, 102, 100, 122, 150],
+                [2, 9, "GCS", 0.79, 104, 100, 124, 150],
+                [8, 9, "CAR", 0.75, 110, 102, 130, 152],
+                [9, 9, "CAR", 0.77, 112, 102, 132, 152],
+            ])
+            report = MODULE.analyze_csv(
+                path, fps=25, class_name=None, short_track_seconds=1,
+                low_confidence=0.25, count_jump=3, worst_limit=5,
+            )
+            self.assertEqual(report["summary"]["suspected_reassociations"], 1)
+
+            event = report["suspected_reassociations"][0]
+            self.assertEqual(event["track_id"], "9")
+            self.assertEqual(event["previous_class"], "GCS")
+            self.assertEqual(event["new_class"], "CAR")
+            self.assertEqual(event["missing_frames"], 5)
+
     def test_rejects_missing_required_columns(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "bad.csv"
