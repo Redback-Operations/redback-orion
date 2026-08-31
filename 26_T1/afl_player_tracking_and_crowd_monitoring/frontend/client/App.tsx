@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Login from "./pages/Login";
+import PageSkeleton from "@/components/PageSkeleton";
 
 const Index = lazy(() => import("./pages/Index"));
 const AFLDashboard = lazy(() => import("./pages/AFLDashboard"));
@@ -74,13 +75,7 @@ export default function App() {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-                        <Suspense
-              fallback={
-                <div className="flex min-h-screen items-center justify-center">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-green-600" />
-                </div>
-              }
-            >
+            <Suspense fallback={<PageSkeleton />}>
               <Routes>
                 <Route path="/" element={<Login />} />
                 <Route path="/login" element={<Login />} />
