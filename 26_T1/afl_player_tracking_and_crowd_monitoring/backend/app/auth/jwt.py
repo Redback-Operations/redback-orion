@@ -1,77 +1,119 @@
-from datetime import datetime, timedelta, timezone
-from jose import JWTError, jwt
-from fastapi import HTTPException, status
-from app.config import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_EXPIRE_MINUTES
+from datetime import (
+    datetime,
+    timedelta,
+    timezone,
+)
+
+from fastapi import (
+    HTTPException,
+    status,
+)
+
+from jose import (
+    JWTError,
+    jwt,
+)
+
+from app.config import (
+    JWT_ALGORITHM,
+    JWT_EXPIRE_MINUTES,
+    JWT_SECRET_KEY,
+)
 
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
-def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRE_MINUTES)
-    to_encode.update({
-        "exp": expire,
-        "type": "access"
-    })
-    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+def create_access_token(
+    data: dict,
+) -> str:
+    payload = data.copy()
+
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=(JWT_EXPIRE_MINUTES))
+
+    payload.update(
+        {
+            "exp": expires_at,
+            "type": "access",
+        }
+    )
+
+    return jwt.encode(
+        payload,
+        JWT_SECRET_KEY,
+        algorithm=JWT_ALGORITHM,
+    )
 
 
-def create_refresh_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(days=7)
-    to_encode.update({
-        "exp": expire,
-        "type": "refresh"
-    })
-    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+def create_refresh_token(
+    data: dict,
+) -> tuple[
+    str,
+    datetime,
+]:
+    payload = data.copy()
+
+    expires_at = datetime.now(timezone.utc) + timedelta(
+        days=(REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+
+    payload.update(
+        {
+            "exp": expires_at,
+            "type": "refresh",
+        }
+    )
+
+    token = jwt.encode(
+        payload,
+        JWT_SECRET_KEY,
+        algorithm=JWT_ALGORITHM,
+    )
+
+    return (
+        token,
+        expires_at.replace(tzinfo=None),
+    )
 
 
-def decode_access_token(token: str) -> dict:
+def decode_access_token(
+    token: str,
+) -> dict:
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-
-        if payload.get("type") != "access":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid access token"
-            )
-
-        return payload
-
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate access token"
+        payload = jwt.decode(
+            token,
+            JWT_SECRET_KEY,
+            algorithms=[JWT_ALGORITHM],
         )
 
+    except JWTError as exc:
+        raise HTTPException(
+            status_code=(status.HTTP_401_UNAUTHORIZED),
+            detail=("Could not validate " "access token"),
+        ) from exc
 
-def decode_refresh_token(token: str) -> dict:
+    if payload.get("type") != "access":
+        raise HTTPException(
+            status_code=(status.HTTP_401_UNAUTHORIZED),
+            detail=("Invalid access token"),
+        )
+
+    return payload
+
+
+def decode_refresh_token(
+    token: str,
+) -> dict | None:
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-
-        if payload.get("type") != "refresh":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token"
-            )
-
-        return payload
+        payload = jwt.decode(
+            token,
+            JWT_SECRET_KEY,
+            algorithms=[JWT_ALGORITHM],
+        )
 
     except JWTError:
         return None
 
-def create_refresh_token(data: dict):
-    to_encode = data.copy()
-    expires_at = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp": expires_at, "type": "refresh"})
-
-    token = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-
-    # Strip timezone before storing — DB column is TIMESTAMP WITHOUT TIME ZONE
-    return token, expires_at.replace(tzinfo=None)
-
-def decode_refresh_token(token: str) -> dict:
-    try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        return payload
-    except JWTError:
+    if payload.get("type") != "refresh":
         return None
+
+    return payload
