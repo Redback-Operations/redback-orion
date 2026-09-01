@@ -131,6 +131,7 @@ def analyze_csv(
     frame_confidence_sum: defaultdict[int, float] = defaultdict(float)
     frame_low_confidence: Counter[int] = Counter()
     class_counts: Counter[str] = Counter()
+    unique_track_ids: set[str] = set()
     first_frame: int | None = None
     last_frame: int | None = None
     rows = 0
@@ -154,6 +155,7 @@ def analyze_csv(
                 continue
 
             track_id = row["track_id"].strip()
+            unique_track_ids.add(track_id)
             key = (detected_class, track_id)
             if key not in tracks:
                 tracks[key] = TrackStats(frame, frame)
@@ -259,7 +261,8 @@ def analyze_csv(
             "last_frame": last_frame,
             "duration_seconds": round(duration_frames / fps, 3),
             "detections": rows,
-            "unique_tracks": len(tracks),
+            "unique_tracks": len(unique_track_ids),
+            "class_track_segments": len(tracks),
             "tracks_per_minute_proxy": round(len(tracks) / duration_minutes, 3),
             "short_lived_tracks": len(short_tracks),
             "short_lived_track_rate": round(len(short_tracks) / len(tracks), 4),
@@ -299,6 +302,7 @@ def format_markdown(reports: list[dict[str, Any]]) -> str:
             "| Metric | Value |", "| --- | ---: |",
             f"| Detections | {summary['detections']:,} |",
             f"| Unique track IDs | {summary['unique_tracks']:,} |",
+            f"| Class-track segments | {summary['class_track_segments']:,} |",
             f"| Tracks/minute (fragmentation proxy) | {summary['tracks_per_minute_proxy']:.2f} |",
             f"| Short-lived tracks | {summary['short_lived_tracks']:,} "
             f"({summary['short_lived_track_rate']:.1%}) |",
