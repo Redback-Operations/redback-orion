@@ -1,0 +1,102 @@
+# Include any files or directories that you don't want to be copied to your
+# container here (e.g., local build artifacts, temporary files, etc.).
+#
+# For more help, visit the .dockerignore file reference guide at
+# https://docs.docker.com/go/build-context-dockerignore/
+
+# macOS
+**/.DS_Store
+
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache
+**/.ipynb_checkpoints
+**/.venv
+**/venv
+
+# IDE / Editor
+**/.vscode
+**/.vs
+**/.idea
+**/.classpath
+**/.project
+**/.settings
+**/.toolstarget
+**/*.*proj.user
+
+# Git
+**/.git
+**/.gitignore
+
+# Node
+**/node_modules
+**/npm-debug.log
+
+# Docker
+**/.dockerignore
+**/docker-compose*
+**/compose.y*ml
+**/Dockerfile*
+
+# Build / temp
+**/bin
+**/obj
+**/build
+**/dist
+**/tmp
+**/temp
+
+# Environment / secrets
+**/.env
+**/.env.*
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Media files
+**/*.mp4
+**/*.avi
+**/*.mov
+**/*.mkv
+
+# Images
+**/*.png
+**/*.jpg
+**/*.jpeg
+
+# Datasets / data
+**/*.csv
+**/*.parquet
+**/*.h5
+
+# ML model files
+**/*.pt
+**/*.pth
+**/*.onnx
+**/*.weights
+**/*.engine
+
+# Archives
+**/*.zip
+**/*.tar
+**/*.gz
+
+# Outputs / generated files
+**/outputs
+**/results
+**/runs
+**/logs
+**/uploads
+
+# Misc
+**/*.dbmdl
+**/*.jfm
+
+LICENSE
+README.md
+uploads/
+.pytest_cache
+tests/__pycache__
+README.md

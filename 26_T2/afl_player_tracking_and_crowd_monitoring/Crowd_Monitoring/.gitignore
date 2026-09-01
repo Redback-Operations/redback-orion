@@ -1,0 +1,71 @@
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Notebook and editor artifacts
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Logs and local environment files
+*.log
+.env
+.env.*
+
+# Model artifacts
+*.pt
+*.pth
+*.onnx
+
+# Data and generated outputs
+data/
+outputs/
+results/
+runs/
+checkpoints/
+temp/
+tmp/
+
+# Media artifacts
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.png
+*.jpg
+*.jpeg
+*.csv
+*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Allow our specific configuration files even if they are .json
+!shared/config/*.json
+
+# Ignore the actual heavy files
+data/raw/*.mp4
+video_processing/data/extracted_frames/*.jpg
+
+# But allow the folder structure (the .gitkeep files)
+!data/raw/.gitkeep
+!video_processing/data/extracted_frames/.gitkeep

@@ -142,6 +142,31 @@ export default function Reports() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [reportType, setReportType] = useState("player");
   const [reportFormat, setReportFormat] = useState("pdf");
+  const [previewReport, setPreviewReport] = useState<(typeof availableReports)[0] | null>(null);
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
+
+  const shareReport = async (report: (typeof availableReports)[0]) => {
+    const url = `${window.location.origin}/reports?id=${report.id}`;
+    const shareData = {
+      title: report.name,
+      text: `${report.type} — ${report.teams}`,
+      url,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setShareMessage("Link copied to clipboard");
+    } catch (error) {
+      if ((error as Error).name === "AbortError") return;
+      setShareMessage("Could not share this report");
+    } finally {
+      setTimeout(() => setShareMessage(null), 3000);
+    }
+  };
 
   const filteredReports = availableReports.filter((report) => {
     const matchesSearch =
@@ -479,12 +504,22 @@ Thank you for using AFL Analytics Platform.
                               <Download className="w-4 h-4 mr-2" />
                               Download
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              aria-label={`Preview ${report.name}`}
+                              onClick={() => setPreviewReport(report)}
+                            >
                               <Eye className="w-4 h-4" />
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              aria-label={`Share ${report.name}`}
+                              onClick={() => shareReport(report)}
+                            >
                               <Share2 className="w-4 h-4" />
-                            </Button>
+                            </Button> 
                           </>
                         ) : (
                           <Button size="sm" className="flex-1" disabled>
@@ -698,6 +733,72 @@ Thank you for using AFL Analytics Platform.
               </div>
             </TabsContent>
           </Tabs>
+          {shareMessage && (
+            <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 rounded-md bg-gray-900 px-4 py-2 text-sm text-white shadow-lg">
+              {shareMessage}
+            </div>
+          )}
+
+          {previewReport && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+              onClick={() => setPreviewReport(null)}
+            >
+              <Card
+                className="w-full max-w-lg"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <CardHeader>
+                  <CardTitle>{previewReport.name}</CardTitle>
+                  <CardDescription>{previewReport.teams}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-600">Type:</span>
+                      <div className="font-medium">{previewReport.type}</div>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Category:</span>
+                      <div className="font-medium">{previewReport.category}</div>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Created:</span>
+                      <div className="font-medium">
+                        {new Date(previewReport.created).toLocaleString()}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Downloads:</span>
+                      <div className="font-medium">{previewReport.downloads}</div>
+                    </div>
+                  </div>
+                  <Separator />
+                  <p className="text-sm text-gray-600">
+                    Full report preview requires a backend endpoint. Download the{" "}
+                    {previewReport.format} file for complete contents.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => downloadReport(previewReport)}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPreviewReport(null)}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </div>
