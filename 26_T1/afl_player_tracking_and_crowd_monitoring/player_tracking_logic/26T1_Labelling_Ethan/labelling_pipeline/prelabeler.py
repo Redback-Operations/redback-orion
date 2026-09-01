@@ -69,11 +69,13 @@ def classify_by_jersey_color(config, image, x1, y1, x2, y2):
     if referee_ratio > float(config.REFEREE_YELLOW_RATIO_THRES):
         return config.REFEREE_ID
 
+    # Gold Coast wears red in the configured CAR vs GCS footage (class 1).
     if red_ratio > float(config.RED_RATIO_THRES) and red_ratio >= black_ratio:
-        return config.TEAM_A_ID
-
-    if black_ratio > float(config.BLACK_RATIO_THRES):
         return config.TEAM_B_ID
+
+    # Carlton wears dark/navy in the configured footage (class 0).
+    if black_ratio > float(config.BLACK_RATIO_THRES):
+        return config.TEAM_A_ID
 
     mean_h = float(np.mean(hsv[:, :, 0]))
     mean_s = float(np.mean(hsv[:, :, 1]))
@@ -83,10 +85,10 @@ def classify_by_jersey_color(config, image, x1, y1, x2, y2):
         return config.REFEREE_ID
 
     if (mean_h <= 10 or mean_h >= 170) and mean_s > 70:
-        return config.TEAM_A_ID
+        return config.TEAM_B_ID
 
     if mean_v < 75:
-        return config.TEAM_B_ID
+        return config.TEAM_A_ID
 
     return config.TEAM_A_ID
 
