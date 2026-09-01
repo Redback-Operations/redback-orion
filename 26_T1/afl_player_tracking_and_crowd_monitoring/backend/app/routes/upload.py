@@ -1,389 +1,177 @@
-import asyncio
-import csv
-import json
 import os
-import tempfile
 import uuid
-
-from datetime import (
-    datetime,
-    timezone,
-)
-
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    File,
-    HTTPException,
-    UploadFile,
-)
-
+import json
+import csv
+import asyncio
+import tempfile
+from datetime import datetime, timezone
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, BackgroundTasks
 from sqlalchemy.orm import Session
-
-from app.auth.dependencies import (
-    get_current_user,
-)
-
-from app.config import (
-    UPLOAD_DIR,
-)
-
-from app.database import (
-    SessionLocal,
-    get_db,
-)
-
+from app.database import get_db, SessionLocal
 from app.models import Job
-
-from app.schemas.jobs import (
-    UploadResponse,
-)
-
-from app.services.crowd_client import (
-    get_crowd_data,
-)
-
+from app.schemas.jobs import UploadResponse
+from app.auth.dependencies import get_current_user
+from app.config import UPLOAD_DIR
 from app.services.player_client import (
-    get_formation_data,
-    get_jersey_color_data,
     get_player_data,
+    get_jersey_color_data,
     get_tackle_data,
+    get_formation_data,
 )
+from app.services.crowd_client import get_crowd_data
 
 router = APIRouter()
 
-
-ALLOWED_EXTENSIONS = {
-    ".mp4",
-    ".avi",
-    ".mov",
-}
+ALLOWED_EXTENSIONS = {".mp4", ".avi", ".mov"}
+ALLOWED_MIME_TYPES = {"video/mp4", "video/x-msvideo", "video/quicktime"}
 
 
-ALLOWED_MIME_TYPES = {
-    "video/mp4",
-    "video/x-msvideo",
-    "video/quicktime",
-}
-
-
-def tracking_to_csv(
-    tracking_results: list,
-    csv_path: str,
-):
-    with open(
-        csv_path,
-        "w",
-        newline="",
-    ) as file:
-
+def tracking_to_csv(tracking_results: list, csv_path: str):
+    with open(csv_path, "w", newline="") as f:
         writer = csv.DictWriter(
-            file,
-            fieldnames=[
-                "frame_id",
-                "timestamps_s",
-                "player_id",
-                "cx",
-                "cy",
-                "x1",
-                "y1",
-                "x2",
-                "y2",
-            ],
+            f,
+            fieldnames=["frame_id", "timestamps_s", "player_id", "cx", "cy", "x1", "y1", "x2", "y2"]
         )
-
         writer.writeheader()
-
         for frame in tracking_results:
-
-            for player in frame.get(
-                "players",
-                [],
-            ):
-                center = player.get("center") or {}
-
-                bbox = player.get("bbox") or {}
-
-                writer.writerow(
-                    {
-                        "frame_id": (frame.get("frame_number")),
-                        "timestamps_s": (frame.get("timestamp")),
-                        "player_id": (player.get("player_id")),
-                        "cx": (center.get("x")),
-                        "cy": (center.get("y")),
-                        "x1": (bbox.get("x1")),
-                        "y1": (bbox.get("y1")),
-                        "x2": (bbox.get("x2")),
-                        "y2": (bbox.get("y2")),
-                    }
-                )
+            for player in frame.get("players", []):
+                writer.writerow({
+                    "frame_id": frame["frame_number"],
+                    "timestamps_s": frame["timestamp"],
+                    "player_id": player["player_id"],
+                    "cx": player["center"]["x"],
+                    "cy": player["center"]["y"],
+                    "x1": player["bbox"]["x1"],
+                    "y1": player["bbox"]["y1"],
+                    "x2": player["bbox"]["x2"],
+                    "y2": player["bbox"]["y2"],
+                })
 
 
-async def process_video(
-    job_id: str,
-    file_path: str,
-):
+async def process_video(job_id: str, file_path: str):
     db = SessionLocal()
-
-    tmp_json_path = None
-    tmp_csv_path = None
-
-    status = "processing"
+    tmp_json = None
+    tmp_csv = None
 
     try:
-        # PLAYER TRACKING
+        # Step 1: tracking (required - all other steps depend on it)
         tracking_result = await get_player_data(file_path)
 
-        if not isinstance(
-            tracking_result,
-            dict,
-        ):
-            raise RuntimeError(
-                "Player tracking service " "returned an invalid response"
-            )
-
-        # TEMP TRACKING JSON
-        with tempfile.NamedTemporaryFile(
-            suffix="_tracking.json",
-            delete=False,
-            mode="w",
-            encoding="utf-8",
-        ) as tmp_json:
-
-            json.dump(
-                tracking_result,
-                tmp_json,
-            )
-
-            tmp_json_path = tmp_json.name
-
-        # TEMP TRACKING CSV
-        with tempfile.NamedTemporaryFile(
-            suffix="_tracking.csv",
-            delete=False,
-        ) as tmp_csv:
-
-            tmp_csv_path = tmp_csv.name
-
-        tracking_to_csv(
-            tracking_result.get(
-                "tracking_results",
-                [],
-            ),
-            tmp_csv_path,
+        # Step 2: save tracking JSON + build tackle CSV for downstream calls
+        tmp_json = tempfile.NamedTemporaryFile(
+            suffix="_tracking.json", delete=False, mode="w"
         )
+        json.dump(tracking_result, tmp_json)
+        tmp_json.close()
+        tracking_json_path = tmp_json.name
 
-        # OTHER SERVICES
-        (
-            jersey_result,
-            formation_result,
-            tackle_result,
-            crowd_result,
-        ) = await asyncio.gather(
-            get_jersey_color_data(
-                file_path,
-                tmp_json_path,
-            ),
-            get_formation_data(
-                file_path,
-                tmp_json_path,
-            ),
-            get_tackle_data(tmp_csv_path),
-            get_crowd_data(file_path),
-            return_exceptions=True,
+        tmp_csv_file = tempfile.NamedTemporaryFile(
+            suffix="_tracking.csv", delete=False
         )
+        tmp_csv_file.close()
+        tmp_csv = tmp_csv_file.name
+        tracking_to_csv(tracking_result.get("tracking_results", []), tmp_csv)
 
-        # PLAYER RESULT
+        # Step 3: run jersey_color, formation, tackle + crowd in parallel
+        jersey_task = get_jersey_color_data(file_path, tracking_json_path)
+        formation_task = get_formation_data(file_path, tracking_json_path)
+        tackle_task = get_tackle_data(tmp_csv)
+        crowd_task = get_crowd_data(file_path)
+
+        results = await asyncio.gather(
+            jersey_task, formation_task, tackle_task, crowd_task,
+            return_exceptions=True
+        )
+        jersey_result, formation_result, tackle_result, crowd_result = results
+
         player_result = {
-            "tracking": (tracking_result),
-            "jersey_color": (
-                None
-                if isinstance(
-                    jersey_result,
-                    Exception,
-                )
-                else jersey_result
-            ),
-            "formation": (
-                None
-                if isinstance(
-                    formation_result,
-                    Exception,
-                )
-                else formation_result
-            ),
-            "tackle": (
-                None
-                if isinstance(
-                    tackle_result,
-                    Exception,
-                )
-                else tackle_result
-            ),
+            "tracking": tracking_result,
+            "jersey_color": None if isinstance(jersey_result, Exception) else jersey_result,
+            "formation": None if isinstance(formation_result, Exception) else formation_result,
+            "tackle": None if isinstance(tackle_result, Exception) else tackle_result,
         }
 
         errors = []
+        if isinstance(jersey_result, Exception):
+            errors.append(f"jersey_color: {jersey_result}")
+        if isinstance(formation_result, Exception):
+            errors.append(f"formation: {formation_result}")
+        if isinstance(tackle_result, Exception):
+            errors.append(f"tackle: {tackle_result}")
+        if isinstance(crowd_result, Exception):
+            errors.append(f"crowd: {crowd_result}")
 
-        if isinstance(
-            jersey_result,
-            Exception,
-        ):
-            errors.append("jersey_color: " f"{jersey_result}")
+        crowd_data = None if isinstance(crowd_result, Exception) else crowd_result
+        status = "done" if not errors else ("failed" if not player_result["tracking"] else "partial")
 
-        if isinstance(
-            formation_result,
-            Exception,
-        ):
-            errors.append("formation: " f"{formation_result}")
-
-        if isinstance(
-            tackle_result,
-            Exception,
-        ):
-            errors.append("tackle: " f"{tackle_result}")
-
-        if isinstance(
-            crowd_result,
-            Exception,
-        ):
-            errors.append("crowd: " f"{crowd_result}")
-
-        crowd_data = (
-            None
-            if isinstance(
-                crowd_result,
-                Exception,
-            )
-            else crowd_result
-        )
-
-        status = "done" if not errors else "partial"
-
-        # STORE REAL ML OUTPUT
-        job = db.query(Job).filter(Job.job_id == uuid.UUID(job_id)).first()
-
+        job = db.query(Job).filter(Job.job_id == job_id).first()
         if job:
             job.status = status
-
             job.player_result = player_result
-
             job.crowd_result = crowd_data
-
             job.error = " | ".join(errors) if errors else None
-
             job.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
-
             db.commit()
 
-    except Exception as exc:
+    except Exception as e:
         status = "failed"
-
-        job = db.query(Job).filter(Job.job_id == uuid.UUID(job_id)).first()
-
+        job = db.query(Job).filter(Job.job_id == job_id).first()
         if job:
             job.status = "failed"
-
-            job.error = str(exc)
-
+            job.error = str(e)
             job.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
-
             db.commit()
-
     finally:
         db.close()
-
-        # Partial jobs retain the video
-        # so /retry can actually process it again.
+        # Keep video file on partial so retry can reuse it; delete on done/failed
         if status != "partial" and os.path.exists(file_path):
             os.remove(file_path)
-
-        if tmp_json_path and os.path.exists(tmp_json_path):
-            os.remove(tmp_json_path)
-
-        if tmp_csv_path and os.path.exists(tmp_csv_path):
-            os.remove(tmp_csv_path)
+        if tmp_json and os.path.exists(tmp_json.name):
+            os.remove(tmp_json.name)
+        if tmp_csv and os.path.exists(tmp_csv):
+            os.remove(tmp_csv)
 
 
-@router.post(
-    "/upload",
-    response_model=UploadResponse,
-)
+@router.post("/upload", response_model=UploadResponse)
 async def upload_video(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ):
     ext = os.path.splitext(file.filename)[1].lower()
-
     if ext not in ALLOWED_EXTENSIONS or file.content_type not in ALLOWED_MIME_TYPES:
         raise HTTPException(
             status_code=400,
-            detail=("Invalid video format. " "Accepted formats: " ".mp4, .avi, .mov"),
+            detail="Invalid video format. Accepted formats: .mp4, .avi, .mov"
         )
-
-    os.makedirs(
-        UPLOAD_DIR,
-        exist_ok=True,
-    )
-
-    filename = f"{uuid.uuid4()}{ext}"
-
-    file_path = os.path.join(
-        UPLOAD_DIR,
-        filename,
-    )
-
     try:
-        contents = await file.read()
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        filename = f"{uuid.uuid4()}{ext}"
+        file_path = os.path.join(UPLOAD_DIR, filename)
 
-        if not contents:
-            raise HTTPException(
-                status_code=400,
-                detail=("Uploaded video is empty"),
-            )
-
-        with open(
-            file_path,
-            "wb",
-        ) as destination:
-
-            destination.write(contents)
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
 
         job = Job(
-            user_id=uuid.UUID(current_user["sub"]),
+            user_id=current_user["sub"],
             status="processing",
-            video_path=file_path,
+            video_path=file_path
         )
-
         db.add(job)
         db.commit()
         db.refresh(job)
 
-        background_tasks.add_task(
-            process_video,
-            str(job.job_id),
-            file_path,
-        )
+        background_tasks.add_task(process_video, str(job.job_id), file_path)
 
         return {
-            "job_id": job.job_id,
+            "job_id": str(job.job_id),
             "status": job.status,
-            "created_at": (job.created_at),
+            "created_at": job.created_at
         }
 
     except HTTPException:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
         raise
 
-    except Exception as exc:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
-        raise HTTPException(
-            status_code=500,
-            detail=("Internal server error " "while uploading video: " f"{exc}"),
-        ) from exc
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error while uploading video")
