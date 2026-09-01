@@ -307,13 +307,16 @@ def format_markdown(reports: list[dict[str, Any]]) -> str:
             f"| Suspected re-associations | {summary['suspected_reassociations']:,} |",
             "", "### Suspected re-associations", "",
             "| Track ID | Last seen | Reappeared | Missing frames | Previous class | New class |",
-            "| --- | ---: | ---: | ---: | --- | --- |",
+            "| --- | --- | --- | ---: | --- | --- |",  
         ])
 
         for event in report["suspected_reassociations"]:
+            fps = report["settings"]["fps"]
+            last_seen = f"{event['last_seen_frame']} ({timestamp(event['last_seen_frame'], fps)})"
+            reappeared = f"{event['reappeared_frame']} ({timestamp(event['reappeared_frame'], fps)})"
             lines.append(
-                f"| {event['track_id']} | {event['last_seen_frame']} | "
-                f"{event['reappeared_frame']} | {event['missing_frames']} | "
+                f"| {event['track_id']} | {last_seen} | "
+                f"{reappeared} | {event['missing_frames']} | "
                 f"{event['previous_class']} | {event['new_class']} |"
             )
 
