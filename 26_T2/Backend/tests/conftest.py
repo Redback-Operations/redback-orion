@@ -1,0 +1,49 @@
+import uuid
+import pytest
+import os
+from datetime import datetime, timezone
+from unittest.mock import MagicMock, AsyncMock, patch
+from fastapi.testclient import TestClient
+from app.main import app
+from app.database import get_db
+
+os.environ["TESTING"] = "true"
+
+@pytest.fixture
+def mock_db():
+    db = MagicMock()
+    # Default: no existing user found
+    db.query.return_value.filter.return_value.first.return_value = None
+
+    def refresh_side_effect(obj):
+        if not getattr(obj, "user_id", None):
+            obj.user_id = uuid.uuid4()
+        if not getattr(obj, "role", None):
+            obj.role = "user"
+        if not getattr(obj, "created_at", None):
+            obj.created_at = datetime.now(timezone.utc)
+
+    db.refresh.side_effect = refresh_side_effect
+    return db
+
+
+@pytest.fixture
+def client(mock_db):
+    def override_get_db():
+        yield mock_db
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    # Replace the async engine in app.main so the lifespan doesn't open a real DB connection.
+    # AsyncEngine.begin is read-only, so we swap the whole engine object.
+    mock_conn = AsyncMock()
+    mock_ctx = MagicMock()
+    mock_ctx.__aenter__ = AsyncMock(return_value=mock_conn)
+    mock_ctx.__aexit__ = AsyncMock(return_value=False)
+    mock_engine = MagicMock()
+    mock_engine.begin.return_value = mock_ctx
+
+    with patch("app.main.engine", mock_engine):
+        with TestClient(app) as c:
+            yield c
+    app.dependency_overrides.clear()

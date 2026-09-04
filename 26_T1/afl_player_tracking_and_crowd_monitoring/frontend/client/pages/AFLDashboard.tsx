@@ -862,14 +862,20 @@ useEffect(() => {
 
   // Logout function
   const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("loggedInUser");
-    navigate("/");
+    const AUTH_KEYS = [
+      "isAuthenticated",
+      "userEmail",
+      "userName",
+      "authToken",
+      "authProvider",
+      "access_token",
+      "refresh_token",
+      "accessToken",
+      "refreshToken",
+      "loggedInUser",
+    ];
+    AUTH_KEYS.forEach((key) => localStorage.removeItem(key));
+    navigate("/login", { replace: true });
   };
 
   // Video upload handlers
@@ -1599,14 +1605,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <Badge
-                  variant={isLive ? "destructive" : "secondary"}
-                  className="animate-pulse"
-                >
-                  <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-                  {isLive ? "LIVE" : "OFFLINE"}
-                </Badge>
-                {userEmail && (
+                 {userEmail && (
                   <span className="text-sm text-gray-600 hidden sm:block">
                     Welcome, {userEmail}
                   </span>

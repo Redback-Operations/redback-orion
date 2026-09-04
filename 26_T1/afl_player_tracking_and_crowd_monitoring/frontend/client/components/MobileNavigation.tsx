@@ -11,7 +11,6 @@ import {
   Menu,
   Home,
   Zap,
-  Terminal,
 } from "lucide-react";
 
 const navigationItems = [
@@ -45,12 +44,7 @@ const navigationItems = [
     icon: Download,
     description: "Download & manage reports",
   },
-  {
-    name: "API Diagnostics",
-    href: "/api-diagnostics",
-    icon: Terminal,
-    description: "System monitoring",
-  },
+  
   {
     name: "About",
     href: "/about",

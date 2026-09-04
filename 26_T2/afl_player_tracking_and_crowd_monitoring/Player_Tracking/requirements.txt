@@ -1,0 +1,12 @@
+# Player_Tracking — T2 2026
+# Tested on Python 3.12, RTX 3080 (CUDA 13). Install torch first if you need
+# a specific CUDA build: https://pytorch.org/get-started/locally/
+
+torch>=2.2
+ultralytics>=8.4
+opencv-python>=4.8
+numpy
+pyyaml
+gdown>=4.7        # scripts/download_data.py
+lap>=0.5.12       # ByteTrack/BoTSORT dependency (not auto-declared by ultralytics)
+imageio-ffmpeg    # H.264 encoding for scripts/track_video.py output

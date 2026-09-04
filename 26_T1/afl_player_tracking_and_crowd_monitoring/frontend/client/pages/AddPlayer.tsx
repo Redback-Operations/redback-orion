@@ -109,7 +109,7 @@ export default function AddPlayer() {
     setIsSaving(true);
 
     try {
-      await apiRequest("http://localhost:8000/players", {
+      await apiRequest("http://localhost:8000/api/player", {
         method: "POST",
         body: JSON.stringify({
           name: formData.name,
