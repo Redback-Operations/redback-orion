@@ -381,11 +381,11 @@ export default function CrowdMonitor() {
                           opacity: (zone.density / 100) * 0.8 + 0.2,
                         }}
                       >
-                        <div className="text-white text-xs font-medium p-1 text-center">
+                         <div className="text-white text-xs font-medium text-center h-full flex flex-col justify-center leading-tight px-1">
                           <div className="truncate">
                             {zone.name.split(" - ")[0]}
                           </div>
-                          <div>{zone.density}%</div>
+                            <div>{zone.density}% · {zone.current.toLocaleString()}</div>
                         </div>
                       </button>
                     ))}
