@@ -20,7 +20,10 @@ __pycache__/
 
 # Data / outputs
 data/
+datasets/
+models/
 out/
+outputs/
 runs/
 
 # IDEs

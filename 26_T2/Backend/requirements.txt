@@ -1,0 +1,26 @@
+# Web framework
+fastapi
+uvicorn[standard]
+
+# Async HTTP client (calls to player/crowd services)
+httpx
+
+# Database
+sqlalchemy
+asyncpg
+psycopg2-binary
+
+# Auth
+python-jose[cryptography]
+bcrypt
+passlib[bcrypt]
+email-validator
+
+# Utilities
+python-dotenv
+python-multipart
+
+# Testing
+pytest
+pytest-asyncio
+httpx
