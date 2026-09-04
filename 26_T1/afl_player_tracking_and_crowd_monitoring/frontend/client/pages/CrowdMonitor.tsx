@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import MobileNavigation from "@/components/MobileNavigation";
-import LiveClock from "@/components/LiveClock";
 import {
   Users,
   TrendingUp,

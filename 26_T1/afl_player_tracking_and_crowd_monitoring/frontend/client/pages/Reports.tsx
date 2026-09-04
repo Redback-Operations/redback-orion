@@ -20,7 +20,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import MobileNavigation from "@/components/MobileNavigation";
-import LiveClock from "@/components/LiveClock";
 import {
   Download,
   FileText,
