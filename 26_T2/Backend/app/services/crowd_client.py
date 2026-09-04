@@ -2,7 +2,19 @@ import os
 import httpx
 
 from app.config import CROWD_SERVICE_URL, USE_MOCK_CROWD
+from app.exceptions import ServiceTimeoutError
 
+
+async def _post_to_crowd_service(url, *, timeout, json_data):
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            response = await client.post(url, json=json_data)
+            response.raise_for_status()
+            return response.json()
+    except (httpx.ConnectTimeout, httpx.ReadTimeout) as exc:
+        raise ServiceTimeoutError(
+            f"Crowd service timed out while requesting {url}"
+        ) from exc
 
 def get_mock_crowd_data(video_id: str):
     return {
@@ -32,31 +44,11 @@ async def get_crowd_data(file_path: str = None, video_id: str = None):
 
     abs_path = os.path.abspath(file_path)
 
-    try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.post(
-                f"{CROWD_SERVICE_URL}/process-crowd-detection",
-                json={
-                    "video_id": video_id,
-                    "video_path": abs_path
-                }
-            )
-
-            response.raise_for_status()
-            return response.json()
-
-    except httpx.TimeoutException:
-        raise RuntimeError("Crowd service request timed out")
-
-    except httpx.ConnectError:
-        raise RuntimeError("Crowd service is unavailable")
-
-    except httpx.HTTPStatusError as e:
-        raise RuntimeError(
-            f"Crowd service returned HTTP {e.response.status_code}"
-        )
-
-    except httpx.RequestError as e:
-        raise RuntimeError(
-            f"Crowd service request failed: {e}"
-        )
+    return await _post_to_crowd_service(
+        f"{CROWD_SERVICE_URL}/process-crowd-detection",
+        timeout=120.0,
+        json_data={
+            "video_id": video_id,
+            "video_path": abs_path
+        }
+    )

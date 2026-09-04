@@ -1,6 +1,18 @@
 import httpx
 from app.config import USE_MOCK_PLAYER, PLAYER_SERVICE_URL
+from app.exceptions import ServiceTimeoutError
 
+
+async def _post_to_player_service(url, *, timeout, files):
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            response = await client.post(url, files=files)
+            response.raise_for_status()
+            return response.json()
+    except (httpx.ConnectTimeout, httpx.ReadTimeout) as exc:
+        raise ServiceTimeoutError(
+            f"Player service timed out while requesting {url}"
+        ) from exc
 
 def get_mock_player_data():
     return {
@@ -70,59 +82,70 @@ async def get_player_data(file_path: str = None):
     if not file_path:
         raise ValueError("file_path is required when not using mock")
 
-    async with httpx.AsyncClient(timeout=300.0) as client:
-        with open(file_path, "rb") as f:
-            response = await client.post(
-                f"{PLAYER_SERVICE_URL}/tracking",
-                files={"video": (file_path.split("/")[-1].split("\\")[-1], f, "video/mp4")}
-            )
-        response.raise_for_status()
-        return response.json()
+    with open(file_path, "rb") as f:
+        return await _post_to_player_service(
+            f"{PLAYER_SERVICE_URL}/tracking",
+            timeout=300.0,
+            files={
+                "video": (
+                    file_path.split("/")[-1].split("\\")[-1],
+                    f,
+                    "video/mp4"
+                )
+            }
+    )
 
 
 async def get_jersey_color_data(video_path: str, tracking_json_path: str):
     if USE_MOCK_PLAYER:
         return get_mock_jersey_color_data()
 
-    async with httpx.AsyncClient(timeout=300.0) as client:
-        with open(video_path, "rb") as vf, open(tracking_json_path, "rb") as jf:
-            response = await client.post(
-                f"{PLAYER_SERVICE_URL}/jersey_color",
-                files={
-                    "video": (video_path.split("\\")[-1], vf, "video/mp4"),
-                    "tracking_json": (tracking_json_path.split("\\")[-1], jf, "application/json")
-                }
-            )
-        response.raise_for_status()
-        return response.json()
-
+    with open(video_path, "rb") as vf, open(tracking_json_path, "rb") as jf:
+        return await _post_to_player_service(
+            f"{PLAYER_SERVICE_URL}/jersey_color",
+            timeout=300.0,
+            files={
+                "video": (video_path.split("\\")[-1], vf, "video/mp4"),
+                "tracking_json": (
+                    tracking_json_path.split("\\")[-1],
+                    jf,
+                    "application/json"
+                )
+            }
+        )
 
 async def get_tackle_data(csv_path: str):
     if USE_MOCK_PLAYER:
         return get_mock_tackle_data()
 
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        with open(csv_path, "rb") as f:
-            response = await client.post(
-                f"{PLAYER_SERVICE_URL}/tackle",
-                files={"tracking_csv": (csv_path.split("\\")[-1], f, "text/csv")}
-            )
-        response.raise_for_status()
-        return response.json()
+    with open(csv_path, "rb") as f:
+        return await _post_to_player_service(
+            f"{PLAYER_SERVICE_URL}/tackle",
+            timeout=120.0,
+            files={
+                "tracking_csv": (
+                    csv_path.split("\\")[-1],
+                    f,
+                    "text/csv"
+                )
+            }
+        )
 
 
 async def get_formation_data(video_path: str, tracking_json_path: str):
     if USE_MOCK_PLAYER:
         return get_mock_formation_data()
 
-    async with httpx.AsyncClient(timeout=600.0) as client:
-        with open(video_path, "rb") as vf, open(tracking_json_path, "rb") as jf:
-            response = await client.post(
-                f"{PLAYER_SERVICE_URL}/formation",
-                files={
-                    "video": (video_path.split("\\")[-1], vf, "video/mp4"),
-                    "tracking_json": (tracking_json_path.split("\\")[-1], jf, "application/json")
-                }
-            )
-        response.raise_for_status()
-        return response.json()
+    with open(video_path, "rb") as vf, open(tracking_json_path, "rb") as jf:
+        return await _post_to_player_service(
+            f"{PLAYER_SERVICE_URL}/formation",
+            timeout=600.0,
+            files={
+                "video": (video_path.split("\\")[-1], vf, "video/mp4"),
+                "tracking_json": (
+                    tracking_json_path.split("\\")[-1],
+                    jf,
+                    "application/json"
+                )
+            }
+        )
