@@ -54,7 +54,7 @@ async def get_player_data(
     file_path: str,
 ):
     if not file_path or not os.path.exists(file_path):
-        raise PlayerServiceError("A valid video file path " "is required.")
+        raise PlayerServiceError("A valid video file path is required.")
 
     with open(
         file_path,
@@ -70,7 +70,7 @@ async def get_player_data(
                     "video/mp4",
                 )
             },
-            1000.0,
+            600.0,
         )
 
 
@@ -108,7 +108,7 @@ async def get_jersey_color_data(
                     "application/json",
                 ),
             },
-            1000.0,
+            600.0,
         )
 
 
@@ -132,7 +132,7 @@ async def get_tackle_data(
                     "text/csv",
                 )
             },
-            1000.0,
+            240.0,
         )
 
 
