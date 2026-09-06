@@ -317,7 +317,6 @@ export default function PlayerPerformance() {
   const [jobStatus, setJobStatus] = useState("");
   const [jobId, setJobId] = useState("");
   const [jobError, setJobError] = useState("");
-  const navigate = useNavigate();
 
   const uploadVideo = async (file: File) => {
     const formData = new FormData();
