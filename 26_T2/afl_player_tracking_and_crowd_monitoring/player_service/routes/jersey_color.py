@@ -24,10 +24,10 @@ async def jersey_color(
         raise HTTPException(status_code=400, detail="tracking_json must be a .json file")
 
     job_id = str(uuid.uuid4())
-    video_path = config.UPLOADS_DIR / f"{job_id}_{Path(video.filename).name}"
+    video_path = config.UPLOADS_DIR / f"{job_id}{Path(video.filename).suffix}"
     json_path = config.UPLOADS_DIR / f"{job_id}_tracking.json"
     output_folder = config.OUTPUTS_DIR / job_id
-    output_folder.mkdir(exist_ok=True)
+    output_folder.mkdir(parents=True,exist_ok=True)
 
     with open(video_path, "wb") as f:
         shutil.copyfileobj(video.file, f)
@@ -66,5 +66,22 @@ async def jersey_color(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
-        video_path.unlink(missing_ok=True)
-        json_path.unlink(missing_ok=True)
+        try:
+            video.file.close()
+        except Exception:
+            pass
+
+        try:
+            tracking_json.file.close()
+        except Exception:
+            pass
+
+        try:
+            video_path.unlink(missing_ok=True)
+        except PermissionError as e:
+            print(f"Could not delete temporary video: {e}")
+
+        try:
+            json_path.unlink(missing_ok=True)
+        except PermissionError as e:
+            print(f"Could not delete temporary JSON: {e}")
