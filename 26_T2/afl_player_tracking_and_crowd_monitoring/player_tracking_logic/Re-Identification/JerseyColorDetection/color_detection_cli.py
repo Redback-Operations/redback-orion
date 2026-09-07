@@ -374,6 +374,12 @@ def run_pipeline(args):
         fps,
         (width, height)
     )
+    os.makedirs(args.output_folder, exist_ok=True)
+
+    print(f"[DEBUG] output_folder: {args.output_folder}")
+    print(f"[DEBUG] folder exists: {os.path.isdir(args.output_folder)}")
+    print(f"[DEBUG] output_video: {output_video}")
+    print(f"[DEBUG] output_csv: {output_csv}")
 
     csv_file = open(output_csv, "w", newline="")
 
