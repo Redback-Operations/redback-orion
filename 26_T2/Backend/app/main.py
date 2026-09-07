@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.routes import health, test, players, crowd, auth, upload, jobs
+from app.routes import health, test, players, crowd, auth, upload, jobs, analytics
 from app.database import engine
 from app.models import Base
 from app import config
@@ -72,3 +72,4 @@ app.include_router(jobs.router, tags=["Jobs"])
 app.include_router(test.router)
 app.include_router(players.router)
 app.include_router(crowd.router)
+app.include_router(analytics.router)

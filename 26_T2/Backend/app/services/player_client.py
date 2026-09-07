@@ -1,151 +1,174 @@
+import os
+
 import httpx
-from app.config import USE_MOCK_PLAYER, PLAYER_SERVICE_URL
-from app.exceptions import ServiceTimeoutError
+
+from app.config import (
+    PLAYER_SERVICE_URL,
+)
 
 
-async def _post_to_player_service(url, *, timeout, files):
+class PlayerServiceError(RuntimeError):
+    pass
+
+
+async def _post_files(
+    endpoint: str,
+    files: dict,
+    timeout: float,
+):
     try:
         async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(url, files=files)
+
+            response = await client.post(
+                (f"{PLAYER_SERVICE_URL}" f"{endpoint}"),
+                files=files,
+            )
+
             response.raise_for_status()
+
             return response.json()
-    except (httpx.ConnectTimeout, httpx.ReadTimeout) as exc:
-        raise ServiceTimeoutError(
-            f"Player service timed out while requesting {url}"
+
+    except httpx.ConnectError as exc:
+        raise PlayerServiceError(
+            "Could not connect to " "player service at " f"{PLAYER_SERVICE_URL}."
         ) from exc
 
-def get_mock_player_data():
-    return {
-        "status": "success",
-        "video_info": {
-            "duration": 7.0,
-            "fps": 24,
-            "total_frames": 168,
-            "resolution": [896, 566]
-        },
-        "tracking_results": [
+    except httpx.TimeoutException as exc:
+        raise PlayerServiceError("Player service timed out " f"on {endpoint}.") from exc
+
+    except httpx.HTTPStatusError as exc:
+        raise PlayerServiceError(
+            f"Player service {endpoint} "
+            "returned HTTP "
+            f"{exc.response.status_code}: "
+            f"{exc.response.text}"
+        ) from exc
+
+    except ValueError as exc:
+        raise PlayerServiceError(
+            f"Player service {endpoint} " "returned invalid JSON."
+        ) from exc
+
+
+async def get_player_data(
+    file_path: str,
+):
+    if not file_path or not os.path.exists(file_path):
+        raise PlayerServiceError("A valid video file path is required.")
+
+    with open(
+        file_path,
+        "rb",
+    ) as file:
+
+        return await _post_files(
+            "/tracking",
             {
-                "frame_number": 1,
-                "timestamp": 0.0,
-                "players": [
-                    {
-                        "player_id": 1,
-                        "team_id": 0,
-                        "team_name": "CAR",
-                        "bbox": {"x1": 100, "y1": 200, "x2": 140, "y2": 300},
-                        "center": {"x": 120, "y": 250},
-                        "confidence": 0.85,
-                        "width": 40,
-                        "height": 100
-                    }
-                ]
-            }
-        ],
-        "video_url": None
-    }
-
-
-def get_mock_jersey_color_data():
-    return {
-        "status": "success",
-        "teams": [
-            {"team_id": 0, "team_name": "CAR", "jersey_color": [255, 0, 0]},
-            {"team_id": 1, "team_name": "OPP", "jersey_color": [0, 0, 255]}
-        ]
-    }
-
-
-def get_mock_tackle_data():
-    return {
-        "status": "success",
-        "tackles": [],
-        "csv_url": None
-    }
-
-
-def get_mock_formation_data():
-    return {
-        "status": "success",
-        "formations": [
-            {"frame_number": 1, "team_id": 0, "formation": "4-3-3"},
-            {"frame_number": 1, "team_id": 1, "formation": "4-4-2"}
-        ],
-        "video_url": None,
-        "csv_url": None
-    }
-
-
-async def get_player_data(file_path: str = None):
-    if USE_MOCK_PLAYER:
-        return get_mock_player_data()
-
-    if not file_path:
-        raise ValueError("file_path is required when not using mock")
-
-    with open(file_path, "rb") as f:
-        return await _post_to_player_service(
-            f"{PLAYER_SERVICE_URL}/tracking",
-            timeout=300.0,
-            files={
                 "video": (
-                    file_path.split("/")[-1].split("\\")[-1],
-                    f,
-                    "video/mp4"
+                    os.path.basename(file_path),
+                    file,
+                    "video/mp4",
                 )
-            }
-    )
-
-
-async def get_jersey_color_data(video_path: str, tracking_json_path: str):
-    if USE_MOCK_PLAYER:
-        return get_mock_jersey_color_data()
-
-    with open(video_path, "rb") as vf, open(tracking_json_path, "rb") as jf:
-        return await _post_to_player_service(
-            f"{PLAYER_SERVICE_URL}/jersey_color",
-            timeout=300.0,
-            files={
-                "video": (video_path.split("\\")[-1], vf, "video/mp4"),
-                "tracking_json": (
-                    tracking_json_path.split("\\")[-1],
-                    jf,
-                    "application/json"
-                )
-            }
+            },
+            600.0,
         )
 
-async def get_tackle_data(csv_path: str):
-    if USE_MOCK_PLAYER:
-        return get_mock_tackle_data()
 
-    with open(csv_path, "rb") as f:
-        return await _post_to_player_service(
-            f"{PLAYER_SERVICE_URL}/tackle",
-            timeout=120.0,
-            files={
+async def get_jersey_color_data(
+    video_path: str,
+    tracking_json_path: str,
+):
+    if not os.path.exists(video_path) or not os.path.exists(tracking_json_path):
+        raise PlayerServiceError(
+            "Video and tracking JSON " "are required for jersey analysis."
+        )
+
+    with (
+        open(
+            video_path,
+            "rb",
+        ) as video_file,
+        open(
+            tracking_json_path,
+            "rb",
+        ) as json_file,
+    ):
+
+        return await _post_files(
+            "/jersey_color",
+            {
+                "video": (
+                    os.path.basename(video_path),
+                    video_file,
+                    "video/mp4",
+                ),
+                "tracking_json": (
+                    os.path.basename(tracking_json_path),
+                    json_file,
+                    "application/json",
+                ),
+            },
+            600.0,
+        )
+
+
+async def get_tackle_data(
+    csv_path: str,
+):
+    if not os.path.exists(csv_path):
+        raise PlayerServiceError("Tracking CSV is required " "for tackle analysis.")
+
+    with open(
+        csv_path,
+        "rb",
+    ) as file:
+
+        return await _post_files(
+            "/tackle",
+            {
                 "tracking_csv": (
-                    csv_path.split("\\")[-1],
-                    f,
-                    "text/csv"
+                    os.path.basename(csv_path),
+                    file,
+                    "text/csv",
                 )
-            }
+            },
+            240.0,
         )
 
 
-async def get_formation_data(video_path: str, tracking_json_path: str):
-    if USE_MOCK_PLAYER:
-        return get_mock_formation_data()
+async def get_formation_data(
+    video_path: str,
+    tracking_json_path: str,
+):
+    if not os.path.exists(video_path) or not os.path.exists(tracking_json_path):
+        raise PlayerServiceError(
+            "Video and tracking JSON " "are required for formation analysis."
+        )
 
-    with open(video_path, "rb") as vf, open(tracking_json_path, "rb") as jf:
-        return await _post_to_player_service(
-            f"{PLAYER_SERVICE_URL}/formation",
-            timeout=600.0,
-            files={
-                "video": (video_path.split("\\")[-1], vf, "video/mp4"),
+    with (
+        open(
+            video_path,
+            "rb",
+        ) as video_file,
+        open(
+            tracking_json_path,
+            "rb",
+        ) as json_file,
+    ):
+
+        return await _post_files(
+            "/formation",
+            {
+                "video": (
+                    os.path.basename(video_path),
+                    video_file,
+                    "video/mp4",
+                ),
                 "tracking_json": (
-                    tracking_json_path.split("\\")[-1],
-                    jf,
-                    "application/json"
-                )
-            }
+                    os.path.basename(tracking_json_path),
+                    json_file,
+                    "application/json",
+                ),
+            },
+            1000.0,
         )

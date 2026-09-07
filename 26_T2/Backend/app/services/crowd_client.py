@@ -1,54 +1,57 @@
 import os
+
 import httpx
 
-from app.config import CROWD_SERVICE_URL, USE_MOCK_CROWD
-from app.exceptions import ServiceTimeoutError
+from app.config import (
+    CROWD_SERVICE_URL,
+)
 
 
-async def _post_to_crowd_service(url, *, timeout, json_data):
-    try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(url, json=json_data)
-            response.raise_for_status()
-            return response.json()
-    except (httpx.ConnectTimeout, httpx.ReadTimeout) as exc:
-        raise ServiceTimeoutError(
-            f"Crowd service timed out while requesting {url}"
-        ) from exc
+class CrowdServiceError(RuntimeError):
+    pass
 
-def get_mock_crowd_data(video_id: str):
-    return {
+
+async def get_crowd_data(
+    file_path: str,
+    video_id: str | None = None,
+):
+    if not file_path or not os.path.exists(file_path):
+        raise CrowdServiceError("A valid video file path " "is required.")
+
+    if video_id is None:
+        video_id = os.path.splitext(os.path.basename(file_path))[0]
+
+    payload = {
         "video_id": video_id,
-        "summary": {
-            "peak_person_count": 10,
-            "crowd_state": "stable"
-        },
-        "heatmap": {
-            "image_path": None
-        }
+        "video_path": os.path.abspath(file_path),
     }
 
+    try:
+        async with httpx.AsyncClient(timeout=300.0) as client:
 
-async def get_crowd_data(file_path: str = None, video_id: str = None):
-    if video_id is None:
-        if file_path:
-            video_id = os.path.splitext(os.path.basename(file_path))[0]
-        else:
-            video_id = "unknown"
+            response = await client.post(
+                (f"{CROWD_SERVICE_URL}" "/process-crowd-detection"),
+                json=payload,
+            )
 
-    if USE_MOCK_CROWD:
-        return get_mock_crowd_data(video_id)
+            response.raise_for_status()
 
-    if not file_path:
-        raise ValueError("file_path is required")
+            return response.json()
 
-    abs_path = os.path.abspath(file_path)
+    except httpx.ConnectError as exc:
+        raise CrowdServiceError(
+            "Could not connect to crowd " "service at " f"{CROWD_SERVICE_URL}."
+        ) from exc
 
-    return await _post_to_crowd_service(
-        f"{CROWD_SERVICE_URL}/process-crowd-detection",
-        timeout=120.0,
-        json_data={
-            "video_id": video_id,
-            "video_path": abs_path
-        }
-    )
+    except httpx.TimeoutException as exc:
+        raise CrowdServiceError("Crowd service timed out.") from exc
+
+    except httpx.HTTPStatusError as exc:
+        raise CrowdServiceError(
+            "Crowd service returned HTTP "
+            f"{exc.response.status_code}: "
+            f"{exc.response.text}"
+        ) from exc
+
+    except ValueError as exc:
+        raise CrowdServiceError("Crowd service returned " "invalid JSON.") from exc
