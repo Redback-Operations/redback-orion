@@ -1,0 +1,17 @@
+# Base install - works on any machine (crowd detection runs on the CPU).
+# crowd_detection picks the fastest available backend automatically
+# (CROWD_DEVICE=auto): CUDA -> DirectML -> OpenVINO -> plain PyTorch on CPU.
+#
+# GPU inference needs one extra step (pip can't detect your GPU):
+#   NVIDIA:      see requirements-nvidia.txt
+#   AMD / Intel: see requirements-amd.txt (Windows only)
+numpy
+pandas
+opencv-python
+ultralytics>=8.4.120   # tested version
+openvino>=2024.0.0     # fast CPU backend; also needs the exported model folder, see crowd_detection/README.md
+matplotlib
+scikit-learn
+scipy
+fastapi
+uvicorn

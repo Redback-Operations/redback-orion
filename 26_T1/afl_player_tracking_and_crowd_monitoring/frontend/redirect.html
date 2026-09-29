@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Microsoft Authentication</title>
+  </head>
+
+  <body>
+    <p>Processing Microsoft authentication...</p>
+
+    <script type="module">
+      import {
+        broadcastResponseToMainFrame
+      } from "@azure/msal-browser/redirect-bridge";
+
+      broadcastResponseToMainFrame().catch(
+        (error) => {
+          console.error(
+            "Microsoft redirect bridge error:",
+            error
+          );
+        }
+      );
+    </script>
+  </body>
+</html>

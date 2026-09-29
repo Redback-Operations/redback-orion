@@ -1,0 +1,35 @@
+# Environment files / secrets
+.env
+.env.*
+!.env.example
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/
+dist/
+build/
+
+# Large/generated files
+*.pt
+*.pth
+*.mp4
+*.mov
+*.avi
+
+# Large generated tracking outputs
+player_tracking_logic/26T1_Re-Identification-Quan/JerseyColorDetection/clustered_tracking.json
+player_tracking_logic/Yolov11_ByteTrack_Player_Tracking/final_code/afl_video_tracking.json
