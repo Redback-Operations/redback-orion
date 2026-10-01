@@ -17,6 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { BACKEND_URL } from "@/lib/config";
+import { getAccessToken, isDemoToken } from "@/lib/auth";
+import { getFriendlyErrorMessage, getFriendlyThrownMessage } from "@/lib/errors";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -213,6 +216,33 @@ export default function Analytics() {
     },
   ];
 
+  const [activeTab, setActiveTab] = useState("analysis");
+  const [queueItems, setQueueItems] = useState(processingQueue);
+
+  const handleViewResult = (item: (typeof processingQueue)[number]) => {
+    setAnalysisComplete(true);
+    setActiveTab("analysis");
+  };
+
+  const handleDownloadResult = (item: (typeof processingQueue)[number]) => {
+    downloadJSON(
+      {
+        file: item.name,
+        analysisType: item.analysisType,
+        duration: item.duration,
+        size: item.size,
+        status: item.status,
+        exportedAt: new Date().toISOString(),
+      },
+      `${item.name.replace(/\.[^.]+$/, "")}_analysis`,
+    );
+  };
+
+  const handleCancelJob = (id: number) => {
+    if (!confirm("Cancel this job?")) return;
+    setQueueItems((prev) => prev.filter((i) => i.id !== id));
+  };
+
   const availableReports = [
     {
       id: 1,
@@ -263,51 +293,66 @@ export default function Analytics() {
     }
   };
 
-  const simulateUpload = async () => {
-    setIsUploading(true);
-    setUploadProgress(0);
+  // Real upload: send the video to the backend, then poll its job status.
+  const startAnalysis = async () => {
+    if (!selectedFile) return;
+    const token = getAccessToken();
+    setAnalysisError(null);
+    setAnalysisComplete(false);
 
-    for (let i = 0; i <= 100; i += 5) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      setUploadProgress(i);
+    if (!token || isDemoToken(token)) {
+      setAnalysisError(
+        "Please log in with a real account to upload videos. Demo login can't analyse videos.",
+      );
+      return;
     }
 
-    setIsUploading(false);
-    startAnalysis();
-  };
-
-  const startAnalysis = async () => {
-    setIsAnalyzing(true);
-    setAnalysisProgress(0);
-    setAnalysisError(null);
-
     try {
-      for (let i = 0; i <= 100; i += 2) {
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        setAnalysisProgress(i);
+      setIsUploading(true);
+      setUploadProgress(30);
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      const res = await fetch(`${BACKEND_URL}/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(getFriendlyErrorMessage(data));
+      setUploadProgress(100);
+      setIsUploading(false);
 
-        // Simulate potential error during analysis
-        if (Math.random() < 0.1 && i > 50) {
-          // 10% chance of error after 50%
-          throw new Error(
-            "Video analysis failed: Unable to process video format",
-          );
+      setIsAnalyzing(true);
+      setAnalysisProgress(10);
+      for (let attempt = 0; attempt < 300; attempt++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const sres = await fetch(`${BACKEND_URL}/status/${data.job_id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const sdata = await sres.json().catch(() => ({}));
+        if (!sres.ok) throw new Error(getFriendlyErrorMessage(sdata));
+        if (sdata.status === "failed") {
+          throw new Error("Unable to process video");
         }
+        if (sdata.status !== "processing") {
+          setIsAnalyzing(false);
+          setAnalysisProgress(100);
+          setAnalysisComplete(true);
+          return;
+        }
+        setAnalysisProgress((p) => Math.min(p + 4, 90));
       }
-
-      setIsAnalyzing(false);
-      setAnalysisComplete(true);
+      throw new Error("The analysis is taking longer than expected. Check Reports later.");
     } catch (error) {
+      setIsUploading(false);
       setIsAnalyzing(false);
-      setAnalysisError(
-        error instanceof Error ? error.message : "Analysis failed",
-      );
+      setAnalysisError(getFriendlyThrownMessage(error));
     }
   };
 
   const handleUploadAndAnalyze = () => {
     if (selectedFile) {
-      simulateUpload();
+      startAnalysis();
     }
   };
 
@@ -605,8 +650,8 @@ export default function Analytics() {
             },
             videoMetrics: {
               trackingPoints: Math.floor(Math.random() * 50000 + 25000),
-              playerDetectionAccuracy: "97.8%",
-              ballTrackingPrecision: "94.2%",
+              dataNote:
+                "Sample report: figures on this page are illustrative and were not produced by the tracking models.",
               sectionsMonitored: jsonInsights.crowdDensity.length,
               keyMomentsIdentified: jsonInsights.matchEvents.length,
               metricsCalculated: jsonInsights.playerStats.length * 14,
@@ -740,8 +785,7 @@ export default function Analytics() {
             <div class="section">
               <h2>Technical Metrics</h2>
               <div class="metric">
-                <strong>Player Detection Accuracy:</strong> 97.8% |
-                <strong>Ball Tracking Precision:</strong> 94.2%<br>
+                <em>Sample report: these figures are illustrative and were not produced by the tracking models.</em><br>
                 <strong>Data Points Collected:</strong> ${(Math.random() * 50000 + 25000).toFixed(0)} |
                 <strong>Processing Time:</strong> ${Math.floor(Math.random() * 5 + 2)} minutes
               </div>
@@ -847,21 +891,24 @@ Generated by AFL Analytics Platform
 
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-4">
-          <LiveClock
-            isLive={isLive}
-            onToggleLive={setIsLive}
-            matchTime={{ quarter: 2, timeRemaining: "15:23" }}
-          />
-
-          <Tabs defaultValue="analysis" className="w-full">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Analytics
+            </h1>
+            <p className="text-gray-600">
+              Video analysis and match insights
+            </p>
+          </div>
+         
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="analysis" className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
                 Analysis
               </TabsTrigger>
-              <TabsTrigger value="reports" className="flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                Reports
+              <TabsTrigger value="upload" className="flex items-center gap-2">
+                <Upload className="w-4 h-4" />
+                Upload
               </TabsTrigger>
               <TabsTrigger value="queue" className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
@@ -902,7 +949,10 @@ Generated by AFL Analytics Platform
                           or click to browse
                         </div>
                         <div className="text-xs text-gray-400 mt-2">
-                          Supports MP4, MOV, AVI • Max 2GB
+                          Supports MP4, MOV, AVI • Max 500 MB 
+                        </div>
+                        <div className="text-xs text-amber-600 mt-2 font-medium">
+                          Uploads are sent to the analysis server. Report figures below are sample data.
                         </div>
                       </label>
                     </div>
@@ -1334,231 +1384,15 @@ Generated by AFL Analytics Platform
                     <p className="text-gray-600 mb-4">
                       Upload a video file to start the analysis process
                     </p>
-                    <Button variant="outline">Go to Upload Tab</Button>
+                    <Button variant="outline" onClick={() => setActiveTab("upload")}>
+                      Go to Upload Tab
+                    </Button>
                   </CardContent>
                 </Card>
               )}
             </TabsContent>
 
-            {/* Reports Tab */}
-            <TabsContent value="reports" className="space-y-4">
-              <div className="grid lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="w-5 h-5" />
-                      Generate New Report
-                    </CardTitle>
-                    <CardDescription>
-                      Create custom analysis reports from processed videos
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {reportsError && (
-                      <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                        <div className="text-sm text-red-700">
-                          {reportsError}
-                        </div>
-                      </div>
-                    )}
-
-                    {downloadSuccess && (
-                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full" />
-                          <span className="text-sm text-green-700 font-medium">
-                            {downloadSuccess}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button
-                        onClick={() => generateReport("Match_Summary", "pdf")}
-                        className="flex items-center gap-2"
-                        disabled={isGeneratingReport}
-                      >
-                        {isGeneratingReport ? (
-                          <Loader className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trophy className="w-4 h-4" />
-                        )}
-                        Match Summary (PDF)
-                      </Button>
-                      <Button
-                        onClick={() => generateReport("Player_Analysis", "csv")}
-                        variant="outline"
-                        className="flex items-center gap-2"
-                        disabled={isGeneratingReport}
-                      >
-                        {isGeneratingReport ? (
-                          <Loader className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <User className="w-4 h-4" />
-                        )}
-                        Player Analysis (CSV)
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          generateReport("Tactical_Report", "json")
-                        }
-                        variant="outline"
-                        className="flex items-center gap-2"
-                        disabled={isGeneratingReport}
-                      >
-                        {isGeneratingReport ? (
-                          <Loader className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Target className="w-4 h-4" />
-                        )}
-                        Tactical Report (JSON)
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          generateReport("Video_Highlights", "pdf")
-                        }
-                        variant="outline"
-                        className="flex items-center gap-2"
-                        disabled={isGeneratingReport}
-                      >
-                        {isGeneratingReport ? (
-                          <Loader className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Video className="w-4 h-4" />
-                        )}
-                        Video Highlights (PDF)
-                      </Button>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-3">
-                      <h4 className="font-medium">Custom Report Builder</h4>
-                      <div className="space-y-2">
-                        <Label>Report Format</Label>
-                        <Select
-                          value={customReportFormat}
-                          onValueChange={setCustomReportFormat}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pdf">PDF Report</SelectItem>
-                            <SelectItem value="csv">CSV Spreadsheet</SelectItem>
-                            <SelectItem value="json">
-                              Raw Data (JSON)
-                            </SelectItem>
-                            <SelectItem value="txt">Text Report</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Include Sections</Label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {[
-                            "Match Statistics",
-                            "Player Performance",
-                            "Key Moments",
-                            "Tactical Analysis",
-                            "Heat Maps",
-                            "Video Clips",
-                          ].map((section) => (
-                            <label
-                              key={section}
-                              className="flex items-center space-x-2"
-                            >
-                              <input
-                                type="checkbox"
-                                defaultChecked
-                                className="rounded"
-                              />
-                              <span className="text-sm">{section}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
-                      <Button
-                        onClick={() =>
-                          generateReport("Custom_Report", customReportFormat)
-                        }
-                        className="w-full bg-gradient-to-r from-green-600 to-blue-600"
-                        disabled={isGeneratingReport}
-                      >
-                        {isGeneratingReport ? (
-                          <Loader className="w-4 h-4 mr-2 animate-spin" />
-                        ) : (
-                          <Download className="w-4 h-4 mr-2" />
-                        )}
-                        {isGeneratingReport
-                          ? "Generating Report..."
-                          : `Generate Custom Report (${customReportFormat.toUpperCase()})`}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Download className="w-5 h-5" />
-                      Available Reports
-                    </CardTitle>
-                    <CardDescription>
-                      Download previously generated reports
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {availableReports.map((report) => (
-                        <div
-                          key={report.id}
-                          className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
-                        >
-                          <div className="flex-1">
-                            <div className="font-medium">{report.name}</div>
-                            <div className="text-sm text-gray-600">
-                              {report.teams} • {report.date} • {report.size} •{" "}
-                              {report.format}
-                            </div>
-                            <Badge variant="outline" className="mt-1">
-                              {report.type}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {report.status === "processing" ? (
-                              <Badge variant="secondary">Processing</Badge>
-                            ) : (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  downloadReport(
-                                    report.id,
-                                    report.format.toLowerCase(),
-                                  )
-                                }
-                                disabled={isGeneratingReport}
-                              >
-                                {isGeneratingReport ? (
-                                  <Loader className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <Download className="w-4 h-4" />
-                                )}
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
+            
             {/* Processing Queue Tab */}
             <TabsContent value="queue" className="space-y-4">
               <Card>
@@ -1573,7 +1407,7 @@ Generated by AFL Analytics Platform
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {processingQueue.map((item) => (
+                    {queueItems.map((item) => (
                       <div key={item.id} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
@@ -1623,17 +1457,17 @@ Generated by AFL Analytics Platform
                           <div className="flex gap-2">
                             {item.status === "completed" && (
                               <>
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" aria-label={`View ${item.name}`} onClick={() => handleViewResult(item)}>
                                   <Eye className="w-4 h-4" />
                                 </Button>
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" aria-label={`Download ${item.name}`} onClick={() => handleDownloadResult(item)}>
                                   <Download className="w-4 h-4" />
                                 </Button>
                               </>
                             )}
                             {(item.status === "queued" ||
                               item.status === "uploading") && (
-                              <Button variant="outline" size="sm">
+                              <Button variant="outline" size="sm" aria-label={`Cancel ${item.name}`} onClick={() => handleCancelJob(item.id)}>
                                 <XCircle className="w-4 h-4" />
                               </Button>
                             )}
@@ -1650,4 +1484,5 @@ Generated by AFL Analytics Platform
       </div>
     </div>
   );
+
 }

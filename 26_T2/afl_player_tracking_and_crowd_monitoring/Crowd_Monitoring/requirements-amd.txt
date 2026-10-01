@@ -1,0 +1,10 @@
+# AMD / Intel GPU (DirectML, Windows only) for crowd_detection.
+# Includes the base requirements. Full setup: crowd_detection/README.md
+#
+# Uninstall other onnxruntime builds first - they hide the DirectML one:
+#   pip uninstall -y onnxruntime onnxruntime-gpu onnxruntime-directml
+# Then build the ONNX export (not in git); without it, auto mode uses the CPU.
+#
+# Check: the pipeline benchmark report shows "(onnx on dml)".
+-r requirements.txt
+onnxruntime-directml; sys_platform == "win32"

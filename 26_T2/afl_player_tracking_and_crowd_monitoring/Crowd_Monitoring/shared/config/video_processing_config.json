@@ -1,0 +1,8 @@
+{
+  "output_resolution": [640, 640],
+  "extracted_frames_dir": "video_processing/data/extracted_frames",
+  "enable_tiling": true,
+  "tile_rows": 8,
+  "tile_columns": 12,
+  "tile_overlap": 0.20
+}

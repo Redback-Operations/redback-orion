@@ -1,34 +1,52 @@
 import "./global.css";
-import { createRoot } from "react-dom/client";
-import App from "./App";
 
-// Ensure we only create the root once
+import { createRoot } from "react-dom/client";
+import { MsalProvider } from "@azure/msal-react";
+
+import App from "./App";
+import { msalInstance } from "./lib/microsoftAuth";
+
+// Ensure we only create the React root once
 let root: ReturnType<typeof createRoot> | null = null;
 
-function initializeApp() {
+function renderApp() {
+  if (!root) {
+    return;
+  }
+
+  root.render(
+    <MsalProvider instance={msalInstance}>
+      <App />
+    </MsalProvider>
+  );
+}
+
+async function initializeApp() {
   const container = document.getElementById("root");
 
   if (!container) {
     throw new Error("Could not find root element");
   }
 
-  // Only create root if it doesn't exist
+  // MSAL must be initialized before Microsoft authentication is used
+  await msalInstance.initialize();
+
+  // Only create the React root once
   if (!root) {
     root = createRoot(container);
   }
 
-  root.render(<App />);
+  renderApp();
 }
 
-// Initialize the app
-initializeApp();
+// Initialize the application
+initializeApp().catch((error) => {
+  console.error("Failed to initialize application:", error);
+});
 
 // Handle hot module replacement in development
 if (import.meta.hot) {
   import.meta.hot.accept(["./App"], () => {
-    // Re-render the app when modules are updated
-    if (root) {
-      root.render(<App />);
-    }
+    renderApp();
   });
 }

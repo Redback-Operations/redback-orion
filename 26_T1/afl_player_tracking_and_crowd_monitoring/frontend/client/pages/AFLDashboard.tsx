@@ -1,3 +1,5 @@
+import ConfirmLogout from "@/components/ConfirmLogout";
+import { getFriendlyThrownMessage } from "../lib/errors";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { downloadText, downloadFile } from "@/lib/download";
@@ -64,8 +66,6 @@ import {
   Upload,
   Search,
   Filter,
-  Play,
-  Pause,
   TrendingUp,
   TrendingDown,
   Clock,
@@ -82,8 +82,9 @@ import {
   Shield,
 } from "lucide-react";
 import MobileNavigation from "@/components/MobileNavigation";
-
-const BACKEND_URL = "http://localhost:8000";
+import { BACKEND_URL } from "../lib/config";
+import { getAccessToken } from "../lib/auth";
+import { VIDEO_STATE_KEY, clearVideoState } from "../lib/videoState";
 
 type BackendStatusResponse = {
   job_id: string;
@@ -96,60 +97,100 @@ type BackendStatusResponse = {
   detail?: string;
 };
 
-const getAccessToken = () =>
-  localStorage.getItem("accessToken") || localStorage.getItem("authToken");
 
-// Mock data for the dashboard
-const mockPlayers = [
-  {
-    id: 1,
-    name: "Marcus Bontempelli",
-    team: "Western Bulldogs",
-    position: "Midfielder",
-    kicks: 28,
-    handballs: 12,
-    marks: 8,
-    tackles: 6,
-    goals: 2,
-    efficiency: 87,
-  },
-  {
-    id: 2,
-    name: "Dustin Martin",
-    team: "Richmond",
-    position: "Forward",
-    kicks: 22,
-    handballs: 8,
-    marks: 6,
-    tackles: 4,
-    goals: 3,
-    efficiency: 82,
-  },
-  {
-    id: 3,
-    name: "Patrick Dangerfield",
-    team: "Geelong",
-    position: "Midfielder",
-    kicks: 25,
-    handballs: 15,
-    marks: 7,
-    tackles: 8,
-    goals: 1,
-    efficiency: 84,
-  },
-  {
-    id: 4,
-    name: "Max Gawn",
-    team: "Melbourne",
-    position: "Ruckman",
-    kicks: 18,
-    handballs: 6,
-    marks: 10,
-    tackles: 3,
-    goals: 1,
-    efficiency: 78,
-  },
-];
+// Keeps the video upload/analysis status when the user visits another page and
+// comes back. Stored per browser tab (sessionStorage) and per signed-in user.
+
+const currentUserKey = () => localStorage.getItem("userEmail") || "";
+
+const loadVideoState = (): any | null => {
+  try {
+    const raw = sessionStorage.getItem(VIDEO_STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Only restore for the same user AND the same login session
+    return parsed &&
+      parsed.user === currentUserKey() &&
+      parsed.token === (getAccessToken() || "")
+      ? parsed
+      : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveVideoState = (state: Record<string, unknown>) => {
+  try {
+    sessionStorage.setItem(
+      VIDEO_STATE_KEY,
+      JSON.stringify({
+        ...state,
+        user: currentUserKey(),
+        token: getAccessToken() || "",
+      }),
+    );
+  } catch {
+    // storage unavailable - status simply won't persist
+  }
+};
+
+type DashboardPlayer = {
+  id: number;
+  name: string;
+  team: string;
+  position: string;
+  number: number;
+  fieldX: number;
+  fieldY: number;
+  kicks: number;
+  handballs: number;
+  marks: number;
+  tackles: number;
+  goals: number;
+  efficiency: number;
+};
+
+const getFieldPositionForRole = (position: string) => {
+  const role = position.trim().toLowerCase();
+
+  if (role.includes("forward")) {
+    return { fieldX: 50, fieldY: 24 };
+  }
+
+  if (role.includes("defender") || role.includes("back")) {
+    return { fieldX: 50, fieldY: 76 };
+  }
+
+  if (role.includes("ruck")) {
+    return { fieldX: 50, fieldY: 50 };
+  }
+
+  if (role.includes("mid") || role.includes("wing")) {
+    return { fieldX: 50, fieldY: 50 };
+  }
+
+  return { fieldX: 50, fieldY: 50 };
+};
+
+const normalizeDatabasePlayer = (player: any): DashboardPlayer => {
+  const fieldPosition = getFieldPositionForRole(player.position || "");
+
+  return {
+    id: Number(player.id),
+    name: player.name || "",
+    team: player.team || "",
+    position: player.position || "",
+    number: Number(player.jersey_number ?? player.jerseyNumber ?? 0),
+    fieldX: fieldPosition.fieldX,
+    fieldY: fieldPosition.fieldY,
+    kicks: Number(player.kicks ?? 0),
+    handballs: Number(player.handballs ?? 0),
+    marks: Number(player.marks ?? 0),
+    tackles: Number(player.tackles ?? 0),
+    goals: Number(player.goals ?? 0),
+    efficiency: Number(player.efficiency ?? 0),
+  };
+};
 
 const matchEvents = [
   {
@@ -242,28 +283,98 @@ const BackToTopButton = () => {
 };
 export default function AFLDashboard() {
   const navigate = useNavigate();
-  const [selectedPlayer, setSelectedPlayer] = useState(mockPlayers[0]);
-  const [comparisonPlayer, setComparisonPlayer] = useState(mockPlayers[1]);
+  const [players, setPlayers] = useState<DashboardPlayer[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<DashboardPlayer | null>(null);
+  const [comparisonPlayer, setComparisonPlayer] = useState<DashboardPlayer | null>(null);
+  const [playersLoading, setPlayersLoading] = useState(true);
+  const [playersError, setPlayersError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
-  const [isLive, setIsLive] = useState(true);
   const [userEmail, setUserEmail] = useState("");
   const [activeQueueItemId, setActiveQueueItemId] = useState<string | null>(null);
+
+  const loadDatabasePlayers = async () => {
+    setPlayersLoading(true);
+    setPlayersError(null);
+
+    try {
+      const token = getAccessToken();
+
+      const response = await fetch(`${BACKEND_URL}/api/players`, {
+        headers: {
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+
+      const data = await response.json().catch(() => []);
+
+      if (!response.ok) {
+        throw new Error(
+          data?.detail ||
+            data?.message ||
+            `Unable to load players (${response.status})`,
+        );
+      }
+
+      if (!Array.isArray(data)) {
+        throw new Error("Player API returned an unexpected response.");
+      }
+
+      const databasePlayers = data.map(normalizeDatabasePlayer);
+
+      setPlayers(databasePlayers);
+      setSelectedPlayer(databasePlayers[0] ?? null);
+      setComparisonPlayer(databasePlayers[1] ?? databasePlayers[0] ?? null);
+    } catch (error) {
+      console.error("Failed to load database players:", error);
+      setPlayers([]);
+      setSelectedPlayer(null);
+      setComparisonPlayer(null);
+      setPlayersError(
+        error instanceof Error ? error.message : "Unable to load players.",
+      );
+    } finally {
+      setPlayersLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadDatabasePlayers();
+  }, []);
 
   // Feature flag to disable live match features
   const ENABLE_LIVE_FEATURES = false;
 
   // Video upload states
+  // Restore status saved before the user navigated away (see saveVideoState)
+  const [persistedVideo] = useState(loadVideoState);
   const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
+  // The File object itself can't be restored, so remember its name and size
+  const [restoredFileMeta, setRestoredFileMeta] = useState<{
+    name: string;
+    size: number;
+  } | null>(persistedVideo?.fileMeta ?? null);
   const [isVideoUploading, setIsVideoUploading] = useState(false);
   const [videoUploadProgress, setVideoUploadProgress] = useState(0);
-  const [isVideoAnalyzing, setIsVideoAnalyzing] = useState(false);
-  const [videoAnalysisProgress, setVideoAnalysisProgress] = useState(0);
-  const [videoAnalysisComplete, setVideoAnalysisComplete] = useState(false);
-  const [videoAnalysisError, setVideoAnalysisError] = useState<string | null>(
-    null,
+  const [isVideoAnalyzing, setIsVideoAnalyzing] = useState(
+    persistedVideo?.isVideoAnalyzing ?? false,
   );
-  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
+  const [videoAnalysisProgress, setVideoAnalysisProgress] = useState(
+    persistedVideo?.videoAnalysisProgress ?? 0,
+  );
+  const [videoAnalysisComplete, setVideoAnalysisComplete] = useState(
+    persistedVideo?.videoAnalysisComplete ?? false,
+  );
+  const [videoAnalysisError, setVideoAnalysisError] = useState<string | null>(
+    persistedVideo?.videoAnalysisError ?? null,
+  );
+  const [currentJobId, setCurrentJobId] = useState<string | null>(
+    persistedVideo?.currentJobId ?? null,
+  );
+  const videoFileMeta = selectedVideoFile
+    ? { name: selectedVideoFile.name, size: selectedVideoFile.size }
+    : restoredFileMeta;
   const [selectedAnalysisType, setSelectedAnalysisType] =
     useState("highlights");
   const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
@@ -298,7 +409,29 @@ export default function AFLDashboard() {
       retryCount: number;
       isUIControlled?: boolean;
     }>
-  >([]);
+  >(persistedVideo?.processingQueue ?? []);
+
+  // Save upload/analysis status so it survives navigating to other pages
+  useEffect(() => {
+    saveVideoState({
+      currentJobId,
+      isVideoAnalyzing,
+      videoAnalysisProgress,
+      videoAnalysisComplete,
+      videoAnalysisError,
+      fileMeta: videoFileMeta,
+      processingQueue,
+    });
+  }, [
+    currentJobId,
+    isVideoAnalyzing,
+    videoAnalysisProgress,
+    videoAnalysisComplete,
+    videoAnalysisError,
+    videoFileMeta?.name,
+    videoFileMeta?.size,
+    processingQueue,
+  ]);
 
   // Processing queue management functions
   const StatusIcon = ({ status }: { status: string }) => {
@@ -377,7 +510,9 @@ export default function AFLDashboard() {
 useEffect(() => {
     if (!currentJobId) return;
 
-    const interval = setInterval(async () => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+
+    const checkStatus = async () => {
       try {
         const token = getAccessToken();
         if (!token) {
@@ -396,7 +531,7 @@ useEffect(() => {
         }
 
         setVideoAnalysisProgress((prev) =>
-          data.status === "processing" ? Math.min(prev + 10, 90) : 100,
+          data.status === "processing" ? Math.min(prev + 5, 90) : 100,
         );
         setProcessingQueue((prev) =>
           prev.map((item) =>
@@ -410,7 +545,7 @@ useEffect(() => {
                       : data.status === "failed"
                         ? "failed"
                         : "completed",
-                  progress: data.status === "processing" ? Math.min(item.progress + 10, 90) : 100,
+                  progress: data.status === "processing" ? Math.min(item.progress + 5, 90) : 100,
                   processingStage:
                     data.status === "processing" ? "video_analysis" : "analysis_complete",
                   completedTime:
@@ -425,16 +560,15 @@ useEffect(() => {
         );
 
         if (data.status !== "processing") {
-          clearInterval(interval);
+          if (interval) clearInterval(interval);
           setCurrentJobId(null);
           setIsVideoAnalyzing(false);
           setVideoAnalysisComplete(data.status === "done" || data.status === "partial");
           if (data.error) {
             setVideoAnalysisError(data.error);
           }
-          if (data.results?.crowd) {
-            navigate(`/crowd-monitor?jobId=${encodeURIComponent(data.job_id)}`);
-          }
+          // Stay on this page when analysis finishes so the user can review
+          // the result or upload another video. (Crowd Monitor is in the menu.)
         }
       } catch (error) {
         console.error("Polling error:", error);
@@ -443,9 +577,15 @@ useEffect(() => {
           error instanceof Error ? error.message : "Polling failed",
         );
       }
-    }, 4000);
+    };
 
-    return () => clearInterval(interval);
+    // Check straight away, then every 2 seconds
+    void checkStatus();
+    interval = setInterval(checkStatus, 2000);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [activeQueueItemId, currentJobId, navigate]);
   // Generate dynamic chart data for analysis results
   const generateAnalysisChartData = (item: any) => {
@@ -862,6 +1002,7 @@ useEffect(() => {
 
   // Logout function
   const handleLogout = () => {
+    clearVideoState();
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userName");
@@ -900,8 +1041,34 @@ useEffect(() => {
       }
 
       setSelectedVideoFile(file);
+      setRestoredFileMeta(null);
       setVideoAnalysisError(null);
       setVideoAnalysisComplete(false);
+    }
+  };
+
+  // Clear the finished/failed analysis so the user can upload another video
+  const resetVideoUpload = (openFilePicker = false) => {
+    setSelectedVideoFile(null);
+    setRestoredFileMeta(null);
+    setIsVideoUploading(false);
+    setVideoUploadProgress(0);
+    setIsVideoAnalyzing(false);
+    setVideoAnalysisProgress(0);
+    setVideoAnalysisComplete(false);
+    setVideoAnalysisError(null);
+    setCurrentJobId(null);
+    try {
+      sessionStorage.removeItem(VIDEO_STATE_KEY);
+    } catch {
+      // ignore
+    }
+    const input = document.getElementById(
+      "video-upload-dashboard",
+    ) as HTMLInputElement | null;
+    if (input) {
+      input.value = ""; // lets the user pick the same file again
+      if (openFilePicker) input.click();
     }
   };
 
@@ -992,6 +1159,18 @@ useEffect(() => {
         throw new Error(data.detail || "Upload failed");
       }
 
+      // Save right away: if the user left this page while the upload was in
+      // flight, the state setters below do nothing but the job is still tracked.
+      saveVideoState({
+        currentJobId: data.job_id,
+        isVideoAnalyzing: true,
+        videoAnalysisProgress: 15,
+        videoAnalysisComplete: false,
+        videoAnalysisError: null,
+        fileMeta: { name: selectedVideoFile.name, size: selectedVideoFile.size },
+        processingQueue: [],
+      });
+
       setCurrentJobId(data.job_id);
       setIsVideoUploading(false);
       setIsVideoAnalyzing(true);
@@ -1014,9 +1193,7 @@ useEffect(() => {
     } catch (error) {
       setIsVideoUploading(false);
       setIsVideoAnalyzing(false);
-      setVideoAnalysisError(
-        error instanceof Error ? error.message : "Upload failed",
-      );
+      setVideoAnalysisError(getFriendlyThrownMessage(error));
 
       // Mark the queue item as failed if there was an error
       setProcessingQueue((prev) =>
@@ -1186,7 +1363,7 @@ useEffect(() => {
       analysisId,
       timestamp: new Date().toISOString(),
       videoFile: {
-        name: selectedVideoFile?.name || "sample_video.mp4",
+        name: videoFileMeta?.name || "sample_video.mp4",
         duration: "02:15:30",
         size: "1.8 GB",
         resolution: "1920x1080",
@@ -1405,7 +1582,7 @@ Report generated by AFL Analytics Platform
   const handleDownloadReport = async (
     format: "pdf" | "json" | "txt" = "txt",
   ) => {
-    if (!videoAnalysisComplete || !selectedVideoFile) {
+    if (!videoAnalysisComplete || !videoFileMeta) {
       alert("Please complete video analysis first");
       return;
     }
@@ -1497,7 +1674,7 @@ Report generated by AFL Analytics Platform
     const clipsData = `AFL ANALYTICS VIDEO CLIPS EXPORT
 
 Generated: ${new Date().toLocaleString()}
-Source Video: ${selectedVideoFile?.name}
+Source Video: ${videoFileMeta?.name}
 Analysis Type: ${
       selectedAnalysisType === "highlights"
         ? "Match Highlights"
@@ -1571,92 +1748,221 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
     downloadText(clipsData, `AFL_Video_Clips_${Date.now()}`);
   };
 
-  const filteredPlayers = mockPlayers.filter(
+  const filteredPlayers = players.filter(
     (player) =>
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedTeam === "all" || player.team === selectedTeam),
   );
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
-      <MobileNavigation />
+  // Field display is intentionally search-driven:
+  // no player marker is shown until the user searches for a player.
+  const normalizedPlayerSearch = searchTerm.trim().toLowerCase();
 
-      <div className="lg:ml-64 pb-16 lg:pb-0">
-        <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-30">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
-                  <Activity className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                    AFL Analytics
-                  </h1>
-                  <p className="text-sm text-gray-600">
-                    Real-time match insights & player analytics
-                  </p>
-                </div>
+  const searchedFieldPlayers = normalizedPlayerSearch
+    ? players.filter((player) =>
+        player.name.toLowerCase().includes(normalizedPlayerSearch),
+      )
+    : [];
+
+  return (
+  <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <MobileNavigation />
+
+    <div className="lg:ml-64 pb-16 lg:pb-0">
+      <header className="sticky top-0 z-30 border-b bg-white/80 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
+         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            {/* Logo and title */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-green-600 to-blue-600">
+                <Activity className="h-6 w-6 text-white" />
               </div>
-              <div className="flex items-center space-x-4">
-                <Badge
-                  variant={isLive ? "destructive" : "secondary"}
-                  className="animate-pulse"
-                >
-                  <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-                  {isLive ? "LIVE" : "OFFLINE"}
-                </Badge>
-                {userEmail && (
-                  <span className="text-sm text-gray-600 hidden sm:block">
-                    Welcome, {userEmail}
-                  </span>
-                )}
-                <Button variant="outline" size="sm">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleLogout}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </Button>
+
+              <div className="min-w-0">
+                <h1 className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-xl font-bold text-transparent sm:text-2xl">
+                  AFL Analytics
+                </h1>
+
+                <p className="text-xs text-gray-600 sm:text-sm">
+                  Real-time match insights &amp; player analytics
+                </p>
               </div>
             </div>
-          </div>
-        </header>
 
-        <div className="container mx-auto px-4 py-6">
-          <Tabs defaultValue="video" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger
-              value="performance"
-              className="flex items-center gap-2"
-            >
-              <BarChart3 className="w-4 h-4" />
-              Player Performance
-            </TabsTrigger>
-            {ENABLE_LIVE_FEATURES && (
-              <TabsTrigger value="match" className="flex items-center gap-2">
-                <Activity className="w-4 h-4" />
-                Live Match
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="crowd" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Crowd Monitor
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-2">
-              <Download className="w-4 h-4" />
-              Reports
-            </TabsTrigger>
-            <TabsTrigger value="video" className="flex items-center gap-2">
-              <Video className="w-4 h-4" />
-              Video Analysis
-            </TabsTrigger>
-          </TabsList>
+            {/* Settings and Logout */}
+            <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start sm:gap-5">
+             
+              {userEmail && (
+                <span className="hidden whitespace-nowrap text-sm text-gray-600 xl:block">
+                  Welcome, {userEmail}
+                </span>
+              )}
+
+              <Button
+  type="button"
+  variant="outline"
+  size="sm"
+  onClick={() => navigate("/settings")}
+  className="hidden items-center gap-2 lg:inline-flex"
+>
+  <Settings className="h-4 w-4" />
+  <span>Settings</span>
+</Button>
+
+<ConfirmLogout onConfirm={handleLogout}>
+<Button
+  type="button"
+  variant="outline"
+  size="sm"
+  
+  className="hidden items-center gap-2 lg:inline-flex"
+>
+  <LogOut className="h-4 w-4" />
+  <span>Logout</span>
+</Button>
+</ConfirmLogout>
+            </div>
+          </div>
+        </div>
+      </header>
+
+
+
+       <div className="container mx-auto px-4 py-6">
+  <Tabs defaultValue="video" className="space-y-6">
+    <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1 md:grid-cols-4">
+
+  <TabsTrigger
+    value="performance"
+    className="
+      flex min-h-10 items-center justify-center gap-2
+      whitespace-normal rounded-lg text-center
+      border border-transparent
+      transition-all duration-300 ease-in-out
+
+      hover:bg-green-100
+      hover:text-green-700
+      hover:border-green-300
+      hover:shadow-md
+      hover:-translate-y-0.5
+
+      data-[state=active]:bg-green-100
+      data-[state=active]:text-green-700
+      data-[state=active]:border-green-300
+      data-[state=active]:shadow-md
+    "
+  >
+    <BarChart3 className="h-4 w-4 shrink-0" />
+    <span>Players &amp; Positions</span>
+  </TabsTrigger>
+
+  <TabsTrigger
+    value="crowd"
+    className="
+      flex min-h-10 items-center justify-center gap-2
+      whitespace-normal rounded-lg text-center
+      border border-transparent
+      transition-all duration-300 ease-in-out
+
+      hover:bg-green-100
+      hover:text-green-700
+      hover:border-green-300
+      hover:shadow-md
+      hover:-translate-y-0.5
+
+      data-[state=active]:bg-green-100
+      data-[state=active]:text-green-700
+      data-[state=active]:border-green-300
+      data-[state=active]:shadow-md
+    "
+  >
+    <Users className="h-4 w-4 shrink-0" />
+    <span>Crowd Monitor</span>
+  </TabsTrigger>
+
+  <TabsTrigger
+    value="reports"
+    className="
+      flex min-h-10 items-center justify-center gap-2
+      whitespace-normal rounded-lg text-center
+      border border-transparent
+      transition-all duration-300 ease-in-out
+
+      hover:bg-green-100
+      hover:text-green-700
+      hover:border-green-300
+      hover:shadow-md
+      hover:-translate-y-0.5
+
+      data-[state=active]:bg-green-100
+      data-[state=active]:text-green-700
+      data-[state=active]:border-green-300
+      data-[state=active]:shadow-md
+    "
+  >
+    <Download className="h-4 w-4 shrink-0" />
+    <span>Reports</span>
+  </TabsTrigger>
+
+  <TabsTrigger
+    value="video"
+    className="
+      flex min-h-10 items-center justify-center gap-2
+      whitespace-normal rounded-lg text-center
+      border border-transparent
+      transition-all duration-300 ease-in-out
+
+      hover:bg-green-100
+      hover:text-green-700
+      hover:border-green-300
+      hover:shadow-md
+      hover:-translate-y-0.5
+
+      data-[state=active]:bg-green-100
+      data-[state=active]:text-green-700
+      data-[state=active]:border-green-300
+      data-[state=active]:shadow-md
+    "
+  >
+    <Video className="h-4 w-4 shrink-0" />
+    <span>Video Analysis</span>
+  </TabsTrigger>
+
+</TabsList>
+
 
           {/* Player Performance Tracker */}
           <TabsContent value="performance" className="space-y-6">
-            <div className="flex flex-col lg:flex-row gap-6">
+            {playersLoading ? (
+              <Card>
+                <CardContent className="py-12 text-center text-gray-600">
+                  Loading players from the database...
+                </CardContent>
+              </Card>
+            ) : playersError ? (
+              <Card>
+                <CardContent className="space-y-4 py-12 text-center">
+                  <p className="font-medium text-red-600">
+                    Unable to load database players
+                  </p>
+                  <p className="text-sm text-gray-600">{playersError}</p>
+                  <Button type="button" variant="outline" onClick={loadDatabasePlayers}>
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : players.length === 0 || !selectedPlayer || !comparisonPlayer ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="font-medium text-gray-900">No players found</p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Add players through the Add Player page. This dashboard only
+                    displays players stored in the database.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="flex flex-col lg:flex-row gap-6">
               {/* Search and Filters */}
               <Card className="lg:w-1/3">
                 <CardHeader>
@@ -1690,12 +1996,14 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Teams</SelectItem>
-                        <SelectItem value="Western Bulldogs">
-                          Western Bulldogs
-                        </SelectItem>
-                        <SelectItem value="Richmond">Richmond</SelectItem>
-                        <SelectItem value="Geelong">Geelong</SelectItem>
-                        <SelectItem value="Melbourne">Melbourne</SelectItem>
+                        {Array.from(new Set(players.map((player) => player.team)))
+                          .filter(Boolean)
+                          .sort()
+                          .map((team) => (
+                            <SelectItem key={team} value={team}>
+                              {team}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -1709,7 +2017,10 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                             ? "border-blue-500 bg-blue-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
-                        onClick={() => setSelectedPlayer(player)}
+                        onClick={() => {
+                          setSelectedPlayer(player);
+                          setSearchTerm(player.name);
+                        }}
                       >
                         <div className="font-medium">{player.name}</div>
                         <div className="text-sm text-gray-600">
@@ -1724,8 +2035,159 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                 </CardContent>
               </Card>
 
-              {/* Player Statistics */}
+              {/* Player Statistics + Search-Driven Field Position */}
               <div className="lg:w-2/3 space-y-6">
+                {/* Live AFL Field Position */}
+                <Card className="overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <MapPin className="h-5 w-5 text-green-600" />
+                          Player Field Position
+                        </CardTitle>
+                        <CardDescription className="mt-1">
+                          Search for a player to view their primary playing
+                          position on the field.
+                        </CardDescription>
+                      </div>
+
+                      {normalizedPlayerSearch &&
+                        searchedFieldPlayers.length > 0 && (
+                          <Badge
+                            variant="outline"
+                            className="w-fit border-green-200 bg-green-50 text-green-700"
+                          >
+                            {searchedFieldPlayers.length === 1
+                              ? `Showing: ${searchedFieldPlayers[0].name}`
+                              : `${searchedFieldPlayers.length} matching players`}
+                          </Badge>
+                        )}
+                    </div>
+                  </CardHeader>
+
+                  <CardContent>
+                    <div className="relative mx-auto aspect-[1.55/1] w-full max-w-4xl overflow-hidden rounded-[46%] border-[5px] border-green-800 bg-gradient-to-b from-green-500 via-green-600 to-green-700 shadow-inner">
+                      {/* Alternating grass stripes */}
+                      <div className="absolute inset-0 grid grid-cols-10 opacity-30">
+                        {Array.from({ length: 10 }).map((_, index) => (
+                          <div
+                            key={index}
+                            className={
+                              index % 2 === 0
+                                ? "bg-white/10"
+                                : "bg-black/5"
+                            }
+                          />
+                        ))}
+                      </div>
+
+                      {/* Boundary line */}
+                      <div className="absolute inset-[3%] rounded-[46%] border-2 border-white/90" />
+
+                      {/* Centre square */}
+                      <div className="absolute left-1/2 top-1/2 h-[31%] w-[26%] -translate-x-1/2 -translate-y-1/2 border-2 border-white/90" />
+
+                      {/* Centre circle */}
+                      <div className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/90 sm:h-14 sm:w-14 lg:h-16 lg:w-16" />
+
+                      {/* 50 metre arcs */}
+                      <div className="absolute left-1/2 top-[4%] h-[32%] w-[58%] -translate-x-1/2 rounded-b-[50%] border-b-2 border-l-2 border-r-2 border-white/90" />
+                      <div className="absolute bottom-[4%] left-1/2 h-[32%] w-[58%] -translate-x-1/2 rounded-t-[50%] border-l-2 border-r-2 border-t-2 border-white/90" />
+
+                      {/* Goal squares */}
+                      <div className="absolute left-1/2 top-[3%] h-[13%] w-[20%] -translate-x-1/2 border-2 border-t-0 border-white/90" />
+                      <div className="absolute bottom-[3%] left-1/2 h-[13%] w-[20%] -translate-x-1/2 border-2 border-b-0 border-white/90" />
+
+                      {/* Top goal posts */}
+                      <div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-2 sm:gap-3">
+                        <div className="h-5 w-0.5 bg-white sm:h-7 sm:w-1" />
+                        <div className="h-7 w-0.5 bg-white sm:h-9 sm:w-1" />
+                        <div className="h-7 w-0.5 bg-white sm:h-9 sm:w-1" />
+                        <div className="h-5 w-0.5 bg-white sm:h-7 sm:w-1" />
+                      </div>
+
+                      {/* Bottom goal posts */}
+                      <div className="absolute bottom-0 left-1/2 flex -translate-x-1/2 items-end gap-2 sm:gap-3">
+                        <div className="h-5 w-0.5 bg-white sm:h-7 sm:w-1" />
+                        <div className="h-7 w-0.5 bg-white sm:h-9 sm:w-1" />
+                        <div className="h-7 w-0.5 bg-white sm:h-9 sm:w-1" />
+                        <div className="h-5 w-0.5 bg-white sm:h-7 sm:w-1" />
+                      </div>
+
+                      {/* No search yet */}
+                      {!normalizedPlayerSearch && (
+                        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-4">
+                          <div className="rounded-lg bg-black/55 px-4 py-2 text-center text-xs font-medium text-white shadow-lg backdrop-blur-sm sm:text-sm">
+                            Search for a player to view their field position
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Search did not match any player */}
+                      {normalizedPlayerSearch &&
+                        searchedFieldPlayers.length === 0 && (
+                          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-4">
+                            <div className="rounded-lg bg-black/55 px-4 py-2 text-center text-xs font-medium text-white shadow-lg backdrop-blur-sm sm:text-sm">
+                              No matching player found
+                            </div>
+                          </div>
+                        )}
+
+                      {/* Only searched players are rendered on the field */}
+                      {normalizedPlayerSearch &&
+                        searchedFieldPlayers.map((player) => (
+                          <div
+                            key={player.id}
+                            className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
+                            style={{
+                              left: `${player.fieldX}%`,
+                              top: `${player.fieldY}%`,
+                            }}
+                          >
+                            {/* Animated outer glow */}
+                            <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full bg-yellow-300/60 sm:h-16 sm:w-16" />
+
+                            {/* Soft glow */}
+                            <div className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-yellow-300/40 blur-md sm:h-16 sm:w-16" />
+
+                            {/* Player marker */}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPlayer(player)}
+                              title={`${player.name} - ${player.team} - ${player.position}`}
+                              className="relative flex h-9 w-9 scale-125 items-center justify-center rounded-full border-2 border-yellow-200 bg-yellow-400 text-xs font-bold text-gray-950 shadow-lg ring-4 ring-yellow-300/40 transition-all duration-300 hover:scale-[1.35] sm:h-10 sm:w-10 lg:h-11 lg:w-11"
+                            >
+                              {player.number}
+                            </button>
+
+                            {/* Player name */}
+                            <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-yellow-400 px-2 py-1 text-[10px] font-semibold text-gray-950 shadow-md sm:text-xs">
+                              {player.name}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <span className="h-3 w-3 rounded-full bg-yellow-400" />
+                        Searched Player
+                      </div>
+
+                      {normalizedPlayerSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setSearchTerm("")}
+                          className="font-medium text-green-700 transition-colors hover:text-green-800 hover:underline"
+                        >
+                          Clear field highlight
+                        </button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
@@ -1808,7 +2270,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                       <Select
                         value={comparisonPlayer.name}
                         onValueChange={(name) => {
-                          const player = mockPlayers.find(
+                          const player = players.find(
                             (p) => p.name === name,
                           );
                           if (player) setComparisonPlayer(player);
@@ -1818,7 +2280,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                           <SelectValue placeholder="Select player to compare" />
                         </SelectTrigger>
                         <SelectContent>
-                          {mockPlayers
+                          {players
                             .filter((p) => p.id !== selectedPlayer.id)
                             .map((player) => (
                               <SelectItem key={player.id} value={player.name}>
@@ -1863,6 +2325,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                         comparisonPlayer[
                                           stat as keyof typeof comparisonPlayer
                                         ] as number,
+                                        1,
                                       )) *
                                     100
                                   }
@@ -1885,6 +2348,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                                         comparisonPlayer[
                                           stat as keyof typeof comparisonPlayer
                                         ] as number,
+                                        1,
                                       )) *
                                     100
                                   }
@@ -1903,6 +2367,7 @@ Export ID: ${Date.now()}-${Math.random().toString(36).substr(2, 9)}
                 </Card>
               </div>
             </div>
+            )}
           </TabsContent>
 
           {/* Current Match Insights */}
@@ -2528,8 +2993,8 @@ Generated on: ${new Date().toLocaleString()}
                     >
                       <Video className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                       <div className="text-lg font-medium text-gray-700">
-                        {selectedVideoFile
-                          ? selectedVideoFile.name
+                        {videoFileMeta
+                          ? videoFileMeta.name
                           : "Drop video files here"}
                       </div>
                       <div className="text-sm text-gray-500">
@@ -2541,17 +3006,17 @@ Generated on: ${new Date().toLocaleString()}
                     </label>
                   </div>
 
-                  {selectedVideoFile && (
+                  {videoFileMeta && (
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Video className="w-4 h-4 text-blue-600" />
                         <span className="font-medium">
-                          {selectedVideoFile.name}
+                          {videoFileMeta.name}
                         </span>
                       </div>
                       <div className="text-sm text-gray-600 mt-1">
                         Size:{" "}
-                        {(selectedVideoFile.size / 1024 / 1024).toFixed(1)} MB
+                        {(videoFileMeta.size / 1024 / 1024).toFixed(1)} MB
                       </div>
                     </div>
                   )}
@@ -2561,6 +3026,15 @@ Generated on: ${new Date().toLocaleString()}
                       <div className="text-sm text-red-700">
                         {videoAnalysisError}
                       </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3 w-full border-red-300 text-red-700 hover:bg-red-100"
+                        onClick={() => resetVideoUpload(true)}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Choose a different video
+                      </Button>
                     </div>
                   )}
 
@@ -2592,6 +3066,15 @@ Generated on: ${new Date().toLocaleString()}
                           Analysis completed successfully!
                         </span>
                       </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3 w-full border-green-300 text-green-700 hover:bg-green-100"
+                        onClick={() => resetVideoUpload(true)}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload another video
+                      </Button>
                     </div>
                   )}
 
@@ -2712,7 +3195,7 @@ Generated on: ${new Date().toLocaleString()}
                           <Badge variant="secondary">Complete</Badge>
                         </div>
                         <div className="text-sm text-gray-600">
-                          Video: {selectedVideoFile?.name}
+                          Video: {videoFileMeta?.name}
                         </div>
                       </div>
 

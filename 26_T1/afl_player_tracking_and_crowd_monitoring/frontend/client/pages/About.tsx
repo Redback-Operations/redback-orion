@@ -101,17 +101,7 @@ export default function About() {
             </CardContent>
           </Card>
 
-          {/* API Diagnostics */}
-          <Card>
-            <CardHeader>
-              <CardTitle>API Diagnostics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Monitor system performance and debug API interactions in real-time.
-              </p>
-            </CardContent>
-          </Card>
+
 
             </CardContent>
           </Card>

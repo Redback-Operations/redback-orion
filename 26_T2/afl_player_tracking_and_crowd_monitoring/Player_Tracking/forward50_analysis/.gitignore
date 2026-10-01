@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+config.json
+input/*.mp4
+output/*.mp4
+output/*.csv
+output/*.json
+models/
+
