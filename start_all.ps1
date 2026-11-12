@@ -5,14 +5,14 @@ Write-Host " Starting Orion Services"
 Write-Host "========================================"
 
 # --------------------------------------------------
-# Player Service - Port 8080
+# Player Service - Port 8001
 # --------------------------------------------------
 
-Write-Host "`nStarting Player Service (port 8080)..."
+Write-Host "`nStarting Player Service (port 8001)..."
 
 Start-Process `
     -FilePath "python" `
-    -ArgumentList "-m uvicorn main:app --host 0.0.0.0 --port 8080" `
+    -ArgumentList "-m uvicorn main:app --host 0.0.0.0 --port 8001" `
     -WorkingDirectory "$root\player_tracking\player_service" `
     -NoNewWindow
 
@@ -58,11 +58,11 @@ Start-Sleep -Seconds 10
 Write-Host "`nChecking services:"
 
 try {
-    $p = Invoke-RestMethod http://localhost:8080/
-    Write-Host "  Player Service   (8080): OK - $($p.service)"
+    $p = Invoke-RestMethod http://localhost:8001/
+    Write-Host "  Player Service   (8001): OK - $($p.service)"
 }
 catch {
-    Write-Host "  Player Service   (8080): FAILED"
+    Write-Host "  Player Service   (8001): FAILED"
 }
 
 try {
@@ -92,6 +92,6 @@ Write-Host "========================================"
 
 Write-Host "Backend Swagger : http://localhost:8000/docs"
 Write-Host "Crowd Swagger   : http://localhost:8002/docs"
-Write-Host "Player Service  : http://localhost:8080"
+Write-Host "Player Service  : http://localhost:8001"
 
 Write-Host "`nServices startup complete."
