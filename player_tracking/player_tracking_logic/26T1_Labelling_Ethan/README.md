@@ -21,7 +21,6 @@ python main.py
 26T1_Labelling_Ethan/
 ├── main.py
 ├── config.py
-├── requirements.txt
 ├── README.md
 ├── .gitignore
 ├── data/
@@ -69,7 +68,7 @@ cd 26T1_Labelling_Ethan
 ### Option A: using pip
 
 ```bash
-pip install -r requirements.txt
+pip install -r ../../pipeline/requirements.txt
 ```
 
 ### Option B: using conda environment
@@ -77,7 +76,7 @@ pip install -r requirements.txt
 ```bash
 conda create -n labelling_26t1 python=3.11 -y
 conda activate labelling_26t1
-pip install -r requirements.txt
+pip install -r ../../pipeline/requirements.txt
 ```
 
 ### Required packages

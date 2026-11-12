@@ -44,6 +44,5 @@ Backend/
 │   └── test_service_failure_dynamic.py
 │
 ├── requirements.txt
-├── requirements-test.txt
 ├── pytest.ini
 └── RUN_TESTS.md

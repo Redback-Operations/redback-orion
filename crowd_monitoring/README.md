@@ -236,18 +236,18 @@ one of the following is enough to switch to the GPU:
 
 - **NVIDIA** - install the CUDA build of torch *before* the base requirements:
   ```bash
-  pip install -r requirements-nvidia.txt
+  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
   pip install -r requirements.txt
   ```
   If a CPU-only torch is already installed, add `--force-reinstall` to the first command.
 - **AMD / Intel (DirectML, Windows)** - remove other onnxruntime builds, install, then export the ONNX model (it isn't in git):
   ```bash
   pip uninstall -y onnxruntime onnxruntime-gpu onnxruntime-directml
-  pip install -r requirements-amd.txt
+  pip install -r requirements.txt onnxruntime-directml
   yolo export model=crowd_detection/yolo26mcrowdpeoplefaces.pt format=onnx imgsz=640 dynamic=True opset=17
   ```
 
-Each file's header comments explain the steps and how to check the GPU is being used.
+The header of `requirements.txt` repeats these steps. Check NVIDIA with `python -c "import torch; print(torch.cuda.is_available())"`; for DirectML the pipeline benchmark report shows `(onnx on dml)`.
 
 See `crowd_detection/README.md` for all backend options.
 

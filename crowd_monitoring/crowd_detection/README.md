@@ -67,16 +67,16 @@ If you set `cuda` or `dml` explicitly and it isn't available, the pipeline stops
 Setup notes (run from `Crowd_Monitoring/`):
 
 - **CPU**: `pip install -r requirements.txt` is enough. It includes `openvino`; build the OpenVINO export below to use it.
-- **CUDA (NVIDIA)**: install `requirements-nvidia.txt` *before* the base requirements, because `pip install ultralytics` otherwise pulls a CPU-only torch:
+- **CUDA (NVIDIA)**: install the CUDA build of torch *before* the base requirements, because `pip install ultralytics` otherwise pulls a CPU-only torch:
   ```bash
-  pip install -r requirements-nvidia.txt
+  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
   pip install -r requirements.txt
   ```
-  If a CPU torch is already installed, add `--force-reinstall` to the first command. The file uses cu128, because cu124 has no Python 3.14 wheels; if your driver is too old for cu128, change it to cu126.
-- **DirectML (AMD/Intel, Windows)**: remove every other onnxruntime build first, because they install into the same folder and hide the DirectML one. Then install `requirements-amd.txt` (it includes the base requirements) and build the ONNX export:
+  If a CPU torch is already installed, add `--force-reinstall` to the first command. This uses cu128, because cu124 has no Python 3.14 wheels; if your driver is too old for cu128, change it to cu126.
+- **DirectML (AMD/Intel, Windows)**: remove every other onnxruntime build first, because they install into the same folder and hide the DirectML one. Then install the base requirements plus `onnxruntime-directml` and build the ONNX export:
   ```bash
   pip uninstall -y onnxruntime onnxruntime-gpu onnxruntime-directml
-  pip install -r requirements-amd.txt
+  pip install -r requirements.txt onnxruntime-directml
   ```
   Ultralytics has no DirectML option of its own, so `dml_backend.enable_dml()` patches ONNX Runtime to use `DmlExecutionProvider`. The `dml` setting also sets `YOLO_AUTOINSTALL=false`, which stops Ultralytics from reinstalling plain onnxruntime over it.
 - **Ultralytics version**: `requirements.txt` asks for `ultralytics>=8.4.120`. On CUDA the predict call uses `quantize=16` for FP16; on older releases that don't accept `quantize`, `main.py` falls back to `half=True`.

@@ -3,8 +3,13 @@
 # (CROWD_DEVICE=auto): CUDA -> DirectML -> OpenVINO -> plain PyTorch on CPU.
 #
 # GPU inference needs one extra step (pip can't detect your GPU):
-#   NVIDIA:      see requirements-nvidia.txt
-#   AMD / Intel: see requirements-amd.txt (Windows only)
+#   NVIDIA (CUDA), BEFORE this file, or ultralytics pulls CPU-only torch:
+#     pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+#     (driver too old for cu128? use .../whl/cu126; already have CPU torch? add --force-reinstall)
+#   AMD / Intel (DirectML, Windows only), AFTER this file:
+#     pip uninstall -y onnxruntime onnxruntime-gpu onnxruntime-directml
+#     pip install onnxruntime-directml
+#   Full setup: crowd_detection/README.md
 numpy
 pandas
 opencv-python
@@ -15,3 +20,5 @@ scikit-learn
 scipy
 fastapi
 uvicorn
+psutil            # video_processing/logger.py
+huggingface_hub   # stampede_detection model download

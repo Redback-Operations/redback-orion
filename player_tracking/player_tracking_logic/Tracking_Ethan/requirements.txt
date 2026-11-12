@@ -1,5 +1,0 @@
-ultralytics
-opencv-python
-numpy
-scipy
-scikit-learn

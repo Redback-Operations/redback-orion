@@ -9,8 +9,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY player_service/requirements.txt .
 RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir scipy
+    pip install --no-cache-dir -r requirements.txt
 
 COPY player_service/ ./player_service/
 COPY player_tracking_logic/Yolov11_ByteTrack_Player_Tracking/ ./player_tracking_logic/Yolov11_ByteTrack_Player_Tracking/
