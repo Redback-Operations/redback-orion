@@ -13,7 +13,7 @@ Write-Host "`nStarting Player Service (port 8080)..."
 Start-Process `
     -FilePath "python" `
     -ArgumentList "-m uvicorn main:app --host 0.0.0.0 --port 8080" `
-    -WorkingDirectory "$root\afl_player_tracking_and_crowd_monitoring\player_service" `
+    -WorkingDirectory "$root\player_tracking\player_service" `
     -NoNewWindow
 
 
@@ -26,7 +26,7 @@ Write-Host "Starting Crowd Service (port 8002)..."
 Start-Process `
     -FilePath "python" `
     -ArgumentList "-m uvicorn shared.services.main:app --host 0.0.0.0 --port 8002" `
-    -WorkingDirectory "$root\afl_player_tracking_and_crowd_monitoring\Crowd_Monitoring" `
+    -WorkingDirectory "$root\crowd_monitoring" `
     -NoNewWindow
 
 
@@ -39,7 +39,7 @@ Write-Host "Starting Backend Gateway (port 8000)..."
 Start-Process `
     -FilePath "python" `
     -ArgumentList "-m uvicorn app.main:app --host 0.0.0.0 --port 8000" `
-    -WorkingDirectory "$root\Backend" `
+    -WorkingDirectory "$root\backend" `
     -NoNewWindow
 
 

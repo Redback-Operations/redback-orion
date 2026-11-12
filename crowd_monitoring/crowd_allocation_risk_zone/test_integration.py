@@ -1,7 +1,8 @@
 """Integration test to verify handoff from crowd_behaviour_analytics"""
 
 import sys
-sys.path.insert(0, '/Users/xiwan2020/redback-orion/26_T1/afl_player_tracking_and_crowd_monitoring/Crowd_Monitoring/2026_T1')
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # crowd_monitoring/
 
 # Import both tasks
 from crowd_allocation_risk_zone.main import assess_risk

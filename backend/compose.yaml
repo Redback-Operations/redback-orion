@@ -33,26 +33,26 @@ services:
 
   player-tracking:
     build:
-      context: ..
+      context: ../player_tracking
       dockerfile: player_service/Dockerfile
     ports:
       - "8081:8080"
     depends_on:
       - backend
     volumes:
-      - ../player_service/outputs:/app/player_service/outputs
-      - ../player_service/uploads:/app/player_service/uploads
+      - ../player_tracking/player_service/outputs:/app/player_service/outputs
+      - ../player_tracking/player_service/uploads:/app/player_service/uploads
 
   crowd-monitoring:
     build:
-      context: ..
-      dockerfile: Crowd_Monitoring/2026_T1/Dockerfile
+      context: ../crowd_monitoring
+      dockerfile: Dockerfile
     ports:
       - "8002:8002"
     restart: unless-stopped
     volumes:
-      - ../Crowd_Monitoring/2026_T1/output:/app/output
-      - ../Crowd_Monitoring/2026_T1/analytics_output:/app/analytics_output
+      - ../crowd_monitoring/output:/app/output
+      - ../crowd_monitoring/analytics_output:/app/analytics_output
       - uploads_data:/app/uploads
 
   db:

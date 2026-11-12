@@ -2,7 +2,7 @@
 
 ## Directory layout
 
-Root: `26_T2/afl_player_tracking_and_crowd_monitoring/Player_Tracking/`
+Root: `player_tracking/pipeline/`
 
 ```
 ├── data/
@@ -24,7 +24,7 @@ per-dataset mapping. See `docs/` for the PLAYER/REF mapping table.
 ## Environment
 
 ```bash
-cd 26_T2/afl_player_tracking_and_crowd_monitoring/Player_Tracking
+cd player_tracking/pipeline
 python3 -m venv .venv            # already created — just activate:
 source .venv/bin/activate
 pip install -r requirements.txt  # only needed on a fresh machine
@@ -71,5 +71,5 @@ link can view".
 
 ## Source
 
-- T1 repo work: `26_T1/afl_player_tracking_and_crowd_monitoring/`
+- T1 repo work: `archive/26_T1/afl_player_tracking_and_crowd_monitoring/`
 - T1 datasets + notebooks + weights: `~/Desktop/AFL_T1_2026` (original), Google Drive (backup, link above)
