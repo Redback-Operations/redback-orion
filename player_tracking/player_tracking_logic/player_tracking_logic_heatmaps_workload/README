@@ -1,0 +1,57 @@
+# AFL Workload & Heatmap Pipeline
+
+This repo provides **workload metrics** and **heatmap visualisations** from AFL player tracking data.  
+It processes coordinate-based tracking files (`tracking2.0.csv`) and delivers outputs consumable by the frontend.
+
+---
+
+## Project structure
+
+afl-workload-pipeline/
+├─ config.yaml                 # thresholds & settings (edit here, no code changes needed)
+├─ examples/
+│  ├─ tracking2.0.csv          # sample input (~200 frames)
+│  ├─ out_workload.json        # sample workload output
+│  ├─ out_workload.csv         # same data in CSV format
+│  └─ heatmaps/                # sample generated PNGs
+├─ scripts/
+│  ├─ compute_workload.py      # workload metrics CLI
+│  └─ generate_heatmaps.py     # heatmap generation CLI
+├─ workload/                   # workload metric logic (distance, speed, HSR, ratios)
+├─ heatmaps/                   # heatmap logic (grid, blur, render)
+└─ tests/                      # unit tests
+
+## Setup
+
+Clone Repo and set up virtual environment:
+
+1. git clone https://github.com/<USERNAME>/afl-workload-pipeline.git
+2. cd afl-workload-pipeline
+
+3. python3 -m venv .venv 
+4. source .venv/bin/activate
+
+# Install dependencies
+5. pip install pandas numpy pyyaml scipy matplotlib imageio
+
+# Run workload  metrics
+6. python scripts/compute_workload.py \
+  --tracking examples/tracking2.0.csv \
+  --config config.yaml \
+  --out-json examples/out_workload.json \
+  --out-csv  examples/out_workload.csv
+
+Outputs:
+	•	JSON: examples/out_workload.json - per-player workload indicators (distance, speed, HSR, work/rest, workload score, fatigue risk).
+	•	CSV: examples/out_workload.csv - tidy table for spreadsheets / BI tools.
+
+7. python scripts/generate_heatmaps.py \
+  --tracking examples/tracking2.0.csv \
+  --config config.yaml \
+  --out-dir examples/heatmaps \
+  --group-by player_id
+
+Outputs:
+	•	PNG heatmaps in examples/heatmaps/
+	•	Configurable grid size (nx, ny), blur (sigma), and weighting mode (conf).
+

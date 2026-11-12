@@ -1,0 +1,293 @@
+{
+    "video_id": "afl_tracking_sample",
+    "events": [
+        {
+            "event_id": 1,
+            "event_type": "multi_player_tackle",
+            "start_frame": 2113,
+            "end_frame": 2119,
+            "start_time_s": 72.828,
+            "end_time_s": 73.034,
+            "duration_frames": 7,
+            "players_involved": 19,
+            "cluster_score": 24.714285714285715,
+            "bounding_box": {
+                "x_min": 49.0,
+                "y_min": 329.0,
+                "x_max": 1164.0,
+                "y_max": 605.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 2,
+            "event_type": "multi_player_tackle",
+            "start_frame": 3514,
+            "end_frame": 3544,
+            "start_time_s": 121.138,
+            "end_time_s": 122.172,
+            "duration_frames": 31,
+            "players_involved": 36,
+            "cluster_score": 26.0625,
+            "bounding_box": {
+                "x_min": 222.0,
+                "y_min": 365.0,
+                "x_max": 1280.0,
+                "y_max": 635.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 3,
+            "event_type": "multi_player_tackle",
+            "start_frame": 3556,
+            "end_frame": 3580,
+            "start_time_s": 122.586,
+            "end_time_s": 123.414,
+            "duration_frames": 25,
+            "players_involved": 30,
+            "cluster_score": 27.181818181818183,
+            "bounding_box": {
+                "x_min": 352.0,
+                "y_min": 332.0,
+                "x_max": 1177.0,
+                "y_max": 589.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 4,
+            "event_type": "multi_player_tackle",
+            "start_frame": 3592,
+            "end_frame": 3601,
+            "start_time_s": 123.828,
+            "end_time_s": 124.138,
+            "duration_frames": 10,
+            "players_involved": 21,
+            "cluster_score": 22.4,
+            "bounding_box": {
+                "x_min": 354.0,
+                "y_min": 336.0,
+                "x_max": 1199.0,
+                "y_max": 615.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 5,
+            "event_type": "multi_player_tackle",
+            "start_frame": 5089,
+            "end_frame": 5097,
+            "start_time_s": 175.448,
+            "end_time_s": 175.724,
+            "duration_frames": 9,
+            "players_involved": 20,
+            "cluster_score": 27.857142857142858,
+            "bounding_box": {
+                "x_min": 27.0,
+                "y_min": 282.0,
+                "x_max": 1216.0,
+                "y_max": 515.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 6,
+            "event_type": "multi_player_tackle",
+            "start_frame": 5123,
+            "end_frame": 5141,
+            "start_time_s": 176.621,
+            "end_time_s": 177.241,
+            "duration_frames": 19,
+            "players_involved": 23,
+            "cluster_score": 25.0,
+            "bounding_box": {
+                "x_min": 183.0,
+                "y_min": 278.0,
+                "x_max": 1280.0,
+                "y_max": 500.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 7,
+            "event_type": "multi_player_tackle",
+            "start_frame": 5193,
+            "end_frame": 5199,
+            "start_time_s": 179.034,
+            "end_time_s": 179.241,
+            "duration_frames": 7,
+            "players_involved": 17,
+            "cluster_score": 23.428571428571427,
+            "bounding_box": {
+                "x_min": 167.0,
+                "y_min": 284.0,
+                "x_max": 1268.0,
+                "y_max": 474.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 8,
+            "event_type": "multi_player_tackle",
+            "start_frame": 5538,
+            "end_frame": 5542,
+            "start_time_s": 190.931,
+            "end_time_s": 191.069,
+            "duration_frames": 5,
+            "players_involved": 21,
+            "cluster_score": 26.0,
+            "bounding_box": {
+                "x_min": 85.0,
+                "y_min": 326.0,
+                "x_max": 1184.0,
+                "y_max": 684.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 9,
+            "event_type": "multi_player_tackle",
+            "start_frame": 14172,
+            "end_frame": 14186,
+            "start_time_s": 488.655,
+            "end_time_s": 489.138,
+            "duration_frames": 15,
+            "players_involved": 22,
+            "cluster_score": 24.363636363636363,
+            "bounding_box": {
+                "x_min": 193.0,
+                "y_min": 154.0,
+                "x_max": 1117.0,
+                "y_max": 502.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 10,
+            "event_type": "multi_player_tackle",
+            "start_frame": 14492,
+            "end_frame": 14502,
+            "start_time_s": 499.69,
+            "end_time_s": 500.034,
+            "duration_frames": 11,
+            "players_involved": 28,
+            "cluster_score": 35.625,
+            "bounding_box": {
+                "x_min": 23.0,
+                "y_min": 106.0,
+                "x_max": 1280.0,
+                "y_max": 516.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 11,
+            "event_type": "multi_player_tackle",
+            "start_frame": 15820,
+            "end_frame": 15841,
+            "start_time_s": 545.483,
+            "end_time_s": 546.207,
+            "duration_frames": 22,
+            "players_involved": 25,
+            "cluster_score": 26.6,
+            "bounding_box": {
+                "x_min": 5.0,
+                "y_min": 51.0,
+                "x_max": 1034.0,
+                "y_max": 599.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 12,
+            "event_type": "multi_player_tackle",
+            "start_frame": 15859,
+            "end_frame": 15864,
+            "start_time_s": 546.828,
+            "end_time_s": 547.0,
+            "duration_frames": 6,
+            "players_involved": 25,
+            "cluster_score": 32.5,
+            "bounding_box": {
+                "x_min": 0.0,
+                "y_min": 105.0,
+                "x_max": 1042.0,
+                "y_max": 582.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 13,
+            "event_type": "multi_player_tackle",
+            "start_frame": 15906,
+            "end_frame": 15941,
+            "start_time_s": 548.448,
+            "end_time_s": 549.655,
+            "duration_frames": 36,
+            "players_involved": 31,
+            "cluster_score": 31.333333333333332,
+            "bounding_box": {
+                "x_min": 8.0,
+                "y_min": 166.0,
+                "x_max": 1200.0,
+                "y_max": 686.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 14,
+            "event_type": "multi_player_tackle",
+            "start_frame": 15962,
+            "end_frame": 16025,
+            "start_time_s": 550.379,
+            "end_time_s": 552.552,
+            "duration_frames": 64,
+            "players_involved": 49,
+            "cluster_score": 25.225,
+            "bounding_box": {
+                "x_min": 2.0,
+                "y_min": 241.0,
+                "x_max": 1178.0,
+                "y_max": 688.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 15,
+            "event_type": "multi_player_tackle",
+            "start_frame": 17843,
+            "end_frame": 17854,
+            "start_time_s": 615.241,
+            "end_time_s": 615.621,
+            "duration_frames": 12,
+            "players_involved": 29,
+            "cluster_score": 29.0,
+            "bounding_box": {
+                "x_min": 121.0,
+                "y_min": 276.0,
+                "x_max": 1217.0,
+                "y_max": 626.0
+            },
+            "confidence": 1.0
+        },
+        {
+            "event_id": 16,
+            "event_type": "multi_player_tackle",
+            "start_frame": 17891,
+            "end_frame": 17936,
+            "start_time_s": 616.897,
+            "end_time_s": 618.448,
+            "duration_frames": 46,
+            "players_involved": 39,
+            "cluster_score": 26.433333333333334,
+            "bounding_box": {
+                "x_min": 0.0,
+                "y_min": 289.0,
+                "x_max": 1255.0,
+                "y_max": 688.0
+            },
+            "confidence": 1.0
+        }
+    ]
+}
