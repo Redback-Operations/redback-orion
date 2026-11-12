@@ -1,4 +1,4 @@
-# Project Orion: AFL Player Tracking and Crowd Monitoring
+# Redback Project 4 - Crowd Monitoring and Player Tracking (Project Orion)
 
 Project Orion is a Redback Operations capstone project. It takes AFL match footage and turns it into analytics. Player tracking finds and follows players on the field, and crowd monitoring estimates how many people are in the stands, where they're packed in, and where that could become a safety risk. A web app sits on top so coaches and analysts can upload a video and see the results.
 
@@ -135,9 +135,19 @@ Every pull request also runs an automated security scan.
 
 At the end of each trimester, the final state of `main` is tagged (`v26.T1`, `v26.T2`, and so on). You can check out any tag to see the code exactly as that cohort left it.
 
-A few conventions:
+## Repository Guidelines
 
-- No spaces in file or folder names. snake_case is preferred.
+Beginning in the second trimester of 2024, members should follow these guidelines while working with this repository:
+
+- **README.md Files**: All folders should contain a `README.md` (unless the folder is automatically generated, e.g., folders beginning with ".").
+- **Naming Conventions**: File and folder names must not contain spaces. Use either snake_case or kebab-case. For instance, instead of "Crowd Monitoring", use "crowd_monitoring" or "crowd-monitoring". Lower-case letters are preferred, but not strictly required.
+- **File Organization**: Do not store loose files at the top level of the repository unless explicitly approved.
+- **Folder Structure**: Teams should work within a designated subfolder under one of the following top-level directories: Crowd-Monitoring, Player-Tracking, Internet-of-Things, or Others.
+
+  *Update (T3 2026):* the top-level team folders are now `backend/`, `frontend/`, `crowd_monitoring/` and `player_tracking/`. The older Crowd-Monitoring, Player-Tracking, Internet-of-Things and Others work is in `archive/`.
+
+Added in T3 2026:
+
 - Never commit `.env` files with real passwords or keys. Put example values in `.env.example`.
 - Large model files (`*.pt`) are ignored by git by default. If the app needs one, add it with `git add -f` and mention it in your pull request.
 - Every service has a single `requirements.txt`. Add new Python packages there, not in a new file.
