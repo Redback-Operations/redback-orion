@@ -580,8 +580,8 @@ After YOLO detects a person, the script crops the upper-body part of the boundin
 
 It then estimates whether the box belongs to:
 
-- `CAR`: red jersey rule
-- `GCS`: dark / black jersey rule
+- `CAR`: dark / navy jersey rule
+- `GCS`: red jersey rule
 - `REF`: fluorescent yellow jersey rule
 
 This keeps the original logic of using jersey colour as a rough automatic labelling strategy.

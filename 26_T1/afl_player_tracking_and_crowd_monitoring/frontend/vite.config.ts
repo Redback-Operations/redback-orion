@@ -8,19 +8,57 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+
     fs: {
-      allow: ["./client", "./shared"],
-      deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
+      allow: [
+        "./client",
+        "./shared",
+      ],
+
+      deny: [
+        ".env",
+        ".env.*",
+        "*.{crt,pem}",
+        "**/.git/**",
+        "server/**",
+      ],
     },
   },
+
   build: {
     outDir: "dist/spa",
+
+    rollupOptions: {
+      input: {
+        main: path.resolve(
+          __dirname,
+          "index.html"
+        ),
+
+        microsoftRedirect: path.resolve(
+          __dirname,
+          "redirect.html"
+        ),
+      },
+    },
   },
-  plugins: [react(), expressPlugin()],
+
+  plugins: [
+    react(),
+    expressPlugin(),
+  ],
+
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./client"),
-      "@shared": path.resolve(__dirname, "./shared"),
+      "@": path.resolve(
+        __dirname,
+        "./client"
+      ),
+
+      "@shared": path.resolve(
+        __dirname,
+        "./shared"
+      ),
     },
   },
 }));
@@ -28,11 +66,15 @@ export default defineConfig(({ mode }) => ({
 function expressPlugin(): Plugin {
   return {
     name: "express-plugin",
-    apply: "serve", // Only apply during development (serve mode)
+
+    // Only apply during development.
+    apply: "serve",
+
     configureServer(server) {
       const app = createServer();
 
-      // Add Express app as middleware to Vite dev server
+      // Add Express app as middleware
+      // to the Vite development server.
       server.middlewares.use(app);
     },
   };

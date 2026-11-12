@@ -1,0 +1,13 @@
+# NVIDIA GPU (CUDA) build of torch for crowd_detection.
+# Full setup: crowd_detection/README.md
+#
+# Install this BEFORE requirements.txt, or ultralytics pulls CPU-only torch:
+#   pip install -r requirements-nvidia.txt
+#   pip install -r requirements.txt
+# Already have CPU torch? Add --force-reinstall to the first command.
+#
+# Check: python -c "import torch; print(torch.cuda.is_available())"  -> True
+# Driver too old for cu128 (see nvidia-smi)? Change the URL to .../whl/cu126.
+--index-url https://download.pytorch.org/whl/cu128
+torch
+torchvision

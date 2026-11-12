@@ -1,0 +1,18 @@
+# ByteTrack experiment tuned for small, fast AFL ball detections.
+# This is a local pilot configuration; the Ultralytics default is unchanged.
+
+tracker_type: bytetrack
+
+# Allow medium-confidence ball detections to start or confirm tracks.
+track_high_thresh: 0.15
+track_low_thresh: 0.05
+new_track_thresh: 0.15
+
+# Keep a lost track alive for about two seconds at 30 FPS so that short
+# occlusions and missed detections do not immediately force a new identity.
+track_buffer: 60
+
+# Permit a wider association cost for a ball that moves substantially between
+# frames. This may also increase incorrect associations and must be evaluated.
+match_thresh: 0.90
+fuse_score: true

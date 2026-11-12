@@ -1,0 +1,17 @@
+{
+  "video": "input/joondalup.mp4",
+  "frame_width": 1920,
+  "frame_height": 1080,
+  "fps": 50.0,
+  "processed_frames": 300,
+  "start_time_seconds": 0.0,
+  "end_time_seconds": 6.0,
+  "inside_forward50_detections": 3200,
+  "inside_detections_with_zone": 3115,
+  "zone_assignment_rate": 0.9734,
+  "limitations": [
+    "Locations are image-coordinate estimates, not GPS or real-world measurements.",
+    "Fixed polygons are appropriate only while the camera view remains stable.",
+    "Tracking IDs may change after occlusion or when a player leaves the frame."
+  ]
+}

@@ -1,0 +1,9 @@
+torch>=2.2
+ultralytics>=8.4
+opencv-python>=4.8
+numpy
+Pillow
+scikit-learn
+easyocr
+imageio-ffmpeg
+lap>=0.5.12

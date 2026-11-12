@@ -1,21 +1,27 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import Index from "./pages/Index";
 import Login from "./pages/Login";
-import AFLDashboard from "./pages/AFLDashboard";
-import PlayerPerformance from "./pages/PlayerPerformance";
-import CrowdMonitor from "./pages/CrowdMonitor";
-import Analytics from "./pages/Analytics";
-import Reports from "./pages/Reports";
-import ApiDiagnostics from "./pages/ApiDiagnostics";
-import ErrorDemo from "./pages/ErrorDemo";
-import About from "./pages/About";
-import NotFound from "./pages/NotFound";
-import AddPlayer from "./pages/AddPlayer";
+import PageSkeleton from "@/components/PageSkeleton";
+import { ThemePreferencesProvider } from "@/components/ThemePreferences";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+const Index = lazy(() => import("./pages/Index"));
+const AFLDashboard = lazy(() => import("./pages/AFLDashboard"));
+const PlayerPerformance = lazy(() => import("./pages/PlayerPerformance"));
+const CrowdMonitor = lazy(() => import("./pages/CrowdMonitor"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Reports = lazy(() => import("./pages/Reports"));
+const ErrorDemo = lazy(() => import("./pages/ErrorDemo"));
+const About = lazy(() => import("./pages/About"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AddPlayer = lazy(() => import("./pages/AddPlayer"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,32 +74,111 @@ export default function App() {
       }}
     >
       <QueryClientProvider client={queryClient}>
+        <ThemePreferencesProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/home" element={<AFLDashboard />} />
-              <Route path="/afl-dashboard" element={<AFLDashboard />} />
-              <Route
-                path="/player-performance"
-                element={<PlayerPerformance />}
-              />
-              <Route path="/crowd-monitor" element={<CrowdMonitor />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/api-diagnostics" element={<ApiDiagnostics />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/error-demo" element={<ErrorDemo />} />
-              <Route path="/stitch" element={<Index />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-              <Route path="/add-player" element={<AddPlayer />} />
-            </Routes>
+            <Suspense fallback={<PageSkeleton />}>
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/home"
+                  element={
+                    <ProtectedRoute>
+                      <AFLDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/afl-dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <AFLDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/player-performance"
+                  element={
+                    <ProtectedRoute>
+                      <PlayerPerformance />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/crowd-monitor"
+                  element={
+                    <ProtectedRoute>
+                      <CrowdMonitor />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/analytics"
+                  element={
+                    <ProtectedRoute>
+                      <Analytics />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/reports"
+                  element={
+                    <ProtectedRoute>
+                      <Reports />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/about"
+                  element={
+                    <ProtectedRoute>
+                      <About />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/error-demo"
+                  element={
+                    <ProtectedRoute>
+                      <ErrorDemo />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/add-player"
+                  element={
+                    <ProtectedRoute>
+                      <AddPlayer />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/stitch" element={<Index />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
+        </ThemePreferencesProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

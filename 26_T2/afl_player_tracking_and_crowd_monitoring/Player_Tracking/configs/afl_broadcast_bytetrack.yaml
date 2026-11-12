@@ -1,0 +1,10 @@
+# Candidate ByteTrack settings for wide-angle AFL broadcast footage.
+# Use with --conf 0.1 so detections between track_low_thresh and
+# track_high_thresh remain available for ByteTrack's second association pass.
+tracker_type: bytetrack
+track_high_thresh: 0.4
+track_low_thresh: 0.1
+new_track_thresh: 0.45
+track_buffer: 75
+match_thresh: 0.9
+fuse_score: true

@@ -43,3 +43,27 @@ export function getFriendlyErrorMessage(errorData: any): string {
 
     return "Something went wrong. Please try again.";
 }
+
+/** Turns any thrown error (network failure, backend message) into plain wording for users. */
+export function getFriendlyThrownMessage(error: unknown): string {
+    const raw = error instanceof Error ? error.message : String(error ?? "");
+    const lower = raw.toLowerCase();
+
+    if (
+        lower.includes("failed to fetch") ||
+        lower.includes("networkerror") ||
+        lower.includes("load failed")
+    ) {
+        return "Can't reach the server. Check that the backend is running and try again.";
+    }
+    if (lower.includes("could not validate") || lower.includes("not authenticated") || lower.includes("401")) {
+        return "Your session has expired. Please log out and log in again.";
+    }
+    if (lower.includes("unable to process video") || lower.includes("unsupported")) {
+        return "This video couldn't be processed. Try an MP4 file and upload it again.";
+    }
+    if (lower.includes("internal server error")) {
+        return "The server had a problem processing this video. Please try again in a moment.";
+    }
+    return raw || "Something went wrong. Please try again.";
+}

@@ -1,0 +1,766 @@
+import React, { useState, useCallback, memo } from 'react'
+import {
+  Eye, EyeOff, Users, MapPin, BarChart3, TrendingUp, Calendar, Plus, Volume2,
+  Circle, Download, Activity, Clock, Star, Search, Upload, FileVideo, AlertCircle,
+  CheckCircle, ArrowLeft
+} from 'lucide-react'
+import './App.css'
+import { uploadVideo } from "./services/uploadService"
+import { pollJob } from "./services/jobService"
+
+import FatigueLivePanel from './components/FatigueLivePanel.jsx'
+
+// AFL Teams data with colors and emojis
+const AFL_TEAMS = [
+  { name: 'Adelaide Crows', primary: '#002E5D', secondary: '#FFD100', emoji: '🦅', mascot: 'Crow' },
+  { name: 'Brisbane Lions', primary: '#A30046', secondary: '#FFD100', emoji: '🦁', mascot: 'Lion' },
+  { name: 'Carlton Blues', primary: '#041E42', secondary: '#FFFFFF', emoji: '🔵', mascot: 'Blue' },
+  { name: 'Collingwood Magpies', primary: '#000000', secondary: '#FFFFFF', emoji: '🖤', mascot: 'Magpie' },
+  { name: 'Essendon Bombers', primary: '#CC0000', secondary: '#000000', emoji: '✈️', mascot: 'Bomber' },
+  { name: 'Fremantle Dockers', primary: '#4A90E2', secondary: '#FFFFFF', emoji: '⚓', mascot: 'Docker' },
+  { name: 'Geelong Cats', primary: '#1E3A8A', secondary: '#FFFFFF', emoji: '🐱', mascot: 'Cat' },
+  { name: 'Gold Coast Suns', primary: '#FF6B35', secondary: '#FFD100', emoji: '☀️', mascot: 'Sun' },
+  { name: 'GWS Giants', primary: '#FF6B35', secondary: '#000000', emoji: '👹', mascot: 'Giant' },
+  { name: 'Hawthorn Hawks', primary: '#8B4513', secondary: '#FFD100', emoji: '🦅', mascot: 'Hawk' },
+  { name: 'Melbourne Demons', primary: '#000080', secondary: '#FF0000', emoji: '😈', mascot: 'Demon' },
+  { name: 'North Melbourne Kangaroos', primary: '#000080', secondary: '#FFFFFF', emoji: '🦘', mascot: 'Kangaroo' },
+  { name: 'Port Adelaide Power', primary: '#000000', secondary: '#00A0DC', emoji: '⚡', mascot: 'Power' },
+  { name: 'Richmond Tigers', primary: '#FFD100', secondary: '#000000', emoji: '🐯', mascot: 'Tiger' },
+  { name: 'St Kilda Saints', primary: '#000000', secondary: '#FF0000', emoji: '⛪', mascot: 'Saint' },
+  { name: 'Sydney Swans', primary: '#FF0000', secondary: '#FFFFFF', emoji: '🦢', mascot: 'Swan' },
+  { name: 'West Coast Eagles', primary: '#002E5D', secondary: '#FFD100', emoji: '🦅', mascot: 'Eagle' },
+  { name: 'Western Bulldogs', primary: '#FF6B35', secondary: '#FFFFFF', emoji: '🐕', mascot: 'Bulldog' }
+]
+
+// Player Positions (kept for future UI use)
+const PLAYER_POSITIONS = ['Forward', 'Midfielder', 'Defender', 'Ruck', 'Interchange']
+
+// Mock Dashboard Data
+const DASHBOARD_DATA = {
+  productiveTime: 12.4,
+  focusedTime: 8.5,
+  teams: [
+    { name: 'Forward Line', utilization: 85, overUtilized: 15, underUtilized: 0 },
+    { name: 'Midfield', utilization: 92, overUtilized: 8, underUtilized: 0 },
+    { name: 'Defense', utilization: 78, overUtilized: 0, underUtilized: 22 },
+    { name: 'Ruck Division', utilization: 88, overUtilized: 12, underUtilized: 0 },
+    { name: 'Interchange', utilization: 65, overUtilized: 0, underUtilized: 35 }
+  ],
+  players: [
+    { name: 'Marcus Bontempelli', team: 'Western Bulldogs', position: 'Midfielder', image: '🏉' },
+    { name: 'Dustin Martin', team: 'Richmond Tigers', position: 'Midfielder', image: '🏉' },
+    { name: 'Patrick Dangerfield', team: 'Geelong Cats', position: 'Midfielder', image: '🏉' }
+  ]
+}
+
+/* =========================
+   HOISTED CHILD COMPONENTS
+   ========================= */
+
+const Dashboard = memo(function Dashboard({
+  showReferee, showBall, showStaff, showCrowd,
+  setShowReferee, setShowBall, setShowStaff, setShowCrowd,
+  activeTab, setActiveTab,
+  setShowPlayerStats, setShowCrowdHeatmap,
+  downloadReport
+}) {
+  const [uploadedVideo, setUploadedVideo] = useState(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisComplete, setAnalysisComplete] = useState(false)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+  const [analysisResults, setAnalysisResults] = useState(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [jobId, setJobId] = useState(null)
+
+  const handleVideoUpload = (event) => {
+    const file = event.target.files[0]
+    if (file && file.type.startsWith('video/')) {
+      setUploadedVideo(file)
+      setAnalysisComplete(false)
+      setAnalysisResults(null)
+    }
+  }
+
+ const startAnalysis = async () => {
+  if (!uploadedVideo) return
+
+  try {
+    setIsAnalyzing(true)
+    setUploadProgress(0)
+
+    const token = localStorage.getItem("token")
+
+    // upload file
+    const response = await uploadVideo(
+      uploadedVideo,
+      token,
+      (progress) => {
+        setUploadProgress(progress)
+      }
+    )
+
+    console.log("Upload response:", response)
+
+    // save job_id
+    setJobId(response.job_id)
+
+    // immediately start polling
+    pollJob(response.job_id, token, {
+      onSuccess: (data) => {
+        console.log("Analysis complete:", data)
+
+        setAnalysisResults(data.results)
+        setAnalysisComplete(true)
+        setIsAnalyzing(false)
+      },
+
+      onError: (err) => {
+        console.error("Polling failed:", err)
+        setIsAnalyzing(false)
+      }
+    })
+
+  } catch (err) {
+    console.error("Upload failed:", err)
+    setIsAnalyzing(false)
+  }
+}
+
+  return (
+    <div className="dashboard-container">
+      {/* Left Sidebar */}
+      <div className="dashboard-sidebar">
+        <div className="sidebar-header">
+          <div className="logo-section">
+            <div className="afl-logo">
+              <div className="logo-icon">🏉</div>
+              <h1>AFL Tracker</h1>
+            </div>
+          </div>
+        </div>
+
+        <div className="sidebar-controls">
+          <h3>Display Controls</h3>
+          <div className="control-item">
+            <button
+              className={`control-btn ${showReferee ? 'active' : ''}`}
+              onClick={() => setShowReferee(!showReferee)}
+            >
+              <Volume2 size={20} />
+              <span>Show Referee</span>
+            </button>
+          </div>
+          <div className="control-item">
+            <button
+              className={`control-btn ${showBall ? 'active' : ''}`}
+              onClick={() => setShowBall(!showBall)}
+            >
+              <Circle size={20} />
+              <span>Show Ball</span>
+            </button>
+          </div>
+          <div className="control-item">
+            <button
+              className={`control-btn ${showStaff ? 'active' : ''}`}
+              onClick={() => setShowStaff(!showStaff)}
+            >
+              <Users size={20} />
+              <span>Show Staff</span>
+            </button>
+          </div>
+          <div className="control-item">
+            <button
+              className={`control-btn ${showCrowd ? 'active' : ''}`}
+              onClick={() => setShowCrowd(!showCrowd)}
+            >
+              <Users size={20} />
+              <span>Show Crowd</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="dashboard-main">
+        {/* Video Upload Section */}
+        <div className="video-upload-section">
+          <div className="section-header">
+            <div className="header-content">
+              <h2>Match Video Analysis</h2>
+              <p>Upload your match video to get comprehensive analysis and insights</p>
+            </div>
+          </div>
+
+          {!uploadedVideo ? (
+            <div className="upload-area">
+              <div className="upload-zone">
+                <Upload size={48} />
+                <h3>Upload Match Video</h3>
+                <p>Drag and drop your video file here or click to browse</p>
+                <p className="file-types">Supported formats: MP4, AVI, MOV, MKV (Max 500MB)</p>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  className="file-input"
+                  id="video-upload"
+                />
+                <label htmlFor="video-upload" className="upload-btn">
+                  Choose Video File
+                </label>
+              </div>
+            </div>
+          ) : (
+            <div className="video-preview-section">
+              <div className="video-info">
+                <div className="video-details">
+                  <FileVideo size={24} />
+                  <div className="video-text">
+                    <h4>{uploadedVideo.name}</h4>
+                    <p>{(uploadedVideo.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  </div>
+                </div>
+                <div className="video-actions">
+                  {!isAnalyzing && !analysisComplete && (
+                    <button className="action-btn primary" onClick={startAnalysis}>
+                      <Eye size={16} />
+                      Start Analysis
+                    </button>
+                  )}
+                  {!isAnalyzing && analysisComplete && (
+                    <button className="action-btn secondary" onClick={resetAnalysis}>
+                      <Upload size={16} />
+                      Upload New Video
+                    </button>
+                  )}
+                  <button className="action-btn" onClick={resetAnalysis}>
+                    <AlertCircle size={16} />
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+                {isAnalyzing && (
+                    <div className="analysis-progress">
+                      <div className="progress-header">
+                        <h4>Uploading Video...</h4>
+                        <span>{uploadProgress}%</span>
+                      </div>
+
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="progress-steps">
+                    <div className={`step ${analysisProgress > 0 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Processing video frames</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 25 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Detecting players and objects</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 50 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Tracking movements and events</span>
+                    </div>
+                    <div className={`step ${analysisProgress > 75 ? 'active' : ''}`}>
+                      <CheckCircle size={16} />
+                      <span>Generating analysis report</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {analysisComplete && analysisResults && (
+                <div className="analysis-results">
+                  <div className="results-header">
+                    <h3>Analysis Complete!</h3>
+                    <p>Comprehensive match analysis results</p>
+                  </div>
+
+                  <div className="results-grid">
+                    <div className="result-card">
+                      <h4>Match Overview</h4>
+                      <div className="result-stats">
+                        <div className="stat"><span className="label">Duration:</span><span className="value">{analysisResults.matchDuration}</span></div>
+                        <div className="stat"><span className="label">Total Players:</span><span className="value">{analysisResults.totalPlayers}</span></div>
+                        <div className="stat"><span className="label">Goals:</span><span className="value">{analysisResults.goals}</span></div>
+                        <div className="stat"><span className="label">Assists:</span><span className="value">{analysisResults.assists}</span></div>
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Possession</h4>
+                      <div className="possession-chart">
+                        <div className="possession-bar">
+                          <div className="team-a" style={{ width: `${analysisResults.possession.teamA}%` }}>
+                            <span>Team A: {analysisResults.possession.teamA}%</span>
+                          </div>
+                          <div className="team-b" style={{ width: `${analysisResults.possession.teamB}%` }}>
+                            <span>Team B: {analysisResults.possession.teamB}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Top Performers</h4>
+                      <div className="player-list">
+                        {analysisResults.playerStats.map((player, index) => (
+                          <div key={index} className="player-stat">
+                            <div className="player-name">{player.name}</div>
+                            <div className="player-metrics">
+                              <span>⚽ {player.goals} goals</span>
+                              <span>🎯 {player.assists} assists</span>
+                              <span>🏃 {player.distance}</span>
+                              <span>⚡ {player.speed}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="result-card">
+                      <h4>Crowd Analysis</h4>
+                      <div className="crowd-stats">
+                        <div className="crowd-metric"><span className="label">Peak Attendance:</span><span className="value">{analysisResults.crowdDensity.peak.toLocaleString()}</span></div>
+                        <div className="crowd-metric"><span className="label">Average Attendance:</span><span className="value">{analysisResults.crowdDensity.average.toLocaleString()}</span></div>
+                      </div>
+                      <div className="zone-list">
+                        {analysisResults.crowdDensity.zones.map((zone, index) => (
+                          <div key={index} className="zone-item">
+                            <span className="zone-name">{zone.zone}</span>
+                            <div className="zone-bar">
+                              <div className="zone-fill" style={{ width: `${zone.density}%` }}></div>
+                            </div>
+                            <span className="zone-density">{zone.density}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="key-events">
+                    <h4>Key Match Events</h4>
+                    <div className="events-timeline">
+                      {analysisResults.keyEvents.map((event, index) => (
+                        <div key={index} className="event-item">
+                          <div className="event-time">{event.time}</div>
+                          <div className="event-content">
+                            <div className="event-title">{event.event}</div>
+                            <div className="event-player">{event.player}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="results-actions">
+                    <button className="action-btn primary" onClick={downloadReport}>
+                      <Download size={16} />
+                      Download Full Report
+                    </button>
+                    <button className="action-btn">
+                      <BarChart3 size={16} />
+                      View Detailed Analytics
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+        </div>
+
+        {/* Current Match Overview */}
+        <div className="match-overview">
+          <h2>Current Match: Team A vs Team B</h2>
+          <div className="match-stats">
+            <span>Score: 2-1</span>
+            <span>Time: 12:34</span>
+            <span>Quarter: 3</span>
+          </div>
+          <div className="match-tabs">
+            <button
+              className={`tab-btn ${activeTab === 'player-tracking' ? 'active' : ''}`}
+              onClick={() => setActiveTab('player-tracking')}
+            >
+              Player Tracking
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'crowd-heatmap' ? 'active' : ''}`}
+              onClick={() => setShowCrowdHeatmap(true)}
+            >
+              Crowd Heatmap
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+              onClick={() => setActiveTab('analytics')}
+            >
+              Analytics
+            </button>
+          </div>
+        </div>
+
+        {/* Player Performance Metrics */}
+        <div className="metrics-section">
+          <div className="section-header">
+            <h3>Player Performance Metrics</h3>
+            <p>Real-time tracking of key player stats.</p>
+            <button className="action-btn" onClick={() => setShowPlayerStats(true)}>
+              <Eye size={16} />
+              View Detailed Stats
+            </button>
+          </div>
+          <div className="metrics-grid">
+            <div className="metric-card">
+              <div className="metric-icon">⚽</div>
+              <div className="metric-content">
+                <h4>Goals</h4>
+                <div className="metric-value">2</div>
+                <div className="metric-change positive">+1</div>
+              </div>
+            </div>
+            <div className="metric-card">
+              <div className="metric-icon">🎯</div>
+              <div className="metric-content">
+                <h4>Shots on Target</h4>
+                <div className="metric-value">5</div>
+                <div className="metric-change positive">+2</div>
+              </div>
+            </div>
+            <div className="metric-card">
+              <div className="metric-icon">🤝</div>
+              <div className="metric-content">
+                <h4>Assists</h4>
+                <div className="metric-value">1</div>
+                <div className="metric-change">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Player Fatigue (Live) panel from feat/fatigue-ui */}
+        <FatigueLivePanel />
+
+        {/* Match Progression Analytics */}
+        <div className="analytics-section">
+          <div className="section-header">
+            <h3>Match Progression Analytics</h3>
+            <p>Analysis of match changes over time.</p>
+            <button className="action-btn" onClick={downloadReport}>
+              <Download size={16} />
+              Download Report
+            </button>
+          </div>
+          <div className="charts-grid">
+            <div className="chart-card">
+              <h4>Possession Over Time</h4>
+              <div className="chart-container">
+                <div className="chart-placeholder">
+                  <div className="chart-line"></div>
+                  <div className="chart-line"></div>
+                  <div className="chart-line"></div>
+                </div>
+                <div className="chart-labels">
+                  <span>Possession %</span>
+                  <span>Time</span>
+                </div>
+              </div>
+            </div>
+            <div className="chart-card">
+              <h4>Player Activity</h4>
+              <div className="chart-container">
+                <div className="bar-chart">
+                  <div className="bar" style={{ height: '60%' }}></div>
+                  <div className="bar" style={{ height: '80%' }}></div>
+                  <div className="bar" style={{ height: '40%' }}></div>
+                  <div className="bar" style={{ height: '90%' }}></div>
+                  <div className="bar" style={{ height: '70%' }}></div>
+                </div>
+                <div className="chart-labels">
+                  <span>Actions</span>
+                  <span>Player</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Live Player Tracking */}
+        <div className="tracking-section">
+          <div className="section-header">
+            <h3>Live Player Tracking</h3>
+            <p>Visual representation of player movements.</p>
+            <button className="action-btn">
+              <Eye size={16} />
+              Show Heatmap
+            </button>
+          </div>
+          <div className="tracking-content">
+            <div className="player-info-cards">
+              <div className="player-card">
+                <h4>Player A</h4>
+                <p>Position: Midfield</p>
+                <p>Confidence: 95%</p>
+              </div>
+              <div className="player-card">
+                <h4>Player B</h4>
+                <p>Position: Forward</p>
+                <p>Confidence: 90%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Interactive Map */}
+        <div className="map-section">
+          <div className="interactive-map">
+            <div className="map-placeholder">
+              <MapPin size={24} />
+              <p>Interactive map showing player positions and movements.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="dashboard-footer">
+          <a href="#">Follow Us on Social Media</a>
+          <a href="#">Contact Support</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+  )
+})
+
+const PlayerStatsView = memo(function PlayerStatsView({ setShowPlayerStats }) {
+  return (
+    <div className="player-stats-container">
+      <div className="player-stats-header">
+        <div className="header-left">
+          <button className="back-btn" onClick={() => setShowPlayerStats(false)}>
+            <ArrowLeft size={20} />
+            Back to Dashboard
+          </button>
+          <div className="header-icon">📊</div>
+          <h1>Player Stats View</h1>
+        </div>
+        <div className="header-right">
+          <nav className="header-nav">
+            <a href="#" className="nav-link">Home</a>
+            <a href="#" className="nav-link">Matches</a>
+            <a href="#" className="nav-link">Players</a>
+            <a href="#" className="nav-link">Stats</a>
+          </nav>
+          <div className="search-bar">
+            <Search size={16} />
+            <input type="text" placeholder="Search in site" />
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="player-stats-footer">
+        <a href="#">Follow Us on Social Media</a>
+        <a href="#">Contact Support</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  )
+})
+
+const CrowdHeatmapView = memo(function CrowdHeatmapView({ setShowCrowdHeatmap }) {
+  const [activeFilter, setActiveFilter] = useState('current-density')
+  const [crowdData] = useState({
+    totalDensity: 1200,
+    densityChange: 200,
+    trend: 'Increased',
+    trendDirection: 'Upward',
+    zoneData: [
+      { zone: 'Zone A', density: 65, color: '#e5e7eb' },
+      { zone: 'Zone B', density: 25, color: '#9ca3af' },
+      { zone: 'Zone C', density: 10, color: '#374151' }
+    ],
+    timeSeriesData: [
+      { time: '10:00', density: 800 },
+      { time: '10:15', density: 950 },
+      { time: '10:30', density: 1100 },
+      { time: '10:45', density: 1050 },
+      { time: '11:00', density: 1200 }
+    ]
+  })
+
+  return (
+    <div className="crowd-heatmap-container">
+      <div className="crowd-heatmap-header">
+        <div className="header-left">
+          <button className="back-btn" onClick={() => setShowCrowdHeatmap(false)}>
+            <ArrowLeft size={20} />
+            Back to Dashboard
+          </button>
+          <div className="header-icon">🔥</div>
+          <h1>Crowd Heatmap Screen</h1>
+        </div>
+        <div className="header-right">
+          <nav className="header-nav">
+            <a href="#" className="nav-link">Home</a>
+            <a href="#" className="nav-link">Match Details</a>
+            <a href="#" className="nav-link">Player Tracking</a>
+            <a href="#" className="nav-link">Analytics</a>
+          </nav>
+          <div className="search-bar">
+            <Search size={16} />
+            <input type="text" placeholder="Search in site" />
+          </div>
+        </div>
+      </div>
+
+      {/* (Trimmed content from crowd heatmap for brevity in this merged version) */}
+
+      <div className="crowd-heatmap-footer">
+        <a href="#">Follow Us on Social Media</a>
+        <a href="#">Contact Support</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  )
+})
+
+pollJob(jobId, {
+  onSuccess: (data) => {
+    setAnalysisResults(data.results)
+    setAnalysisComplete(true)
+    setIsAnalyzing(false)
+  },
+  onError: () => {
+    setIsAnalyzing(false)
+  }
+})
+
+/* ===========
+   APP (OWNER)
+   =========== */
+
+function App() {
+  // Views
+  const [currentView, setCurrentView] = useState('login')
+  const [showPlayerStats, setShowPlayerStats] = useState(false)
+  const [showCrowdHeatmap, setShowCrowdHeatmap] = useState(false)
+
+  // Auth states
+  const [isLogin, setIsLogin] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState(null)
+  const [showTeamSelector, setShowTeamSelector] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    name: '',
+    team: '',
+    position: '',
+    favoriteGround: ''
+  })
+
+  // Dashboard display states
+  const [showReferee, setShowReferee] = useState(true)
+  const [showBall, setShowBall] = useState(true)
+  const [showStaff, setShowStaff] = useState(false)
+  const [showCrowd, setShowCrowd] = useState(true)
+  const [activeTab, setActiveTab] = useState('player-tracking')
+
+  // Handlers (memoized)
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }, [])
+
+  const handleSubmit = useCallback(async (e) => {
+  e.preventDefault()
+
+  try {
+    setIsLoading(true)
+
+    const endpoint = isLogin
+      ? "http://localhost:8000/auth/login"
+      : "http://localhost:8000/auth/register"
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+        username: formData.name
+      })
+    })
+
+    const data = await res.json()
+
+    console.log(data)
+
+    // SAVE TOKEN 
+    localStorage.setItem(
+      "token",
+      data.access_token
+    )
+
+    setCurrentView("dashboard")
+
+    } catch (err) {
+      console.error(err)
+
+      alert("Authentication failed")
+
+    } finally {
+      setIsLoading(false)
+    }
+
+  }, [formData, isLogin])
+
+  const toggleForm = useCallback(() => {
+    setIsLogin(prev => !prev)
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      name: '',
+      team: '',
+      position: '',
+      favoriteGround: ''
+    })
+    setSelectedTeam(null)
+  }, [])
+
+  const selectTeam = useCallback((team) => {
+    setSelectedTeam(team)
+    setFormData(prev => ({ ...prev, team: team.name }))
+    setShowTeamSelector(false)
+  }, [])
+
+  // Download Report Function
+ const downloadReport = useCallback(() => {
+  const reportData = {
+    matchInfo: { teams: 'Team A vs Team B', score: '2-1', time: '12:34', quarter: '3' },
+    analytics: {
+      possessionOverTime: [
+        { time: '0-5min', teamA: 65, teamB: 35 },
+        { time: '5-10min', teamA: 58, teamB: 42 },
+        { time: '10-15min', teamA: 72, teamB: 28 },
+        { time: '15-20min', teamA: 45, teamB: 55 }
+      ]
+    }
+  } }, )}
+
+export default App

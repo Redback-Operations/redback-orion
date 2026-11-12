@@ -1,0 +1,1 @@
+#For the crowd_detection_service.py (in shared/services folder) to "import" process_video() function, Python needs an init file.

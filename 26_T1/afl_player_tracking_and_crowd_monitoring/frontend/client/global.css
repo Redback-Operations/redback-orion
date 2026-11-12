@@ -104,3 +104,167 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+/* Accessibility features and AFL Analytics dark mode */
+@layer base {
+  /* Text enlargement */
+  html[data-text-size="large"] {
+    font-size: 112.5%;
+  }
+
+  html[data-text-size="extra-large"] {
+    font-size: 125%;
+  }
+
+  /* AFL Analytics dark-mode brand colours */
+  .dark {
+    --primary: 145 72% 42%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 145 72% 42%;
+    --accent: 217 91% 18%;
+    --accent-foreground: 210 40% 98%;
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 214 32% 91%;
+    --sidebar-accent: 217 40% 14%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 30% 16%;
+  }
+
+  /* High-contrast accessibility mode */
+  .high-contrast {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --border: 0 0% 0%;
+    --muted-foreground: 0 0% 15%;
+  }
+
+  .dark.high-contrast {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+    --border: 0 0% 100%;
+    --muted-foreground: 0 0% 90%;
+  }
+
+  /* Turn pale page gradients into the dark application background */
+  .dark .from-green-50,
+  .dark .from-blue-50,
+  .dark .from-slate-50,
+  .dark .via-white,
+  .dark .to-blue-50,
+  .dark .to-green-50,
+  .dark .to-purple-50 {
+    --tw-gradient-from: hsl(var(--background)) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: hsl(var(--background)) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  }
+
+  /* Preserve the AFL Analytics green-to-blue logo */
+  .dark .from-green-600 {
+    --tw-gradient-from: #16a34a var(--tw-gradient-from-position) !important;
+  }
+
+  .dark .to-blue-600 {
+    --tw-gradient-to: #2563eb var(--tw-gradient-to-position) !important;
+  }
+
+  /* Dark-mode surfaces */
+  .dark .bg-white,
+  .dark .bg-white\/80 {
+    background-color: hsl(var(--card)) !important;
+  }
+
+  .dark .bg-slate-50 {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .dark .border-gray-200,
+  .dark .border-slate-200 {
+    border-color: hsl(var(--border)) !important;
+  }
+
+  /* Clear text on dark backgrounds */
+  .dark p,
+  .dark li,
+  .dark .text-gray-400,
+  .dark .text-gray-500,
+  .dark .text-gray-600,
+  .dark .text-gray-700,
+  .dark .text-slate-400,
+  .dark .text-slate-500,
+  .dark .text-slate-600,
+  .dark .text-slate-700 {
+    color: #cbd5e1 !important;
+  }
+
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark .font-semibold {
+    color: #f8fafc;
+  }
+
+  /* AFL green and blue accents */
+  .dark .text-green-600,
+  .dark .text-green-700 {
+    color: #22c55e !important;
+  }
+
+  .dark .text-blue-600,
+  .dark .text-blue-700 {
+    color: #60a5fa !important;
+  }
+
+  /* Readable text inside the light player-stat cards */
+  .dark .bg-blue-50,
+  .dark .bg-green-50,
+  .dark .bg-purple-50,
+  .dark .bg-orange-50,
+  .dark .bg-red-50,
+  .dark .bg-yellow-50 {
+    color: #0f172a !important;
+  }
+
+  .dark .bg-blue-50 .text-gray-600,
+  .dark .bg-green-50 .text-gray-600,
+  .dark .bg-purple-50 .text-gray-600,
+  .dark .bg-orange-50 .text-gray-600,
+  .dark .bg-red-50 .text-gray-600,
+  .dark .bg-yellow-50 .text-gray-600,
+  .dark .bg-blue-50 .text-slate-600,
+  .dark .bg-green-50 .text-slate-600,
+  .dark .bg-purple-50 .text-slate-600,
+  .dark .bg-orange-50 .text-slate-600,
+  .dark .bg-red-50 .text-slate-600,
+  .dark .bg-yellow-50 .text-slate-600 {
+    color: #334155 !important;
+  }
+
+  /* Selected player: dark text on light-blue background */
+  .dark .bg-blue-50 .font-medium {
+    color: #0f172a !important;
+  }
+
+  .dark .bg-blue-50 .text-gray-600 {
+    color: #475569 !important;
+  }
+
+  .dark .bg-blue-50 .text-green-600 {
+    color: #15803d !important;
+  }
+
+  /* Reduced-motion accessibility preference */
+  .reduce-motion *,
+  .reduce-motion *::before,
+  .reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
