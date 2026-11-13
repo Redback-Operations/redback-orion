@@ -123,13 +123,7 @@ uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
-In `.env`, set the database line to:
-
-```text
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/orion_db
-```
-
-Then start it:
+The example file already points `DATABASE_URL` at the Docker database from step 1, so you don't need to edit `.env` to run locally. Then start it:
 
 ```bash
 uvicorn app.main:app --reload --port 8000
@@ -181,7 +175,7 @@ On Windows, `start_all.ps1` starts the backend and both services in one go. You 
 
 - **Port already in use:** another copy is probably still running. Stop it, or change the port.
 - **Backend can't connect to the database:** check that `docker ps` shows `orion-db`, and check `DATABASE_URL` in `.env`.
-- **The frontend loads but every request fails:** the backend isn't running on port 8000, or the frontend isn't on 8080. The backend only accepts browser requests from ports 8080 and 3000.
+- **The frontend loads but every request fails:** the backend isn't running on port 8000, or the frontend isn't on 8080. The backend only accepts browser requests from ports 8080 and 3000. If something else is already using 8080, Vite quietly starts on 8081 instead (check the URL it prints). Run `lsof -i :8080` to see what's using the port and stop it.
 
 ## Steps before handover
 
