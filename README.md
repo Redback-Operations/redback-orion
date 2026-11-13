@@ -122,18 +122,92 @@ On Windows, `start_all.ps1` starts the backend and both services in one go. You 
 - **Backend can't connect to the database:** check that `docker ps` shows `orion-db`, and check `DATABASE_URL` in `.env`.
 - **The frontend loads but every request fails:** the backend isn't running on port 8000, or the frontend isn't on 8080. The backend only accepts browser requests from ports 8080 and 3000.
 
-## How we work
+## Branching strategy (GitHub flow)
 
-`main` is the only long-lived branch and the single source of truth. Please don't create trimester folders like `26_T3/`, and don't keep work only in a personal fork.
+We use GitHub flow: short-lived feature branches, merged into `main` through pull requests.
 
-1. Pull the latest `main` and create a branch named `feature/<team>-<short-description>`, for example `feature/crowd-heatmap-legend`.
-2. Keep changes inside your team's folder where you can.
-3. Open a pull request into `main`. A stream lead reviews and approves it. GitHub won't let you approve your own pull request.
-4. Once it's approved, merge it and delete the branch.
+```text
+main  ──●────────●────────●────────●──  (tag v26.T3 at handover)
+         \      /  \      /
+          feature/...    feature/...
+```
 
-Every pull request also runs an automated security scan.
+`main` is the only long-lived branch and the single source of truth. There are no release or trimester branches. Please don't create trimester folders like `26_T3/`, and don't keep work only in a personal fork.
 
-At the end of each trimester, the final state of `main` is tagged (`v26.T1`, `v26.T2`, and so on). You can check out any tag to see the code exactly as that cohort left it.
+1. Start from the latest `main`:
+
+   ```bash
+   git switch main
+   git pull
+   git switch -c feature/<team>-<short-description>   # e.g. feature/crowd-heatmap-legend
+   ```
+
+2. Commit your work, keeping changes inside your team's folder where you can. Push the branch and open a pull request into `main`:
+
+   ```bash
+   git push -u origin feature/<team>-<short-description>
+   gh pr create --base main
+   ```
+
+3. A stream lead reviews and approves it. GitHub won't let you approve your own pull request, and every pull request also runs an automated security scan.
+4. Once it's approved, merge it and delete the branch. If `main` has moved on while you were working, run `git pull origin main` on your branch first and fix any conflicts.
+
+Try to keep branches small and merge them within a sprint. The longer a branch lives, the harder it is to merge.
+
+Each trimester's final state is kept as a tag on `main` (`v26.T1`, `v26.T2`, and so on). To see the code exactly as a cohort left it, run `git switch --detach v26.T2`.
+
+## Steps before handover
+
+At the end of each trimester, the project lead (or whoever has Maintain access) does the following, so the next team starts from a clean repo where everything is in `main`.
+
+**1. Merge or close every open pull request.** When you're done, nothing should be left pending.
+
+```bash
+gh pr list --state open
+```
+
+For each one, either get it reviewed and merged, or close it with a comment explaining why. Work that won't be finished can still be kept: close the PR and tag its branch (see step 2).
+
+**2. Delete feature branches that are merged, stale or no longer useful.** Only `main` should remain.
+
+```bash
+git fetch --prune
+git branch -r --merged origin/main | grep -v 'origin/main'     # already in main, safe to delete
+git branch -r --no-merged origin/main                          # not in main, check these first
+```
+
+Delete a branch that's already merged:
+
+```bash
+git push origin --delete <branch-name>
+```
+
+If a branch has work that isn't in `main` but might be useful later, tag it before deleting it, so nothing is lost:
+
+```bash
+git tag -a archive/<branch-name> origin/<branch-name> -m "Unmerged work from <branch-name>, T3 2026"
+git push origin archive/<branch-name>
+git push origin --delete <branch-name>
+```
+
+**3. Tag the trimester on `main`.** Use `v<year>.T<trimester>`, for example `v26.T3`:
+
+```bash
+git switch main
+git pull
+git tag -a v26.T3 -m "End of T3 2026"
+git push origin v26.T3
+```
+
+**4. Final check.** All three should come back clean:
+
+```bash
+gh pr list --state open                # no open pull requests
+git ls-remote --heads origin           # only refs/heads/main
+git ls-remote --tags origin | grep v26.T3
+```
+
+The repo is then ready to hand over to the next team. Update this README and the handover documents if anything about running the project has changed.
 
 ## Repository Guidelines
 
