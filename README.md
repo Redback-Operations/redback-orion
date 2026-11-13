@@ -16,6 +16,55 @@ These rules have applied since T2 2024 and were updated in T3 2026. Please follo
 - **Add large model files on purpose.** Git ignores `*.pt` files by default. If the app needs one, add it with `git add -f` and mention it in your pull request.
 - **One `requirements.txt` per service.** Add new Python packages to the service's existing file instead of creating another one.
 
+## Branching strategy (GitHub flow)
+
+We use GitHub flow: short-lived feature branches, merged into `main` through pull requests.
+
+```text
+main  ──●────────●────────●────────●──  (tag v26.T3 at handover)
+         \      /  \      /
+          feature/...    feature/...
+```
+
+`main` is the only long-lived branch and the single source of truth. There are no release or trimester branches.
+
+1. Start from the latest `main`:
+
+   ```bash
+   git switch main
+   git pull
+   git switch -c feature/<team>-<short-description>   # see Branch naming below
+   ```
+
+2. Commit your work, keeping changes inside your team's folder where you can. Push the branch and open a pull request into `main`:
+
+   ```bash
+   git push -u origin feature/<team>-<short-description>
+   gh pr create --base main
+   ```
+
+3. A stream lead reviews and approves it. GitHub won't let you approve your own pull request, and every pull request also runs an automated security scan.
+4. Once it's approved, merge it and delete the branch. If `main` has moved on while you were working, run `git pull origin main` on your branch first and fix any conflicts.
+
+Try to keep branches small and merge them within a sprint. The longer a branch lives, the harder it is to merge.
+
+Each trimester's final state is kept as a tag on `main` (`v26.T1`, `v26.T2`, and so on). To see the code exactly as a cohort left it, run `git switch --detach v26.T2`.
+
+### Branch naming
+
+> [!IMPORTANT]
+> Name every branch `<type>/<team>-<short-description>`, all lower case, with hyphens instead of spaces.
+
+| Part | Use |
+|------|-----|
+| `type` | `feature` for new work, `fix` for bug fixes, `docs` for documentation only |
+| `team` | `backend`, `frontend`, `crowd` or `player` |
+| `short-description` | Two to four words saying what the branch does |
+
+Examples: `feature/crowd-heatmap-legend`, `fix/backend-upload-timeout`, `docs/player-setup-guide`.
+
+Please avoid personal or trimester names like `ahmed-branch`, `t3-work` or `release_26_t3`. Nobody else can tell what those branches are for.
+
 ## How the pieces fit together
 
 ```text
@@ -133,40 +182,6 @@ On Windows, `start_all.ps1` starts the backend and both services in one go. You 
 - **Port already in use:** another copy is probably still running. Stop it, or change the port.
 - **Backend can't connect to the database:** check that `docker ps` shows `orion-db`, and check `DATABASE_URL` in `.env`.
 - **The frontend loads but every request fails:** the backend isn't running on port 8000, or the frontend isn't on 8080. The backend only accepts browser requests from ports 8080 and 3000.
-
-## Branching strategy (GitHub flow)
-
-We use GitHub flow: short-lived feature branches, merged into `main` through pull requests.
-
-```text
-main  ──●────────●────────●────────●──  (tag v26.T3 at handover)
-         \      /  \      /
-          feature/...    feature/...
-```
-
-`main` is the only long-lived branch and the single source of truth. There are no release or trimester branches.
-
-1. Start from the latest `main`:
-
-   ```bash
-   git switch main
-   git pull
-   git switch -c feature/<team>-<short-description>   # e.g. feature/crowd-heatmap-legend
-   ```
-
-2. Commit your work, keeping changes inside your team's folder where you can. Push the branch and open a pull request into `main`:
-
-   ```bash
-   git push -u origin feature/<team>-<short-description>
-   gh pr create --base main
-   ```
-
-3. A stream lead reviews and approves it. GitHub won't let you approve your own pull request, and every pull request also runs an automated security scan.
-4. Once it's approved, merge it and delete the branch. If `main` has moved on while you were working, run `git pull origin main` on your branch first and fix any conflicts.
-
-Try to keep branches small and merge them within a sprint. The longer a branch lives, the harder it is to merge.
-
-Each trimester's final state is kept as a tag on `main` (`v26.T1`, `v26.T2`, and so on). To see the code exactly as a cohort left it, run `git switch --detach v26.T2`.
 
 ## Steps before handover
 
