@@ -4,6 +4,18 @@ Project Orion is a Redback Operations capstone project. It takes AFL match foota
 
 The project carries over from one trimester to the next, so most of the code here was written by earlier students. If you're new, read this page first, then the README in your team's folder.
 
+## Repository guidelines
+
+These rules have applied since T2 2024 and were updated in T3 2026. Please follow them in every pull request.
+
+- **Work in your team's folder.** Backend, Frontend, Crowd Monitoring and Player Tracking each have a top-level folder (see [Repository structure](#repository-structure)). Don't add loose files at the top level of the repo unless the project lead agrees.
+- **Give every folder a `README.md`** that says what's in it and how to run it. Generated folders and folders starting with `.` are the exception.
+- **No spaces in file or folder names.** Use snake_case or kebab-case, so `crowd_monitoring` or `crowd-monitoring` rather than `Crowd Monitoring`. Lower case is preferred.
+- **Go through `main`.** Work happens on feature branches merged into `main` by pull request (see [Branching strategy](#branching-strategy-github-flow)). Don't create trimester folders like `26_T3/`, and don't keep work only in a personal fork.
+- **Keep secrets out of git.** Never commit `.env` files with real passwords or keys. Put example values in `.env.example`.
+- **Add large model files on purpose.** Git ignores `*.pt` files by default. If the app needs one, add it with `git add -f` and mention it in your pull request.
+- **One `requirements.txt` per service.** Add new Python packages to the service's existing file instead of creating another one.
+
 ## How the pieces fit together
 
 ```text
@@ -132,7 +144,7 @@ main  ──●────────●────────●───�
           feature/...    feature/...
 ```
 
-`main` is the only long-lived branch and the single source of truth. There are no release or trimester branches. Please don't create trimester folders like `26_T3/`, and don't keep work only in a personal fork.
+`main` is the only long-lived branch and the single source of truth. There are no release or trimester branches.
 
 1. Start from the latest `main`:
 
@@ -208,23 +220,6 @@ git ls-remote --tags origin | grep v26.T3
 ```
 
 The repo is then ready to hand over to the next team. Update this README and the handover documents if anything about running the project has changed.
-
-## Repository Guidelines
-
-Beginning in the second trimester of 2024, members should follow these guidelines while working with this repository:
-
-- **README.md Files**: All folders should contain a `README.md` (unless the folder is automatically generated, e.g., folders beginning with ".").
-- **Naming Conventions**: File and folder names must not contain spaces. Use either snake_case or kebab-case. For instance, instead of "Crowd Monitoring", use "crowd_monitoring" or "crowd-monitoring". Lower-case letters are preferred, but not strictly required.
-- **File Organization**: Do not store loose files at the top level of the repository unless explicitly approved.
-- **Folder Structure**: Teams should work within a designated subfolder under one of the following top-level directories: Crowd-Monitoring, Player-Tracking, Internet-of-Things, or Others.
-
-  *Update (T3 2026):* the top-level team folders are now `backend/`, `frontend/`, `crowd_monitoring/` and `player_tracking/`. The older Crowd-Monitoring, Player-Tracking, Internet-of-Things and Others work is in `archive/`.
-
-Added in T3 2026:
-
-- Never commit `.env` files with real passwords or keys. Put example values in `.env.example`.
-- Large model files (`*.pt`) are ignored by git by default. If the app needs one, add it with `git add -f` and mention it in your pull request.
-- Every service has a single `requirements.txt`. Add new Python packages there, not in a new file.
 
 ## Where to look next
 
