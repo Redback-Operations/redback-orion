@@ -13,7 +13,7 @@ engine = create_async_engine(
 # Sync engine — used by all routes and background tasks
 SYNC_DATABASE_URL = DATABASE_URL.replace(
     "postgresql+asyncpg://",
-    "postgresql://",
+    "postgresql+psycopg2://",
     1,
 )
 

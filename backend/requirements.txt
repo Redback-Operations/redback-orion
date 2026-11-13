@@ -6,7 +6,7 @@ uvicorn[standard]
 httpx
 
 # Database
-sqlalchemy
+sqlalchemy[asyncio]
 asyncpg
 psycopg2-binary
 
