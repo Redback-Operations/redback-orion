@@ -8,6 +8,7 @@
 
 # Python venv
 .venv/
+venv/
 
 # Jupyter
 *.ipynb
@@ -53,3 +54,6 @@ bin/
 .DS_Store
 /Player_Tracking/Pose_Matching_project/Pose_Estimation/pose-estimation-fitness
 *.jpg
+
+# Frontend config files must be committed (overrides *.json above)
+!frontend/*.json

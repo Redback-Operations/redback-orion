@@ -1,0 +1,48 @@
+# === AFL Workload & Heatmap Config ===
+
+# Tracking video parameters
+fps: 25.0     # frames per second of the dataset
+
+field:
+  length_m: 165.0   # AFL oval length (metres)
+  width_m: 135.0    # AFL oval width (metres)
+
+# Data smoothing
+speed_smoothing_window: 3
+accel_smoothing_window: 3
+
+# Thresholds for workload metrics
+thresholds:
+  hsr_kmh: 18.0       # high-speed running (HSR) threshold in km/h
+  sprint_kmh: 24.0    # sprint threshold (optional future use)
+  accel_ms2: 3.0      # high acceleration threshold (m/s²)
+  decel_ms2: -3.0     # high deceleration threshold (m/s²)
+  min_sprint_dur_s: 1.0        # sprint must last at lease this long
+  repeat_sprint_window_s: 60   # time window for repeated sprints (seconds)
+
+# Weights for workload score calculation
+weights:
+  distance: 0.25
+  hsr: 0.25
+  repeat_sprints: 0.20
+  accels_decels: 0.20
+  work_rest: 0.10
+
+# Risk bands for fatigue risk classification
+risk_bands:
+  - {max: 40, label: "Low"}
+  - {max: 70, label: "Moderate"}
+  - {max: 100, label: "High"}
+
+# Quarter segmentation (seconds from game start)
+quarters:
+  # Default: standard 20-min quarters → edges at 1200s, 2400s, 3600s
+  edges_s: [1200, 2400, 3600]
+
+# Heatmap rendering parameters
+heatmap:
+  nx: 200          # grid cells in x-direction
+  ny: 150          # grid cells in y-direction
+  sigma: 2.0       # Gaussian blur (controls smoothing)
+  weight_mode: conf   # "conf" = confidence-weighted, or None for uniform
+  vmax_percentile: 99 # scaling for consistent colour intensity

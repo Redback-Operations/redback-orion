@@ -1,0 +1,17 @@
+# Player tracking service (player_service/) and the player_tracking_logic
+# scripts it runs: Yolov11_ByteTrack_Player_Tracking/final_code, Tracking_Ethan,
+# Re-Identification/JerseyColorDetection, Re-Identification/Formation_Visualization,
+# tackle_detection_shafqat_ullah.
+
+# API
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Models and processing
+ultralytics
+opencv-python
+numpy
+pandas
+scikit-learn
+scipy
