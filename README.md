@@ -88,7 +88,10 @@ redback-orion/
 │   ├── player_service/       FastAPI service the backend calls for player analysis
 │   ├── player_tracking_logic/  Models and scripts player_service runs (tracking, re-ID,
 │   │                           tackle detection, formations), plus earlier experiments
-│   └── pipeline/             Training, datasets, tracking quality checks, Forward-50 analysis
+│   ├── pipeline/             Training, datasets, tracking quality checks, Forward-50 analysis
+│   ├── Orion_Player_Tracking_Studio/  Desktop app for running and reviewing tracking results
+│   ├── early_afl_work/       Earlier AFL tracking prototypes and datasets, kept for reference
+│   └── generic_sports_cv/    Computer vision experiments on other sports, kept for reference
 ├── archive/                  Earlier work, kept for reference (see below)
 ├── start_all.ps1             Windows script that starts the backend and both services
 └── .github/workflows/        Security scan that runs on pull requests
