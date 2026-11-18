@@ -35,6 +35,18 @@ def test_upload_valid_file(client, monkeypatch, mock_db):
     assert response.json()["status"] == "processing"
 
 
+def test_upload_too_large(client, monkeypatch):
+    app.dependency_overrides[get_current_user] = override_get_current_user
+    monkeypatch.setattr("app.routes.upload.MAX_UPLOAD_SIZE_BYTES", 16)
+
+    response = client.post(
+        "/upload",
+        files={"file": ("test.mp4", b"\x00\x00\x00\x18ftypisom" + b"0" * 32, "video/mp4")}
+    )
+
+    assert response.status_code == 413
+
+
 def test_upload_invalid_file_header(client):
     app.dependency_overrides[get_current_user] = override_get_current_user
 

@@ -29,6 +29,7 @@ from app.auth.dependencies import (
 )
 
 from app.config import (
+    MAX_UPLOAD_SIZE_BYTES,
     UPLOAD_DIR,
 )
 
@@ -71,6 +72,33 @@ ALLOWED_MIME_TYPES = {
     "video/x-msvideo",
     "video/quicktime",
 }
+
+
+async def validate_video_signature(file: UploadFile, ext: str) -> None:
+    """Reject files whose first bytes don't match the claimed video format."""
+    header = await file.read(32)
+    await file.seek(0)
+
+    if ext in {".mp4", ".mov"}:
+        valid = b"ftyp" in header
+    else:  # .avi
+        valid = header[0:4] == b"RIFF" and header[8:12] == b"AVI "
+
+    if not valid:
+        raise HTTPException(status_code=400, detail=f"Invalid {ext} file header")
+
+
+async def validate_upload_size(file: UploadFile) -> None:
+    """Reject uploads over MAX_UPLOAD_SIZE_BYTES, reading 1 MB at a time."""
+    size = 0
+    while chunk := await file.read(1024 * 1024):
+        size += len(chunk)
+        if size > MAX_UPLOAD_SIZE_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Video exceeds the maximum upload size of {MAX_UPLOAD_SIZE_BYTES // (1024 * 1024)} MB",
+            )
+    await file.seek(0)
 
 
 def get_video_metadata(file_path: str) -> dict:
@@ -405,6 +433,9 @@ async def upload_video(
             status_code=400,
             detail=("Invalid video format. " "Accepted formats: " ".mp4, .avi, .mov"),
         )
+
+    await validate_video_signature(file, ext)
+    await validate_upload_size(file)
 
     os.makedirs(
         UPLOAD_DIR,
