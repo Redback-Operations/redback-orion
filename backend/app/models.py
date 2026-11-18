@@ -120,6 +120,33 @@ class Job(Base):
         nullable=True,
     )
 
+    # Job lifecycle fields used by routes/upload.py, routes/jobs.py
+    # and services/job_manager.py.
+    retry_count = Column(
+        Integer,
+        default=0,
+    )
+
+    progress = Column(
+        Integer,
+        default=0,
+    )
+
+    started_at = Column(
+        DateTime,
+        nullable=True,
+    )
+
+    completed_at = Column(
+        DateTime,
+        nullable=True,
+    )
+
+    failure_reason = Column(
+        String,
+        nullable=True,
+    )
+
     created_at = Column(
         DateTime,
         default=_now,
