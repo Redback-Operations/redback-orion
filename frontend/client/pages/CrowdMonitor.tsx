@@ -150,17 +150,24 @@ const generateCrowdData = () => {
   }));
 };
 
+// Density tiers (% of capacity) shared by the labels, cards and alert banner
+const CRITICAL_DENSITY = 95;
+const HIGH_DENSITY = 85;
+// A zone stays in the alert banner until it drops this many points below
+// HIGH_DENSITY, so small fluctuations don't make the banner flicker.
+const ALERT_CLEAR_MARGIN = 5;
+
 const getDensityColor = (density: number) => {
-  if (density >= 95) return "#dc2626"; // red-600 - Critical
-  if (density >= 85) return "#f97316"; // orange-500 - High
+  if (density >= CRITICAL_DENSITY) return "#dc2626"; // red-600 - Critical
+  if (density >= HIGH_DENSITY) return "#f97316"; // orange-500 - High
   if (density >= 70) return "#f59e0b"; // amber-500 - Medium
   if (density >= 50) return "#eab308"; // yellow-500 - Low-Medium
   return "#22c55e"; // green-500 - Low
 };
 
 const getDensityLabel = (density: number) => {
-  if (density >= 95) return "Critical";
-  if (density >= 85) return "High";
+  if (density >= CRITICAL_DENSITY) return "Critical";
+  if (density >= HIGH_DENSITY) return "High";
   if (density >= 70) return "Medium";
   if (density >= 50) return "Low-Medium";
   return "Low";
@@ -363,8 +370,41 @@ export default function CrowdMonitor() {
   const [viewMode, setViewMode] = useState("heatmap");
   const [heatmapDisplayMode, setHeatmapDisplayMode] = useState<"zones" | "image">("zones");
   const [timeRange, setTimeRange] = useState("live");
-  const anomalyZones = crowdZones.filter((zone) => zone.density >= 90);
-  const hasAnomaly = anomalyZones.length > 0;
+  const [alertZoneIds, setAlertZoneIds] = useState<Set<number>>(
+    () =>
+      new Set(
+        crowdZones
+          .filter((zone) => zone.density >= HIGH_DENSITY)
+          .map((zone) => zone.id),
+      ),
+  );
+
+  // Zones enter the alert at HIGH_DENSITY and leave only once they fall
+  // ALERT_CLEAR_MARGIN points below it.
+  useEffect(() => {
+    setAlertZoneIds((prev) => {
+      const next = new Set(
+        crowdZones
+          .filter(
+            (zone) =>
+              zone.density >= HIGH_DENSITY ||
+              (prev.has(zone.id) &&
+                zone.density >= HIGH_DENSITY - ALERT_CLEAR_MARGIN),
+          )
+          .map((zone) => zone.id),
+      );
+      const unchanged =
+        next.size === prev.size && [...next].every((id) => prev.has(id));
+      return unchanged ? prev : next;
+    });
+  }, [crowdZones]);
+
+  const alertZones = crowdZones
+    .filter((zone) => alertZoneIds.has(zone.id))
+    .sort((a, b) => b.density - a.density);
+  const hasCriticalAlert = alertZones.some(
+    (zone) => zone.density >= CRITICAL_DENSITY,
+  );
 
   // Simulate real-time crowd updates
   useEffect(() => {
@@ -402,9 +442,11 @@ export default function CrowdMonitor() {
   const totalCurrent = crowdZones.reduce((sum, zone) => sum + zone.current, 0);
   const averageDensity = Math.round((totalCurrent / totalCapacity) * 100);
 
-  const criticalZones = crowdZones.filter((zone) => zone.density >= 95);
+  const criticalZones = crowdZones.filter(
+    (zone) => zone.density >= CRITICAL_DENSITY,
+  );
   const highDensityZones = crowdZones.filter(
-    (zone) => zone.density >= 85 && zone.density < 95,
+    (zone) => zone.density >= HIGH_DENSITY && zone.density < CRITICAL_DENSITY,
   );
 
   return (
@@ -421,17 +463,34 @@ export default function CrowdMonitor() {
               Stadium crowd density and safety analytics
             </p>
           </div>
-          {hasAnomaly && (
-            <div className="flex items-start gap-3 rounded-lg border border-amber-400 bg-amber-50 p-4 text-amber-950 dark:border-amber-500/60 dark:bg-amber-950/30 dark:text-amber-100">
+          {/* Announces only which zones are alerting, not the live percentages,
+              so screen readers aren't interrupted on every 3s data refresh. */}
+          <div role="status" className="sr-only">
+            {alertZones.length > 0 &&
+              `${hasCriticalAlert ? "Critical" : "High"} crowd density alert: ${crowdZones
+                .filter((zone) => alertZoneIds.has(zone.id))
+                .sort((a, b) => a.id - b.id)
+                .map((zone) => zone.name)
+                .join(", ")}`}
+          </div>
+          {alertZones.length > 0 && (
+            <div
+              className="flex items-start gap-3 rounded-lg border border-amber-400 bg-amber-50 p-4 text-amber-950 dark:border-amber-500/60 dark:bg-amber-950/30 dark:text-amber-100"
+            >
               <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
 
               <div>
-                <h2 className="font-semibold">Anomaly Alert</h2>
+                <h2 className="font-semibold">
+                  {hasCriticalAlert ? "Critical crowd density" : "High crowd density"}
+                </h2>
 
                 <p className="mt-1 text-sm">
-                  Unusual crowd activity detected in{" "}
-                  {anomalyZones.map((zone) => zone.name).join(", ")}. Please review the
-                  live crowd data and take appropriate action if required.
+                  {alertZones
+                    .map((zone) => `${zone.name} (${zone.density}%)`)
+                    .join(", ")}{" "}
+                  {alertZones.length === 1 ? "is" : "are"} near capacity.
+                  Monitor {alertZones.length === 1 ? "this zone" : "these zones"}{" "}
+                  and consider redirecting entry to quieter gates.
                 </p>
               </div>
             </div>
@@ -905,7 +964,7 @@ export default function CrowdMonitor() {
                           Zones by Wait Time
                         </h5>
                         <div className="space-y-2">
-                          {crowdZones
+                          {[...crowdZones]
                             .sort((a, b) => b.waitTime - a.waitTime)
                             .slice(0, 3)
                             .map((zone, index) => (
