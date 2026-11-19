@@ -74,7 +74,7 @@ def frame_to_timestamp(frame_number, fps):
 
     return f"{minutes:02d}:{remaining_seconds:02d}"
 
-    def load_events_from_json(json_path):
+def load_events_from_json(json_path):
     with open(json_path, "r") as file:
         data = json.load(file)
 
@@ -118,7 +118,7 @@ def frame_to_timestamp(frame_number, fps):
 
     return pd.DataFrame(events)
 
-    def group_consecutive_frames(frames):
+def group_consecutive_frames(frames):
     frames = sorted(frames)
 
     if len(frames) == 0:
@@ -138,7 +138,7 @@ def frame_to_timestamp(frame_number, fps):
 
     return grouped_events
 
-    def load_events_from_csv(csv_path):
+def load_events_from_csv(csv_path):
     df = pd.read_csv(csv_path)
 
     print("CSV columns found:")
@@ -201,7 +201,8 @@ def frame_to_timestamp(frame_number, fps):
         })
 
     return pd.DataFrame(events)
-    events_df = None
+
+events_df = None
 
 if json_file is not None:
     print("Loading events from JSON file:", json_file)
