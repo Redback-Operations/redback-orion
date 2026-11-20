@@ -714,7 +714,7 @@ All endpoints in this section require authentication.
 
 ---
 
-#### `GET /analysis/{job_id}`
+#### `GET /api/analysis/{job_id}`
 
 Returns the detailed Player Tracking and Crowd Monitoring results for a specific job.
 
@@ -746,7 +746,7 @@ The job must have a status of `done` or `partial`.
 
 ---
 
-#### `GET /analytics/{job_id}`
+#### `GET /api/analytics/{job_id}`
 
 Returns summarised analytics for a specific processing job.
 
@@ -769,7 +769,7 @@ Crowd analytics can include crowd summary information, peak person count, crowd 
 
 ---
 
-#### `GET /player-tracking/{job_id}`
+#### `GET /api/player-tracking/{job_id}`
 
 Returns the formatted Player Tracking result associated with a specific processing job.
 
@@ -777,7 +777,7 @@ The `job_id` ensures that the Player Tracking result belongs to the selected upl
 
 ---
 
-#### `GET /crowd/{job_id}`
+#### `GET /api/crowd/{job_id}`
 
 Returns the Crowd Monitoring result associated with a specific processing job.
 
@@ -787,11 +787,11 @@ The response contains the Crowd Monitoring information stored for the requested 
 
 ### 7. Direct Processing APIs
 
-#### `POST /players`
+#### `POST /api/players`
 
 Sends an uploaded video to the Player Tracking service for processing.
 
-#### `POST /crowd`
+#### `POST /api/crowd`
 
 Sends an uploaded video to the Crowd Monitoring service for processing.
 
@@ -884,6 +884,7 @@ Error Handling
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 2.0.0 | 2026-11-20 | Append /api/ prefix to relevant HTTP paths GET (/analysis/{job_id}, /analytics{job_id}, /player-tracking/{job_id}, /crowd/{job_id}) POST (/players, /crowd)
 | 1.3.0 | 2026-05-13 | Player service fully integrated. All result paths now returned as full URLs (no client-side transformation needed). Added `jersey_color`, `formation`, `tackle` to player results. Fixed retry response to return `processing`. Added 409 error to retry. Updated CORS table (all 3 services). Removed stale "do not use paths directly" note. |
 | 1.2.0 | 2026-04-27 | Added confirmed crowd response schema. Added `GET /jobs/{job_id}/heatmap` proxy endpoint. Added split mock flags (`USE_MOCK_PLAYER` / `USE_MOCK_CROWD`). Crowd service integrated and tested end-to-end. |
 | 1.1.0 | 2026-04-13 | Added refresh token flow — `POST /auth/refresh`, `POST /auth/logout`. Updated `/auth/register` and `/auth/login` responses to include `refresh_token`. Updated auth checklist. |
