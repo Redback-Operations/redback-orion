@@ -833,6 +833,19 @@ Allowed methods and headers: all. Credentials: yes.
 
 ---
 
+The Backend Gateway listens on `http://localhost:8000` and allows browser requests from these frontend origins:
+- `http://localhost:8080` — the current local frontend setup.
+- `http://localhost:3000` — an additional supported development origin.
+
+|     Service     | Listening port |             Allowed CORS origins                 |
+|-----------------|----------------|--------------------------------------------------|
+| Backend Gateway |      8000      | `http://localhost:8080`, `http://localhost:3000` |
+
+Allowed methods and headers: all.
+Credentials: enabled.
+
+Origins must match exactly, including scheme, hostname, and port.
+
 ## Frontend Integration Checklist
 
 ```
