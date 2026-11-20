@@ -180,6 +180,14 @@ def tracking_to_csv(
                 )
 
 
+def _set_progress(db, job_id: str, progress: int) -> None:
+    """Record how far a job has got so GET /jobs/{id} can report it."""
+    job = db.query(Job).filter(Job.job_id == uuid.UUID(job_id)).first()
+    if job:
+        job.progress = progress
+        db.commit()
+
+
 async def process_video(
     job_id: str,
     file_path: str,
@@ -202,6 +210,7 @@ async def process_video(
         # PLAYER TRACKING
         tracking_result = await get_player_data(file_path)
         print(f"[{job_id}] Player tracking completed")
+        _set_progress(db, job_id, 25)
         if not isinstance(
             tracking_result,
             dict,
@@ -262,6 +271,7 @@ async def process_video(
             get_crowd_data(file_path),
             return_exceptions=True,
         )
+        _set_progress(db, job_id, 75)
 
         # PLAYER RESULT
         player_result = {

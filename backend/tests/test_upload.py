@@ -145,3 +145,20 @@ def test_get_video_metadata(monkeypatch):
     assert metadata["resolution"] == "1920x1080"
     assert metadata["fps"] == 30
     assert metadata["duration"] == 10
+
+
+def test_job_model_has_lifecycle_fields():
+    # upload.py creates jobs with these fields; if a column goes missing
+    # every real upload fails with a 500.
+    from app.models import Job
+
+    job = Job(
+        status="processing",
+        progress=25,
+        retry_count=0,
+        started_at=datetime.now(timezone.utc),
+        completed_at=None,
+        failure_reason=None,
+    )
+
+    assert job.progress == 25
