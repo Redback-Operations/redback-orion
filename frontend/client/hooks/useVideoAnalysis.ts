@@ -145,6 +145,7 @@ export function useVideoAnalysis() {
         }
       } catch (error) {
         console.error("Polling error:", error);
+        clearInterval(interval);
         setIsVideoAnalyzing(false);
         setVideoAnalysisError(
           error instanceof Error ? error.message : "Polling failed",
