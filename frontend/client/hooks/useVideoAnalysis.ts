@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { downloadText } from "@/lib/download";
 import { BACKEND_URL } from "@/lib/config";
+import { getAccessToken } from "@/lib/auth";
 import type {
   BackendStatusResponse,
   ProcessingQueueItem,
@@ -12,11 +13,6 @@ import {
   generateDashboardInsights,
   generateDashboardPDF,
 } from "@/components/dashboard/reportUtils";
-
-const getAccessToken = () =>
-  localStorage.getItem("accessToken") ||
-  localStorage.getItem("access_token") ||
-  localStorage.getItem("authToken");
 
 /**
  * Upload, backend polling, processing queue and export logic for the Video Analysis tab.
