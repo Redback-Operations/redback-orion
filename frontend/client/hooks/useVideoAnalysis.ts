@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { downloadText } from "@/lib/download";
 import { BACKEND_URL } from "@/lib/config";
-import { getAccessToken } from "@/lib/auth";
+import { getAccessToken, isDemoToken } from "@/lib/auth";
 import type {
   BackendStatusResponse,
   ProcessingQueueItem,
@@ -468,7 +468,7 @@ export function useVideoAnalysis() {
     }
 
     const token = getAccessToken();
-    if (!token) {
+    if (!token || isDemoToken(token)) {
       setVideoAnalysisError("Please sign in before uploading");
       navigate("/login");
       return;
