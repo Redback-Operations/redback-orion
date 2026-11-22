@@ -10,8 +10,8 @@ opencv-python>=4.8
 numpy
 pandas            # forward50_analysis/
 pyyaml
-scikit-learn      # player_tracker.py colour clustering
-gdown>=4.7        # scripts/download_data.py
+scikit-learn      # experiments/player_tracker.py colour clustering
+gdown>=5           # training/download_data.py (older versions fail on Drive)
 lap>=0.5.12       # ByteTrack/BoTSORT dependency (not auto-declared by ultralytics)
-imageio-ffmpeg    # H.264 encoding for scripts/track_video.py output
-easyocr           # test_ocr.py / test_ocr_upscale.py
+imageio-ffmpeg    # H.264 output from analysis_pipeline/detect_and_track.py
+easyocr           # experiments/jumper_numbers/test_ocr*.py
