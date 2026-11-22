@@ -3,12 +3,8 @@ from pathlib import Path
 
 SERVICE_DIR = Path(__file__).parent
 PROJECT_ROOT = SERVICE_DIR.parent
-SCRIPTS_BASE = PROJECT_ROOT / "player_tracking_logic"
-
-PATH_TRAJ_SCRIPT_DIR  = SCRIPTS_BASE / "Tracking_Ethan"
-JERSEY_COLOR_SCRIPT_DIR = SCRIPTS_BASE / "Re-Identification" / "JerseyColorDetection"
-TACKLE_SCRIPT_DIR     = SCRIPTS_BASE / "tackle_detection_shafqat_ullah"
-FORMATION_SCRIPT_DIR  = SCRIPTS_BASE / "Re-Identification" / "Formation_Visualization"
+PIPELINE_DIR = PROJECT_ROOT / "analysis_pipeline"
+FORMATION_SCRIPT_DIR = PIPELINE_DIR / "formation_analysis"
 
 MODEL_NAME = "player_ref_best.pt"
 MODELS_DIR = PROJECT_ROOT / "models"

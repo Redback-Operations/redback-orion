@@ -60,10 +60,10 @@ class PathTrajectoryRouteTests(unittest.TestCase):
                     for key, value in kwargs.items():
                         setattr(self, key, value)
 
-            fake_config_module = type(sys)("player_tracking.config")
+            fake_config_module = type(sys)("analysis_pipeline.movement_metrics.config")
             fake_config_module.TrackingConfig = FakeTrackingConfig
 
-            fake_processor_module = type(sys)("player_tracking.video_processor")
+            fake_processor_module = type(sys)("analysis_pipeline.movement_metrics.video_processor")
             fake_processor_module.process_video = fake_process_video
 
             with (
@@ -73,8 +73,8 @@ class PathTrajectoryRouteTests(unittest.TestCase):
                 patch.dict(
                     sys.modules,
                     {
-                        "player_tracking.config": fake_config_module,
-                        "player_tracking.video_processor": fake_processor_module,
+                        "analysis_pipeline.movement_metrics.config": fake_config_module,
+                        "analysis_pipeline.movement_metrics.video_processor": fake_processor_module,
                     },
                 ),
             ):

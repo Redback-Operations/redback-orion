@@ -1,4 +1,3 @@
-import sys
 import uuid
 import json
 import shutil
@@ -7,8 +6,7 @@ from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import config
 
-sys.path.insert(0, str(config.JERSEY_COLOR_SCRIPT_DIR))
-from color_detection_cli import run_pipeline
+from analysis_pipeline.identify_players.color_detection_cli import run_pipeline
 
 router = APIRouter()
 

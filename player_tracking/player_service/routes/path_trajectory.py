@@ -6,7 +6,6 @@ from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import config
 
-sys.path.insert(0, str(config.PATH_TRAJ_SCRIPT_DIR))
 
 router = APIRouter()
 
@@ -26,8 +25,8 @@ async def path_trajectory(video: UploadFile = File(...)):
         shutil.copyfileobj(video.file, f)
 
     try:
-        from player_tracking.config import TrackingConfig
-        from player_tracking.video_processor import process_video
+        from analysis_pipeline.movement_metrics.config import TrackingConfig
+        from analysis_pipeline.movement_metrics.video_processor import process_video
 
         tracking_config = TrackingConfig(
             video_path=video_path,

@@ -5,11 +5,11 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from player_tracking.config import TrackingConfig
-from player_tracking.metrics import export_player_metrics_csv
+from analysis_pipeline.movement_metrics.config import TrackingConfig
+from analysis_pipeline.movement_metrics.metrics import export_player_metrics_csv
 
 
 class MetricsCalibrationTests(unittest.TestCase):
