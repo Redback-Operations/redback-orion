@@ -1,10 +1,11 @@
-import sys
 import uuid
 import shutil
 from pathlib import Path
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import config
+from tracks import file_hash, get_tracks, tracks_csv_path
+from routes.tracking import run_tracking
 
 
 router = APIRouter()
@@ -26,20 +27,21 @@ async def path_trajectory(video: UploadFile = File(...)):
 
     try:
         from analysis_pipeline.movement_metrics.config import TrackingConfig
-        from analysis_pipeline.movement_metrics.video_processor import process_video
+        from analysis_pipeline.movement_metrics.video_processor import process_tracks
+
+        # Reuse the tracks /tracking saved for this video, or run tracking now.
+        key = file_hash(video_path)
+        get_tracks(video_path, config.TRACKS_DIR, run_tracking, key=key)
 
         tracking_config = TrackingConfig(
             video_path=video_path,
-            model_path=config.ensure_model(),
             output_video_path=output_video,
             output_json_path=output_json,
             output_csv_path=output_csv,
             process_seconds=9999,
-            conf_threshold=0.25,
-            imgsz=640,
         )
 
-        result_data = process_video(tracking_config)
+        result_data = process_tracks(tracking_config, tracks_csv_path(config.TRACKS_DIR, key))
         movement_metrics = result_data.get("movement_metrics", {})
 
         internal_keys = {
@@ -59,6 +61,8 @@ async def path_trajectory(video: UploadFile = File(...)):
             "video_url": f"/outputs/{output_video.name}",
         }
 
+    except config.DownloadError as e:
+        raise HTTPException(status_code=503, detail=f"Tracking model unavailable. {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -7,7 +7,7 @@ from pathlib import Path
 SERVICE_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVICE_DIR))
 
-from tracks import get_tracks, to_legacy_json
+from tracks import get_tracks, to_legacy_json, tracks_csv_path
 
 
 class GetTracksTests(unittest.TestCase):
@@ -23,7 +23,14 @@ class GetTracksTests(unittest.TestCase):
 
     def fake_tracking(self, video_path, tracks_dir, key):
         self.calls.append(key)
+        tracks_csv_path(tracks_dir, key).write_text("frame,track_id\n")
         return {"key": key, "tracking_results": []}
+
+    def test_runs_tracking_again_if_the_tracks_csv_is_gone(self):
+        result = get_tracks(self.video, self.dir, self.fake_tracking)
+        tracks_csv_path(self.dir, result["key"]).unlink()
+        get_tracks(self.video, self.dir, self.fake_tracking)
+        self.assertEqual(len(self.calls), 2)
 
     def test_runs_tracking_when_nothing_is_saved(self):
         result = get_tracks(self.video, self.dir, self.fake_tracking)

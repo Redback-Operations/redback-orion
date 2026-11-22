@@ -1,27 +1,48 @@
+"""Movement metrics from a tracks CSV.
+
+Reads the tracks detect_and_track.py wrote, so no detection model runs here
+and the player IDs match the tracking stage. The video is still read for
+appearance and jersey-colour features, which drive team clustering.
+"""
+
+import csv
 import json
 from collections import defaultdict
+from pathlib import Path
 
 import cv2
-from ultralytics import YOLO
 
+from .appearance import extract_appearance_feature, extract_jersey_colour_feature
 from .config import TrackingConfig
-from .detector import parse_yolo_detections
+from .geometry import bbox_bottom_center, bbox_center
 from .jersey_cluster import assign_jersey_clusters
 from .metrics import export_player_metrics_csv
-from .tracker import RobustPlayerTracker
+from .tracker import track_from_detection, tracks_to_json_records
 from .visualizer import draw_frame_records
 
+PLAYER_CLASS = "PLAYER"
 
-def validate_paths(config: TrackingConfig):
+
+def validate_paths(config: TrackingConfig, tracks_csv: Path):
     if not config.video_path.exists():
         raise FileNotFoundError(f"Cannot find video: {config.video_path}")
 
-    if not config.model_path.exists():
-        raise FileNotFoundError(f"Cannot find model: {config.model_path}")
+    if not tracks_csv.exists():
+        raise FileNotFoundError(f"Cannot find tracks CSV: {tracks_csv}")
 
     config.output_video_path.parent.mkdir(parents=True, exist_ok=True)
     config.output_json_path.parent.mkdir(parents=True, exist_ok=True)
     config.output_csv_path.parent.mkdir(parents=True, exist_ok=True)
+
+
+def read_player_rows(tracks_csv: Path):
+    """Group the tracks CSV rows for players (not umpires) by frame."""
+    by_frame = defaultdict(list)
+    with open(tracks_csv, newline="") as f:
+        for row in csv.DictReader(f):
+            if row["class"] == PLAYER_CLASS:
+                by_frame[int(row["frame"])].append(row)
+    return by_frame
 
 
 def _build_frame_record_map(tracks):
@@ -72,11 +93,10 @@ def _render_clustered_video(config: TrackingConfig, tracks, fps: float, width: i
         video_writer.release()
 
 
-def process_video(config: TrackingConfig):
-    print("===== YOLO tracking + JerseyColorDetection-style KMeans clustering =====")
-    validate_paths(config)
-
-    model = YOLO(str(config.model_path))
+def process_tracks(config: TrackingConfig, tracks_csv):
+    """Cluster teams, render the trajectory video and export movement metrics."""
+    tracks_csv = Path(tracks_csv)
+    validate_paths(config, tracks_csv)
 
     cap = cv2.VideoCapture(str(config.video_path))
     if not cap.isOpened():
@@ -91,59 +111,44 @@ def process_video(config: TrackingConfig):
         raise ValueError("Video FPS is invalid. Cannot calculate process duration.")
 
     max_frames_to_process = min(int(fps * config.process_seconds), total_frames)
+    rows_by_frame = read_player_rows(tracks_csv)
 
-    print(f"Video: {config.video_path}")
-    print(f"Model: {config.model_path}")
-    print(f"FPS: {fps:.2f}")
-    print(f"Total frames: {total_frames}")
-    print(f"Frames to process: {max_frames_to_process}")
-    print(f"Resolution: {width} x {height}")
-
-    tracker = RobustPlayerTracker(config)
+    tracks = {}
     processed_frames = 0
-
     try:
         for frame_index in range(max_frames_to_process):
             ok, frame = cap.read()
             if not ok:
                 break
 
-            results = model.predict(
-                frame,
-                conf=config.conf_threshold,
-                imgsz=config.imgsz,
-                verbose=False,
-            )
-
-            result = results[0] if results else None
-            detections = parse_yolo_detections(
-                result=result,
-                frame=frame,
-                model=model,
-                player_classes=config.player_classes,
-                duplicate_center_distance=config.duplicate_center_distance,
-            )
-
             time_sec = frame_index / fps
-            active_tracks = tracker.update(detections, frame_index=frame_index, time_sec=time_sec)
+            for row in rows_by_frame.get(frame_index, []):
+                bbox = [float(row[k]) for k in ("x1", "y1", "x2", "y2")]
+                detection = {
+                    "bbox": bbox,
+                    "center": bbox_center(bbox),
+                    "ground_point": bbox_bottom_center(bbox),
+                    "conf": float(row["confidence"]),
+                    "class_id": 0,
+                    "class_name": PLAYER_CLASS,
+                    "appearance": extract_appearance_feature(frame, bbox),
+                    "jersey_feature": extract_jersey_colour_feature(frame, bbox),
+                }
+                track_id = int(row["track_id"])
+                if track_id in tracks:
+                    tracks[track_id].update(detection, frame_index, time_sec, config.appearance_momentum)
+                else:
+                    tracks[track_id] = track_from_detection(track_id, detection, frame_index, time_sec, config)
 
             processed_frames += 1
-            if config.print_every_n_frames > 0 and processed_frames % config.print_every_n_frames == 0:
-                print(
-                    f"Processed {processed_frames}/{max_frames_to_process} frames | "
-                    f"detections={len(detections)} | active_tracks={len(active_tracks)}"
-                )
-
     finally:
         cap.release()
 
-    all_tracks = tracker.all_tracks()
-
-    clustering_summary = assign_jersey_clusters(all_tracks, config)
+    clustering_summary = assign_jersey_clusters(tracks, config)
 
     _render_clustered_video(
         config=config,
-        tracks=all_tracks,
+        tracks=tracks,
         fps=fps,
         width=width,
         height=height,
@@ -151,7 +156,7 @@ def process_video(config: TrackingConfig):
     )
 
     metrics_summary = export_player_metrics_csv(
-        tracks=all_tracks,
+        tracks=tracks,
         csv_path=config.output_csv_path,
         fps=fps,
         config=config,
@@ -171,19 +176,10 @@ def process_video(config: TrackingConfig):
         "player_classes": [int(c) for c in config.player_classes],
         "jersey_clustering": clustering_summary,
         "movement_metrics": metrics_summary,
-        "tracks": tracker.to_json_records(),
+        "tracks": tracks_to_json_records(tracks),
     }
 
     with open(config.output_json_path, "w", encoding="utf-8") as f:
         json.dump(export_data, f, ensure_ascii=False, indent=2)
-
-    print("Done.")
-    print(f"Output video: {config.output_video_path}")
-    print(f"Output JSON: {config.output_json_path}")
-    print(f"Output CSV: {config.output_csv_path}")
-    print(f"Metric mode: {metrics_summary['metric_mode']}")
-    print(f"Calibration available: {metrics_summary['calibration_available']}")
-    print(f"Total tracks: {len(export_data['tracks'])}")
-    print(f"Jersey clustering: {clustering_summary}")
 
     return export_data

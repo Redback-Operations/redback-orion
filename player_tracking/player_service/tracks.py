@@ -22,15 +22,22 @@ def file_hash(path) -> str:
     return digest.hexdigest()
 
 
-def get_tracks(video_path, tracks_dir: Path, run_tracking: Callable[[Path, Path, str], dict]) -> dict:
+def tracks_csv_path(tracks_dir: Path, key: str) -> Path:
+    return Path(tracks_dir) / f"{key}.csv"
+
+
+def get_tracks(video_path, tracks_dir: Path, run_tracking: Callable[[Path, Path, str], dict],
+               key: str = None) -> dict:
     """Return the tracking result for this video, running tracking if needed.
 
-    run_tracking(video_path, tracks_dir, key) must write its files into
-    tracks_dir and return a JSON-serialisable result.
+    run_tracking(video_path, tracks_dir, key) must write <key>.csv into
+    tracks_dir and return a JSON-serialisable result. A result counts as
+    saved only when both <key>.json and <key>.csv exist. Pass key if the
+    caller already hashed the file.
     """
-    key = file_hash(video_path)
+    key = key or file_hash(video_path)
     saved = Path(tracks_dir) / f"{key}.json"
-    if saved.exists():
+    if saved.exists() and tracks_csv_path(tracks_dir, key).exists():
         return json.loads(saved.read_text())
 
     # ponytail: two requests for the same new video at the same moment both run

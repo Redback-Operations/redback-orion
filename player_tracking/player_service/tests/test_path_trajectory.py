@@ -13,6 +13,7 @@ SERVICE_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVICE_DIR))
 
 import config
+import routes.path_trajectory as path_trajectory_route
 from routes.path_trajectory import path_trajectory
 
 
@@ -24,8 +25,11 @@ class PathTrajectoryRouteTests(unittest.TestCase):
             uploads_dir = temp_path / "uploads"
             outputs_dir = temp_path / "outputs"
 
+            tracks_dir = temp_path / "tracks"
+
             uploads_dir.mkdir()
             outputs_dir.mkdir()
+            tracks_dir.mkdir()
 
             fake_upload = UploadFile(
                 filename="sample.mp4",
@@ -51,9 +55,17 @@ class PathTrajectoryRouteTests(unittest.TestCase):
 
             captured_config = {}
 
-            def fake_process_video(tracking_config):
+            def fake_process_tracks(tracking_config, tracks_csv):
                 captured_config["config"] = tracking_config
+                captured_config["tracks_csv"] = tracks_csv
                 return fake_result
+
+            tracking_runs = []
+
+            def fake_run_tracking(video_path, tracks_dir, key):
+                tracking_runs.append(key)
+                (tracks_dir / f"{key}.csv").write_text("frame,track_id,class,confidence,x1,y1,x2,y2\n")
+                return {"tracking_results": []}
 
             class FakeTrackingConfig:
                 def __init__(self, **kwargs):
@@ -64,12 +76,13 @@ class PathTrajectoryRouteTests(unittest.TestCase):
             fake_config_module.TrackingConfig = FakeTrackingConfig
 
             fake_processor_module = type(sys)("analysis_pipeline.movement_metrics.video_processor")
-            fake_processor_module.process_video = fake_process_video
+            fake_processor_module.process_tracks = fake_process_tracks
 
             with (
                 patch.object(config, "UPLOADS_DIR", uploads_dir),
                 patch.object(config, "OUTPUTS_DIR", outputs_dir),
-                patch.object(config, "ensure_model", return_value=Path("model.pt")),
+                patch.object(config, "TRACKS_DIR", tracks_dir),
+                patch.object(path_trajectory_route, "run_tracking", fake_run_tracking),
                 patch.dict(
                     sys.modules,
                     {
@@ -81,6 +94,14 @@ class PathTrajectoryRouteTests(unittest.TestCase):
                 response = asyncio.run(
                     path_trajectory(fake_upload)
                 )
+
+                # Nothing was saved for this video, so tracking ran first.
+                self.assertEqual(len(tracking_runs), 1)
+                self.assertEqual(captured_config["tracks_csv"].parent, tracks_dir)
+
+                # The same video again reuses the saved tracks.
+                asyncio.run(path_trajectory(UploadFile(filename="again.mp4", file=io.BytesIO(b"fake video"))))
+                self.assertEqual(len(tracking_runs), 1)
 
             tracking_config = captured_config["config"]
 
