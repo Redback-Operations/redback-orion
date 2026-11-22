@@ -1,0 +1,15 @@
+# backend/compose.yaml builds player_service with player_tracking/ as the
+# build context. Keep large local folders out of it.
+data/
+datasets/
+models/
+outputs/
+runs/
+.venv/
+**/.venv/
+**/__pycache__/
+player_service/uploads/
+player_service/outputs/
+experiments/
+evaluation/
+orion_player_tracking_studio/

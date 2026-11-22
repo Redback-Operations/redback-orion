@@ -1,0 +1,17 @@
+# Player Tracking tools: training/, evaluation/ and experiments/
+# (including experiments/forward50_analysis/).
+# player_service and analysis_pipeline use player_service/requirements.txt instead.
+# Python 3.11. Install torch first if you need a specific CUDA build:
+# https://pytorch.org/get-started/locally/
+
+torch>=2.2
+ultralytics>=8.4
+opencv-python>=4.8
+numpy
+pandas            # forward50_analysis/
+pyyaml
+scikit-learn      # experiments/player_tracker.py colour clustering
+gdown>=5           # training/download_data.py (older versions fail on Drive)
+lap>=0.5.12       # ByteTrack/BoTSORT dependency (not auto-declared by ultralytics)
+imageio-ffmpeg    # H.264 output from analysis_pipeline/detect_and_track.py
+easyocr           # experiments/jumper_numbers/test_ocr*.py

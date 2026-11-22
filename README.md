@@ -86,12 +86,13 @@ redback-orion/
 ├── crowd_monitoring/         Crowd detection, density zones, heatmaps, risk and behaviour analysis
 ├── player_tracking/
 │   ├── player_service/       FastAPI service the backend calls for player analysis
-│   ├── player_tracking_logic/  Models and scripts player_service runs (tracking, re-ID,
-│   │                           tackle detection, formations), plus earlier experiments
-│   ├── pipeline/             Training, datasets, tracking quality checks, Forward-50 analysis
-│   ├── Orion_Player_Tracking_Studio/  Desktop app for running and reviewing tracking results
-│   ├── early_afl_work/       Earlier AFL tracking prototypes and datasets, kept for reference
-│   └── generic_sports_cv/    Computer vision experiments on other sports, kept for reference
+│   ├── analysis_pipeline/    Tracking and analytics: teams, movement, tackles, workload,
+│   │                           formation (run_pipeline.py runs them all on a video)
+│   ├── orion_player_tracking_studio/  Desktop app for running and reviewing tracking results
+│   ├── training/             Datasets, labelling and model training
+│   ├── evaluation/           Tracking quality checks
+│   ├── experiments/          Ball tracking, Forward-50, jumper numbers
+│   └── docs/                 Setup, code inventory and pipeline design
 ├── archive/                  Earlier work, kept for reference (see below)
 ├── start_all.ps1             Windows script that starts the backend and both services
 └── .github/workflows/        Security scan that runs on pull requests
@@ -237,5 +238,5 @@ The repo is then ready to hand over to the next team. Update this README and the
 
 - `backend/README.md`, plus `API_CONTRACT.md` for the request and response formats
 - `crowd_monitoring/README.md` for the crowd pipeline and the JSON schemas
-- `player_tracking/pipeline/README.md` and `docs/setup.md` for training and tracking scripts
+- `player_tracking/docs/setup.md` for player tracking setup, and `docs/target_pipeline.md` for how it fits together
 - Earlier cohorts' handover documents, which the project lead can share
