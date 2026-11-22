@@ -1,5 +1,5 @@
 # Player Tracking tools: training/, evaluation/ and experiments/
-# (including experiments/forward50_analysis/ and player_tracking_logic/26T1_Labelling_Ethan/).
+# (including experiments/forward50_analysis/).
 # player_service and analysis_pipeline use player_service/requirements.txt instead.
 # Python 3.11. Install torch first if you need a specific CUDA build:
 # https://pytorch.org/get-started/locally/

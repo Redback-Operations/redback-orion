@@ -10,7 +10,7 @@ This project performs:
 - Player metric extraction
 - JSON and CSV analytics export
 
-The system is designed to work **after** a player tracking stage has already been completed by running the video through Project\redback-orion\26_T1\afl_player_tracking_and_crowd_monitoring\player_tracking_logic\Yolov11_ByteTrack_Player_Tracking
+The system is designed to work **after** the tracking stage (`analysis_pipeline/detect_and_track.py`, or `POST /tracking` in player_service) has produced a tracking JSON.
 
 The tracking stage generates a JSON file containing:
 

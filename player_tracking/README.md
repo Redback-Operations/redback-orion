@@ -18,11 +18,15 @@ match video
    (detect_and_track.py) ByteTrack links them across frames so each keeps one ID.
    │                     → annotated video + tracks CSV (one row per player per frame)
    ▼
-2. Analytics             Read the tracks: team colours, movement and speed,
-   (player_service)      tackles, team formation.
+2. Analytics             Every stage reads those tracks; none runs the model again.
+   identify_players        team from jumper colour
+   movement_metrics        speed and distance per player
+   tackle_detection        tackle events
+   workload_heatmaps       high-speed running, sprints, heatmaps
+   formation_analysis      team shape
    │
    ▼
-results for the backend and dashboard
+results.json from the command line, or the player_service responses for the dashboard
 ```
 
 The default model is `player_ref_best.pt`. It recognises two classes, PLAYER and REF (umpire), and works on any match because it doesn't depend on team kits. Teams are worked out afterwards from jumper colour.
@@ -41,10 +45,9 @@ The tracks CSV has one row per detection:
 
 | Folder | What's in it |
 |---|---|
-| `analysis_pipeline/` | The pipeline itself. `detect_and_track.py` finds and follows players and writes the tracks CSV. |
+| `analysis_pipeline/` | The pipeline itself: `detect_and_track.py`, one folder or file per analytics stage, and `run_pipeline.py` to run them all |
 | `player_service/` | The web API the backend calls (port 8001) |
 | `orion_player_tracking_studio/` | Desktop app for reviewing and correcting tracking results |
-| `player_tracking_logic/` | T1 code that `player_service` still runs for analytics, moving into `analysis_pipeline/` |
 | `training/` | Datasets, labelling, model training, and the model and data download scripts |
 | `evaluation/` | Tracking quality checks |
 | `experiments/` | Ball tracking, Forward-50, jumper numbers: not in the pipeline yet |
@@ -66,7 +69,7 @@ uv pip install -r requirements.txt
 cd ..
 ```
 
-This one environment covers `player_service` and `analysis_pipeline/`. The first install is slow because it pulls in PyTorch.
+This one environment covers `player_service` and everything in `analysis_pipeline/`. The first install is slow because it pulls in PyTorch.
 
 ### 2. Download the model
 
@@ -94,6 +97,26 @@ ffmpeg -ss 1200 -i data/videos/broadcast_essendon_hawthorn.mp4 -t 20 -c copy dat
 Any AFL broadcast clip works if you already have one.
 
 ## Running it
+
+### Run the whole pipeline on a video
+
+```bash
+python analysis_pipeline/run_pipeline.py data/videos/test_clip_20s.mp4
+```
+
+This tracks the players once, then runs every analytics stage on those tracks. Everything lands in `outputs/test_clip_20s/`:
+
+| File or folder | What it holds |
+|---|---|
+| `tracks.csv`, `tracks.mp4` | Every player in every frame, and the annotated video |
+| `teams/` | Team cluster for each player, from jumper colour |
+| `movement/` | Distance and average and top speed per player, plus a trajectory video |
+| `tackles.json` | Tackle events with start and end times |
+| `workload.json`, `heatmaps/` | Distance, high-speed running, sprints and a workload score per player; position heatmaps |
+| `formation.mp4` | Team shape overlay |
+| `results.json` | A summary of all of the above, and any stage that failed |
+
+Add `--max-frames 300` for a quick test. A 20-second clip takes about 40 seconds on a laptop. Speeds are estimates from pixel distances, because broadcast camera movement changes the scale.
 
 ### Track a video from the command line
 
@@ -138,7 +161,7 @@ The other endpoints:
 | Endpoint | Input | What it returns |
 |---|---|---|
 | `POST /tracking` | video | Every player in every frame, plus the annotated video |
-| `POST /path_trajectory` | video | Movement paths and metrics per player |
+| `POST /path_trajectory` | video | Movement paths and metrics per player (reuses the tracks `/tracking` saved, or tracks first) |
 | `POST /jersey_color` | video + tracking JSON | Team for each player, from jumper colour |
 | `POST /formation` | video + tracking JSON | Team shape overlay video |
 | `POST /tackle` | tracking CSV | Tackle events with start and end times |
@@ -183,7 +206,7 @@ Training needs the tools environment and works best on a GPU. See [`docs/trainin
 
 ```bash
 cd player_service && python -m pytest tests && cd ..
-python -m pytest training/tests evaluation/tests experiments/forward50_analysis/tests
+python -m pytest analysis_pipeline/tests training/tests evaluation/tests experiments/forward50_analysis/tests
 ```
 
 Install `pytest` into the environment first if it isn't there (`uv pip install pytest`).

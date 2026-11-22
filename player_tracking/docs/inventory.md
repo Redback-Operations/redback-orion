@@ -1,31 +1,27 @@
 # Player tracking code inventory
 
-What the T1 and T2 player tracking code does, whether it runs, and where it's going. Written in T3 2026 as the input to `target_pipeline.md`.
+What the T1 and T2 player tracking code did, whether it ran, and where it went. Written in T3 2026 as the input to `target_pipeline.md`; updated after PR #161 merged both into `analysis_pipeline/`.
 
-**Checks run on all 101 Python files (November 2026):** every file parses, and all 41 existing tests pass (Tracking_Ethan 5, 26T1_Labelling_Ethan 5, T2 pipeline 17, player_service 1, Studio 13). Only `CSV Converter.py` and `tackle_detection_shafqat_ullah/validation/apaar_validator.py` contain Colab or machine-specific paths.
+**Checks run on all 101 Python files at the audit (November 2026):** every file parses, and all 41 existing tests pass (Tracking_Ethan 5, 26T1_Labelling_Ethan 5, T2 pipeline 17, player_service 1, Studio 13). Only `CSV Converter.py` and `tackle_detection_shafqat_ullah/validation/apaar_validator.py` contain Colab or machine-specific paths.
 
-## T1: `player_tracking_logic/`
+## T1: what was `player_tracking_logic/`
 
-### Still in use or still to be moved
+The folder no longer exists. The code still in use moved into `analysis_pipeline/` with history, and everything else is in `archive/player_tracking_legacy/player_tracking_logic/`, whose README says why each item was archived.
 
-| Folder | What it does | In → Out | Model | Status | Goes to |
-|---|---|---|---|---|---|
-| `Tracking_Ethan/` | Modular tracker with appearance features, jersey clustering, homography calibration and movement metrics | video → JSON, metrics CSV, video | `player_ref_best.pt` (via player_service) | Live in `/path_trajectory`. Best-structured T1 code, with tests. | `field_calibration.py`, `movement_metrics.py` |
-| `Re-Identification/JerseyColorDetection/` | HSV + KMeans team clustering | video + tracking JSON → team-labelled JSON | none | Live in `/jersey_color` | `identify_players.py`, if it wins the team test |
-| `Re-Identification/Formation_Visualization/` | Team shape and connectivity overlay | video + clustered JSON → video | none | Live in `/formation` | `formation_analysis.py` |
-| `Re-Identification/JerseyOCR/` | EasyOCR jumper numbers with voting across frames | crops → numbers | none | Not connected. Close to the Studio's OCR. | Compare with the Studio, keep one |
-| `tackle_detection_shafqat_ullah/` | Tackle events from player clustering, plus a validator | tracking CSV → events JSON | none | Logic is copied inline into `/tackle`; the folder isn't imported | `tackle_detection.py` (imported, not copied) |
-| `26T1_Speed_Detection_Drew/` | Speed, acceleration and distance, added to the backend's JSON shape | tracking JSON + video → JSON, CSV, video | none | Not connected | Output fields go into `movement_metrics.py` |
-| `player_tracking_logic_heatmaps_workload/` | Heatmaps and workload (sprints, high-intensity segments) | tracking CSV → PNG, JSON | none | Not connected | `workload_heatmaps.py` |
-| `Yolov11_ByteTrack_Player_Tracking/` | YOLO + ByteTrack tracker, plus older DeepSORT and OCR variants | video → tracking JSON | T1 CAR/GCS/REF `best.pt` | No longer used: `/tracking` runs `analysis_pipeline/` | Archive |
-| `26T1-Modelling-Sri/` | Training notebooks for the three per-match T1 models | dataset → `.pt` | produces CAR_vs_GCS, SS_vs_WB, CAT_vs_HAW | Reference | Archive |
-| `26T1_Labelling_Ethan/` | Frame extraction, YOLO pre-labelling, OpenCV annotator | video → YOLO labels | COCO YOLO | Works (5 tests pass) | Archive once `training/smart_labeller.py` covers its use |
-| `Notebooks/` | Unified-model training (Nithin), heatmap and distance notebook | n/a | n/a | Reference | Archive |
-| Event tools: `annotation_converter.py`, `annotation_sync.py`, `merge_synced.py`, `prediction_vs_truth.py`, `event_timing_analysis.py` | Sync hand-labelled kick, mark and tackle events with tracking data | CSV → CSV, report | none | Not connected | `evaluation/` if event labelling continues, otherwise archive |
-
-### Archived in T3 2026
-
-Moved to `archive/player_tracking_legacy/player_tracking_logic/` (its README says why): `matthew_player_tracking/`, `yolo_player_tracker.py` (identical copies), `player_tracking_Matthew/` (README only), `Yolov11_retain/`, `colour_speed_detection_drew/`, `Re-Identification/ReID/`, `Re-Identification/PlayerTracking/`, `26T1-Modelling-Sri/temp*.py`, `CSV Converter.py`, `BoundingBoxes`, `sprint_detection.py`.
+| T1 folder | What it does | Status at audit | Now |
+|---|---|---|---|
+| `Tracking_Ethan/` | Modular tracker with appearance features, jersey clustering, homography calibration and movement metrics | Live in `/path_trajectory`, ran its own YOLO pass. Tests pass. | `analysis_pipeline/movement_metrics/`, reading the saved tracks. Its own matcher and YOLO parsing were removed (ByteTrack gave 28 tracks where it gave 55 on the same clip). |
+| `Re-Identification/JerseyColorDetection/` | HSV + KMeans team clustering | Live in `/jersey_color` | `analysis_pipeline/identify_players/` |
+| `Re-Identification/Formation_Visualization/` | Team shape and connectivity overlay | Live in `/formation` | `analysis_pipeline/formation_analysis/` |
+| `tackle_detection_shafqat_ullah/` | Tackle events from player clustering, plus a validator | Logic copied inline into `/tackle`; folder not imported | The inline logic is `analysis_pipeline/tackle_detection.py` (tested). The original module and validator are archived. |
+| `player_tracking_logic_heatmaps_workload/` | Heatmaps and workload (sprints, high-intensity segments) | Not connected | `analysis_pipeline/workload_heatmaps/`, run by `run_pipeline.py` |
+| `26T1_Speed_Detection_Drew/` | Speed, acceleration and distance | Not connected | Archived. Acceleration not yet carried over. |
+| `Re-Identification/JerseyOCR/` | EasyOCR jumper numbers with voting across frames | Not connected | Archived; the Studio has the newer OCR |
+| `Yolov11_ByteTrack_Player_Tracking/` | YOLO + ByteTrack tracker with the T1 CAR/GCS/REF model | Live in `/tracking` | Archived; `analysis_pipeline/detect_and_track.py` replaced it |
+| `26T1-Modelling-Sri/`, `Notebooks/` | Training notebooks for the T1 models | Reference | Archived |
+| `26T1_Labelling_Ethan/` | Frame extraction, pre-labelling, annotator | Works (5 tests pass) | Archived; `training/smart_labeller.py` covers it |
+| Event tools (`annotation_*.py`, `merge_synced.py`, `prediction_vs_truth.py`, `event_timing_analysis.py`) | Sync hand-labelled events with tracking data | Not connected | Archived |
+| Duplicates, scratch files, Colab exports, re-ID experiments | see the duplicates section below | Not used | Archived |
 
 ## T2: what was `pipeline/`, and the Studio
 

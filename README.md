@@ -86,9 +86,8 @@ redback-orion/
 ├── crowd_monitoring/         Crowd detection, density zones, heatmaps, risk and behaviour analysis
 ├── player_tracking/
 │   ├── player_service/       FastAPI service the backend calls for player analysis
-│   ├── analysis_pipeline/    Runs a match video through tracking (detect_and_track.py)
-│   ├── player_tracking_logic/  T1 scripts player_service still runs (re-ID, tackles,
-│   │                           formations), moving into analysis_pipeline/
+│   ├── analysis_pipeline/    Tracking and analytics: teams, movement, tackles, workload,
+│   │                           formation (run_pipeline.py runs them all on a video)
 │   ├── orion_player_tracking_studio/  Desktop app for running and reviewing tracking results
 │   ├── training/             Datasets, labelling and model training
 │   ├── evaluation/           Tracking quality checks

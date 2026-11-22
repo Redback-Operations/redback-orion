@@ -6,7 +6,8 @@ Run every command from `player_tracking/` unless a step says otherwise.
 
 ```
 player_tracking/
-├── analysis_pipeline/            Runs a match video through tracking (and later analytics)
+├── analysis_pipeline/            Runs a match video through tracking and analytics
+│   ├── run_pipeline.py           Runs every stage on one video
 │   ├── detect_and_track.py       YOLO + ByteTrack → annotated video + tracks CSV
 │   └── configs/                  tracker settings (afl_broadcast_bytetrack.yaml)
 ├── player_service/               The web API the backend calls (port 8001)
@@ -14,7 +15,6 @@ player_tracking/
 ├── training/                     Datasets, labelling and model training
 ├── evaluation/                   Tracking quality checks
 ├── experiments/                  Ball tracking, Forward-50, jumper numbers: not in the pipeline yet
-├── player_tracking_logic/        T1 code that player_service still runs (moving into analysis_pipeline/)
 ├── docs/                         This folder
 ├── requirements.txt              For training/, evaluation/ and experiments/
 │
@@ -113,5 +113,5 @@ uvicorn main:app --port 8001
 
 ## Source
 
-- T1 code: `player_tracking_logic/` (still running in `player_service`) and `archive/26_T1/`
+- T1 code that isn't part of the pipeline: `archive/player_tracking_legacy/player_tracking_logic/` and `archive/26_T1/`
 - What each folder contains and where it's going: `inventory.md`
