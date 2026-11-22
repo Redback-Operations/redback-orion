@@ -326,10 +326,6 @@ Player-Tracking/
 │   ├── Tackle event detection
 │   └── Direct model inference
 │
-├── colour_speed_detection_drew/
-│   ├── 
-│   └── 
-│
 ├── 26T1_Tracking_Ethan/
 │   ├── 
 │   └── 
