@@ -3,7 +3,8 @@ import shutil
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import config
-from tracks import get_tracks, to_legacy_json
+from tracks import get_tracks
+from analysis_pipeline.tracking_json import to_legacy_json
 
 router = APIRouter()
 
