@@ -89,7 +89,7 @@ redback-orion/
 │   ├── analysis_pipeline/    Runs a match video through tracking (detect_and_track.py)
 │   ├── player_tracking_logic/  T1 scripts player_service still runs (re-ID, tackles,
 │   │                           formations), moving into analysis_pipeline/
-│   ├── Orion_Player_Tracking_Studio/  Desktop app for running and reviewing tracking results
+│   ├── orion_player_tracking_studio/  Desktop app for running and reviewing tracking results
 │   ├── training/             Datasets, labelling and model training
 │   ├── evaluation/           Tracking quality checks
 │   ├── experiments/          Ball tracking, Forward-50, jumper numbers

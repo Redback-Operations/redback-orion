@@ -10,7 +10,7 @@ player_tracking/
 │   ├── detect_and_track.py       YOLO + ByteTrack → annotated video + tracks CSV
 │   └── configs/                  tracker settings (afl_broadcast_bytetrack.yaml)
 ├── player_service/               The web API the backend calls (port 8001)
-├── Orion_Player_Tracking_Studio/ Desktop app for reviewing and correcting tracking results
+├── orion_player_tracking_studio/ Desktop app for reviewing and correcting tracking results
 ├── training/                     Datasets, labelling and model training
 ├── evaluation/                   Tracking quality checks
 ├── experiments/                  Ball tracking, Forward-50, jumper numbers: not in the pipeline yet

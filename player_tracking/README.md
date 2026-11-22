@@ -6,7 +6,7 @@ Follows AFL players through match footage and turns their movement into analytic
 |---|---|
 | `analysis_pipeline/` | Runs a match video through tracking: `detect_and_track.py` finds and follows players and writes a tracks CSV |
 | `player_service/` | The web API the backend calls (port 8001) |
-| `Orion_Player_Tracking_Studio/` | Desktop app for reviewing and correcting tracking results |
+| `orion_player_tracking_studio/` | Desktop app for reviewing and correcting tracking results |
 | `player_tracking_logic/` | T1 code that `player_service` still runs, moving into `analysis_pipeline/` |
 | `training/` | Datasets, labelling, model training, and the model and data download scripts |
 | `evaluation/` | Tracking quality checks |

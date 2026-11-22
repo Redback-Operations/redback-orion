@@ -51,7 +51,7 @@ player_tracking/
 │   ├── run_pipeline.py             runs the stages and writes the result
 │   └── configs/
 ├── player_service/               The web API the backend calls (name, port and endpoints unchanged)
-├── Orion_Player_Tracking_Studio/ Desktop review app; imports identify_players.py
+├── orion_player_tracking_studio/ Desktop review app; imports identify_players.py
 ├── training/  evaluation/  experiments/
 ├── models/                       Weights from the models-v1 release (git-ignored)
 └── docs/
@@ -106,7 +106,7 @@ Browser upload → Backend /upload → player_service /tracking         (tracks 
 ### Reviewing results
 
 ```bash
-cd Orion_Player_Tracking_Studio
+cd orion_player_tracking_studio
 python run_orion_tracking_studio.py
 ```
 

@@ -40,7 +40,7 @@ Moved to `archive/player_tracking_legacy/player_tracking_logic/` (its README say
 | Forward-50 | `experiments/forward50_analysis/` | Zone calibration and positions in the forward-50 area. Has its own tracker. | Works, with tests |
 | Jumper numbers | `experiments/jumper_numbers/` | CNN trained on a Kaggle **NFL** jersey dataset, plus OCR tests | Experimental, not connected |
 | Starter tracker | `experiments/player_tracker.py`, `track_videos.py`, `yolo_merged_best.pt` | Newer copy of Matthew's T1 tracker (with an ID-stability fix), batch runner | Superseded by `analysis_pipeline/` |
-| Studio | `Orion_Player_Tracking_Studio/` | Tracking, review events, team suggestion, multi-frame EasyOCR, identity merging of fragmented tracks, export | Newest feature set. Logic is separable from the tkinter GUI. |
+| Studio | `orion_player_tracking_studio/` | Tracking, review events, team suggestion, multi-frame EasyOCR, identity merging of fragmented tracks, export | Newest feature set. Logic is separable from the tkinter GUI. |
 
 ## Where T1 and T2 overlap
 
