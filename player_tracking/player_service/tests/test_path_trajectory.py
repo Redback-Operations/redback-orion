@@ -69,6 +69,7 @@ class PathTrajectoryRouteTests(unittest.TestCase):
             with (
                 patch.object(config, "UPLOADS_DIR", uploads_dir),
                 patch.object(config, "OUTPUTS_DIR", outputs_dir),
+                patch.object(config, "ensure_model", return_value=Path("model.pt")),
                 patch.dict(
                     sys.modules,
                     {

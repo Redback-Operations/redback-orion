@@ -31,7 +31,7 @@ async def path_trajectory(video: UploadFile = File(...)):
 
         tracking_config = TrackingConfig(
             video_path=video_path,
-            model_path=config.MODEL_PATH,
+            model_path=config.ensure_model(),
             output_video_path=output_video,
             output_json_path=output_json,
             output_csv_path=output_csv,

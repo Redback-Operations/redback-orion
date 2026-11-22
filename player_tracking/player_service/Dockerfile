@@ -11,11 +11,15 @@ COPY player_service/requirements.txt .
 RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir -r requirements.txt
 
-COPY player_service/ ./player_service/
-COPY player_tracking_logic/Yolov11_ByteTrack_Player_Tracking/ ./player_tracking_logic/Yolov11_ByteTrack_Player_Tracking/
+# Model weights come from the GitHub release, checked against their SHA-256.
+COPY training/download_models.py ./training/download_models.py
+RUN python training/download_models.py player_ref_best.pt
+
+COPY analysis_pipeline/ ./analysis_pipeline/
 COPY player_tracking_logic/Re-Identification/ ./player_tracking_logic/Re-Identification/
 COPY player_tracking_logic/tackle_detection_shafqat_ullah/ ./player_tracking_logic/tackle_detection_shafqat_ullah/
 COPY player_tracking_logic/Tracking_Ethan/ ./player_tracking_logic/Tracking_Ethan/
+COPY player_service/ ./player_service/
 
 WORKDIR /app/player_service
 
