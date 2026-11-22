@@ -4,9 +4,9 @@
 Fresh runs use the T1 recipe; --fine-tune adapts the existing player/ref model.
 
 Usage:
-    python scripts/train.py all_teams
-    python scripts/train.py player_ref --epochs 60 --batch 8
-    python scripts/train.py --data datasets/player_ref_broadcast_clean/data.yaml --fine-tune --name broadcast_repaired
+    python training/train.py all_teams
+    python training/train.py player_ref --epochs 60 --batch 8
+    python training/train.py --data datasets/player_ref_broadcast_clean/data.yaml --fine-tune --name broadcast_repaired
 
 Outputs land in runs/detect/<name>/ (weights under .../weights/best.pt).
 """
@@ -52,7 +52,7 @@ def main() -> None:
     elif args.dataset is not None:
         data_yaml = ROOT / "datasets" / args.dataset / "data.yaml"
         if not data_yaml.exists():
-            raise SystemExit(f"{data_yaml} not found — run scripts/build_datasets.py first")
+            raise SystemExit(f"{data_yaml} not found — run training/build_datasets.py first")
         run_name = args.name or args.dataset
     else:
         raise SystemExit("Provide a dataset name or --data path")

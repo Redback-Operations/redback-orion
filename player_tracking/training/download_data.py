@@ -7,9 +7,9 @@ into the Player_Tracking directory, mirroring the local layout.
 
 Usage:
     pip install gdown
-    python scripts/download_data.py              # downloads everything
-    python scripts/download_data.py data         # only the data/ folder
-    python scripts/download_data.py data models  # multiple folders
+    python training/download_data.py              # downloads everything
+    python training/download_data.py data         # only the data/ folder
+    python training/download_data.py data models  # multiple folders
 
 Requires the Drive folder to be shared as "anyone with the link can view".
 """

@@ -1,7 +1,7 @@
 # Training Results (T2 2026)
 
 Recipe (from T1): yolo11s pretrained, 50 epochs, imgsz 640, batch 16,
-patience 10, seed 42. Trained locally on RTX 3080 via `scripts/train.py`.
+patience 10, seed 42. Trained locally on RTX 3080 via `training/train.py`.
 Weights copied to `models/`; full runs in `runs/detect/`.
 
 ## all_teams (7 classes)

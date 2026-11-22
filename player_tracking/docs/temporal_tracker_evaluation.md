@@ -100,11 +100,11 @@ model weights and generated results are intentionally excluded from Git.
 ## Reproducing the evaluation
 
 The evaluation utility is
-[`scripts/evaluate_temporal_tracker.py`](../scripts/evaluate_temporal_tracker.py).
+[`experiments/ball_tracking/evaluate_temporal_tracker.py`](../experiments/ball_tracking/evaluate_temporal_tracker.py).
 It requires explicit paths so no local datasets or models are assumed:
 
 ```bash
-python scripts/evaluate_temporal_tracker.py \
+python experiments/ball_tracking/evaluate_temporal_tracker.py \
   --ground-truth path/to/evaluation_ground_truth.zip \
   --model path/to/ball_detector_best.pt \
   --tracker-csv path/to/temporal_tracker_output.csv

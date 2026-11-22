@@ -6,8 +6,8 @@ that has a label file and writes a new H.264 video. Frames without labels are
 copied through unchanged, so the output keeps the source timing.
 
 Usage:
-    python scripts/render_labels.py data/videos/broadcast_stkilda_northmelbourne.mp4
-    python scripts/render_labels.py data/videos/broadcast_stkilda_northmelbourne.mp4 \
+    python training/render_labels.py data/videos/broadcast_stkilda_northmelbourne.mp4
+    python training/render_labels.py data/videos/broadcast_stkilda_northmelbourne.mp4 \
         --labels-dir data/raw/broadcast_stkilda_northmelbourne/reviewed/labels \
         --output outputs/broadcast_stkilda_northmelbourne_reviewed.mp4
 """

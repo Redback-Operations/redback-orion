@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "analyze_tracking.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "analyze_tracking.py"
 SPEC = importlib.util.spec_from_file_location("analyze_tracking", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC and SPEC.loader

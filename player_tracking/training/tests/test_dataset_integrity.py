@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 import yaml
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from dataset_integrity import audit_yaml, read_pairs
 from smart_labeller import SmartLabeller, Box
 import build_datasets

@@ -23,7 +23,7 @@ import numpy as np
 from ultralytics import YOLO
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs" / "temporal_tracker_evaluation"
 FRAME_PATTERN = re.compile(r"_frame_(\d+)_")
 IOU_THRESHOLDS = (0.10, 0.30, 0.50)

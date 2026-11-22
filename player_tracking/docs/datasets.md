@@ -1,6 +1,6 @@
 # Datasets
 
-Built by `scripts/build_datasets.py` from `data/raw/` into `datasets/`.
+Built by `training/build_datasets.py` from `data/raw/` into `datasets/`.
 All splits are 80/20 train/val, shuffled with seed 42 (same as T1).
 Each dataset folder has `train/`, `val/`, and a `data.yaml` ready for
 `model.train(data=...)`.

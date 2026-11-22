@@ -1,18 +1,18 @@
 # Tracking broadcasts
 
-`scripts/track_video.py` writes an annotated H.264 video and a CSV containing
+`analysis_pipeline/detect_and_track.py` writes an annotated H.264 video and a CSV containing
 the source frame number, track ID, class, confidence and bounding box.
 
 ## Broadcast-tuned ByteTrack candidate
 
 Wide AFL camera angles contain small detections and longer occlusions than the
 default ByteTrack configuration is designed around. A candidate configuration
-is provided at `configs/afl_broadcast_bytetrack.yaml`:
+is provided at `analysis_pipeline/configs/afl_broadcast_bytetrack.yaml`:
 
 ```bash
-python scripts/track_video.py data/videos/broadcast.mp4 \
+python analysis_pipeline/detect_and_track.py data/videos/broadcast.mp4 \
   --model models/player_ref_best.pt \
-  --tracker configs/afl_broadcast_bytetrack.yaml \
+  --tracker analysis_pipeline/configs/afl_broadcast_bytetrack.yaml \
   --conf 0.1
 ```
 
@@ -29,9 +29,9 @@ next source frame, and offset new IDs by at least the maximum ID already present
 in the earlier CSV plus one:
 
 ```bash
-python scripts/track_video.py data/videos/broadcast.mp4 \
+python analysis_pipeline/detect_and_track.py data/videos/broadcast.mp4 \
   --model models/player_ref_best.pt \
-  --tracker configs/afl_broadcast_bytetrack.yaml \
+  --tracker analysis_pipeline/configs/afl_broadcast_bytetrack.yaml \
   --conf 0.1 \
   --start-frame 69140 \
   --track-id-offset 10000 \

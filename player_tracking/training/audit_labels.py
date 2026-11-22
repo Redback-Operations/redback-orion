@@ -6,7 +6,7 @@ are drawn red with a big index, the rest green/dim. Tiled into contact sheets
 so they can be visually audited in batches.
 
 Usage:
-    python scripts/audit_labels.py \
+    python training/audit_labels.py \
         --images data/raw/broadcast_stkilda_northmelbourne/reviewed/images \
         --labels data/raw/broadcast_stkilda_northmelbourne/reviewed/labels \
         --out /tmp/audit

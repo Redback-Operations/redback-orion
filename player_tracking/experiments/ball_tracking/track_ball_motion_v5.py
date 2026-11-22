@@ -23,7 +23,7 @@ import imageio_ffmpeg
 from ultralytics import YOLO
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MODEL = ROOT / "training_runs" / "dataset_v4_30epochs" / "weights" / "best.pt"
 DEFAULT_OUTPUT_DIR = ROOT / "temporal_tracker_runs" / "motion_v5"
 

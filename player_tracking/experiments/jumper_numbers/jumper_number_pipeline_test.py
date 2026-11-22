@@ -7,7 +7,7 @@ from torch import nn
 from torchvision import transforms
 
 
-PROJECT_FOLDER = Path(__file__).resolve().parent.parent
+PROJECT_FOLDER = Path(__file__).resolve().parents[2]
 MODEL_PATH = PROJECT_FOLDER / "models" / "jumper_digit_model.pth"
 IMAGE_SIZE = 64
 

@@ -4,12 +4,12 @@
 Writes an annotated video and a tracking CSV to outputs/.
 
 Usage:
-    python scripts/track_video.py data/videos/video_1.mp4
-    python scripts/track_video.py data/videos/video_1.mp4 --model models/all_teams_best.pt
-    python scripts/track_video.py data/videos/video_1.mp4 --max-frames 300   # quick test
-    python scripts/track_video.py data/videos/video_1.mp4 --start-frame 50000 \
+    python analysis_pipeline/detect_and_track.py data/videos/video_1.mp4
+    python analysis_pipeline/detect_and_track.py data/videos/video_1.mp4 --model models/all_teams_best.pt
+    python analysis_pipeline/detect_and_track.py data/videos/video_1.mp4 --max-frames 300   # quick test
+    python analysis_pipeline/detect_and_track.py data/videos/video_1.mp4 --start-frame 50000 \
         --track-id-offset 1200 --output-suffix _part2
-    python scripts/track_video.py data/videos/broadcast.mp4 \
+    python analysis_pipeline/detect_and_track.py data/videos/broadcast.mp4 \
         --model runs/detect/broadcast/weights/best.pt --grass-filter
 
 CSV columns: frame, track_id, class, confidence, x1, y1, x2, y2 (pixels).

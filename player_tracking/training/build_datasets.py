@@ -18,7 +18,7 @@ In combined datasets, files are prefixed with the source dataset name
 (e.g. ss_vs_wb__012f0df2-01.jpg) to avoid filename collisions.
 
 Usage:
-    python scripts/build_datasets.py
+    python training/build_datasets.py
 """
 
 import random

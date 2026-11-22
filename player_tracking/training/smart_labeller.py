@@ -10,39 +10,39 @@ static shots) so you only keep useful gameplay frames.
 
 Usage examples:
     # Interactive labelling of one broadcast video (uses COCO yolov8s by default)
-    python scripts/smart_labeller.py data/videos/broadcast_stkilda_northmelbourne.mp4
+    python training/smart_labeller.py data/videos/broadcast_stkilda_northmelbourne.mp4
 
     # Batch auto-label every 30th frame into data/raw/<video_name>/
-    python scripts/smart_labeller.py data/videos/broadcast_*.mp4 \
+    python training/smart_labeller.py data/videos/broadcast_*.mp4 \
         --auto --stride 30
 
     # Keep only good gameplay frames (skip close-ups, transitions, static shots)
-    python scripts/smart_labeller.py data/videos/broadcast_*.mp4 \
+    python training/smart_labeller.py data/videos/broadcast_*.mp4 \
         --auto --stride 30 \
         --min-detections 8 --max-detections 28 --max-box-area-ratio 0.35
 
     # Use a stronger person detector (e.g. yolov8m / yolov8x)
-    python scripts/smart_labeller.py data/videos/broadcast_*.mp4 \
+    python training/smart_labeller.py data/videos/broadcast_*.mp4 \
         --auto --model yolov8m.pt
 
     # Override output location for all videos
-    python scripts/smart_labeller.py data/videos/broadcast_*.mp4 \
+    python training/smart_labeller.py data/videos/broadcast_*.mp4 \
         --auto --stride 30 --output-dir datasets/player_ref/train
 
     # Resume / extend an existing dataset
-    python scripts/smart_labeller.py data/videos/broadcast_brisbane_portadelaide.mp4 \
+    python training/smart_labeller.py data/videos/broadcast_brisbane_portadelaide.mp4 \
         --start-frame 5000
 
     # Review saved labels for a video (skips unlabelled frames)
-    python scripts/smart_labeller.py data/videos/broadcast_stkilda_northmelbourne.mp4 \
+    python training/smart_labeller.py data/videos/broadcast_stkilda_northmelbourne.mp4 \
         --review
 
     # Continue a review session you already started (first 84 frames done)
-    python scripts/smart_labeller.py data/videos/broadcast_stkilda_northmelbourne.mp4 \
+    python training/smart_labeller.py data/videos/broadcast_stkilda_northmelbourne.mp4 \
         --review --reviewed-up-to 84
 
     # Split labelled frames into reviewed/ and unreviewed/ subfolders
-    python scripts/smart_labeller.py data/videos/broadcast_stkilda_northmelbourne.mp4 \
+    python training/smart_labeller.py data/videos/broadcast_stkilda_northmelbourne.mp4 \
         --split
 
 Keyboard controls (interactive mode):

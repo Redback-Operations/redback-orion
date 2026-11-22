@@ -17,7 +17,7 @@ balls outside the field of play.
 The tracker requires a video and a trained ball-detection model:
 
 ```bash
-python scripts/track_ball_temporal.py data/videos/example.mp4 --model models/ball_only_best.pt
+python experiments/ball_tracking/track_ball_temporal.py data/videos/example.mp4 --model models/ball_only_best.pt
 ```
 
 By default, it saves an annotated video, tracking CSV and JSON summary under `outputs/temporal_tracker/`. Model weights and generated outputs are not stored in Git. Green boxes represent detector observations, while orange boxes represent short motion-based predictions.
@@ -45,7 +45,7 @@ stable ball identity.
 ## Prototype design
 
 The standalone prototype is implemented in
-[`scripts/track_ball_temporal.py`](../scripts/track_ball_temporal.py). It uses the
+[`experiments/ball_tracking/track_ball_temporal.py`](../experiments/ball_tracking/track_ball_temporal.py). It uses the
 V4 ball-only detector and writes:
 
 - an annotated video;

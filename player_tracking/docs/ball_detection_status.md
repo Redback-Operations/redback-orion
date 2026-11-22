@@ -64,7 +64,7 @@ phase based on the V4 detector.
   Dataset V4 training and evaluation evidence.
 - [`dataset_v5_experiment_report.md`](dataset_v5_experiment_report.md) —
   Dataset V5 construction, evaluation and the decision to retain V4.
-- [`../configs/bytetrack_ball.yaml`](../configs/bytetrack_ball.yaml) — tuned
+- [`../experiments/ball_tracking/bytetrack_ball.yaml`](../experiments/ball_tracking/bytetrack_ball.yaml) — tuned
   experimental tracker configuration.
 
 ## Evidence storage
