@@ -69,7 +69,9 @@ npx pnpm@10.14.0 dev
 
 Open http://localhost:8080 and create an account on the login page.
 
-To point the app at a backend somewhere other than `http://localhost:8000`, set `VITE_BACKEND_URL` in `frontend/.env` and restart the dev server. Google and Apple sign-in need extra setup, covered in [OAUTH_SETUP.md](OAUTH_SETUP.md).
+To point the app at a backend somewhere other than `http://localhost:8000`, set `VITE_BACKEND_URL` in `frontend/.env` and restart the dev server.
+
+**Working on player screens with an empty database?** Create `frontend/.env.local` containing `VITE_USE_MOCK_PLAYERS=true` and restart the dev server. Player Performance and the dashboard's Player Performance tab then show the example players from `client/lib/mockPlayers.ts`, with a yellow banner saying so. `.env.local` is gitignored, so this only affects your machine, and production builds ignore the setting. Google and Apple sign-in need extra setup, covered in [OAUTH_SETUP.md](OAUTH_SETUP.md).
 
 ### Other commands
 

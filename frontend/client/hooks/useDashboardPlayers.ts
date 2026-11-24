@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
-import { BACKEND_URL } from "@/lib/config";
+import { getPlayers, type Player } from "@/lib/players";
 import type { DashboardPlayer } from "@/components/dashboard/types";
-
-const getAccessToken = () =>
-  localStorage.getItem("accessToken") ||
-  localStorage.getItem("access_token") ||
-  localStorage.getItem("authToken");
 
 const getFieldPositionForRole = (position: string) => {
   const role = position.trim().toLowerCase();
@@ -29,23 +24,28 @@ const getFieldPositionForRole = (position: string) => {
   return { fieldX: 50, fieldY: 50 };
 };
 
-const normalizeDatabasePlayer = (player: any): DashboardPlayer => {
-  const fieldPosition = getFieldPositionForRole(player.position || "");
+/**
+ * The Home tab works with a flatter shape plus a spot on the field.
+ * It starts from the shared Player, so backend changes only need handling in
+ * lib/players.ts.
+ */
+const toDashboardPlayer = (player: Player): DashboardPlayer => {
+  const fieldPosition = getFieldPositionForRole(player.position);
 
   return {
-    id: Number(player.id),
-    name: player.name || "",
-    team: player.team || "",
-    position: player.position || "",
-    number: Number(player.jersey_number ?? player.jerseyNumber ?? 0),
+    id: player.id,
+    name: player.name,
+    team: player.team,
+    position: player.position,
+    number: player.number,
     fieldX: fieldPosition.fieldX,
     fieldY: fieldPosition.fieldY,
-    kicks: Number(player.kicks ?? 0),
-    handballs: Number(player.handballs ?? 0),
-    marks: Number(player.marks ?? 0),
-    tackles: Number(player.tackles ?? 0),
-    goals: Number(player.goals ?? 0),
-    efficiency: Number(player.efficiency ?? 0),
+    kicks: player.stats.kicks,
+    handballs: player.stats.handballs,
+    marks: player.stats.marks,
+    tackles: player.stats.tackles,
+    goals: player.stats.goals,
+    efficiency: player.stats.efficiency,
   };
 };
 
@@ -67,30 +67,7 @@ export function useDashboardPlayers() {
     setPlayersError(null);
 
     try {
-      const token = getAccessToken();
-
-      const response = await fetch(`${BACKEND_URL}/api/players`, {
-        headers: {
-          Accept: "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      });
-
-      const data = await response.json().catch(() => []);
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail ||
-            data?.message ||
-            `Unable to load players (${response.status})`,
-        );
-      }
-
-      if (!Array.isArray(data)) {
-        throw new Error("Player API returned an unexpected response.");
-      }
-
-      const databasePlayers = data.map(normalizeDatabasePlayer);
+      const databasePlayers = (await getPlayers()).map(toDashboardPlayer);
 
       setPlayers(databasePlayers);
       setSelectedPlayer(databasePlayers[0] ?? null);
