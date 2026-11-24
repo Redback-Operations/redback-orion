@@ -39,6 +39,11 @@ from analysis_pipeline.tracking_json import to_legacy_json, write_player_table  
 
 
 def stage_teams(video, tracking_json, out_dir):
+    """Group players into teams by jumper colour (identify_players).
+
+    Writes the clustered tracking JSON, video and metrics CSV into out_dir and returns
+    each track's cluster label plus the list of files written.
+    """
     import argparse as ap
     from analysis_pipeline.identify_players.color_detection_cli import run_pipeline
 
@@ -58,6 +63,12 @@ def stage_teams(video, tracking_json, out_dir):
 
 
 def stage_movement(video, tracks_csv, out_dir):
+    """Work out speed and distance per player from tracks.csv (movement_metrics).
+
+    Writes trajectory.mp4, trajectory.json and player_metrics.csv into out_dir.
+    Returns the per-player rows plus metric_mode and calibration_available,
+    which say whether distances are a pixel estimate or calibrated metres.
+    """
     from analysis_pipeline.movement_metrics.config import TrackingConfig
     from analysis_pipeline.movement_metrics.video_processor import process_tracks
 
@@ -81,6 +92,10 @@ def stage_movement(video, tracks_csv, out_dir):
 
 
 def stage_tackles(players_csv, out_path):
+    """Find tackle events with the rule-based detector in tackle_detection.py.
+
+    Writes {"events": [...]} to out_path and returns the same dict.
+    """
     import pandas as pd
     from analysis_pipeline.tackle_detection import detect_tackles
 
@@ -90,6 +105,11 @@ def stage_tackles(players_csv, out_path):
 
 
 def run_script(script, *args):
+    """Run a stage's command-line script with this Python interpreter.
+
+    Used for stages that only exist as scripts. Raises RuntimeError with the
+    last line of the script's output if it exits with an error.
+    """
     result = subprocess.run([sys.executable, str(script), *map(str, args)],
                             capture_output=True, text=True)
     if result.returncode != 0:
@@ -97,6 +117,12 @@ def run_script(script, *args):
 
 
 def stage_workload(players_csv, out_json, heatmap_dir):
+    """Compute workload per player and draw position heatmaps (workload_heatmaps).
+
+    Thresholds come from workload_heatmaps/config.yaml. Writes workload.json
+    plus a heatmap PNG and density grid CSV per player, and returns the
+    workload rows and the heatmap folder.
+    """
     wl = PIPELINE_DIR / "workload_heatmaps"
     run_script(wl / "scripts" / "compute_workload.py", "--tracking", players_csv,
                "--config", wl / "config.yaml", "--out-json", out_json)
@@ -107,54 +133,59 @@ def stage_workload(players_csv, out_json, heatmap_dir):
 
 
 def stage_formation(video, tracking_json, out_video):
+    """Draw each team's shape over the video (formation_analysis).
+
+    Writes out_video and returns its path.
+    """
     run_script(PIPELINE_DIR / "formation_analysis" / "formation_visualizer_cli.py",
                "--input_video", video, "--input_tracking", tracking_json,
                "--output_video", out_video, "--no_display")
     return {"video": str(out_video)}
 
 
-def main() -> None:
-    p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    p.add_argument("video", type=Path)
-    p.add_argument("--model", type=Path, default=DEFAULT_MODEL)
-    p.add_argument("--conf", type=float, default=0.3)
-    p.add_argument("--max-frames", type=int, default=None, help="stop after N frames (for quick tests)")
-    p.add_argument("--out-dir", type=Path, default=None, help="default: outputs/<video name>/")
-    args = p.parse_args()
+def run_all(video, out_dir=None, tracks_csv=None, tracking=None,
+            model=DEFAULT_MODEL, conf=0.3, max_frames=None) -> dict:
+    """Run every stage on one video, write results.json and return the results.
 
-    out = args.out_dir or ROOT / "outputs" / args.video.stem
+    Pass tracks_csv and tracking (the /tracking JSON for the same video) to
+    reuse saved tracks and skip detection, as player_service does.
+    """
+    video = Path(video)
+    out = Path(out_dir) if out_dir else ROOT / "outputs" / video.stem
     out.mkdir(parents=True, exist_ok=True)
 
-    print("1/6 Detecting and tracking players...")
-    try:
-        info = detect_and_track(args.video, model_path=args.model, tracker=BROADCAST_TRACKER,
-                                conf=args.conf, out_dir=out, stem="tracks",
-                                max_frames=args.max_frames)
-    except (FileNotFoundError, ValueError) as e:
-        raise SystemExit(str(e))
+    if tracks_csv and tracking:
+        csv_path, legacy = Path(tracks_csv), tracking
+        processed = len(legacy["tracking_results"])
+    else:
+        print("1/6 Detecting and tracking players...")
+        info = detect_and_track(video, model_path=model, tracker=BROADCAST_TRACKER,
+                                conf=conf, out_dir=out, stem="tracks",
+                                max_frames=max_frames)
+        csv_path, legacy = info["csv"], to_legacy_json(info["csv"], info)
+        processed = info["processed_frames"]
 
-    legacy = to_legacy_json(info["csv"], info)
     tracking_json = out / "tracking.json"
     tracking_json.write_text(json.dumps(legacy))
     players_csv = out / "players.csv"
     write_player_table(legacy, players_csv)
 
     results = {
-        "video": str(args.video),
-        "model": args.model.name,
+        "video": str(video),
+        "model": Path(model).name,
         "video_info": legacy["video_info"],
-        "processed_frames": info["processed_frames"],
+        "processed_frames": processed,
         "track_ids": len({p["player_id"] for f in legacy["tracking_results"] for p in f["players"]}),
         "stages": {},
         "errors": {},
     }
 
     stages = [
-        ("teams", lambda: stage_teams(args.video, tracking_json, out / "teams")),
-        ("movement", lambda: stage_movement(args.video, info["csv"], out / "movement")),
+        ("teams", lambda: stage_teams(video, tracking_json, out / "teams")),
+        ("movement", lambda: stage_movement(video, csv_path, out / "movement")),
         ("tackles", lambda: stage_tackles(players_csv, out / "tackles.json")),
         ("workload", lambda: stage_workload(players_csv, out / "workload.json", out / "heatmaps")),
-        ("formation", lambda: stage_formation(args.video, tracking_json, out / "formation.mp4")),
+        ("formation", lambda: stage_formation(video, tracking_json, out / "formation.mp4")),
     ]
     for number, (name, stage) in enumerate(stages, start=2):
         print(f"{number}/6 {name}...")
@@ -166,6 +197,26 @@ def main() -> None:
             traceback.print_exc(limit=1)
 
     (out / "results.json").write_text(json.dumps(results, indent=2, default=str))
+    return results
+
+
+def main() -> None:
+    """Command-line entry point: parse the arguments and call run_all()."""
+    p =argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    p.add_argument("video", type=Path)
+    p.add_argument("--model", type=Path, default=DEFAULT_MODEL)
+    p.add_argument("--conf", type=float, default=0.3)
+    p.add_argument("--max-frames", type=int, default=None, help="stop after N frames (for quick tests)")
+    p.add_argument("--out-dir", type=Path, default=None, help="default: outputs/<video name>/")
+    args = p.parse_args()
+
+    out = args.out_dir or ROOT / "outputs" / args.video.stem
+    try:
+        results = run_all(args.video, out, model=args.model,
+                          conf=args.conf, max_frames=args.max_frames)
+    except (FileNotFoundError, ValueError) as e:
+        raise SystemExit(str(e))
+
     print(f"\nDone. Results in {out}")
     if results["errors"]:
         print(f"Stages with errors: {', '.join(results['errors'])} (details in results.json)")
