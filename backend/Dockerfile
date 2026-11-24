@@ -18,6 +18,11 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
+# Shared libraries required by opencv-python (cv2)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libxcb1 libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
