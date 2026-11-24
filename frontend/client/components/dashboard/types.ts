@@ -1,3 +1,5 @@
+import type { Stat } from "@/lib/players";
+
 export type BackendStatusResponse = {
   job_id: string;
   status: string;
@@ -17,12 +19,13 @@ export type DashboardPlayer = {
   number: number;
   fieldX: number;
   fieldY: number;
-  kicks: number;
-  handballs: number;
-  marks: number;
-  tackles: number;
-  goals: number;
-  efficiency: number;
+  // null = not measured. Show with formatStat() from lib/players.
+  kicks: Stat;
+  handballs: Stat;
+  marks: Stat;
+  tackles: Stat;
+  goals: Stat;
+  efficiency: Stat;
 };
 
 export type QueueItemStatus =

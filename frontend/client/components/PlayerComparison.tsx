@@ -29,52 +29,21 @@ import {
 import { cn } from "@/lib/utils";
 import { ArrowLeftRight, BarChart3, TrendingUp, Award } from "lucide-react";
 
-interface PlayerStats {
-  disposals: number;
-  kicks: number;
-  handballs: number;
-  marks: number;
-  tackles: number;
-  goals: number;
-  behinds: number;
-  efficiency: number;
-  contested: number;
-  uncontested: number;
-  inside50s: number;
-  goalAccuracy: number;
-  avgSpeed: number;
-  maxSpeed: number;
-  distance: number;
-  clangers: number;
-  rebounds: number;
-  onePercenters: number;
-  turnovers: number;
-  intercepted: number;
-}
+import { formatStat, type Player, type Stat } from "@/lib/players";
 
-interface AFLPlayer {
-  id: number;
-  name: string;
-  team: string;
-  position: string;
-  number: number;
-  age: number;
-  height: string;
-  weight: string;
-  stats: PlayerStats;
-  form: number[];
-  heatMap: Array<{
-    zone: string;
-    touches: number;
-    effectiveness: number;
-  }>;
-}
+/** value as a percentage of max, or null if it wasn't measured. */
+const percentOf = (value: Stat, max: number): Stat =>
+  value === null ? null : Math.round((value / max) * 100);
+
+/** A chart row can only compare two players if both were measured. */
+const bothMeasured = (row: { player1: Stat; player2: Stat }) =>
+  row.player1 !== null && row.player2 !== null;
 
 interface PlayerComparisonProps {
-  players: AFLPlayer[];
-  selectedPlayer1?: AFLPlayer;
-  selectedPlayer2?: AFLPlayer;
-  onPlayerSelect?: (player: AFLPlayer, position: 1 | 2) => void;
+  players: Player[];
+  selectedPlayer1?: Player;
+  selectedPlayer2?: Player;
+  onPlayerSelect?: (player: Player, position: 1 | 2) => void;
 }
 
 export default function PlayerComparison({
@@ -96,24 +65,24 @@ export default function PlayerComparison({
       stat: "Goals",
       player1: player1.stats.goals,
       player2: player2.stats.goals,
-      maxValue: Math.max(player1.stats.goals, player2.stats.goals, 5),
+      maxValue: Math.max(player1.stats.goals ?? 0, player2.stats.goals ?? 0, 5),
     },
     {
       stat: "Disposals",
-      player1: Math.round((player1.stats.disposals / 50) * 100),
-      player2: Math.round((player2.stats.disposals / 50) * 100),
+      player1: percentOf(player1.stats.disposals, 50),
+      player2: percentOf(player2.stats.disposals, 50),
       maxValue: 100,
     },
     {
       stat: "Marks",
-      player1: Math.round((player1.stats.marks / 15) * 100),
-      player2: Math.round((player2.stats.marks / 15) * 100),
+      player1: percentOf(player1.stats.marks, 15),
+      player2: percentOf(player2.stats.marks, 15),
       maxValue: 100,
     },
     {
       stat: "Tackles",
-      player1: Math.round((player1.stats.tackles / 15) * 100),
-      player2: Math.round((player2.stats.tackles / 15) * 100),
+      player1: percentOf(player1.stats.tackles, 15),
+      player2: percentOf(player2.stats.tackles, 15),
       maxValue: 100,
     },
     {
@@ -124,11 +93,11 @@ export default function PlayerComparison({
     },
     {
       stat: "Speed",
-      player1: Math.round((player1.stats.avgSpeed / 35) * 100),
-      player2: Math.round((player2.stats.avgSpeed / 35) * 100),
+      player1: percentOf(player1.stats.avgSpeed, 35),
+      player2: percentOf(player2.stats.avgSpeed, 35),
       maxValue: 100,
     },
-  ];
+  ].filter(bothMeasured);
 
   // Prepare bar chart data
   const barData = [
@@ -162,15 +131,16 @@ export default function PlayerComparison({
       player1: player1.stats.handballs,
       player2: player2.stats.handballs,
     },
-  ];
+  ].filter(bothMeasured);
 
   // Prepare form comparison data
   const formData = Array.from(
     { length: Math.max(player1.form.length, player2.form.length) },
     (_, i) => ({
       game: `Game ${i + 1}`,
-      player1: player1.form[i] || 0,
-      player2: player2.form[i] || 0,
+      // null leaves a gap in the line where a player has no score for that game.
+      player1: player1.form[i] ?? null,
+      player2: player2.form[i] ?? null,
     }),
   );
 
@@ -204,14 +174,17 @@ export default function PlayerComparison({
     unit = "",
   }: {
     label: string;
-    value1: number;
-    value2: number;
+    value1: Stat;
+    value2: Stat;
     unit?: string;
   }) => {
-    const max = Math.max(value1, value2);
-    const winner1 = value1 > value2;
-    const winner2 = value2 > value1;
-    const tie = value1 === value2;
+    // Only pick a winner when both players were measured.
+    const comparable = value1 !== null && value2 !== null;
+    // `|| 1` stops a divide-by-zero when both values are 0.
+    const max = Math.max(value1 ?? 0, value2 ?? 0) || 1;
+    const winner1 = comparable && value1 > value2;
+    const winner2 = comparable && value2 > value1;
+    const tie = comparable && value1 === value2;
 
     return (
       <div className="space-y-2">
@@ -221,15 +194,13 @@ export default function PlayerComparison({
             <span
               className={cn("text-sm", winner1 && "font-bold text-green-600")}
             >
-              {value1}
-              {unit}
+              {formatStat(value1, unit)}
             </span>
             <span className="text-gray-400">vs</span>
             <span
               className={cn("text-sm", winner2 && "font-bold text-green-600")}
             >
-              {value2}
-              {unit}
+              {formatStat(value2, unit)}
             </span>
           </div>
         </div>
@@ -237,13 +208,13 @@ export default function PlayerComparison({
           <div className="h-2 bg-blue-200 rounded-l">
             <div
               className="h-full bg-blue-500 rounded-l transition-all"
-              style={{ width: `${(value1 / max) * 100}%` }}
+              style={{ width: `${((value1 ?? 0) / max) * 100}%` }}
             />
           </div>
           <div className="h-2 bg-red-200 rounded-r">
             <div
               className="h-full bg-red-500 rounded-r transition-all ml-auto"
-              style={{ width: `${(value2 / max) * 100}%` }}
+              style={{ width: `${((value2 ?? 0) / max) * 100}%` }}
             />
           </div>
         </div>
@@ -355,19 +326,19 @@ export default function PlayerComparison({
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="bg-blue-50 p-2 rounded">
                 <div className="text-lg font-bold text-blue-600">
-                  {player1.stats.goals}
+                  {formatStat(player1.stats.goals)}
                 </div>
                 <div className="text-xs text-gray-600">Goals</div>
               </div>
               <div className="bg-green-50 p-2 rounded">
                 <div className="text-lg font-bold text-green-600">
-                  {player1.stats.disposals}
+                  {formatStat(player1.stats.disposals)}
                 </div>
                 <div className="text-xs text-gray-600">Disposals</div>
               </div>
               <div className="bg-purple-50 p-2 rounded">
                 <div className="text-lg font-bold text-purple-600">
-                  {player1.stats.efficiency}%
+                  {formatStat(player1.stats.efficiency, "%")}
                 </div>
                 <div className="text-xs text-gray-600">Efficiency</div>
               </div>
@@ -400,19 +371,19 @@ export default function PlayerComparison({
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="bg-blue-50 p-2 rounded">
                 <div className="text-lg font-bold text-blue-600">
-                  {player2.stats.goals}
+                  {formatStat(player2.stats.goals)}
                 </div>
                 <div className="text-xs text-gray-600">Goals</div>
               </div>
               <div className="bg-green-50 p-2 rounded">
                 <div className="text-lg font-bold text-green-600">
-                  {player2.stats.disposals}
+                  {formatStat(player2.stats.disposals)}
                 </div>
                 <div className="text-xs text-gray-600">Disposals</div>
               </div>
               <div className="bg-purple-50 p-2 rounded">
                 <div className="text-lg font-bold text-purple-600">
-                  {player2.stats.efficiency}%
+                  {formatStat(player2.stats.efficiency, "%")}
                 </div>
                 <div className="text-xs text-gray-600">Efficiency</div>
               </div>
