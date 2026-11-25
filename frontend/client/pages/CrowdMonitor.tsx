@@ -366,7 +366,12 @@ function GeneratedCrowdHeatmap({
 export default function CrowdMonitor() {
   const [isLive, setIsLive] = useState(true);
   const [crowdZones, setCrowdZones] = useState(generateCrowdData());
-  const [selectedZone, setSelectedZone] = useState(crowdZones[0]);
+
+  const [selectedZoneId, setSelectedZoneId] = useState(crowdZones[0].id);
+
+  const selectedZone =
+    crowdZones.find((zone) => zone.id === selectedZoneId) ?? crowdZones[0];
+
   const [viewMode, setViewMode] = useState("heatmap");
   const [heatmapDisplayMode, setHeatmapDisplayMode] = useState<"zones" | "image">("zones");
   const [timeRange, setTimeRange] = useState("live");
@@ -644,7 +649,7 @@ export default function CrowdMonitor() {
                     {crowdZones.map((zone) => (
                       <button
                         key={zone.id}
-                        onClick={() => setSelectedZone(zone)}
+                        onClick={() => setSelectedZoneId(zone.id)}
                         className={`absolute transition-all duration-300 border-2 
                            hover:scale-105 hover:z-10 hover:shadow-xl hover:ring-2 hover:ring-white
                            border-transparent ${
@@ -794,7 +799,7 @@ export default function CrowdMonitor() {
                     className={`cursor-pointer transition-colors ${
                       selectedZone.id === zone.id ? "ring-2 ring-blue-500" : ""
                     }`}
-                    onClick={() => setSelectedZone(zone)}
+                    onClick={() => setSelectedZoneId(zone.id)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
