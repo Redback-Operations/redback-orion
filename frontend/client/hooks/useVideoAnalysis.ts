@@ -371,22 +371,12 @@ export function useVideoAnalysis() {
                   : "Crowd Analysis",
         status: "uploading" as const,
         progress: 0,
-        duration: `${Math.floor(Math.random() * 60 + 30)}:${Math.floor(
-          Math.random() * 60,
-        )
-          .toString()
-          .padStart(2, "0")}`,
+        duration: "--", // real duration not known until processed
         size: `${(selectedVideoFile.size / (1024 * 1024)).toFixed(1)} MB`,
         uploadTime: new Date().toISOString(),
         completedTime: null,
-        estimatedCompletion: new Date(
-          Date.now() + Math.random() * 600000 + 300000,
-        ).toISOString(), // 5-15 minutes
-        priority: (selectedFocusAreas.length > 2
-          ? "high"
-          : Math.random() > 0.5
-            ? "medium"
-            : "low") as "low" | "medium" | "high",
+        estimatedCompletion: null,
+        priority: "medium" as const,
         userId: "current_user",
         processingStage: "file_upload",
         errorCount: 0,
