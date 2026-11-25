@@ -1,7 +1,5 @@
-# Player tracking service (player_service/) and the player_tracking_logic
-# scripts it runs: Yolov11_ByteTrack_Player_Tracking/final_code, Tracking_Ethan,
-# Re-Identification/JerseyColorDetection, Re-Identification/Formation_Visualization,
-# tackle_detection_shafqat_ullah.
+# Player tracking service (player_service/) and analysis_pipeline/,
+# including analysis_pipeline/run_pipeline.py.
 
 # API
 fastapi
@@ -15,3 +13,5 @@ numpy
 pandas
 scikit-learn
 scipy
+lap>=0.5.12       # ByteTrack dependency (not auto-declared by ultralytics)
+imageio-ffmpeg    # H.264 output from analysis_pipeline/detect_and_track.py

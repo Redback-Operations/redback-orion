@@ -2,6 +2,8 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,10 +12,23 @@ from fastapi.responses import FileResponse
 import config
 from routes import tracking, path_trajectory, jersey_color, tackle, formation
 
+
+@asynccontextmanager
+async def lifespan(app):
+    # Fetch the model at startup so the first upload doesn't wait for it.
+    # If it fails, the service still starts and /tracking explains the problem.
+    try:
+        config.ensure_model()
+    except config.DownloadError as e:
+        print(f"Warning: tracking model not downloaded yet.\n{e}")
+    yield
+
+
 app = FastAPI(
     title="AFL Player Tracking Service",
     description="Microservice for AFL player tracking, jersey colour, tackle detection and formation analysis",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -63,4 +78,4 @@ def root():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

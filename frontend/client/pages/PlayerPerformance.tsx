@@ -21,7 +21,6 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MobileNavigation from "@/components/MobileNavigation";
 import LiveClock from "@/components/LiveClock";
-import AFLPlayerCard from "@/components/AFLPlayerCard";
 import PlayerComparison from "@/components/PlayerComparison";
 import {
   LineChart,
@@ -32,11 +31,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
   RadarChart,
   Radar,
   PolarGrid,
@@ -47,13 +42,10 @@ import {
 } from "recharts";
 import {
   Search,
-  Filter,
   TrendingUp,
   TrendingDown,
   Target,
   Activity,
-  Zap,
-  Award,
   Users,
   BarChart3,
   PieChart as PieChartIcon,
@@ -61,254 +53,303 @@ import {
   Pause,
   RefreshCw,
   Download,
-  Settings,
-  Eye,
-  Star,
   Heart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { isAdmin } from "@/lib/auth";
-import { canManagePlayers } from "@/lib/auth";
+import { canManagePlayers, getAccessToken } from "@/lib/auth";
+import MockPlayersBanner from "@/components/MockPlayersBanner";
+import {
+  averageStats,
+  formatStat,
+  getPlayers,
+  playersToCsv,
+  sumStats,
+  type Player,
+} from "@/lib/players";
+import { downloadCSV } from "@/lib/download";
 
-// Comprehensive player data with enhanced AFL statistics
-const generatePlayerData = () => {
-  const teams = [
-    "Western Bulldogs",
-    "Richmond",
-    "Geelong",
-    "Melbourne",
-    "Carlton",
-    "Adelaide",
-    "West Coast",
-    "Collingwood",
-    "Essendon",
-    "Fremantle",
-    "Brisbane",
-    "Sydney",
-    "St Kilda",
-    "Port Adelaide",
-    "North Melbourne",
-    "Gold Coast",
-    "GWS Giants",
-    "Hawthorn",
-  ];
+// How often Play Live re-fetches players from the backend.
+const LIVE_REFRESH_MS = 10_000;
+
+// Shown in place of a chart when the selected player has no data for it.
+const NoChartData = ({
+  message,
+  className = "",
+}: {
+  message: string;
+  className?: string;
+}) => (
+  <div
+    className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 p-8 text-center ${className}`}
+  >
+    <BarChart3 className="mb-2 h-8 w-8 text-gray-300" />
+    <p className="text-sm font-medium text-gray-600">No data yet</p>
+    <p className="mt-1 text-xs text-gray-500">{message}</p>
+  </div>
+);
 
 
-
-
-  const positions = ["Midfielder", "Forward", "Defender", "Ruckman"];
-
-  const players = [
-    {
-      id: 1,
-      name: "Marcus Bontempelli",
-      team: "Western Bulldogs",
-      position: "Midfielder",
-      number: 4,
-      age: 28,
-      height: "1.93m",
-      weight: "92kg",
-      photo: "/image.png",
-      stats: {
-        kicks: 28,
-        handballs: 12,
-        disposals: 40,
-        marks: 8,
-        tackles: 6,
-        goals: 2,
-        behinds: 1,
-        efficiency: 87,
-        contested: 18,
-        uncontested: 22,
-        clangers: 3,
-        inside50s: 7,
-        rebounds: 4,
-        onePercenters: 2,
-        turnovers: 4,
-        intercepted: 2,
-        goalAccuracy: 67,
-        avgSpeed: 24.8,
-        maxSpeed: 32.4,
-        distance: 12.8,
-      },
-      form: [85, 89, 91, 87, 93, 88, 87, 90, 85, 92],
-      heatMap: [
-        { zone: "Forward 50", touches: 12, effectiveness: 85 },
-        { zone: "Center Bounce", touches: 18, effectiveness: 92 },
-        { zone: "Defensive 50", touches: 10, effectiveness: 78 },
-      ],
-      possessionData: [
-        { time: 0, possession: 12 },
-        { time: 5, possession: 8 },
-        { time: 10, possession: 15 },
-        { time: 15, possession: 20 },
-        { time: 20, possession: 18 },
-        { time: 25, possession: 22 },
-        { time: 30, possession: 25 },
-      ],
-    },
-    {
-      id: 2,
-      name: "Dayne Zorko",
-      team: "Brisbane",
-      position: "Midfielder",
-      number: 5,
-      age: 35,
-      height: "1.78m",
-      weight: "78kg",
-      photo: "/image.png",
-      stats: {
-        kicks: 31,
-        handballs: 14,
-        disposals: 45,
-        marks: 9,
-        tackles: 7,
-        goals: 3,
-        behinds: 2,
-        efficiency: 89,
-        contested: 20,
-        uncontested: 25,
-        clangers: 2,
-        inside50s: 8,
-        rebounds: 5,
-        onePercenters: 1,
-        turnovers: 3,
-        intercepted: 1,
-        goalAccuracy: 75,
-        avgSpeed: 26.2,
-        maxSpeed: 33.1,
-        distance: 13.5,
-      },
-      form: [92, 85, 88, 94, 91, 89, 93, 87, 90, 95],
-      heatMap: [
-        { zone: "Forward 50", touches: 15, effectiveness: 88 },
-        { zone: "Center Bounce", touches: 22, effectiveness: 90 },
-        { zone: "Defensive 50", touches: 8, effectiveness: 85 },
-      ],
-      possessionData: [
-        { time: 0, possession: 8 },
-        { time: 5, possession: 12 },
-        { time: 10, possession: 18 },
-        { time: 15, possession: 20 },
-        { time: 20, possession: 23 },
-        { time: 25, possession: 26 },
-        { time: 30, possession: 30 },
-      ],
-    },
-    // Add more players with similar detailed data structure
-    ...Array.from({ length: 16 }, (_, i) => ({
-      id: i + 3,
-      name: `Player ${i + 3}`,
-      team: teams[i % teams.length],
-      position: positions[i % positions.length],
-      number: (i % 50) + 1,
-      age: Math.floor(Math.random() * 15) + 20,
-      height: `1.${Math.floor(Math.random() * 30) + 70}m`,
-      weight: `${Math.floor(Math.random() * 30) + 75}kg`,
-      photo: "/image.png",
-      stats: {
-        kicks: Math.floor(Math.random() * 20) + 15,
-        handballs: Math.floor(Math.random() * 15) + 5,
-        disposals: Math.floor(Math.random() * 30) + 25,
-        marks: Math.floor(Math.random() * 10) + 3,
-        tackles: Math.floor(Math.random() * 8) + 2,
-        goals: Math.floor(Math.random() * 5),
-        behinds: Math.floor(Math.random() * 3),
-        efficiency: Math.floor(Math.random() * 25) + 70,
-        contested: Math.floor(Math.random() * 15) + 10,
-        uncontested: Math.floor(Math.random() * 20) + 15,
-        clangers: Math.floor(Math.random() * 5) + 1,
-        inside50s: Math.floor(Math.random() * 8) + 2,
-        rebounds: Math.floor(Math.random() * 6) + 1,
-        onePercenters: Math.floor(Math.random() * 5) + 1,
-        turnovers: Math.floor(Math.random() * 6) + 2,
-        intercepted: Math.floor(Math.random() * 3) + 1,
-        goalAccuracy: Math.floor(Math.random() * 40) + 60,
-        avgSpeed: Math.random() * 10 + 20,
-        maxSpeed: Math.random() * 10 + 28,
-        distance: Math.random() * 5 + 10,
-      },
-      form: Array.from(
-        { length: 10 },
-        () => Math.floor(Math.random() * 25) + 75,
-      ),
-      heatMap: [
-        {
-          zone: "Forward 50",
-          touches: Math.floor(Math.random() * 15) + 5,
-          effectiveness: Math.floor(Math.random() * 20) + 75,
-        },
-        {
-          zone: "Center Bounce",
-          touches: Math.floor(Math.random() * 20) + 10,
-          effectiveness: Math.floor(Math.random() * 20) + 75,
-        },
-        {
-          zone: "Defensive 50",
-          touches: Math.floor(Math.random() * 12) + 3,
-          effectiveness: Math.floor(Math.random() * 20) + 75,
-        },
-      ],
-      possessionData: Array.from({ length: 7 }, (_, j) => ({
-        time: j * 5,
-        possession: Math.floor(Math.random() * 20) + 5 + j * 2,
-      })),
-    })),
-  ];
-
-  return players;
+const getTeamColor = (team: string) => {
+  const teamColors: Record<string, string> = {
+    "Western Bulldogs": "#1E40AF",
+    Brisbane: "#8B0000",
+    Richmond: "#FFD700",
+    Geelong: "#1E3A8A",
+    Melbourne: "#DC2626",
+    Carlton: "#3B82F6",
+    Adelaide: "#EF4444",
+    "West Coast": "#1D4ED8",
+    Collingwood: "#000000",
+    Essendon: "#B91C1C",
+    Fremantle: "#9333EA",
+  };
+  return teamColors[team] || "#6B7280";
 };
 
-const normalizePlayer = (p: any) => ({
-  id: p.id,
-  name: p.name,
-  team: p.team,
-  position: p.position,
-  number: p.jersey_number,
-  age: p.age,
-  height: p.height || "-",
-  weight: p.weight || "-",
-  photo: p.photo || "/image.png",
-  stats: {
-    kicks: p.kicks,
-    handballs: p.handballs,
-    disposals: p.disposals,
-    marks: p.marks,
-    tackles: p.tackles,
-    goals: p.goals,
-    behinds: 0,
-    efficiency: p.efficiency,
-    contested: 0,
-    uncontested: 0,
-    clangers: 0,
-    inside50s: p.inside50s,
-    rebounds: 0,
-    onePercenters: 0,
-    turnovers: 0,
-    intercepted: 0,
-    goalAccuracy: p.efficiency,
-    avgSpeed: 0,
-    maxSpeed: 0,
-    distance: 0,
-  },
-  form: [],
-  heatMap: [],
-  possessionData: [],
-});
+const getTeamLogo = (team: string) => {
+  const teamLogos: Record<string, string> = {
+    "Western Bulldogs": "/team-logos/western-bulldogs.svg",
+    Richmond: "/team-logos/richmond.svg",
+    Geelong: "/team-logos/geelong.svg",
+    Melbourne: "/team-logos/melbourne.svg",
+    Carlton: "/team-logos/carlton.svg",
+    Adelaide: "/team-logos/adelaide.svg",
+    "West Coast": "/team-logos/west-coast.svg",
+    Collingwood: "/team-logos/collingwood.svg",
+    Essendon: "/team-logos/essendon.svg",
+    Fremantle: "/team-logos/fremantle.svg",
+    Brisbane: "/team-logos/brisbane.svg",
+    Sydney: "/team-logos/sydney.svg",
+    "St Kilda": "/team-logos/st-kilda.svg",
+    "Port Adelaide": "/team-logos/port-adelaide.svg",
+    "North Melbourne": "/team-logos/north-melbourne.svg",
+    "Gold Coast": "/team-logos/gold-coast.svg",
+    "GWS Giants": "/team-logos/gws-giants.svg",
+    Hawthorn: "/team-logos/hawthorn.svg",
+  };
+
+  return teamLogos[team] || "/team-logos/default.svg";
+};
+
+const colorClasses: Record<string, { text: string; bg: string }> = {
+  blue:   { text: "text-blue-600",   bg: "bg-blue-100" },
+  green:  { text: "text-green-600",  bg: "bg-green-100" },
+  purple: { text: "text-purple-600", bg: "bg-purple-100" },
+  orange: { text: "text-orange-600", bg: "bg-orange-100" },
+  red:    { text: "text-red-600",    bg: "bg-red-100" },
+  yellow: { text: "text-yellow-600", bg: "bg-yellow-100" },
+  pink:   { text: "text-pink-600",   bg: "bg-pink-100" },
+  gray:   { text: "text-gray-600",   bg: "bg-gray-100" },
+};
+
+const StatCard = ({
+  title,
+  value,
+  subtitle,
+  trend,
+  color = "blue",
+  icon: Icon,
+  active = false,
+  onClick,
+}: {
+  title: string;
+  value: string | number;
+  subtitle?: string;
+  trend?: "up" | "down" | "stable";
+  color?: string;
+  icon?: any;
+  active?: boolean;
+  onClick?: () => void;
+}) => {
+  // Pick the full class names for this colour. Unknown colours fall back to blue.
+  const c = colorClasses[color] ?? colorClasses.blue;
+
+  return (
+    <Card
+      className={`relative overflow-hidden transition-all duration-200 ${
+        onClick ? "cursor-pointer" : ""
+      } ${active ? "ring-2 ring-blue-500 ring-offset-2 shadow-lg" : ""}`}
+      onClick={onClick}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            {Icon && <Icon className={`w-4 h-4 ${c.text}`} />}
+            <span className="text-sm font-medium text-gray-600">{title}</span>
+          </div>
+          {trend && (
+            <div className="flex items-center">
+              {trend === "up" && (
+                <TrendingUp className="w-3 h-3 text-green-500" />
+              )}
+              {trend === "down" && (
+                <TrendingDown className="w-3 h-3 text-red-500" />
+              )}
+              {trend === "stable" && (
+                <div className="w-3 h-3 rounded-full bg-gray-400" />
+              )}
+            </div>
+          )}
+        </div>
+        <div className={`text-2xl font-bold mb-1 ${c.text}`}>{value}</div>
+        {subtitle && <div className="text-xs text-gray-500">{subtitle}</div>}
+        <div
+          className={`absolute bottom-0 right-0 w-16 h-16 rounded-full -mr-8 -mb-8 opacity-50 ${c.bg}`}
+        />
+      </CardContent>
+    </Card>
+  );
+};
+
+type EnhancedPlayerCardProps = {
+  player: Player;
+  isSelected: boolean;
+  isFavorite: boolean;
+  isDeleting: boolean;
+  onClick: () => void;
+  onToggleFavorite: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onDelete: () => void;
+};
+
+const EnhancedPlayerCard = ({
+  player,
+  isSelected,
+  isFavorite,
+  isDeleting,
+  onClick,
+  onToggleFavorite,
+  onDelete,
+}: EnhancedPlayerCardProps) => (
+  <Card
+    className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""
+      }`}
+    onClick={onClick}
+  >
+    <div
+      className="h-24 rounded-t-lg relative"
+      style={{ backgroundColor: getTeamColor(player.team) }}
+    >
+      <div className="absolute top-4 left-4 flex items-start gap-3 text-white">
+        <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center overflow-hidden">
+          <img
+            src={getTeamLogo(player.team)}
+            alt={`${player.team} logo`}
+            className="w-10 h-10 object-cover scale-110"
+            onError={(e) => {
+              e.currentTarget.src = "/team-logos/default.svg";
+            }}
+          />
+        </div>
+
+        <div>
+          <div className="text-2xl font-bold">#{player.number}</div>
+          <div className="text-sm">{player.team}</div>
+        </div>
+      </div>
+
+      <div className="absolute top-4 right-4 text-white text-right">
+        <div className="text-xl font-bold">{formatStat(player.stats.disposals)}</div>
+        <div className="text-xs">DISPOSALS</div>
+      </div>
+    </div>
+
+    <CardContent className="p-4">
+      <div className="flex items-center gap-3 mb-3">
+        {player.photo ? (
+          <img
+            src={player.photo}
+            alt={player.name}
+            className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gray-300 border-2 border-white shadow-lg flex items-center justify-center">
+            <span className="text-sm font-bold text-gray-600">
+              {player.name
+                .split(" ")
+                .map((n: string) => n[0])
+                .join("")}
+            </span>
+          </div>
+        )}
+
+        <div className="flex-1">
+          <h3 className="font-bold text-sm leading-tight">{player.name}</h3>
+          <p className="text-xs text-gray-600">{player.position}</p>
+        </div>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          aria-label={
+            isFavorite
+              ? `Remove ${player.name} from favourites`
+              : `Add ${player.name} to favourites`
+          }
+          onClick={onToggleFavorite}
+        >
+          <Heart
+            className={`h-5 w-5 ${
+              isFavorite
+                ? "fill-red-500 text-red-500"
+                : "text-gray-500"
+            }`}
+          />
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="bg-blue-50 p-2 rounded">
+          <div className="font-bold text-blue-600">{formatStat(player.stats.goals)}</div>
+          <div className="text-gray-600">Goals</div>
+        </div>
+        <div className="bg-green-50 p-2 rounded">
+          <div className="font-bold text-green-600">{formatStat(player.stats.marks)}</div>
+          <div className="text-gray-600">Marks</div>
+        </div>
+        <div className="bg-purple-50 p-2 rounded">
+          <div className="font-bold text-purple-600">
+            {formatStat(player.stats.efficiency, "%")}
+          </div>
+          <div className="text-gray-600">Eff.</div>
+        </div>
+      </div>
+
+      {canManagePlayers() && (
+      <Button
+        variant="ghost"
+        size="sm"
+        className="mt-3 w-full text-red-600 hover:bg-red-50"
+        disabled={isDeleting}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+      >
+        {isDeleting ? "Deleting..." : "Delete"}
+      </Button>
+      )}
+    </CardContent>
+  </Card>
+);
 
 
 export default function PlayerPerformance() {
   const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const ENABLE_LIVE_FEATURES = true;
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  // The LiveClock counts down from a made-up "Q2 15:23" and isn't connected
+  // to a real match. Keep it hidden until the backend provides match time.
+  const ENABLE_LIVE_FEATURES = false;
 
-  const [players, setPlayers] = useState<any[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [playersLoading, setPlayersLoading] = useState(true);
   const [playersError, setPlayersError] = useState("");
   const [deletingPlayerId, setDeletingPlayerId] = useState<number | null>(null);
-  const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
-  const [comparisonPlayer, setComparisonPlayer] = useState(players[1]);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [comparisonPlayer, setComparisonPlayer] = useState<Player | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("all");
   const [selectedPosition, setSelectedPosition] = useState("all");
@@ -318,10 +359,7 @@ export default function PlayerPerformance() {
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState("");
   const [jobs, setJobs] = useState<any[]>([]);
-  const token =
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("access_token") ||
-    localStorage.getItem("authToken");
+  const token = getAccessToken();
   const [jobStatus, setJobStatus] = useState("");
   const [jobId, setJobId] = useState("");
   const [jobError, setJobError] = useState("");
@@ -344,7 +382,7 @@ export default function PlayerPerformance() {
     return `favoritePlayers:${email.trim().toLowerCase()}`;
   };
 
-  const [favoritePlayers, setFavoritePlayers] = useState<any[]>([]);
+  const [favoritePlayers, setFavoritePlayers] = useState<Player[]>([]);
 
   // --- Bulk Excel upload state ---
   const [excelUploadStatus, setExcelUploadStatus] = useState("");
@@ -365,7 +403,6 @@ export default function PlayerPerformance() {
 
 
     const data = await res.json();
-    console.log("UPLOAD RESULT:", data);
     return data.job_id;
   };
 
@@ -377,7 +414,6 @@ export default function PlayerPerformance() {
     });
 
     const data = await res.json();
-    console.log("JOBS:", data);
     return data.jobs;
   };
 
@@ -411,7 +447,7 @@ export default function PlayerPerformance() {
 
   const toggleFavoritePlayer = (
     event: React.MouseEvent<HTMLButtonElement>,
-    player: any,
+    player: Player,
   ) => {
     event.stopPropagation();
 
@@ -511,6 +547,9 @@ export default function PlayerPerformance() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/players/upload-excel`, {
         method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: formData,
       });
 
@@ -542,50 +581,51 @@ export default function PlayerPerformance() {
     }
   };
 
-  const fetchPlayers = async () => {
-    setPlayersLoading(true);
-    setPlayersError("");
+  // silent: a background refresh from Play Live. It doesn't show the loading
+  // screen, and if it fails it keeps the last good data on screen.
+  const fetchPlayers = async ({ silent = false } = {}) => {
+    if (!silent) {
+      setPlayersLoading(true);
+      setPlayersError("");
+    }
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/players`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail ||
-            data?.message ||
-            `Failed to fetch players (${response.status})`,
-        );
-      }
-
-      if (!Array.isArray(data)) {
-        throw new Error("Invalid player response received from server.");
-      }
-
-      setPlayers(data.map(normalizePlayer));
+      setPlayers(await getPlayers());
+      setPlayersError("");
+      setLastUpdated(new Date());
     } catch (error) {
       console.error("PLAYER DATABASE ERROR:", error);
-      setPlayers([]);
-      setPlayersError(
-        error instanceof Error
-          ? error.message
-          : "Unable to load players from database.",
-      );
+      if (!silent) {
+        setPlayers([]);
+        setPlayersError(
+          error instanceof Error
+            ? error.message
+            : "Unable to load players from database.",
+        );
+      }
     } finally {
-      setPlayersLoading(false);
+      if (!silent) setPlayersLoading(false);
     }
   };
 
   useEffect(() => {
     fetchPlayers();
   }, []);
+
+  // Play Live: re-fetch players in the background while it's on.
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      // Skip refreshes while the browser tab is hidden.
+      if (document.visibilityState === "visible") {
+        fetchPlayers({ silent: true });
+      }
+    }, LIVE_REFRESH_MS);
+
+    // Runs when Play Live is turned off or the page is left, so timers never pile up.
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   useEffect(() => {
     try {
@@ -609,10 +649,10 @@ export default function PlayerPerformance() {
 
   useEffect(() => {
     if (players.length > 0) {
-      setSelectedPlayer((current: any) =>
+      setSelectedPlayer((current) =>
         players.find((player) => player.id === current?.id) || players[0],
       );
-      setComparisonPlayer((current: any) =>
+      setComparisonPlayer((current) =>
         players.find((player) => player.id === current?.id) ||
         players[1] ||
         players[0],
@@ -656,7 +696,7 @@ export default function PlayerPerformance() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-red-600">{playersError}</p>
-              <Button onClick={fetchPlayers}>
+              <Button onClick={() => fetchPlayers()}>
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Try Again
               </Button>
@@ -686,7 +726,7 @@ export default function PlayerPerformance() {
               >
                 Add Player
               </Button>
-              <Button variant="outline" onClick={fetchPlayers}>
+              <Button variant="outline" onClick={() => fetchPlayers()}>
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Refresh
               </Button>
@@ -738,13 +778,16 @@ export default function PlayerPerformance() {
       target: 85,
       color: "#00ff00",
     },
-  ];
+    // Stats that weren't measured are left off the chart rather than drawn as 0.
+  ].filter((metric) => metric.value !== null);
+
+  const { inside50s, avgSpeed } = selectedPlayer.stats;
 
   const playerMetrics = [
     { metric: "Goals", value: selectedPlayer.stats.goals, max: 5 },
     {
       metric: "Assists",
-      value: Math.floor(selectedPlayer.stats.inside50s / 2),
+      value: inside50s === null ? null : Math.floor(inside50s / 2),
       max: 4,
     },
     { metric: "Tackles", value: selectedPlayer.stats.tackles, max: 10 },
@@ -752,222 +795,24 @@ export default function PlayerPerformance() {
     { metric: "Efficiency", value: selectedPlayer.stats.efficiency, max: 100 },
     {
       metric: "Speed",
-      value: Math.round(selectedPlayer.stats.avgSpeed),
+      value: avgSpeed === null ? null : Math.round(avgSpeed),
       max: 35,
     },
-  ];
+  ].filter((metric) => metric.value !== null);
 
-  const getTeamColor = (team: string) => {
-    const teamColors: Record<string, string> = {
-      "Western Bulldogs": "#1E40AF",
-      Brisbane: "#8B0000",
-      Richmond: "#FFD700",
-      Geelong: "#1E3A8A",
-      Melbourne: "#DC2626",
-      Carlton: "#3B82F6",
-      Adelaide: "#EF4444",
-      "West Coast": "#1D4ED8",
-      Collingwood: "#000000",
-      Essendon: "#B91C1C",
-      Fremantle: "#9333EA",
-    };
-    return teamColors[team] || "#6B7280";
+  // Export: downloads the players that match the current search and filters.
+  const handleExport = () => {
+    const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+    downloadCSV(playersToCsv(filteredPlayers), `players-${today}.csv`);
   };
 
-  const getTeamLogo = (team: string) => {
-    const teamLogos: Record<string, string> = {
-      "Western Bulldogs": "/team-logos/western-bulldogs.svg",
-      Richmond: "/team-logos/richmond.svg",
-      Geelong: "/team-logos/geelong.svg",
-      Melbourne: "/team-logos/melbourne.svg",
-      Carlton: "/team-logos/carlton.svg",
-      Adelaide: "/team-logos/adelaide.svg",
-      "West Coast": "/team-logos/west-coast.svg",
-      Collingwood: "/team-logos/collingwood.svg",
-      Essendon: "/team-logos/essendon.svg",
-      Fremantle: "/team-logos/fremantle.svg",
-      Brisbane: "/team-logos/brisbane.svg",
-      Sydney: "/team-logos/sydney.svg",
-      "St Kilda": "/team-logos/st-kilda.svg",
-      "Port Adelaide": "/team-logos/port-adelaide.svg",
-      "North Melbourne": "/team-logos/north-melbourne.svg",
-      "Gold Coast": "/team-logos/gold-coast.svg",
-      "GWS Giants": "/team-logos/gws-giants.svg",
-      Hawthorn: "/team-logos/hawthorn.svg",
-    };
-
-    return teamLogos[team] || "/team-logos/default.svg";
-  };
-
-  const StatCard = ({
-    title,
-    value,
-    subtitle,
-    trend,
-    color = "blue",
-    icon: Icon,
-    active = false,
-    onClick,
-  }: {
-    title: string;
-    value: string | number;
-    subtitle?: string;
-    trend?: "up" | "down" | "stable";
-    color?: string;
-    icon?: any;
-    active?: boolean;
-    onClick?: () => void;
-  }) => (
-    <Card
-      className={`relative overflow-hidden transition-all duration-200 ${onClick ? "cursor-pointer" : ""} ${active ? "ring-2 ring-blue-500 ring-offset-2 shadow-lg" : ""
-        }`}
-      onClick={onClick}
-    >
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            {Icon && <Icon className={`w-4 h-4 text-${color}-600`} />}
-            <span className="text-sm font-medium text-gray-600">{title}</span>
-          </div>
-          {trend && (
-            <div className="flex items-center">
-              {trend === "up" && (
-                <TrendingUp className="w-3 h-3 text-green-500" />
-              )}
-              {trend === "down" && (
-                <TrendingDown className="w-3 h-3 text-red-500" />
-              )}
-              {trend === "stable" && (
-                <div className="w-3 h-3 rounded-full bg-gray-400" />
-              )}
-            </div>
-          )}
-        </div>
-        <div className={`text-2xl font-bold text-${color}-600 mb-1`}>
-          {value}
-        </div>
-        {subtitle && <div className="text-xs text-gray-500">{subtitle}</div>}
-        <div
-          className={`absolute bottom-0 right-0 w-16 h-16 bg-${color}-100 rounded-full -mr-8 -mb-8 opacity-50`}
-        />
-      </CardContent>
-    </Card>
+  // Summary tiles. Only measured values count towards totals and averages.
+  const totalGoals = sumStats(filteredPlayers.map((p) => p.stats.goals));
+  const totalDisposals = sumStats(filteredPlayers.map((p) => p.stats.disposals));
+  const averageEfficiency = averageStats(
+    filteredPlayers.map((p) => p.stats.efficiency),
   );
 
-  const EnhancedPlayerCard = ({ player, isSelected, onClick, onDelete }: any) => (
-    <Card
-      className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""
-        }`}
-      onClick={onClick}
-    >
-      <div
-        className="h-24 rounded-t-lg relative"
-        style={{ backgroundColor: getTeamColor(player.team) }}
-      >
-        <div className="absolute top-4 left-4 flex items-start gap-3 text-white">
-          <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center overflow-hidden">
-            <img
-              src={getTeamLogo(player.team)}
-              alt={`${player.team} logo`}
-              className="w-10 h-10 object-cover scale-110"
-              onError={(e) => {
-                e.currentTarget.src = "/team-logos/default.svg";
-              }}
-            />
-          </div>
-
-          <div>
-            <div className="text-2xl font-bold">#{player.number}</div>
-            <div className="text-sm">{player.team}</div>
-          </div>
-        </div>
-
-        <div className="absolute top-4 right-4 text-white text-right">
-          <div className="text-xl font-bold">{player.stats.disposals}</div>
-          <div className="text-xs">DISPOSALS</div>
-        </div>
-      </div>
-
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3 mb-3">
-          {player.photo ? (
-            <img
-              src={player.photo}
-              alt={player.name}
-              className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-300 border-2 border-white shadow-lg flex items-center justify-center">
-              <span className="text-sm font-bold text-gray-600">
-                {player.name
-                  .split(" ")
-                  .map((n: string) => n[0])
-                  .join("")}
-              </span>
-            </div>
-          )}
-
-          <div className="flex-1">
-            <h3 className="font-bold text-sm leading-tight">{player.name}</h3>
-            <p className="text-xs text-gray-600">{player.position}</p>
-          </div>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="shrink-0"
-            aria-label={
-              isFavoritePlayer(player.id)
-                ? `Remove ${player.name} from favourites`
-                : `Add ${player.name} to favourites`
-            }
-            onClick={(event) => toggleFavoritePlayer(event, player)}
-          >
-            <Heart
-              className={`h-5 w-5 ${
-                isFavoritePlayer(player.id)
-                  ? "fill-red-500 text-red-500"
-                  : "text-gray-500"
-              }`}
-            />
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 text-center text-xs">
-          <div className="bg-blue-50 p-2 rounded">
-            <div className="font-bold text-blue-600">{player.stats.goals}</div>
-            <div className="text-gray-600">Goals</div>
-          </div>
-          <div className="bg-green-50 p-2 rounded">
-            <div className="font-bold text-green-600">{player.stats.marks}</div>
-            <div className="text-gray-600">Marks</div>
-          </div>
-          <div className="bg-purple-50 p-2 rounded">
-            <div className="font-bold text-purple-600">
-              {player.stats.efficiency}%
-            </div>
-            <div className="text-gray-600">Eff.</div>
-          </div>
-        </div>
-
-        {canManagePlayers() && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-3 w-full text-red-600 hover:bg-red-50"
-          disabled={deletingPlayerId === player.id}
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(player.id);
-          }}
-        >
-          {deletingPlayerId === player.id ? "Deleting..." : "Delete"}
-        </Button>
-        )}
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
@@ -976,6 +821,8 @@ export default function PlayerPerformance() {
       {/* Main Content */}
       <div className="lg:ml-64 pb-16 lg:pb-0">
         <div className="p-4 space-y-6">
+          <MockPlayersBanner />
+
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -987,6 +834,11 @@ export default function PlayerPerformance() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              {isPlaying && lastUpdated && (
+                <span className="text-xs text-gray-500 hidden sm:inline">
+                  Updated {lastUpdated.toLocaleTimeString()}
+                </span>
+              )}
               <Button
                 variant={isPlaying ? "default" : "outline"}
                 size="sm"
@@ -1000,44 +852,49 @@ export default function PlayerPerformance() {
                 )}
                 {isPlaying ? "Pause" : "Play"} Live
               </Button>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                disabled={filteredPlayers.length === 0}
+                title="Download the players shown below as a CSV file"
+              >
                 <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4" />
+                Export CSV
               </Button>
             </div>
           </div>
-          <div style={{ margin: "20px", padding: "10px", border: "1px solid gray" }}>
-            <h3>Backend Integration Test</h3>
+          {import.meta.env.DEV && (
+            <div style={{ margin: "20px", padding: "10px", border: "1px solid gray" }}>
+              <h3>Backend Integration Test</h3>
 
-            <input
-              type="file"
-              accept=".mp4,.avi,.mov"
-              onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
-            />
+              <input
+                type="file"
+                accept=".mp4,.avi,.mov"
+                onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
+              />
 
-            <button onClick={handleUpload}>Upload Video</button>
-            <p>Status: {jobStatus}</p>
+              <button onClick={handleUpload}>Upload Video</button>
+              <p>Status: {jobStatus}</p>
 
-            {jobStatus === "processing" && <p>Processing video...</p>}
-            {jobStatus === "done" && <p>Processing completed successfully.</p>}
-            {jobStatus === "failed" && <p>{jobError}</p>}
+              {jobStatus === "processing" && <p>Processing video...</p>}
+              {jobStatus === "done" && <p>Processing completed successfully.</p>}
+              {jobStatus === "failed" && <p>{jobError}</p>}
 
-            {jobStatus === "partial" && (
-              <button onClick={handleUpload}>Retry</button>
-            )}
-            <p>{uploadStatus}</p>
+              {jobStatus === "partial" && (
+                <button onClick={handleUpload}>Retry</button>
+              )}
+              <p>{uploadStatus}</p>
 
-            {jobs.map((job) => (
-              <div key={job.job_id}>
-                <p>Job ID: {job.job_id}</p>
-                <p>Status: {job.status}</p>
-              </div>
-            ))}
-          </div>
-
+              {jobs.map((job) => (
+                <div key={job.job_id}>
+                  <p>Job ID: {job.job_id}</p>
+                  <p>Status: {job.status}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          
           {/* Live Clock */}
           <div className="bg-white rounded-xl shadow-sm border px-4 py-3 flex items-center justify-between gap-3">
             <div className="flex-1">
@@ -1056,7 +913,6 @@ export default function PlayerPerformance() {
                   type="button"
                   size="sm"
                   onClick={() => {
-                    console.log("navigating to add-player");
                     navigate("/add-player");
                   }}
                   className="bg-green-600 hover:bg-green-700 text-white"
@@ -1124,7 +980,7 @@ export default function PlayerPerformance() {
 
             <StatCard
               title="Total Goals"
-              value={filteredPlayers.reduce((sum, p) => sum + p.stats.goals, 0)}
+              value={formatStat(totalGoals)}
               icon={Target}
               color="green"
               trend="up"
@@ -1134,15 +990,10 @@ export default function PlayerPerformance() {
 
             <StatCard
               title="Avg Efficiency"
-              value={`${filteredPlayers.length > 0
-                ? Math.round(
-                  filteredPlayers.reduce(
-                    (sum, p) => sum + p.stats.efficiency,
-                    0,
-                  ) / filteredPlayers.length,
-                )
-                : 0
-                }%`}
+              value={formatStat(
+                averageEfficiency === null ? null : Math.round(averageEfficiency),
+                "%",
+              )}
               icon={Activity}
               color="purple"
               trend="stable"
@@ -1152,10 +1003,7 @@ export default function PlayerPerformance() {
 
             <StatCard
               title="Total Disposals"
-              value={filteredPlayers.reduce(
-                (sum, p) => sum + p.stats.disposals,
-                0,
-              )}
+              value={formatStat(totalDisposals)}
               icon={BarChart3}
               color="orange"
               trend="up"
@@ -1219,8 +1067,11 @@ export default function PlayerPerformance() {
                 key={player.id}
                 player={player}
                 isSelected={selectedPlayer.id === player.id}
+                isFavorite={isFavoritePlayer(player.id)}
+                isDeleting={deletingPlayerId === player.id}
                 onClick={() => setSelectedPlayer(player)}
-                onDelete={handleDeletePlayer}
+                onToggleFavorite={(event) => toggleFavoritePlayer(event, player)}
+                onDelete={() => handleDeletePlayer(player.id)}
               />
             ))}
           </div>
@@ -1286,13 +1137,13 @@ export default function PlayerPerformance() {
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="bg-blue-50 p-3 rounded-lg">
                       <div className="text-2xl font-bold text-blue-600">
-                        {selectedPlayer.stats.goals}
+                        {formatStat(selectedPlayer.stats.goals)}
                       </div>
                       <div className="text-xs text-gray-600">GOALS</div>
                     </div>
                     <div className="bg-green-50 p-3 rounded-lg">
                       <div className="text-2xl font-bold text-green-600">
-                        {selectedPlayer.stats.disposals}
+                        {formatStat(selectedPlayer.stats.disposals)}
                       </div>
                       <div className="text-xs text-gray-600">DISPOSALS</div>
                     </div>
@@ -1302,11 +1153,12 @@ export default function PlayerPerformance() {
                     <div className="flex justify-between text-sm">
                       <span>GOAL ACCURACY</span>
                       <span className="font-semibold">
-                        {selectedPlayer.stats.goalAccuracy}%
+                        {formatStat(selectedPlayer.stats.goalAccuracy, "%")}
                       </span>
                     </div>
+                    {/* An empty bar for "not measured", not one filled to 0. */}
                     <Progress
-                      value={selectedPlayer.stats.goalAccuracy}
+                      value={selectedPlayer.stats.goalAccuracy ?? 0}
                       className="h-2"
                     />
                   </div>
@@ -1315,11 +1167,11 @@ export default function PlayerPerformance() {
                     <div className="flex justify-between text-sm">
                       <span>EFFICIENCY</span>
                       <span className="font-semibold">
-                        {selectedPlayer.stats.efficiency}%
+                        {formatStat(selectedPlayer.stats.efficiency, "%")}
                       </span>
                     </div>
                     <Progress
-                      value={selectedPlayer.stats.efficiency}
+                      value={selectedPlayer.stats.efficiency ?? 0}
                       className="h-2"
                     />
                   </div>
@@ -1370,7 +1222,16 @@ export default function PlayerPerformance() {
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
-                    {chartType === "possession" && (
+                    {chartType === "possession" &&
+                      selectedPlayer.possessionData.length === 0 && (
+                        <NoChartData
+                          className="h-full"
+                          message="Possession over time hasn't been recorded for this player."
+                        />
+                      )}
+
+                    {chartType === "possession" &&
+                      selectedPlayer.possessionData.length > 0 && (
                       <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={selectedPlayer.possessionData}>
                           <CartesianGrid strokeDasharray="3 3" />
@@ -1438,42 +1299,42 @@ export default function PlayerPerformance() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <StatCard
                   title="Kicks"
-                  value={selectedPlayer.stats.kicks}
+                  value={formatStat(selectedPlayer.stats.kicks)}
                   color="blue"
                 />
                 <StatCard
                   title="Handballs"
-                  value={selectedPlayer.stats.handballs}
+                  value={formatStat(selectedPlayer.stats.handballs)}
                   color="green"
                 />
                 <StatCard
                   title="Marks"
-                  value={selectedPlayer.stats.marks}
+                  value={formatStat(selectedPlayer.stats.marks)}
                   color="purple"
                 />
                 <StatCard
                   title="Tackles"
-                  value={selectedPlayer.stats.tackles}
+                  value={formatStat(selectedPlayer.stats.tackles)}
                   color="red"
                 />
                 <StatCard
                   title="Contested"
-                  value={selectedPlayer.stats.contested}
+                  value={formatStat(selectedPlayer.stats.contested)}
                   color="orange"
                 />
                 <StatCard
                   title="Uncontested"
-                  value={selectedPlayer.stats.uncontested}
+                  value={formatStat(selectedPlayer.stats.uncontested)}
                   color="yellow"
                 />
                 <StatCard
                   title="Inside 50s"
-                  value={selectedPlayer.stats.inside50s}
+                  value={formatStat(selectedPlayer.stats.inside50s)}
                   color="pink"
                 />
                 <StatCard
                   title="Clangers"
-                  value={selectedPlayer.stats.clangers}
+                  value={formatStat(selectedPlayer.stats.clangers)}
                   color="gray"
                 />
               </div>
@@ -1485,6 +1346,10 @@ export default function PlayerPerformance() {
                   <CardTitle>Recent Form (Last 10 Games)</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {selectedPlayer.form.length === 0 ? (
+                    <NoChartData message="Match-by-match form scores haven't been recorded for this player." />
+                  ) : (
+                  <>
                   <div className="grid grid-cols-10 gap-2 mb-4">
                     {selectedPlayer.form.map((score, index) => (
                       <div key={index} className="text-center">
@@ -1525,6 +1390,8 @@ export default function PlayerPerformance() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
+                  </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -1535,6 +1402,9 @@ export default function PlayerPerformance() {
                   <CardTitle>Field Position Heat Map</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {selectedPlayer.heatMap.length === 0 ? (
+                    <NoChartData message="Touches by field zone haven't been recorded for this player." />
+                  ) : (
                   <div className="space-y-4">
                     {selectedPlayer.heatMap.map((zone, index) => (
                       <div key={index} className="space-y-2">
@@ -1568,6 +1438,7 @@ export default function PlayerPerformance() {
                       </div>
                     ))}
                   </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -1576,7 +1447,7 @@ export default function PlayerPerformance() {
               <PlayerComparison
                 players={players}
                 selectedPlayer1={selectedPlayer}
-                selectedPlayer2={comparisonPlayer}
+                selectedPlayer2={comparisonPlayer ?? undefined}
                 onPlayerSelect={(player, position) => {
                   if (position === 1) {
                     setSelectedPlayer(player);

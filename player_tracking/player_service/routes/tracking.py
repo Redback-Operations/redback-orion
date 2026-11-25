@@ -1,22 +1,29 @@
-import sys
 import uuid
 import shutil
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import config
-
-sys.path.insert(0, str(config.TRACKING_SCRIPT_DIR))
-from track import Tracking
+from tracks import get_tracks
+from analysis_pipeline.tracking_json import to_legacy_json
 
 router = APIRouter()
-_tracker = None
 
 
-def get_tracker():
-    global _tracker
-    if _tracker is None:
-        _tracker = Tracking(model_path=str(config.MODEL_PATH), confidence_threshold=0.3)
-    return _tracker
+def run_tracking(video_path: Path, tracks_dir: Path, key: str) -> dict:
+    """Track players with the analysis pipeline and return the /tracking response."""
+    from analysis_pipeline.detect_and_track import run
+
+    info = run(
+        video_path,
+        model_path=config.ensure_model(),
+        tracker=config.TRACKER_CONFIG,
+        conf=config.TRACKING_CONFIDENCE,
+        out_dir=tracks_dir,
+        stem=key,
+    )
+    result = to_legacy_json(info["csv"], info)
+    result["video_url"] = f"/outputs/{tracks_dir.name}/{info['video'].name}"
+    return result
 
 
 @router.post("/tracking")
@@ -26,19 +33,14 @@ async def player_tracking(video: UploadFile = File(...)):
 
     job_id = str(uuid.uuid4())
     video_path = config.UPLOADS_DIR / f"{job_id}_{Path(video.filename).name}"
-    output_video = config.OUTPUTS_DIR / f"{job_id}_tracking.mp4"
 
     with open(video_path, "wb") as f:
         shutil.copyfileobj(video.file, f)
 
     try:
-        tracker = get_tracker()
-        results = tracker(
-            video_path=str(video_path),
-            output_video=str(output_video),
-            save_json=False
-        )
-        return results
+        return get_tracks(video_path, config.TRACKS_DIR, run_tracking)
+    except config.DownloadError as e:
+        raise HTTPException(status_code=503, detail=f"Tracking model unavailable. {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:

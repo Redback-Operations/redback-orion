@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Search, MapPin, Target } from "lucide-react";
+import { formatStat } from "@/lib/players";
+import MockPlayersBanner from "@/components/MockPlayersBanner";
 
 export default function PlayerPerformanceTab({
   playersState,
@@ -44,6 +46,7 @@ export default function PlayerPerformanceTab({
 
   return (
     <>
+      <MockPlayersBanner />
       {playersLoading ? (
         <Card>
           <CardContent className="py-10 text-center text-gray-600">
@@ -128,7 +131,7 @@ export default function PlayerPerformanceTab({
                       {player.team} ��� {player.position}
                     </div>
                     <div className="text-xs text-green-600 mt-1">
-                      Efficiency: {player.efficiency}%
+                      Efficiency: {formatStat(player.efficiency, "%")}
                     </div>
                   </div>
                 ))}
@@ -299,31 +302,31 @@ export default function PlayerPerformanceTab({
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">
-                      {selectedPlayer.kicks}
+                      {formatStat(selectedPlayer.kicks)}
                     </div>
                     <div className="text-sm text-gray-600">Kicks</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
                     <div className="text-2xl font-bold text-green-600">
-                      {selectedPlayer.handballs}
+                      {formatStat(selectedPlayer.handballs)}
                     </div>
                     <div className="text-sm text-gray-600">Handballs</div>
                   </div>
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
                     <div className="text-2xl font-bold text-purple-600">
-                      {selectedPlayer.marks}
+                      {formatStat(selectedPlayer.marks)}
                     </div>
                     <div className="text-sm text-gray-600">Marks</div>
                   </div>
                   <div className="text-center p-4 bg-orange-50 rounded-lg">
                     <div className="text-2xl font-bold text-orange-600">
-                      {selectedPlayer.tackles}
+                      {formatStat(selectedPlayer.tackles)}
                     </div>
                     <div className="text-sm text-gray-600">Tackles</div>
                   </div>
                   <div className="text-center p-4 bg-red-50 rounded-lg">
                     <div className="text-2xl font-bold text-red-600">
-                      {selectedPlayer.goals}
+                      {formatStat(selectedPlayer.goals)}
                     </div>
                     <div className="text-sm text-gray-600">Goals</div>
                   </div>
@@ -332,31 +335,39 @@ export default function PlayerPerformanceTab({
                     title="Efficiency Rating"
                   >
                     <div className="text-2xl font-bold text-yellow-600">
-                      {selectedPlayer.efficiency}%
+                      {formatStat(selectedPlayer.efficiency, "%")}
                     </div>
                     <div className="text-sm text-gray-600">Efficiency</div>
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10 w-48 bg-gray-800 text-white text-xs rounded-lg p-3 shadow-lg">
-                      <div className="font-bold mb-1">
-                        {selectedPlayer.efficiency >= 90
-                          ? "🏆 Excellent"
-                          : selectedPlayer.efficiency >= 80
-                            ? "⭐ Good"
-                            : selectedPlayer.efficiency >= 70
-                              ? "👍 Average"
-                              : "📈 Needs Improvement"}
-                      </div>
-                      <div>
-                        {selectedPlayer.efficiency >= 90
-                          ? "Elite level performance. Top 10% of all players."
-                          : selectedPlayer.efficiency >= 80
-                            ? "Strong performance. Above average player."
-                            : selectedPlayer.efficiency >= 70
-                              ? "Solid performance. Room to improve."
-                              : "Below average. Focus on consistency."}
-                      </div>
-                      <div className="mt-1 text-yellow-300">
-                        Score: {selectedPlayer.efficiency}/100
-                      </div>
+                      {selectedPlayer.efficiency === null ? (
+                        // Without this, a missing value would fall through
+                        // every check below and read "Needs Improvement".
+                        <div>Efficiency hasn't been measured for this player yet.</div>
+                      ) : (
+                        <>
+                          <div className="font-bold mb-1">
+                            {selectedPlayer.efficiency >= 90
+                              ? "🏆 Excellent"
+                              : selectedPlayer.efficiency >= 80
+                                ? "⭐ Good"
+                                : selectedPlayer.efficiency >= 70
+                                  ? "👍 Average"
+                                  : "📈 Needs Improvement"}
+                          </div>
+                          <div>
+                            {selectedPlayer.efficiency >= 90
+                              ? "Elite level performance. Top 10% of all players."
+                              : selectedPlayer.efficiency >= 80
+                                ? "Strong performance. Above average player."
+                                : selectedPlayer.efficiency >= 70
+                                  ? "Solid performance. Room to improve."
+                                  : "Below average. Focus on consistency."}
+                          </div>
+                          <div className="mt-1 text-yellow-300">
+                            Score: {selectedPlayer.efficiency}/100
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -399,43 +410,27 @@ export default function PlayerPerformanceTab({
                 </div>
 
                 <div className="space-y-4">
-                  {["kicks", "handballs", "marks", "tackles", "goals"].map(
-                    (stat) => (
+                  {(
+                    ["kicks", "handballs", "marks", "tackles", "goals"] as const
+                  ).map((stat) => {
+                    const a = selectedPlayer[stat];
+                    const b = comparisonPlayer[stat];
+                    // Bars are scaled to the bigger value. A stat that wasn't
+                    // measured shows "—" and an empty bar.
+                    const max = Math.max(a ?? 0, b ?? 0, 1);
+
+                    return (
                       <div key={stat} className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="capitalize">{stat}</span>
                           <span>
-                            {
-                              selectedPlayer[
-                                stat as keyof typeof selectedPlayer
-                              ]
-                            }{" "}
-                            vs{" "}
-                            {
-                              comparisonPlayer[
-                                stat as keyof typeof comparisonPlayer
-                              ]
-                            }
+                            {formatStat(a)} vs {formatStat(b)}
                           </span>
                         </div>
                         <div className="flex gap-2">
                           <div className="flex-1">
                             <Progress
-                              value={
-                                ((selectedPlayer[
-                                  stat as keyof typeof selectedPlayer
-                                ] as number) /
-                                  Math.max(
-                                    selectedPlayer[
-                                      stat as keyof typeof selectedPlayer
-                                    ] as number,
-                                    comparisonPlayer[
-                                      stat as keyof typeof comparisonPlayer
-                                    ] as number,
-                                    1,
-                                  )) *
-                                100
-                              }
+                              value={((a ?? 0) / max) * 100}
                               className="h-2"
                             />
                             <div className="text-xs text-gray-600 mt-1">
@@ -444,21 +439,7 @@ export default function PlayerPerformanceTab({
                           </div>
                           <div className="flex-1">
                             <Progress
-                              value={
-                                ((comparisonPlayer[
-                                  stat as keyof typeof comparisonPlayer
-                                ] as number) /
-                                  Math.max(
-                                    selectedPlayer[
-                                      stat as keyof typeof selectedPlayer
-                                    ] as number,
-                                    comparisonPlayer[
-                                      stat as keyof typeof comparisonPlayer
-                                    ] as number,
-                                    1,
-                                  )) *
-                                100
-                              }
+                              value={((b ?? 0) / max) * 100}
                               className="h-2"
                             />
                             <div className="text-xs text-gray-600 mt-1">
@@ -467,8 +448,8 @@ export default function PlayerPerformanceTab({
                           </div>
                         </div>
                       </div>
-                    ),
-                  )}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
