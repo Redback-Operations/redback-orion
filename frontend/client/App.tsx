@@ -189,10 +189,24 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-
-                <Route path="/api-diagnostics" element={<ApiDiagnostics />} />
+                
+              <Route
+                path="/api-diagnostics"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <ApiDiagnostics />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/error-demo"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <ErrorDemo />
+                  </ProtectedRoute>
+                }
+              />
                 <Route path="/about" element={<About />} />
-                <Route path="/error-demo" element={<ErrorDemo />} />
                 <Route path="/stitch" element={<Index />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
