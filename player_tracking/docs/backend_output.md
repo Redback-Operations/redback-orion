@@ -139,7 +139,7 @@ Every field that isn't built yet is present with `null`, so the frontend can cod
 
 ## Timing
 
-Measured 2026-11-27 on `run_pipeline.py` (what `/analyse` will run), on a 5-minute clip of live play (Essendon vs Hawthorn, 1920x1080, 25 fps, 7,502 frames). Machine: Apple M4 Pro laptop, 48 GB RAM, using the Mac GPU (MPS). No stage errors.
+Measured 2026-11-27 on `run_pipeline.py` (what `/analyse` will run), on a 5-minute clip of live play (Essendon vs Hawthorn, 1920x1080, 25 fps, 7,552 frames). Machine: Apple M4 Pro laptop, 48 GB RAM, using the Mac GPU (MPS). No stage errors.
 
 | Stage | Time | Notes |
 |---|---|---|
@@ -158,7 +158,7 @@ What it means:
 - **A 5-minute clip fits in one request, just.** 10 minutes is under the backend's longest current timeout (1000 s for `/path_trajectory` and `/formation`), with little margin. A slower machine (no GPU) would go over.
 - **A full match does not.** At about 2x real time, a full broadcast (roughly 2.5 hours of video) would take around 5 hours. Detection alone would be about 2 hours, far past the 600 s `/tracking` allows today.
 - **Recommendation:** make `/analyse` a background job from the start: `POST /analyse` saves the video and returns a `job_id` straight away; `GET /analyse/{job_id}` returns `{"status": "processing", "progress": 40}` until it's done, then the response above. The backend already works this way with its own jobs (`/status/{job_id}`), so it would poll the player service the same way instead of holding one HTTP request open.
-- **Response size:** `tracking.json` for 5 minutes is 11 MB (7,502 frames, 945 tracks). A full match would be roughly 30 times that, which is a reason to consider leaving `tracking_results` out of the response.
+- **Response size:** `tracking.json` for 5 minutes is 11 MB (7,502 frames with players, 945 tracks). A full match would be roughly 30 times that. `tracking_results` stays in the response for v2 anyway, because `analytics.py` loops over it to work out the dashboard's tracking numbers. Worth revisiting if full-match responses get too big.
 - **Easy speed-up:** heatmaps for very short tracks (a few seconds on screen) are a third of the time and aren't useful. Skipping tracks shorter than, say, 5 seconds would cut that stage sharply. Separate change; not needed for the format.
 
 ## Things the backend should know
