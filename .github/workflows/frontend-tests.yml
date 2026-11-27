@@ -1,0 +1,36 @@
+#The purpose of this workflow is to run frontend tests and generate coverage reports
+name: Frontend Tests
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  frontend-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npx pnpm@10.14.0 install --frozen-lockfile
+      - name: TypeScript validation
+        run: npx pnpm@10.14.0 typecheck
+      - name: Run frontend tests
+        run: npx pnpm@10.14.0 test
+      - name: Generate coverage report
+        run: npx pnpm@10.14.0 test:coverage
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/
+          retention-days: 5
