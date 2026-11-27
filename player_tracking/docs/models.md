@@ -15,7 +15,7 @@ The official model weights are attached to the GitHub `models-v1` release rather
 | `player_ref_best.pt` | PLAYER, REF | Default model for detecting players and referees |
 | `all_teams_best.pt` | CAR, GCS, HAW, CAT, REF, SS, WB | Detecting specific AFL teams and referees |
 | `all_classes_best.pt` | Seven teams, REF, BALL, POST | Experimental detection of teams, ball and goal posts |
-| `yolo_merged_best.pt` | Not documented | Older experimental model used by the legacy tracker |
+| `yolo_merged_best.pt` | CAR, GCS, REF, SS, WB | Older experimental model used by the legacy tracker |
 
 ## 2. Training Information
 
@@ -119,7 +119,8 @@ BALL has limited validation data, with only six validation boxes. More labelled 
 - Referenced by `experiments/track_videos.py`.
 - Associated with the older starter tracker.
 - The tracker is documented in `docs/inventory.md` as superseded by `analysis_pipeline/`.
-- Training dataset, class details and validation metrics are not documented in the current training results.
+- Classes stored in the model weights: CAR, GCS, REF, SS and WB.
+- Training dataset and validation metrics are not documented in the current training results.
 - It is not listed among the three models downloaded by `training/download_models.py`.
 
 Its original training details should be confirmed before using it as a benchmark or treating it as an officially released model.
@@ -160,7 +161,7 @@ The model weights are stored locally in the git-ignored `models/` directory afte
 
 ## 6. Model Storage and Versioning
 
-Official model weights are attached to GitHub releases rather than committed to the repository.
+Official model weights are attached to GitHub releases rather than committed to the repository. The older experimental model `experiments/yolo_merged_best.pt` is an exception: it is committed directly to the repository and is not part of the official `models-v1` release.
 
 - Current release: `models-v1`
 - Download script: `training/download_models.py`
