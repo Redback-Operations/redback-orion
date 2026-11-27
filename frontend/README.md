@@ -12,7 +12,7 @@ frontend/
 │   ├── pages/         One file per route (Index.tsx is the home page)
 │   ├── components/    Shared components; components/ui/ is the Radix-based UI library
 │   ├── lib/           Helpers, including config.ts (backend URL)
-|   ├──tests/          Automated frontend tests
+│   ├──tests/          Automated frontend tests
 │   │   ├── unit/      Tests for individual functions and application logic
 │   │   ├── components/ Tests for React components and user interactions
 │   │   └── setup.ts   Shared test environment setup

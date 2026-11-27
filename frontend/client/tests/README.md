@@ -6,5 +6,5 @@ Component tests react components and their behaviour
 
 
 
-integration tests how multiple components route and application services interacti
+integration tests how multiple components route and application services interact
 
