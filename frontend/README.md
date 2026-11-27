@@ -2,7 +2,7 @@
 
 The React web app for Project Orion. Coaches and analysts log in here, upload match footage, and view the player tracking and crowd monitoring results that the backend sends back.
 
-It's built with React 18, React Router 6, TypeScript, Vite, TailwindCSS 3 and Radix UI. A small Express server runs inside the Vite dev server for the few things that have to stay server-side. Everything runs on one port, **8080**.
+It's built with React 18, React Router 6, TypeScript, Vite, TailwindCSS 3 and Radix UI. Vitest and the React testing library are used for automated frontend testing. A small Express server runs inside the Vite dev server for the few things that have to stay server-side. Everything runs on one port, **8080**.
 
 ## What's in this folder
 
@@ -12,10 +12,15 @@ frontend/
 │   ├── pages/         One file per route (Index.tsx is the home page)
 │   ├── components/    Shared components; components/ui/ is the Radix-based UI library
 │   ├── lib/           Helpers, including config.ts (backend URL)
+│   ├──tests/          Automated frontend tests
+│   │   ├── unit/      Tests for individual functions and application logic
+│   │   ├── components/ Tests for React components and user interactions
+│   │   └── setup.ts   Shared test environment setup
 │   └── App.tsx        Route definitions
 ├── server/            Express server (routes under server/routes/, served at /api/...)
 ├── shared/            Types used by both client and server
 ├── public/            Static files
+├── vitest.config.ts   Frontend testing configuration
 ├── OAUTH_SETUP.md     Google and Apple sign-in setup
 └── AGENTS.md          Notes on the starter template's conventions
 ```
@@ -80,7 +85,59 @@ npx pnpm@10.14.0 build       # production build into dist/
 npx pnpm@10.14.0 start       # run the production build
 npx pnpm@10.14.0 typecheck   # TypeScript check
 npx pnpm@10.14.0 test        # Vitest tests
+npx pnpm@10.14.0 test:watch     # rerun tests when files change
+npx pnpm@10.14.0 test:coverage  # run tests and generate coverage report
 ```
+## Frontend testing
+
+The frontend uses [Vitest](https://vitest.dev/guide/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) for automated testing. Tests run in a simulated browser environment using jsdom, so the backend database and mock services don't need to be running for isolated frontend tests.
+
+### Running tests
+
+From the `frontend/` directory:
+
+```bash
+npx pnpm@10.14.0 install
+npx pnpm@10.14.0 test
+```
+
+To automatically rerun tests when files change:
+
+```bash
+npx pnpm@10.14.0 test:watch
+```
+
+### Adding tests
+
+Tests are located in `client/tests/` and are separated into the following folders:
+
+- unit/ - these are tests for individual functions and application logic.
+- components/ - these are tests for React components, rendering and user interactions.
+
+Use ".test.ts" for TypeScript unit tests and ".test.tsx" for React component tests.
+
+The test environment is configured in `vitest.config.ts`, with shared setup in `client/tests/setup.ts`. The existing `@/` and `@shared/` path aliases can also be used in test files.
+
+please use mock external API requests where possible so that tests can run independently of the backend.
+
+### Code coverage
+
+To generate a code coverage report:
+
+```bash
+npx pnpm@10.14.0 test:coverage
+```
+
+Coverage reports are generated in `coverage/`. Open `coverage/index.html` in your browser to view the percentage of statements, branches, functions and lines covered by the tests.
+
+The coverage/ directory is generated locally and should not be committed to Git. make sure it is included in your 
+gitignore file
+
+### Continuous integration
+
+Frontend tests are automatically run through GitHub Actions using `.github/workflows/frontend-tests.yml` at the repository root.
+
+security checks on python security vulnerabilities and dependencies are done through a security-scan.yml file which also runs seperate to our frontend tests
 
 ## Known limitation: demo data
 
