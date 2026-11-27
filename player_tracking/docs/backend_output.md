@@ -158,7 +158,7 @@ What it means:
 - **A 5-minute clip fits in one request, just.** 10 minutes is under the backend's longest current timeout (1000 s for `/path_trajectory` and `/formation`), with little margin. A slower machine (no GPU) would go over.
 - **A full match does not.** At about 2x real time, a full broadcast (roughly 2.5 hours of video) would take around 5 hours. Detection alone would be about 2 hours, far past the 600 s `/tracking` allows today.
 - **Recommendation:** make `/analyse` a background job from the start: `POST /analyse` saves the video and returns a `job_id` straight away; `GET /analyse/{job_id}` returns `{"status": "processing", "progress": 40}` until it's done, then the response above. The backend already works this way with its own jobs (`/status/{job_id}`), so it would poll the player service the same way instead of holding one HTTP request open.
-- **Response size:** `tracking.json` for 5 minutes is 11 MB (7,502 frames, 945 tracks). A full match would be roughly 30 times that, which is a reason to drop `tracking_results` from the response (open question 2).
+- **Response size:** `tracking.json` for 5 minutes is 11 MB (7,502 frames, 945 tracks). A full match would be roughly 30 times that, which is a reason to consider leaving `tracking_results` out of the response.
 - **Easy speed-up:** heatmaps for very short tracks (a few seconds on screen) are a third of the time and aren't useful. Skipping tracks shorter than, say, 5 seconds would cut that stage sharply. Separate change; not needed for the format.
 
 ## Things the backend should know
@@ -166,9 +166,3 @@ What it means:
 - **Two dashboard numbers are always 0 today.** `backend/app/routes/analytics.py` reads `player_result.tackle.tackles`, but `/tackle` returns `events`; and it reads `player_result.formation.formations`, but `/formation` returns only `video_url`. So tackle and formation counts show 0 whatever the video. With `/analyse`, tackles move to `events.tackles`; `analytics.py` needs that one-line change when the backend switches.
 - **Distances differ slightly between two modules.** `movement_metrics` and `workload_heatmaps` each convert pixels to metres their own way. `/analyse` takes distance and speed from `movement_metrics` only, and workload score and fatigue from `workload_heatmaps`, so each number has one source.
 - **No change is needed in the backend until it chooses to switch.** The existing endpoints keep working.
-
-## Open questions for Henry and Luke
-
-1. Is `players[]` per track (as above) fine for v2, or does the frontend need per real player first? Per player needs the identity stage (Sprint 3).
-2. Should `tracking.tracking_results` stay in the response? It's most of the payload size. The dashboard only needs the summary counts `analytics.py` already computes, plus `tracking.video_url`.
-3. Full matches need `/analyse` to be a background job (start, then poll `GET /analyse/{job_id}`); see Timing. Is that acceptable for v2, or should v2 stay with short clips and one blocking request?
