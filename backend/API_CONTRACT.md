@@ -807,29 +807,19 @@ POST /upload
       v
    job_id
       |
-      +------> GET /status/{job_id}
+      +------> GET /api/status/{job_id}
       |
-      +------> GET /analysis/{job_id}
+      +------> GET /api/analysis/{job_id}
       |
-      +------> GET /analytics/{job_id}
+      +------> GET /api/analytics/{job_id}
       |
-      +------> GET /player-tracking/{job_id}
+      +------> GET /api/player-tracking/{job_id}
       |
-      +------> GET /crowd/{job_id}
+      +------> GET /api/crowd/{job_id}
 ```
 
 
 ## CORS
-
-All three services are configured to accept requests from `http://localhost:3000`. No proxy configuration needed.
-
-| Service | Port | CORS origin |
-|---------|------|-------------|
-| Backend Gateway | 8000 | `http://localhost:3000` |
-| Player Service | 8080 | `*` (all origins) |
-| Crowd Service | 8002 | `http://localhost:3000` |
-
-Allowed methods and headers: all. Credentials: yes.
 
 ---
 
@@ -897,7 +887,7 @@ Error Handling
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 2.0.0 | 2026-11-20 | Append /api/ prefix to relevant HTTP paths GET (/analysis/{job_id}, /analytics{job_id}, /player-tracking/{job_id}, /crowd/{job_id}) POST (/players, /crowd)
+| 1.3.1 | 2026-11-27 | Append /api/ prefix to relevant HTTP paths GET (/analysis/{job_id}, /analytics/{job_id}, /player-tracking/{job_id}, /crowd/{job_id}) POST (/players, /crowd) |
 | 1.3.0 | 2026-05-13 | Player service fully integrated. All result paths now returned as full URLs (no client-side transformation needed). Added `jersey_color`, `formation`, `tackle` to player results. Fixed retry response to return `processing`. Added 409 error to retry. Updated CORS table (all 3 services). Removed stale "do not use paths directly" note. |
 | 1.2.0 | 2026-04-27 | Added confirmed crowd response schema. Added `GET /jobs/{job_id}/heatmap` proxy endpoint. Added split mock flags (`USE_MOCK_PLAYER` / `USE_MOCK_CROWD`). Crowd service integrated and tested end-to-end. |
 | 1.1.0 | 2026-04-13 | Added refresh token flow — `POST /auth/refresh`, `POST /auth/logout`. Updated `/auth/register` and `/auth/login` responses to include `refresh_token`. Updated auth checklist. |
